@@ -9,21 +9,17 @@
 `Optimization <optimization_tutorial.html>`_ ||
 `Save & Load Model <saveloadrun_tutorial.html>`_
 
-Automatic Differentiation with ``torch.autograd``
+使用 ``torch.autograd`` 进行自动微分
 =================================================
 
-When training neural networks, the most frequently used algorithm is
-**back propagation**. In this algorithm, parameters (model weights) are
-adjusted according to the **gradient** of the loss function with respect
-to the given parameter.
+在训练神经网络时，最常用的算法是**反向传播**。
+在这个算法中，参数（模型权重）根据损失函数相对于给定参数的**梯度**进行调整。
 
-To compute those gradients, PyTorch has a built-in differentiation engine
-called ``torch.autograd``. It supports automatic computation of gradient for any
-computational graph.
+为了计算这些梯度，PyTorch 提供了一个内置的微分引擎，称为 ``torch.autograd``。
+它支持对任何计算图自动计算梯度。
 
-Consider the simplest one-layer neural network, with input ``x``,
-parameters ``w`` and ``b``, and some loss function. It can be defined in
-PyTorch in the following manner:
+考虑最简单的单层神经网络，具有输入 ``x``、参数 ``w`` 和 ``b``，以及一些损失函数。
+可以在 PyTorch 中按以下方式定义它：
 """
 
 import torch
@@ -37,48 +33,39 @@ loss = torch.nn.functional.binary_cross_entropy_with_logits(z, y)
 
 
 ######################################################################
-# Tensors, Functions and Computational graph
+# 张量、函数和计算图
 # ------------------------------------------
 #
-# This code defines the following **computational graph**:
+# 这段代码定义了以下**计算图**:
 #
 # .. figure:: /_static/img/basics/comp-graph.png
 #    :alt:
 #
-# In this network, ``w`` and ``b`` are **parameters**, which we need to
-# optimize. Thus, we need to be able to compute the gradients of loss
-# function with respect to those variables. In order to do that, we set
-# the ``requires_grad`` property of those tensors.
+# 在这个网络中，``w`` 和 ``b`` 是**参数**，我们需要对它们进行优化。
+# 因此，我们需要能够计算损失函数相对于这些变量的梯度。为了做到这一点，
+# 我们设置了这些张量的 ``requires_grad`` 属性。
 
 #######################################################################
-# .. note:: You can set the value of ``requires_grad`` when creating a
-#           tensor, or later by using ``x.requires_grad_(True)`` method.
+# .. 提示:: 可在创建tensor的时候配置 ``requires_grad`` 参数,
+# 或在创建后使用 ``x.requires_grad_(True)`` 方法来设置。
 
 #######################################################################
-# A function that we apply to tensors to construct computational graph is
-# in fact an object of class ``Function``. This object knows how to
-# compute the function in the *forward* direction, and also how to compute
-# its derivative during the *backward propagation* step. A reference to
-# the backward propagation function is stored in ``grad_fn`` property of a
-# tensor. You can find more information of ``Function`` `in the
-# documentation <https://pytorch.org/docs/stable/autograd.html#function>`__.
-#
+# 我们应用于张量以构建计算图的函数实际上是 ``Function`` 类的对象。
+# 这个对象知道如何在*前向*方向计算函数，也知道如何在*反向传播*步骤中计算其导数。
+# 对于反向传播函数的引用存储在张量的 ``grad_fn``` 属性中。
+# 您可以在`文档 <https://pytorch.org/docs/stable/autograd.html#function>`__ 中找到有关 ``Function`` 的更多信息。
 
 print(f"Gradient function for z = {z.grad_fn}")
 print(f"Gradient function for loss = {loss.grad_fn}")
 
 ######################################################################
-# Computing Gradients
+# 计算梯度
 # -------------------
 #
-# To optimize weights of parameters in the neural network, we need to
-# compute the derivatives of our loss function with respect to parameters,
-# namely, we need :math:`\frac{\partial loss}{\partial w}` and
-# :math:`\frac{\partial loss}{\partial b}` under some fixed values of
-# ``x`` and ``y``. To compute those derivatives, we call
-# ``loss.backward()``, and then retrieve the values from ``w.grad`` and
-# ``b.grad``:
-#
+# 为了优化神经网络中的参数权重，我们需要计算损失函数相对于参数的导数，
+# 即在某些固定的 ``x`` 和 ``y`` 值下，我们需要 `\frac{\partial loss}{\partial w}`
+# 和 `\frac{\partial loss}{\partial b}`。要计算这些导数，我们调用 ``loss.backward()``，
+# 然后从 ``w.grad`` 和 ``b.grad`` 中检索值：
 
 loss.backward()
 print(w.grad)
@@ -86,30 +73,22 @@ print(b.grad)
 
 
 ######################################################################
-# .. note::
-#   - We can only obtain the ``grad`` properties for the leaf
-#     nodes of the computational graph, which have ``requires_grad`` property
-#     set to ``True``. For all other nodes in our graph, gradients will not be
-#     available.
-#   - We can only perform gradient calculations using
-#     ``backward`` once on a given graph, for performance reasons. If we need
-#     to do several ``backward`` calls on the same graph, we need to pass
-#     ``retain_graph=True`` to the ``backward`` call.
+# .. 提示::
+#   - 我们只能获取计算图的叶节点 ``grad`` 属性，这些叶节点的 ``requires_grad`` 属性设置为 ``True``。
+#     对于计算图中的所有其他节点，梯度将不可用。
+#   - 出于性能原因，我们只能在给定的计算图上执行一次 ``backward`` 梯度计算。如果我们需要在同一图上进行多次
+#     ``backward`` 调用，我们需要在 ``backward`` 调用中传递 ``retain_graph=True``。
 #
 
 
 ######################################################################
-# Disabling Gradient Tracking
+# 禁用梯度跟踪
 # ---------------------------
 #
-# By default, all tensors with ``requires_grad=True`` are tracking their
-# computational history and support gradient computation. However, there
-# are some cases when we do not need to do that, for example, when we have
-# trained the model and just want to apply it to some input data, i.e. we
-# only want to do *forward* computations through the network. We can stop
-# tracking computations by surrounding our computation code with
-# ``torch.no_grad()`` block:
-#
+# 默认情况下，所有具有 ``requires_grad=True`` 的张量都在跟踪它们的计算历史并支持梯度计算。
+# 然而，有些情况下我们不需要这样做，例如，当我们已经训练好模型并只想将其应用于一些输入数据时，
+# 即我们只想通过网络进行*前向*计算。
+# 我们可以通过将我们的计算代码包裹在 ``torch.no_grad()`` 块中来停止跟踪计算：
 
 z = torch.matmul(x, w)+b
 print(z.requires_grad)
@@ -120,63 +99,52 @@ print(z.requires_grad)
 
 
 ######################################################################
-# Another way to achieve the same result is to use the ``detach()`` method
-# on the tensor:
-#
+# 另一种实现相同结果的方法是对张量使用 ``detach()`` 方法：
 
 z = torch.matmul(x, w)+b
 z_det = z.detach()
 print(z_det.requires_grad)
 
 ######################################################################
-# There are reasons you might want to disable gradient tracking:
-#   - To mark some parameters in your neural network as **frozen parameters**.
-#   - To **speed up computations** when you are only doing forward pass, because computations on tensors that do
-#     not track gradients would be more efficient.
+# 希望禁用梯度跟踪的原因可能如下：
+# - 将神经网络中的某些参数标记为**冻结参数**。
+# - 在仅进行前向传递时**加速计算**，因为不跟踪梯度的张量上的计算会更高效。
 
 
 ######################################################################
 
 ######################################################################
-# More on Computational Graphs
+# 更多关于计算图
 # ----------------------------
-# Conceptually, autograd keeps a record of data (tensors) and all executed
-# operations (along with the resulting new tensors) in a directed acyclic
-# graph (DAG) consisting of
-# `Function <https://pytorch.org/docs/stable/autograd.html#torch.autograd.Function>`__
-# objects. In this DAG, leaves are the input tensors, roots are the output
-# tensors. By tracing this graph from roots to leaves, you can
-# automatically compute the gradients using the chain rule.
 #
-# In a forward pass, autograd does two things simultaneously:
+# 概念上，autograd 在一个由 `Function <https://pytorch.org/docs/stable/autograd.html#torch.autograd.Function>`__ 对象
+# 组成的有向无环图 (DAG) 中记录数据（张量）和所有执行的操作（以及产生的新张量）。
+# 在这个 DAG 中，叶子节点是输入张量，根节点是输出张量。通过从根到叶跟踪这个图，可以使用链式法则自动计算梯度。
 #
-# - run the requested operation to compute a resulting tensor
-# - maintain the operation’s *gradient function* in the DAG.
+# 在前向传递中，autograd 同时做两件事：
 #
-# The backward pass kicks off when ``.backward()`` is called on the DAG
-# root. ``autograd`` then:
+# - 执行请求的操作以计算结果张量
+# - 在 DAG 中维护操作的*梯度函数*。
 #
-# - computes the gradients from each ``.grad_fn``,
-# - accumulates them in the respective tensor’s ``.grad`` attribute
-# - using the chain rule, propagates all the way to the leaf tensors.
+# 当在 DAG 根节点上调用 ``.backward()`` 时，反向传递开始。然后，``autograd``：
 #
-# .. note::
-#   **DAGs are dynamic in PyTorch**
-#   An important thing to note is that the graph is recreated from scratch; after each
-#   ``.backward()`` call, autograd starts populating a new graph. This is
-#   exactly what allows you to use control flow statements in your model;
-#   you can change the shape, size and operations at every iteration if
-#   needed.
+# - 从每个 ```.grad_fn``` 计算梯度，
+# - 将它们累积到各自张量的 ```.grad`` 属性中，
+# - 使用链式法则，一直传播到叶子张量。
+#
+# .. 提示::
+#   **PyTorch中的DAGs 是动态的**
+#   需要注意的一点是，计算图是从头开始重新创建的；在每次调用
+#   ``.backward()`` 之后，autograd 会开始填充一个新的计算图。
+#   这正是允许您在模型中使用控制流语句的原因；如果需要，您可以在每次迭代中更改形状、大小和操作。
 
 ######################################################################
-# Optional Reading: Tensor Gradients and Jacobian Products
+# 可选阅读：张量梯度(Tensor Gradients)和雅可比乘积(Jacobian Products)
 # --------------------------------------------------------
 #
-# In many cases, we have a scalar loss function, and we need to compute
-# the gradient with respect to some parameters. However, there are cases
-# when the output function is an arbitrary tensor. In this case, PyTorch
-# allows you to compute so-called **Jacobian product**, and not the actual
-# gradient.
+# 在很多情况下，我们有一个标量损失函数，需要计算相对于某些参数的梯度。
+# 然而，也有一些情况下，输出函数是一个任意的张量。在这种情况下，PyTorch 允许您计算所谓的**雅可比乘积**，
+# 而不是实际的梯度。
 #
 # For a vector function :math:`\vec{y}=f(\vec{x})`, where
 # :math:`\vec{x}=\langle x_1,\dots,x_n\rangle` and
