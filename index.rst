@@ -301,14 +301,14 @@ Welcome to PyTorch Tutorials
    :tags: Reinforcement-Learning
 
 .. customcarditem::
-   :header: Reinforcement Learning (PPO) with TorchRL
+   :header: 使用TorchRL进行强化学习（PPO）
    :card_description: Learn how to use PyTorch and TorchRL to train a Proximal Policy Optimization agent on the Inverted Pendulum task from Gym.
    :image: _static/img/invpendulum.gif
    :link: intermediate/reinforcement_ppo.html
    :tags: Reinforcement-Learning
 
 .. customcarditem::
-   :header: Train a Mario-playing RL Agent
+   :header: 训练一个马里奥游戏的 RL Agent
    :card_description: Use PyTorch to train a Double Q-learning agent to play Mario.
    :image: _static/img/mario.gif
    :link: intermediate/mario_rl_tutorial.html
