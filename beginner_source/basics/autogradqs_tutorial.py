@@ -9,7 +9,7 @@
 `Optimization <optimization_tutorial.html>`_ ||
 `Save & Load Model <saveloadrun_tutorial.html>`_
 
-使用 ``torch.autograd`` 进行自动微分
+``torch.autograd`` 自动微分
 =================================================
 
 在训练神经网络时，最常用的算法是**反向传播**。

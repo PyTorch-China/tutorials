@@ -13,6 +13,11 @@ Save and Load the Model
 ============================
 
 In this section we will look at how to persist model state with saving, loading and running model predictions.
+
+保存和加载模型
+============================
+
+在本节中，我们将学习如何通过保存、加载以及运行模型预测，来持久化模型。
 """
 
 import torch
@@ -20,45 +25,42 @@ import torchvision.models as models
 
 
 #######################################################################
-# Saving and Loading Model Weights
+# 保存和加载模型权重
 # --------------------------------
-# PyTorch models store the learned parameters in an internal
-# state dictionary, called ``state_dict``. These can be persisted via the ``torch.save``
-# method:
+# PyTorch模型将学习到的参数存储在一个内部状态字典中，称为``state_dict``。这些参数可以通过``torch.save``进行持久化。
+# 方法:
 
 model = models.vgg16(weights='IMAGENET1K_V1')
 torch.save(model.state_dict(), 'model_weights.pth')
 
 ##########################
-# To load model weights, you need to create an instance of the same model first, and then load the parameters
-# using ``load_state_dict()`` method.
+# 要加载模型权重，您需要先创建一个相同模型的实例，然后使用``load_state_dict()``方法加载参数。
 
 model = models.vgg16() # we do not specify ``weights``, i.e. create untrained model
 model.load_state_dict(torch.load('model_weights.pth'))
 model.eval()
 
 ###########################
-# .. note:: be sure to call ``model.eval()`` method before inferencing to set the dropout and batch normalization layers to evaluation mode. Failing to do this will yield inconsistent inference results.
+# 。。 注意:: 在进行推理之前，请确保调用``model.eval()``方法以将 dropout 和 batch normalization layers设置为评估模式。如果不这样做，将导致不一致的推理结果。
 
 #######################################################################
-# Saving and Loading Models with Shapes
+# 保存和加载带有结构的模型
 # -------------------------------------
-# When loading model weights, we needed to instantiate the model class first, because the class
-# defines the structure of a network. We might want to save the structure of this class together with
-# the model, in which case we can pass ``model`` (and not ``model.state_dict()``) to the saving function:
+# 在加载模型权重时，我们需要先实例化模型类，因为类定义了网络的结构。我们可能希望将这个类的结构与模型一起保存，
+# 在这种情况下，我们可以将``model``（而不是``model.state_dict()``）传递给 save 函数：
 
 torch.save(model, 'model.pth')
 
 ########################
-# We can then load the model like this:
+# 我们可以使用如下方式加载模型: 
 
 model = torch.load('model.pth')
 
 ########################
-# .. note:: This approach uses Python `pickle <https://docs.python.org/3/library/pickle.html>`_ module when serializing the model, thus it relies on the actual class definition to be available when loading the model.
+# .. 注意:: 这种方法在序列化模型时使用 Python 的 `pickle <https://docs.python.org/3/library/pickle.html>`_模块，因此在加载模型时需要依赖实际的类定义。
 
 #######################
-# Related Tutorials
+# 相关教程
 # -----------------
-# - `Saving and Loading a General Checkpoint in PyTorch <https://pytorch.org/tutorials/recipes/recipes/saving_and_loading_a_general_checkpoint.html>`_
-# - `Tips for loading an nn.Module from a checkpoint <https://pytorch.org/tutorials/recipes/recipes/module_load_state_dict_tips.html?highlight=loading%20nn%20module%20from%20checkpoint>`_
+# - `PyTorch 中保存和加载通用Checkpoint <https://pytorch.org/tutorials/recipes/recipes/saving_and_loading_a_general_checkpoint.html>`_
+# - `从 checkpoint 加载 nn.Module 的实用技巧 <https://pytorch.org/tutorials/recipes/recipes/module_load_state_dict_tips.html?highlight=loading%20nn%20module%20from%20checkpoint>`_

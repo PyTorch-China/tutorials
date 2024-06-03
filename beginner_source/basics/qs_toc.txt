@@ -1,8 +1,8 @@
-| 0. `Quickstart <quickstart_tutorial.html>`_
-| 1. `Tensors <tensorqs_tutorial.html>`_
-| 2. `Datasets and DataLoaders <data_tutorial.html>`_
+| 0. `快速入门 <quickstart_tutorial.html>`_
+| 1. `张量(Tensors) <tensorqs_tutorial.html>`_
+| 2. `数据集(Dataset)与数据加载器(DataLoader) <data_tutorial.html>`_
 | 3. `Transforms <transforms_tutorial.html>`_
-| 4. `Build Model <buildmodel_tutorial.html>`_
-| 5. `Automatic Differentiation <autogradqs_tutorial.html>`_
-| 6. `Optimization Loop <optimization_tutorial.html>`_
-| 7. `Save, Load and Use Model <saveloadrun_tutorial.html>`_
+| 4. `构建神经网络 <buildmodel_tutorial.html>`_
+| 5. `自动微分 <autogradqs_tutorial.html>`_
+| 6. `优化模型 <optimization_tutorial.html>`_
+| 7. `保存、加载和使用模型 <saveloadrun_tutorial.html>`_

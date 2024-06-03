@@ -19,32 +19,24 @@ Authors:
 `Dmitry Soshnikov <https://soshnikov.com/>`_,
 `Ari Bornstein <https://github.com/aribornstein/>`_
 
-Most machine learning workflows involve working with data, creating models, optimizing model
-parameters, and saving the trained models. This tutorial introduces you to a complete ML workflow
-implemented in PyTorch, with links to learn more about each of these concepts.
+大多数机器学习工作流涉及处理数据、创建模型、优化模型参数和保存训练好的模型。本教程将向您介绍在PyTorch中实现的完整ML工作流，并提供链接以了解有关这些概念的更多信息。
 
-We'll use the FashionMNIST dataset to train a neural network that predicts if an input image belongs
-to one of the following classes: T-shirt/top, Trouser, Pullover, Dress, Coat, Sandal, Shirt, Sneaker,
-Bag, or Ankle boot.
+我们将使用FashionMNIST数据集来训练一个神经网络，该网络可以预测输入图像是否属于以下类别之一：T恤/上衣、长裤、套头衫、连衣裙、外套、凉鞋、衬衫、运动鞋、包或踝靴。
 
-`This tutorial assumes a basic familiarity with Python and Deep Learning concepts.`
+`本教程假设您对Python和深度学习概念有基本的了解。`
 
+运行教程代码
+--------------
+您可以通过以下几种方式运行本教程：
 
-Running the Tutorial Code
--------------------------
-You can run this tutorial in a couple of ways:
+- **在云端**：这是开始的最简单方式！每个部分的顶部都有一个“在Microsoft Learn中运行”和“在Google Colab中运行”的链接，分别会在Microsoft Learn或Google Colab中打开一个集成的笔记本，提供带有代码的完全托管环境。
+- **本地运行**：此选项需要您首先在本地机器上设置PyTorch和TorchVision（`安装说明 <https://pytorch.org/get-started/locally/>`_）。下载笔记本或将代码复制到您喜欢的IDE中。
 
-- **In the cloud**: This is the easiest way to get started! Each section has a "Run in Microsoft Learn" and "Run in Google Colab" link at the top, which opens an integrated notebook in Microsoft Learn or Google Colab, respectively, with the code in a fully-hosted environment.
-- **Locally**: This option requires you to setup PyTorch and TorchVision first on your local machine (`installation instructions <https://pytorch.org/get-started/locally/>`_). Download the notebook or copy the code into your favorite IDE.
+如何使用本指南
+----------------
+如果您熟悉其他深度学习框架，请先查看`0. 快速入门 <quickstart_tutorial.html>`_，以快速熟悉PyTorch的API。
 
-
-How to Use this Guide
----------------------
-If you're familiar with other deep learning frameworks, check out the `0. Quickstart <quickstart_tutorial.html>`_ first
-to quickly familiarize yourself with PyTorch's API.
-
-If you're new to deep learning frameworks, head right into the first section of our step-by-step guide: `1. Tensors <tensor_tutorial.html>`_.
-
+如果您是深度学习框架的新手，请直接进入我们逐步指南的第一部分：`1. 张量 <tensor_tutorial.html>`_。
 
 .. include:: /beginner_source/basics/qs_toc.txt
 
