@@ -89,7 +89,7 @@ print(y_train.min(), y_train.max())
 #
 # 首先，我们只使用 PyTorch 张量操作创建一个模型。我们假设你已经熟悉神经网络的基础知识。（如果不熟悉，可以在 `course.fast.ai <https://course.fast.ai>`_ 学习。）
 #
-# PyTorch 提供了创建 随机 或 零 填充张量的方法，我们将使用这些方法为一个简单的线性模型创建权重和偏置。
+# PyTorch 提供方法来创建 随机 或 零 填充的张量，我们将使用这些方法为一个简单的线性模型创建权重和偏置。
 # 这些只是常规的张量，有一个非常特别的附加功能：我们告诉 PyTorch 它们需要梯度。PyTorch 会记录在张量上完成的所有操作，以便在反向传播期间 *自动* 计算梯度！
 #
 # 对于权重，我们在初始化 **之后** 设置 ``requires_grad``，因为我们不希望初始化步骤包括在梯度中。（注意，PyTorch 中的尾随 ``_`` 表示操作是在原地执行。）
@@ -107,7 +107,7 @@ bias = torch.zeros(10, requires_grad=True)
 ###############################################################################
 # 由于 PyTorch 能够自动计算梯度，我们可以使用任何标准的 Python 函数（或可调用对象）作为模型！
 # 让我们编写一个简单的矩阵乘法和广播加法，来创建一个简单的线性模型。我们还需要编写一个激活函数 `log_softmax`。
-# PyTorch 提供了许多预先编写的损失函数、激活函数等，你仍可以使用普通的 Python 轻松编写自己的函数。
+# PyTorch 提供了许多预先编写的损失函数、激活函数等，你仍可以使用普通的 Python 编写自己的函数。
 # PyTorch 会为你的函数自动创建 GPU 或矢量化 CPU 代码。
 
 def log_softmax(x):
@@ -118,7 +118,7 @@ def model(xb):
 
 ######################################################################################
 # 在上面的代码中，``@`` 表示矩阵乘法操作。在一个数据批次上调用我们的函数（在本例中为64张图像）。
-# 这就是一次 *前向传递*。请注意，由于我们从随机权重开始，此时我们的预测结果不会比随机来的好。
+# 这就是一次 *前向传递*。请注意，由于我们在开始时设置权重为随机数值，此时预测结果准确性较低。
 
 bs = 64  # batch size
 
@@ -128,7 +128,7 @@ preds[0], preds.shape
 print(preds[0], preds.shape)
 
 ###############################################################################
-# 如你所见，``preds`` 张量不仅包含张量值，还包含梯度函数。我们稍后会用它来进行反向传播。
+# 如你所见，``preds`` 张量不仅包含张量值，还包含梯度函数。在稍后的反向传播过程中会用到它。
 # 
 # 让我们实现 negative log-likelihood 作为损失函数（同样，我们可以只使用标准的 Python）：
 
@@ -147,7 +147,7 @@ print(loss_func(preds, yb))
 
 ###############################################################################
 # 我们还要实现一个函数来计算我们模型的准确率。
-# 对于每个预测，如果具有最大值的索引与目标值匹配，则预测是正确的。
+# 对于每个预测结果，如果具有最大值的索引与目标值匹配，则预测是正确的。
 
 def accuracy(out, yb):
     preds = torch.argmax(out, dim=1)
@@ -159,30 +159,6 @@ def accuracy(out, yb):
 print(accuracy(preds, yb))
 
 ###############################################################################
-# We can now run a training loop.  For each iteration, we will:
-#
-# - select a mini-batch of data (of size ``bs``)
-# - use the model to make predictions
-# - calculate the loss
-# - ``loss.backward()`` updates the gradients of the model, in this case, ``weights``
-#   and ``bias``.
-#
-# We now use these gradients to update the weights and bias.  We do this
-# within the ``torch.no_grad()`` context manager, because we do not want these
-# actions to be recorded for our next calculation of the gradient.  You can read
-# more about how PyTorch's Autograd records operations
-# `here <https://pytorch.org/docs/stable/notes/autograd.html>`_.
-#
-# We then set the
-# gradients to zero, so that we are ready for the next loop.
-# Otherwise, our gradients would record a running tally of all the operations
-# that had happened (i.e. ``loss.backward()`` *adds* the gradients to whatever is
-# already stored, rather than replacing them).
-#
-# .. tip:: You can use the standard python debugger to step through PyTorch
-#    code, allowing you to check the various variable values at each step.
-#    Uncomment ``set_trace()`` below to try it out.
-#
 # 现在可以运行一个训练循环。对于每次迭代：
 #
 # - 选择一个大小为 ``bs`` 的批量数据
@@ -221,37 +197,25 @@ for epoch in range(epochs):
             bias.grad.zero_()
 
 ###############################################################################
-# That's it: we've created and trained a minimal neural network (in this case, a
-# logistic regression, since we have no hidden layers) entirely from scratch!
-#
-# Let's check the loss and accuracy and compare those to what we got
-# earlier. We expect that the loss will have decreased and accuracy to
-# have increased, and they have.
+# 我们已经从零开始创建并训练了一个最小的神经网络（使用逻辑回归，没有隐藏层）。
+# 让我们检查一下损失和准确率，并将它们与之前得到的结果进行比较，预计损失会减少，准确率会提高。
 
 print(loss_func(model(xb), yb), accuracy(model(xb), yb))
 
 ###############################################################################
-# Using ``torch.nn.functional``
+# 使用 ``torch.nn.functional``
 # ------------------------------
 #
-# We will now refactor our code, so that it does the same thing as before, only
-# we'll start taking advantage of PyTorch's ``nn`` classes to make it more concise
-# and flexible. At each step from here, we should be making our code one or more
-# of: shorter, more understandable, and/or more flexible.
+# 现在我们将重构代码，使其与之前做的事情相同，只是我们将开始利用 PyTorch 的 ``nn`` 类，使其更简洁和灵活。
+# 从这里开始的每一步，都让我们的代码变得更短、更易理解和更灵活。
 #
-# The first and easiest step is to make our code shorter by replacing our
-# hand-written activation and loss functions with those from ``torch.nn.functional``
-# (which is generally imported into the namespace ``F`` by convention). This module
-# contains all the functions in the ``torch.nn`` library (whereas other parts of the
-# library contain classes). As well as a wide range of loss and activation
-# functions, you'll also find here some convenient functions for creating neural
-# nets, such as pooling functions. (There are also functions for doing convolutions,
-# linear layers, etc, but as we'll see, these are usually better handled using
-# other parts of the library.)
+# 第一步也是最简单的一步是通过用 ``torch.nn.functional``（通常按惯例导入为命名空间 ``F``）
+# 中的激活和损失函数替换我们手写的激活和损失函数，从而使我们的代码更简短。该模块包含 ``torch.nn`` 库中的所有函数。
+# 除了各种损失和激活函数，你还会看到一些创建神经网络的便捷函数，比如池化函数。
+#（还有用于卷积、线性层等的函数，但正如我们将看到的，这些通常更适合使用库的其他模块来处理。）
 #
-# If you're using negative log likelihood loss and log softmax activation,
-# then Pytorch provides a single function ``F.cross_entropy`` that combines
-# the two. So we can even remove the activation function from our model.
+# 如果你使用negative log likelihood loss 和 log softmax activation，那么 PyTorch 提供了一个结合了两者的单一函数 
+# ``F.cross_entropy``。所以我们可以从模型中移除激活函数。
 
 import torch.nn.functional as F
 
@@ -261,25 +225,20 @@ def model(xb):
     return xb @ weights + bias
 
 ###############################################################################
-# Note that we no longer call ``log_softmax`` in the ``model`` function. Let's
-# confirm that our loss and accuracy are the same as before:
+# 我们不再在 ``model`` 函数中调用 ``log_softmax``。查看下损失和准确率是否与之前结果一致：
 
 print(loss_func(model(xb), yb), accuracy(model(xb), yb))
 
 ###############################################################################
-# Refactor using ``nn.Module``
+# 使用 ``nn.Module`` 重构
 # -----------------------------
-# Next up, we'll use ``nn.Module`` and ``nn.Parameter``, for a clearer and more
-# concise training loop. We subclass ``nn.Module`` (which itself is a class and
-# able to keep track of state).  In this case, we want to create a class that
-# holds our weights, bias, and method for the forward step.  ``nn.Module`` has a
-# number of attributes and methods (such as ``.parameters()`` and ``.zero_grad()``)
-# which we will be using.
 #
-# .. note:: ``nn.Module`` (uppercase M) is a PyTorch specific concept, and is a
-#    class we'll be using a lot. ``nn.Module`` is not to be confused with the Python
-#    concept of a (lowercase ``m``) `module <https://docs.python.org/3/tutorial/modules.html>`_,
-#    which is a file of Python code that can be imported.
+# 接下来，我们将使用 ``nn.Module`` 和 ``nn.Parameter``，以实现更清晰和简洁的训练循环。
+# 我们将继承 ``nn.Module``（它本身是一个类，能够跟踪状态）。在这种情况下，我们想创建一个类来保存我们的权重、偏置和forward方法。
+# 我们将会使用 ``nn.Module`` 的属性和方法（例如 ``.parameters()`` 和 ``.zero_grad()``）。
+
+# .. 注意:: ``nn.Module``（大写 M）是 PyTorch 特有的概念，是使用PyTorch过程中大量使用的类。
+# ``nn.Module`` 不要与 Python 概念的（小写 ``m``）`module <https://docs.python.org/3/tutorial/modules.html>`_ 混淆。
 
 from torch import nn
 
@@ -293,22 +252,18 @@ class Mnist_Logistic(nn.Module):
         return xb @ self.weights + self.bias
 
 ###############################################################################
-# Since we're now using an object instead of just using a function, we
-# first have to instantiate our model:
+# 由于我们现在使用的是对象而不是仅仅使用函数，我们首先要创建模型对象：
 
 model = Mnist_Logistic()
 
 ###############################################################################
-# Now we can calculate the loss in the same way as before. Note that
-# ``nn.Module`` objects are used as if they are functions (i.e they are
-# *callable*), but behind the scenes Pytorch will call our ``forward``
-# method automatically.
+# 现在我们可以像之前一样计算损失。请注意，``nn.Module`` 对象可以像函数一样使用（即它们是*可调用的*），
+# PyTorch 会自动调用我们的 ``forward`` 方法。
 
 print(loss_func(model(xb), yb))
 
 ###############################################################################
-# Previously for our training loop we had to update the values for each parameter
-# by name, and manually zero out the grads for each parameter separately, like this:
+# 在之前的训练循环中，我们必须按名称更新每个参数的值，并手动将每个参数的梯度分别清零，如下所示：
 #
 # .. code-block:: python
 #
@@ -319,10 +274,8 @@ print(loss_func(model(xb), yb))
 #        bias.grad.zero_()
 #
 #
-# Now we can take advantage of model.parameters() and model.zero_grad() (which
-# are both defined by PyTorch for ``nn.Module``) to make those steps more concise
-# and less prone to the error of forgetting some of our parameters, particularly
-# if we had a more complicated model:
+# 现在我们可以利用 model.parameters() 和 model.zero_grad()（PyTorch 在 ``nn.Module`` 定义的方法）
+# 来使这些步骤更简洁，防止忘记处理某些参数导致错误，尤其是当我们实现一个更复杂的模型时：
 #
 # .. code-block:: python
 #
@@ -331,8 +284,7 @@ print(loss_func(model(xb), yb))
 #        model.zero_grad()
 #
 #
-# We'll wrap our little training loop in a ``fit`` function so we can run it
-# again later.
+# 将训练循环包装在一个 ``fit`` 函数中，这样可以多次运行它。
 
 def fit():
     for epoch in range(epochs):
@@ -354,20 +306,17 @@ fit()
 
 ###############################################################################
 # Let's double-check that our loss has gone down:
+# 让我们查看下训练后，损失是否下降了：
 
 print(loss_func(model(xb), yb))
 
 ###############################################################################
-# Refactor using ``nn.Linear``
+# 使用 ``nn.Linear`` 重构
 # ----------------------------
 #
-# We continue to refactor our code.  Instead of manually defining and
-# initializing ``self.weights`` and ``self.bias``, and calculating ``xb  @
-# self.weights + self.bias``, we will instead use the Pytorch class
-# `nn.Linear <https://pytorch.org/docs/stable/nn.html#linear-layers>`_ for a
-# linear layer, which does all that for us. Pytorch has many types of
-# predefined layers that can greatly simplify our code, and often makes it
-# faster too.
+# 我们继续重构代码。使用 PyTorch 类 `nn.Linear <https://pytorch.org/docs/stable/nn.html#linear-layers>`_ 来实现线性层，
+# 不再手动定义和初始化 ``self.weights`` 和 ``self.bias``，以及计算 ``xb @ self.weights + self.bias``。
+# PyTorch 具有多种预定义的层，可以大大简化我们的代码，并且提高执行速度。
 
 class Mnist_Logistic(nn.Module):
     def __init__(self):
@@ -378,27 +327,26 @@ class Mnist_Logistic(nn.Module):
         return self.lin(xb)
 
 ###############################################################################
-# We instantiate our model and calculate the loss in the same way as before:
+# 初始化模型对象，并计算损失数值
 
 model = Mnist_Logistic()
 print(loss_func(model(xb), yb))
 
 ###############################################################################
-# We are still able to use our same ``fit`` method as before.
+# 调用 ``fit`` 方法进行训练模型
 
 fit()
 
+# 查看训练结果
 print(loss_func(model(xb), yb))
 
 ###############################################################################
-# Refactor using ``torch.optim``
+# 使用 ``torch.optim`` 重构
 # ------------------------------
 #
-# Pytorch also has a package with various optimization algorithms, ``torch.optim``.
-# We can use the ``step`` method from our optimizer to take a forward step, instead
-# of manually updating each parameter.
-#
-# This will let us replace our previous manually coded optimization step:
+# PyTorch ``torch.optim``包含多种优化算法 。我们可以使用优化器的 ``step`` 方法进行优化步骤，无需手动更新每个参数。
+# 
+# 之前的优化步骤：
 #
 # .. code-block:: python
 #
@@ -406,21 +354,19 @@ print(loss_func(model(xb), yb))
 #        for p in model.parameters(): p -= p.grad * lr
 #        model.zero_grad()
 #
-# and instead use just:
+# 重构为:
 #
 # .. code-block:: python
 #
 #    opt.step()
 #    opt.zero_grad()
 #
-# (``optim.zero_grad()`` resets the gradient to 0 and we need to call it before
-# computing the gradient for the next minibatch.)
+# (在下个训练循环开始前，我们需调用 ``optim.zero_grad()`` 方法，将参数的梯度重置为0。)
 
 from torch import optim
 
 ###############################################################################
-# We'll define a little function to create our model and optimizer so we
-# can reuse it in the future.
+# 定义创建模型和优化器的方法如下:
 
 def get_model():
     model = Mnist_Logistic()
@@ -445,32 +391,26 @@ for epoch in range(epochs):
 print(loss_func(model(xb), yb))
 
 ###############################################################################
-# Refactor using Dataset
+# 使用 Dataset 重构
 # ------------------------------
 #
-# PyTorch has an abstract Dataset class.  A Dataset can be anything that has
-# a ``__len__`` function (called by Python's standard ``len`` function) and
-# a ``__getitem__`` function as a way of indexing into it.
-# `This tutorial <https://pytorch.org/tutorials/beginner/data_loading_tutorial.html>`_
-# walks through a nice example of creating a custom ``FacialLandmarkDataset`` class
-# as a subclass of ``Dataset``.
+# PyTorch 有一个抽象的 Dataset 类。Dataset 可以是任何具有 ``__len__`` 函数（由 Python 的标准 ``len`` 函数调用）
+# 和 ``__getitem__`` 函数（作为索引方式）的对象。
+# `教程 <https://pytorch.org/tutorials/beginner/data_loading_tutorial.html>`_ 详细介绍了创建一个自定义 
+# ``FacialLandmarkDataset`` 类作为 ``Dataset`` 子类的例子。
 #
-# PyTorch's `TensorDataset <https://pytorch.org/docs/stable/_modules/torch/utils/data/dataset.html#TensorDataset>`_
-# is a Dataset wrapping tensors. By defining a length and way of indexing,
-# this also gives us a way to iterate, index, and slice along the first
-# dimension of a tensor. This will make it easier to access both the
-# independent and dependent variables in the same line as we train.
+# PyTorch 的 `TensorDataset <https://pytorch.org/docs/stable/_modules/torch/utils/data/dataset.html#TensorDataset>`_ 
+# 是一个包装张量的 Dataset，为我们提供了一种迭代、索引和沿张量的第一个维度切片的方式，使我们在训练时更容易同时访问自变量和因变量。
 
 from torch.utils.data import TensorDataset
 
 ###############################################################################
-# Both ``x_train`` and ``y_train`` can be combined in a single ``TensorDataset``,
-# which will be easier to iterate over and slice.
+# 使用``TensorDataset`` 对 ``x_train`` 和 ``y_train`` 进行包装， 让我们更容易对数据进行遍历和切片操作。
 
 train_ds = TensorDataset(x_train, y_train)
 
 ###############################################################################
-# Previously, we had to iterate through minibatches of ``x`` and ``y`` values separately:
+# 之前我们需要单独处理 ``x``、``y`` 两组数值。
 #
 # .. code-block:: python
 #
@@ -478,7 +418,7 @@ train_ds = TensorDataset(x_train, y_train)
 #    yb = y_train[start_i:end_i]
 #
 #
-# Now, we can do these two steps together:
+# 现在可以合并处理:
 #
 # .. code-block:: python
 #
@@ -500,13 +440,11 @@ for epoch in range(epochs):
 print(loss_func(model(xb), yb))
 
 ###############################################################################
-# Refactor using ``DataLoader``
+# 使用 ``DataLoader`` 重构
 # ------------------------------
 #
-# PyTorch's ``DataLoader`` is responsible for managing batches. You can
-# create a ``DataLoader`` from any ``Dataset``. ``DataLoader`` makes it easier
-# to iterate over batches. Rather than having to use ``train_ds[i*bs : i*bs+bs]``,
-# the ``DataLoader`` gives us each minibatch automatically.
+# 你可以从任何 ``Dataset`` 创建一个 ``DataLoader``，而后由 ``DataLoader`` 负责对数据分批。
+# 我们不必再去实现分批代码，如 ``train_ds[i*bs : i*bs+bs]``，``DataLoader`` 会自动为我们提供每批数据。
 
 from torch.utils.data import DataLoader
 
@@ -514,7 +452,7 @@ train_ds = TensorDataset(x_train, y_train)
 train_dl = DataLoader(train_ds, batch_size=bs)
 
 ###############################################################################
-# Previously, our loop iterated over batches ``(xb, yb)`` like this:
+# 之前我们编写分批代码如下：
 #
 # .. code-block:: python
 #
@@ -522,7 +460,7 @@ train_dl = DataLoader(train_ds, batch_size=bs)
 #        xb,yb = train_ds[i*bs : i*bs+bs]
 #        pred = model(xb)
 #
-# Now, our loop is much cleaner, as ``(xb, yb)`` are loaded automatically from the data loader:
+# 现在，我们的循环变得更加简洁，``(xb, yb)`` 自动从DataLoader中加载: 
 #
 # .. code-block:: python
 #
@@ -567,6 +505,21 @@ print(loss_func(model(xb), yb))
 # store the gradients). We take advantage of this to use a larger batch
 # size and compute the loss more quickly.
 
+# 通过使用 PyTorch 中 ``nn.Module``、``nn.Parameter``、``Dataset`` 和 ``DataLoader``，
+# 我们实现的训练循代码量并且更容易理解。现在让我们尝试增加一些创建实际有效模型所需的基本功能。
+#
+# 添加验证集
+# -----------------------
+#
+# 在第一部分中，我们只是实现了使用数据进行训练的逻辑。
+# 实际应用中，还需要`验证集 <https://www.fast.ai/2017/11/13/validation-sets/>`_，以确定我们的模型是否存在过拟合问题。
+#
+# 打乱训练数据是 `十分必要的 <https://www.quora.com/Does-the-order-of-training-data-matter-when-training-neural-networks>`_，
+# 以防止批次之间的相关性和过拟合。而验证数据集则无需进此操作，无论打乱与否，验证损失值是相同的，而且打乱操作需要消耗额外的时间，没有实际意义。
+#
+# 我们将为验证集使用的批量大小设为训练集的两倍。因为验证集不需要进行反向传播，因此需要的内存较少（不需要存储梯度）。
+# 因此我我们可以配置较大单批数量，提高计算速度。
+
 train_ds = TensorDataset(x_train, y_train)
 train_dl = DataLoader(train_ds, batch_size=bs, shuffle=True)
 
@@ -574,11 +527,10 @@ valid_ds = TensorDataset(x_valid, y_valid)
 valid_dl = DataLoader(valid_ds, batch_size=bs * 2)
 
 ###############################################################################
-# We will calculate and print the validation loss at the end of each epoch.
-#
-# (Note that we always call ``model.train()`` before training, and ``model.eval()``
-# before inference, because these are used by layers such as ``nn.BatchNorm2d``
-# and ``nn.Dropout`` to ensure appropriate behavior for these different phases.)
+# 我们在每个 epoch 结束时计算并打印损失值。
+# 
+# （请注意，我们在训练之前总是调用 ``model.train()``，在推断之前调用 ``model.eval()``，
+# 因为 ``nn.BatchNorm2d`` 和 ``nn.Dropout`` 层会使用，来确保其结果正确。）
 
 model, opt = get_model()
 
@@ -599,17 +551,12 @@ for epoch in range(epochs):
     print(epoch, valid_loss / len(valid_dl))
 
 ###############################################################################
-# Create fit() and get_data()
+# 创建 fit() 和 get_data()
 # ----------------------------------
 #
-# We'll now do a little refactoring of our own. Since we go through a similar
-# process twice of calculating the loss for both the training set and the
-# validation set, let's make that into its own function, ``loss_batch``, which
-# computes the loss for one batch.
-#
-# We pass an optimizer in for the training set, and use it to perform
-# backprop.  For the validation set, we don't pass an optimizer, so the
-# method doesn't perform backprop.
+# 我们在计算训练集和验证集的损失类似的代码，抽取一个独立的函数 ``loss_batch``，用于计算一个批次的损失。
+# 
+# 训练集传入一个优化器，并使用它执行反向传播，对于验证集，则不传入优化器，不执行反向传播。
 
 
 def loss_batch(model, loss_func, xb, yb, opt=None):
@@ -623,8 +570,7 @@ def loss_batch(model, loss_func, xb, yb, opt=None):
     return loss.item(), len(xb)
 
 ###############################################################################
-# ``fit`` runs the necessary operations to train our model and compute the
-# training and validation losses for each epoch.
+# ``fit `` 在每个训练循环中计算训练和验证损失
 
 import numpy as np
 
@@ -644,7 +590,7 @@ def fit(epochs, model, loss_func, opt, train_dl, valid_dl):
         print(epoch, val_loss)
 
 ###############################################################################
-# ``get_data`` returns dataloaders for the training and validation sets.
+# ``get_data`` 返回训练和验证数据集的DataLoader。
 
 
 def get_data(train_ds, valid_ds, bs):
@@ -654,30 +600,24 @@ def get_data(train_ds, valid_ds, bs):
     )
 
 ###############################################################################
-# Now, our whole process of obtaining the data loaders and fitting the
-# model can be run in 3 lines of code:
+# 现在，我们获取数据加载器和拟合模型的整个过程可以用 3 行代码来实现：
 
 train_dl, valid_dl = get_data(train_ds, valid_ds, bs)
 model, opt = get_model()
 fit(epochs, model, loss_func, opt, train_dl, valid_dl)
 
 ###############################################################################
-# You can use these basic 3 lines of code to train a wide variety of models.
-# Let's see if we can use them to train a convolutional neural network (CNN)!
+# 你可以使用这三行基本代码来训练各种各样的模型。让我们看看是否可以用来训练一个卷积神经网络（CNN）。
 #
-# Switch to CNN
+# CNN
 # -------------
 #
-# We are now going to build our neural network with three convolutional layers.
-# Because none of the functions in the previous section assume anything about
-# the model form, we'll be able to use them to train a CNN without any modification.
+# 现在我们将使用三个卷积层构建我们的神经网络。因为前面部分的函数都不假设任何关于模型形式的东西，
+# 所以我们可以在不做任何修改的情况下使用它们来训练一个 CNN。
 #
-# We will use PyTorch's predefined
-# `Conv2d <https://pytorch.org/docs/stable/nn.html#torch.nn.Conv2d>`_ class
-# as our convolutional layer. We define a CNN with 3 convolutional layers.
-# Each convolution is followed by a ReLU.  At the end, we perform an
-# average pooling.  (Note that ``view`` is PyTorch's version of Numpy's
-# ``reshape``)
+# 我们将使用 PyTorch 预定义的 `Conv2d <https://pytorch.org/docs/stable/nn.html#torch.nn.Conv2d>`_ 类作为我们的卷积层。
+# 我们定义一个具有 3 个卷积层的 CNN。每个卷积层后面跟着一个 ReLU。最后，我们执行平均池化。
+# （注意，``view`` 是 PyTorch 版的 Numpy ``reshape``）
 
 class Mnist_CNN(nn.Module):
     def __init__(self):
@@ -697,9 +637,8 @@ class Mnist_CNN(nn.Module):
 lr = 0.1
 
 ###############################################################################
-# `Momentum <https://cs231n.github.io/neural-networks-3/#sgd>`_ is a variation on
-# stochastic gradient descent that takes previous updates into account as well
-# and generally leads to faster training.
+# `Momentum <https://cs231n.github.io/neural-networks-3/#sgd>`_ 是
+# stochastic gradient descent 的一种变体，通过统计更新记录来提升训练速度
 
 model = Mnist_CNN()
 opt = optim.SGD(model.parameters(), lr=lr, momentum=0.9)
@@ -707,7 +646,7 @@ opt = optim.SGD(model.parameters(), lr=lr, momentum=0.9)
 fit(epochs, model, loss_func, opt, train_dl, valid_dl)
 
 ###############################################################################
-# Using ``nn.Sequential``
+# 使用 ``nn.Sequential``
 # ------------------------
 #
 # ``torch.nn`` has another handy class we can use to simplify our code:
@@ -720,6 +659,10 @@ fit(epochs, model, loss_func, opt, train_dl, valid_dl)
 # have a `view` layer, and we need to create one for our network. ``Lambda``
 # will create a layer that we can then use when defining a network with
 # ``Sequential``.
+# 我们可以使用 ``torch.nn`` 中的 `Sequential <https://pytorch.org/docs/stable/nn.html#torch.nn.Sequential>`_ 类
+# 来帮助我们简化代码。`` Sequential`` 提供了一种更简单的编写神经网络的方式，其会按顺序运行定义中包含的每个模块。
+#
+# 我们可以创建一个 ``自定义层``，例如，PyTorch 没有的 view层：
 
 class Lambda(nn.Module):
     def __init__(self, func):
@@ -734,7 +677,7 @@ def preprocess(x):
     return x.view(-1, 1, 28, 28)
 
 ###############################################################################
-# The model created with ``Sequential`` is simple:
+# 使用 ``Sequential`` 创建模型十分简单：
 
 model = nn.Sequential(
     Lambda(preprocess),
@@ -753,16 +696,15 @@ opt = optim.SGD(model.parameters(), lr=lr, momentum=0.9)
 fit(epochs, model, loss_func, opt, train_dl, valid_dl)
 
 ###############################################################################
-# Wrapping ``DataLoader``
+# 包装 ``DataLoader``
 # -----------------------------
 #
-# Our CNN is fairly concise, but it only works with MNIST, because:
-#  - It assumes the input is a 28\*28 long vector
-#  - It assumes that the final CNN grid size is 4\*4 (since that's the average pooling kernel size we used)
-#
-# Let's get rid of these two assumptions, so our model works with any 2d
-# single channel image. First, we can remove the initial Lambda layer by
-# moving the data preprocessing into a generator:
+# 我们编写的 CNN 十分简洁，但仅适用于MNIST，因为：
+#  - 它假设输入是一个 28 * 28 长的向量
+#  - 它假设最终的 CNN 网格大小是 4 * 4 (我们使用的平均池化核大小)
+
+# 让我们去除这两个假设，使我们的模型适用于任何2D单通道图像。
+# 首先，我们可以通过将数据预处理移到生成器中来删除 Lambda 层:
 
 def preprocess(x, y):
     return x.view(-1, 1, 28, 28), y
@@ -785,10 +727,8 @@ train_dl = WrappedDataLoader(train_dl, preprocess)
 valid_dl = WrappedDataLoader(valid_dl, preprocess)
 
 ###############################################################################
-# Next, we can replace ``nn.AvgPool2d`` with ``nn.AdaptiveAvgPool2d``, which
-# allows us to define the size of the *output* tensor we want, rather than
-# the *input* tensor we have. As a result, our model will work with any
-# size input.
+# 接下来，为了让我们定义我们想要的输出张量的大小，而非 *输入* 张量，我们可以用 `nn.AdaptiveAvgPool2d` 替换 `nn.AvgPool2d`。
+# 从而使我们的模型可适用于任何大小的输入。
 
 model = nn.Sequential(
     nn.Conv2d(1, 16, kernel_size=3, stride=2, padding=1),
@@ -804,29 +744,26 @@ model = nn.Sequential(
 opt = optim.SGD(model.parameters(), lr=lr, momentum=0.9)
 
 ###############################################################################
-# Let's try it out:
+# 让我们查看下结果:
 
 fit(epochs, model, loss_func, opt, train_dl, valid_dl)
 
 ###############################################################################
-# Using your GPU
+# 使用 GPU
 # ---------------
 #
-# If you're lucky enough to have access to a CUDA-capable GPU (you can
-# rent one for about $0.50/hour from most cloud providers) you can
-# use it to speed up your code. First check that your GPU is working in
-# Pytorch:
+# 在拥有 CUDA 的 GPU的环境中，你可以使用它来加速代码。首先检查你的GPU在PyTorch中是否正常工作:
 
 print(torch.cuda.is_available())
 
 ###############################################################################
-# And then create a device object for it:
+# 然后创建 device 对象：
 
 dev = torch.device(
     "cuda") if torch.cuda.is_available() else torch.device("cpu")
 
 ###############################################################################
-# Let's update ``preprocess`` to move batches to the GPU:
+# 修改 ``preprocess`` 步骤，将数据移动至 GPU 上:
 
 
 def preprocess(x, y):
@@ -838,46 +775,33 @@ train_dl = WrappedDataLoader(train_dl, preprocess)
 valid_dl = WrappedDataLoader(valid_dl, preprocess)
 
 ###############################################################################
-# Finally, we can move our model to the GPU.
+# 最后，将模型加载到 GPU 中。
 
 model.to(dev)
 opt = optim.SGD(model.parameters(), lr=lr, momentum=0.9)
 
 ###############################################################################
-# You should find it runs faster now:
+# 运行速度会提升很多：
 
 fit(epochs, model, loss_func, opt, train_dl, valid_dl)
 
 ###############################################################################
-# Closing thoughts
+# 总结
 # -----------------
 #
-# We now have a general data pipeline and training loop which you can use for
-# training many types of models using Pytorch. To see how simple training a model
-# can now be, take a look at the `mnist_sample notebook <https://github.com/fastai/fastai_dev/blob/master/dev_nb/mnist_sample.ipynb>`__.
+# 我们使用 PyTorch 编写了一个可以用于多种模型训练的实现，完整的训练代码
+# `mnist_sample notebook <https://github.com/fastai/fastai_dev/blob/master/dev_nb/mnist_sample.ipynb>`__.
 #
-# Of course, there are many things you'll want to add, such as data augmentation,
-# hyperparameter tuning, monitoring training, transfer learning, and so forth.
-# These features are available in the fastai library, which has been developed
-# using the same design approach shown in this tutorial, providing a natural
-# next step for practitioners looking to take their models further.
+# 后续还可尝试增加其他功能，例如数据增强、超参数调优、监控训练、迁移学习等等。
+# 这些功能在fastai库中都有提供，该库是使用本教程中所示的相同设计方法开发的，为希望进一步改进模型的从业人员提供下一步指导。
 #
-# We promised at the start of this tutorial we'd explain through example each of
-# ``torch.nn``, ``torch.optim``, ``Dataset``, and ``DataLoader``. So let's summarize
-# what we've seen:
+# 我们学习了如何使用
+# ``torch.nn``，``torch.optim``，``Dataset``， and ``DataLoader``。现在让我们总结一下:
 #
 #  - ``torch.nn``:
-#
-#    + ``Module``: creates a callable which behaves like a function, but can also
-#      contain state(such as neural net layer weights). It knows what ``Parameter`` (s) it
-#      contains and can zero all their gradients, loop through them for weight updates, etc.
-#    + ``Parameter``: a wrapper for a tensor that tells a ``Module`` that it has weights
-#      that need updating during backprop. Only tensors with the `requires_grad` attribute set are updated
-#    + ``functional``: a module(usually imported into the ``F`` namespace by convention)
-#      which contains activation functions, loss functions, etc, as well as non-stateful
-#      versions of layers such as convolutional and linear layers.
-#  - ``torch.optim``: Contains optimizers such as ``SGD``, which update the weights
-#    of ``Parameter`` during the backward step
-#  - ``Dataset``: An abstract interface of objects with a ``__len__`` and a ``__getitem__``,
-#    including classes provided with Pytorch such as ``TensorDataset``
-#  - ``DataLoader``: Takes any ``Dataset`` and creates an iterator which returns batches of data.
+#    + ``Module``: 创建一个类似于函数的可调用对象，其中包含了状态数据(如神经网络层权重)。它可以自动对包含的参数，进行梯度归零和更新权重等操作。
+#    + ``Parameter``: 对张量进行包装，使 ``Module`` 对象在进行反向传播时，可更新权重参数(仅设置 `requires_grad=True` 参数时生效)。
+#    + ``functional``: 包含多种激活函数、损失函数，以及无状态的卷积层和线性层等的实现。
+#  - ``torch.optim``: 包含多种优化器，例如 ``SGD``，在反向传播过程中优化权重参数(``Parameter``)。
+#  - ``Dataset``: 对 ``__len__`` 和 a ``__getitem__`` 方法的抽象接口定义，包含 ``TensorDataset`` 等 PyTorch 实现类。
+#  - ``DataLoader``: 对 ``Dataset`` 进行封装，提供分批遍历数据集的能力。
