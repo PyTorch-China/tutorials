@@ -1,4 +1,4 @@
-Real Time Inference on Raspberry Pi 4 (30 fps!)
+在 Raspberry Pi 4 上进行实时推理 (30 fps!)
 =================================================
 **Author**: `Tristan Rice <https://github.com/d4l3k>`_
 
@@ -11,7 +11,7 @@ variant as well as on the 3B with reduced performance.
 
 .. image:: https://user-images.githubusercontent.com/909104/153093710-bc736b6f-69d9-4a50-a3e8-9f2b2c9e04fd.gif
 
-Prerequisites
+准备环境
 ~~~~~~~~~~~~~~~~
 
 To follow this tutorial you'll need a Raspberry Pi 4, a camera for it and all
@@ -25,7 +25,7 @@ the other standard accessories.
 * SD card read/writer
 
 
-Raspberry Pi 4 Setup
+Raspberry Pi 4 设置
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 PyTorch only provides pip packages for Arm 64bit (aarch64) so you'll need to install a 64 bit version of the OS on your Raspberry Pi
@@ -60,7 +60,7 @@ Once that boots and you complete the initial setup you'll need to edit the ``/bo
 
 And then reboot. After you reboot the video4linux2 device ``/dev/video0`` should exist.
 
-Installing PyTorch and OpenCV
+安装 PyTorch 和 OpenCV
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 PyTorch and all the other libraries we need have ARM 64-bit/aarch64 variants so you can just install them via pip and have it work like any other Linux system.
@@ -83,7 +83,7 @@ We can now check that everything installed correctly:
 .. image:: https://user-images.githubusercontent.com/909104/152874271-d7057c2d-80fd-4761-aed4-df6c8b7aa99f.png
 
 
-Video Capture
+视频捕获
 ~~~~~~~~~~~~~~
 
 For video capture we're going to be using OpenCV to stream the video frames
@@ -117,7 +117,7 @@ shuffling to get it into the expected RGB format.
 
 This data reading and processing takes about ``3.5 ms``.
 
-Image Preprocessing
+图片处理
 ~~~~~~~~~~~~~~~~~~~~
 
 We need to take the frames and transform them into the format the model expects. This is the same processing as you would do on any machine with the standard torchvision transforms.
@@ -138,7 +138,7 @@ We need to take the frames and transform them into the format the model expects.
     # [3, 224, 224] -> [1, 3, 224, 224]
     input_batch = input_tensor.unsqueeze(0)
 
-Model Choices
+选择模型
 ~~~~~~~~~~~~~~~
 
 There's a number of models you can choose from to use with different performance
@@ -177,7 +177,7 @@ Raspberry Pi 4 Benchmark Results:
 | shufflenet_v2_x2_0 | 11.6 |                  86.3 |                  82.7 | False              |
 +--------------------+------+-----------------------+-----------------------+--------------------+
 
-MobileNetV2: Quantization and JIT
+MobileNetV2: 量化和 JIT
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 For optimal performance we want a model that's quantized and fused. Quantized
@@ -207,7 +207,7 @@ We then want to jit the model to reduce Python overhead and fuse any ops. Jit gi
 
     net = torch.jit.script(net)
 
-Putting It Together
+总结
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
 We can now put all the pieces together and run it:
@@ -311,7 +311,7 @@ Detecting a mug:
 .. image:: https://user-images.githubusercontent.com/909104/153092155-4b90002f-a0f3-4267-8d70-e713e7b4d5a0.jpg
 
 
-Troubleshooting: Performance
+性能优化
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 PyTorch by default will use all of the cores available. If you have anything
@@ -328,7 +328,7 @@ For ``shufflenet_v2_x1_5`` using ``2 threads`` instead of ``4 threads``
 increases best case latency to ``72 ms`` from ``60 ms`` but eliminates the
 latency spikes of ``128 ms``.
 
-Next Steps
+后续
 ~~~~~~~~~~~~~
 
 You can create your own model or fine tune an existing one. If you fine tune on

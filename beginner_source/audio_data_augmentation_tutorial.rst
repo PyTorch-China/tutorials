@@ -1,4 +1,4 @@
-Audio Data Augmentation
+音频数据增强
 =======================
 
 This tutorial has been moved to https://pytorch.org/audio/stable/tutorials/audio_data_augmentation_tutorial.html

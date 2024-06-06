@@ -1,4 +1,4 @@
-Introduction to Holistic Trace Analysis
+Holistic Trace Analysis 介绍
 =======================================
 
 **Author:** `Anupam Bhatnagar <https://github.com/anupambhatnagar>`_

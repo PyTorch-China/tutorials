@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-TorchVision Object Detection Finetuning Tutorial
+TorchVision 对象检测微调教程
 ====================================================
 """
 

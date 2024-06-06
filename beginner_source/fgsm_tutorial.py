@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Adversarial Example Generation
+对抗样本生成
 ==============================
 
 **Author:** `Nathan Inkawhich <https://github.com/inkawhich>`__

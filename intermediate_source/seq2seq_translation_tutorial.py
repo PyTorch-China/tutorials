@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-NLP From Scratch: Translation with a Sequence to Sequence Network and Attention
+从零开始的自然语言处理：序列到序列网络和注意力机制进行翻译
 *******************************************************************************
 **Author**: `Sean Robertson <https://github.com/spro>`_
 

@@ -1,4 +1,4 @@
-Audio I/O
+音频 I/O
 =========
 
 This tutorial has been moved to https://pytorch.org/audio/stable/tutorials/audio_io_tutorial.html

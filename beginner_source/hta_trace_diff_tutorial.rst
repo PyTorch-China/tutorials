@@ -1,4 +1,4 @@
-Trace Diff using Holistic Trace Analysis
+Holistic Trace Analysis 差异分析
 ========================================
 
 **Author:** `Anupam Bhatnagar <https://github.com/anupambhatnagar>`_

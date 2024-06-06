@@ -1,5 +1,5 @@
 """
-Profiling your PyTorch Module
+PyTorch 模型分析
 -----------------------------
 
 **Author:** `Suraj Subramanian <https://github.com/suraj813>`_

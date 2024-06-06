@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 Deploying PyTorch in Python via a REST API with Flask
+使用 Flask 在 Python 中部署 PyTorch REST API
 ========================================================
 **Author**: `Avinash Sajjanshetty <https://avi.im>`_
 
@@ -16,7 +17,7 @@ serving your PyTorch models, but it will not work for a use case
 with high performance requirements. For that:
 
     - If you're already familiar with TorchScript, you can jump straight into our
-      `Loading a TorchScript Model in C++ <https://pytorch.org/tutorials/advanced/cpp_export.html>`_ tutorial.
+      `在 C++ 中加载 TorchScript 模型 <https://pytorch.org/tutorials/advanced/cpp_export.html>`_ tutorial.
 
     - If you first need a refresher on TorchScript, check out our
       `Intro a TorchScript <https://pytorch.org/tutorials/beginner/Intro_to_TorchScript_tutorial.html>`_ tutorial.
@@ -24,7 +25,7 @@ with high performance requirements. For that:
 
 
 ######################################################################
-# API Definition
+# API 定义
 # --------------
 #
 # We will first define our API endpoints, the request and response types. Our
@@ -39,7 +40,7 @@ with high performance requirements. For that:
 #
 
 ######################################################################
-# Dependencies
+# 依赖
 # ------------
 #
 # Install the required dependencies by running the following command:
@@ -50,7 +51,7 @@ with high performance requirements. For that:
 
 
 ######################################################################
-# Simple Web Server
+# 简单的 Web Server
 # -----------------
 #
 # Following is a simple web server, taken from Flask's documentation
@@ -78,7 +79,7 @@ def predict():
 
 
 ######################################################################
-# Inference
+# 推理
 # -----------------
 #
 # In the next sections we will focus on writing the inference code. This will

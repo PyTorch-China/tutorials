@@ -3,7 +3,7 @@
 `Exporting a PyTorch model to ONNX <export_simple_model_to_onnx_tutorial.html>`_ ||
 `Extending the ONNX Registry <onnx_registry_tutorial.html>`_
 
-Introduction to ONNX
+ONNX 介绍
 ====================
 
 Authors:

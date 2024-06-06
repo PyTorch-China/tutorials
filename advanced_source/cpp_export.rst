@@ -1,4 +1,4 @@
-Loading a TorchScript Model in C++
+在 C++ 中加载 TorchScript 模型
 =====================================
 
 As its name suggests, the primary interface to PyTorch is the Python

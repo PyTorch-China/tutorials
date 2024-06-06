@@ -1,4 +1,4 @@
-Deep Learning with PyTorch: A 60 Minute Blitz
+PyTorch 深度学习：60分钟入门
 ---------------------------------------------
 **Author**: `Soumith Chintala <http://soumith.ch>`_
 

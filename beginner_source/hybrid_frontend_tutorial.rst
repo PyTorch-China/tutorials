@@ -1,4 +1,4 @@
-Hybrid Frontend Tutorials
+Hybrid Frontend 教程
 -------------------------
 **Authors**: `Nathan Inkawhich <https://google.com>`_ and `Matthew Inkawhich <https://github.com/MatthewInkawhich>`_
 

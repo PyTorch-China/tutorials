@@ -1,4 +1,4 @@
-Visualizing Models, Data, and Training with TensorBoard
+TensorBoard 可视化模型、数据和训练
 =======================================================
 
 In the `60 Minute Blitz <https://pytorch.org/tutorials/beginner/deep_learning_60min_blitz.html>`_,

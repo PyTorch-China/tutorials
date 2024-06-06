@@ -1,5 +1,5 @@
 """
-Optimizing Vision Transformer Model for Deployment
+优化视觉 Transformer 模型
 ==================================================
 
 `Jeff Tang <https://github.com/jeffxtang>`_,

@@ -1,5 +1,5 @@
 """
-Introduction to TorchScript
+TorchScript 介绍
 ===========================
 
 **Authors:** James Reed (jamesreed@fb.com), Michael Suo (suo@fb.com), rev2

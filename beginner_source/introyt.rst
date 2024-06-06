@@ -6,7 +6,7 @@
 `Training Models <introyt/trainingyt.html>`_ ||
 `Model Understanding <introyt/captumyt.html>`_
 
-Introduction to PyTorch - YouTube Series
+PyTorch 介绍 - YouTube
 ========================================
 
 Authors: 

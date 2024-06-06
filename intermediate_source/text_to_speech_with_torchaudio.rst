@@ -1,4 +1,4 @@
-Text-to-speech with Tacotron2
+Tacotron2 文本转语音
 =============================
 
 This tutorial has been moved to https://pytorch.org/audio/stable/tutorials/tacotron2_pipeline_tutorial.html

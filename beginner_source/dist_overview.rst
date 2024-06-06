@@ -1,4 +1,4 @@
-PyTorch Distributed Overview
+PyTorch 分布式概述
 ============================
 **Author**: `Shen Li <https://mrshenli.github.io/>`_
 

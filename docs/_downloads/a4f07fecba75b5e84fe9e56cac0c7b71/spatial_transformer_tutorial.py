@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Spatial Transformer Networks Tutorial
+Spatial Transformer Networks 教程
 =====================================
 **Author**: `Ghassen HAMROUNI <https://github.com/GHamrouni>`_
 

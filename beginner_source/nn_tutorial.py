@@ -481,30 +481,6 @@ for epoch in range(epochs):
 print(loss_func(model(xb), yb))
 
 ###############################################################################
-# Thanks to PyTorch's ``nn.Module``, ``nn.Parameter``, ``Dataset``, and ``DataLoader``,
-# our training loop is now dramatically smaller and easier to understand. Let's
-# now try to add the basic features necessary to create effective models in practice.
-#
-# Add validation
-# -----------------------
-#
-# In section 1, we were just trying to get a reasonable training loop set up for
-# use on our training data.  In reality, you **always** should also have
-# a `validation set <https://www.fast.ai/2017/11/13/validation-sets/>`_, in order
-# to identify if you are overfitting.
-#
-# Shuffling the training data is
-# `important <https://www.quora.com/Does-the-order-of-training-data-matter-when-training-neural-networks>`_
-# to prevent correlation between batches and overfitting. On the other hand, the
-# validation loss will be identical whether we shuffle the validation set or not.
-# Since shuffling takes extra time, it makes no sense to shuffle the validation data.
-#
-# We'll use a batch size for the validation set that is twice as large as
-# that for the training set. This is because the validation set does not
-# need backpropagation and thus takes less memory (it doesn't need to
-# store the gradients). We take advantage of this to use a larger batch
-# size and compute the loss more quickly.
-
 # 通过使用 PyTorch 中 ``nn.Module``、``nn.Parameter``、``Dataset`` 和 ``DataLoader``，
 # 我们实现的训练循代码量并且更容易理解。现在让我们尝试增加一些创建实际有效模型所需的基本功能。
 #
@@ -649,16 +625,6 @@ fit(epochs, model, loss_func, opt, train_dl, valid_dl)
 # 使用 ``nn.Sequential``
 # ------------------------
 #
-# ``torch.nn`` has another handy class we can use to simplify our code:
-# `Sequential <https://pytorch.org/docs/stable/nn.html#torch.nn.Sequential>`_ .
-# A ``Sequential`` object runs each of the modules contained within it, in a
-# sequential manner. This is a simpler way of writing our neural network.
-#
-# To take advantage of this, we need to be able to easily define a
-# **custom layer** from a given function.  For instance, PyTorch doesn't
-# have a `view` layer, and we need to create one for our network. ``Lambda``
-# will create a layer that we can then use when defining a network with
-# ``Sequential``.
 # 我们可以使用 ``torch.nn`` 中的 `Sequential <https://pytorch.org/docs/stable/nn.html#torch.nn.Sequential>`_ 类
 # 来帮助我们简化代码。`` Sequential`` 提供了一种更简单的编写神经网络的方式，其会按顺序运行定义中包含的每个模块。
 #

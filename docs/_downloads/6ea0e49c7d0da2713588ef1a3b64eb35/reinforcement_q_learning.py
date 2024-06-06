@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Reinforcement Learning (DQN) Tutorial
+强化学习 (DQN) 教程
 =====================================
 **Author**: `Adam Paszke <https://github.com/apaszke>`_
             `Mark Towers <https://github.com/pseudo-rnd-thoughts>`_

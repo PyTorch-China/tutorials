@@ -1,5 +1,5 @@
 """
-Text classification with the torchtext library
+torchtext 文本分类
 ==============================================
 
 In this tutorial, we will show how to use the torchtext library to build the dataset for the text classification analysis. Users will have the flexibility to

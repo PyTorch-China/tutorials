@@ -1,13 +1,13 @@
-Welcome to PyTorch Tutorials
+欢迎来到 PyTorch 教程
 ============================
 
-**What's new in PyTorch tutorials?**
+**PyTorch 新增教程**
 
-* `Using User-Defined Triton Kernels with torch.compile <https://pytorch.org/tutorials/recipes/torch_compile_user_defined_triton_kernel_tutorial.html>`__
-* `Large Scale Transformer model training with Tensor Parallel (TP) <https://pytorch.org/tutorials/intermediate/TP_tutorial.html>`__
-* `Accelerating BERT with semi-structured (2:4) sparsity <https://pytorch.org/tutorials/advanced/semi_structured_sparse.html>`__
-* `torch.export Tutorial with torch.export.Dim <https://pytorch.org/tutorials/intermediate/torch_export_tutorial.html>`__
-* `Extension points in nn.Module for load_state_dict and tensor subclasses <https://pytorch.org/tutorials/recipes/recipes/swap_tensors.html>`__
+* `使用自定义的 Triton 内核与 torch.compile <https://pytorch.org/tutorials/recipes/torch_compile_user_defined_triton_kernel_tutorial.html>`__
+* `使用 Tensor Parallel (TP) 进行大规模 Transformer 模型训练 <https://pytorch.org/tutorials/intermediate/TP_tutorial.html>`__
+* `利用半结构化(2:4)稀疏性加速 BERT <https://pytorch.org/tutorials/advanced/semi_structured_sparse.html>`__
+* `torch.export 教程 <https://pytorch.org/tutorials/intermediate/torch_export_tutorial.html>`__
+* `nn.Module 中 load_state_dict 和张量子类的扩展点 <https://pytorch.org/tutorials/recipes/recipes/swap_tensors.html>`__
 
 .. raw:: html
 
@@ -17,16 +17,16 @@ Welcome to PyTorch Tutorials
 .. Add callout items below this line
 
 .. customcalloutitem::
-   :description: Familiarize yourself with PyTorch concepts and modules. Learn how to load data, build deep neural networks, train and save your models in this quickstart guide.
-   :header: Learn the Basics
+   :description: 熟悉 PyTorch 的概念和模块。通过本快速入门指南，学习如何加载数据、构建深度神经网络、训练和保存模型。
+   :header: 基础知识
    :button_link:  beginner/basics/intro.html
-   :button_text: Get started with PyTorch
+   :button_text: 开启 PyTorch 旅程
 
 .. customcalloutitem::
-   :description: Bite-size, ready-to-deploy PyTorch code examples.
-   :header: PyTorch Recipes
+   :description: 小巧易用、即时部署的 PyTorch 代码示例。
+   :header: PyTorch 示例
    :button_link: recipes/recipes_index.html
-   :button_text: Explore Recipes
+   :button_text: 查看示例
 
 .. End of callout item section
 
@@ -41,7 +41,7 @@ Welcome to PyTorch Tutorials
         <div class="tutorial-tags-container">
             <div id="dropdown-filter-tags">
                 <div class="tutorial-filter-menu">
-                    <div class="tutorial-filter filter-btn all-tag-selected" data-tag="all">All</div>
+                    <div class="tutorial-filter filter-btn all-tag-selected" data-tag="all">全部</div>
                 </div>
             </div>
         </div>
@@ -59,7 +59,7 @@ Welcome to PyTorch Tutorials
 .. Learning PyTorch
 
 .. customcarditem::
-   :header: 基础内容
+   :header: 基础知识
    :card_description: 逐步教你如何用PyTorch构建完整的机器学习流程。
    :image: _static/img/thumbnails/cropped/60-min-blitz.png
    :link: beginner/basics/intro.html
@@ -339,7 +339,7 @@ Welcome to PyTorch Tutorials
 
 
 .. customcarditem::
-   :header: Deploying PyTorch in Python via a REST API with Flask
+   :header: 使用 Flask 在 Python 中部署 PyTorch REST API
    :card_description: Deploy a PyTorch model using Flask and expose a REST API for model inference using the example of a pretrained DenseNet 121 model which detects the image.
    :image: _static/img/thumbnails/cropped/Deploying-PyTorch-in-Python-via-a-REST-API-with-Flask.png
    :link: intermediate/flask_rest_api_tutorial.html
@@ -353,7 +353,7 @@ Welcome to PyTorch Tutorials
    :tags: Production,TorchScript
 
 .. customcarditem::
-   :header: Loading a TorchScript Model in C++
+   :header: 在 C++ 中加载 TorchScript 模型
    :card_description:  Learn how PyTorch provides to go from an existing Python model to a serialized representation that can be loaded and executed purely from C++, with no dependency on Python.
    :image: _static/img/thumbnails/cropped/Loading-a-TorchScript-Model-in-Cpp.png
    :link: advanced/cpp_export.html
@@ -851,7 +851,7 @@ Welcome to PyTorch Tutorials
     <br>
 
 
-Additional Resources
+更多资源
 ============================
 
 .. raw:: html
@@ -862,28 +862,28 @@ Additional Resources
 .. Add callout items below this line
 
 .. customcalloutitem::
-   :header: Examples of PyTorch
-   :description: A set of examples around PyTorch in Vision, Text, Reinforcement Learning that you can incorporate in your existing work.
+   :header: PyTorch 示例
+   :description: 视觉、文本、强化学习的 PyTorch 示例，可以将其融入现有工作内容。
    :button_link: https://pytorch.org/examples?utm_source=examples&utm_medium=examples-landing
-   :button_text: Check Out Examples
+   :button_text: 查看示例
 
 .. customcalloutitem::
    :header: PyTorch Cheat Sheet
-   :description: Quick overview to essential PyTorch elements.
+   :description: PyTorch 基础内容速览。
    :button_link: beginner/ptcheat.html
-   :button_text: Open
+   :button_text: 打开
 
 .. customcalloutitem::
-   :header: Tutorials on GitHub
-   :description: Access PyTorch Tutorials from GitHub.
+   :header: GitHub 上的教程
+   :description: 获取 GitHub 上的 PyTorch 教程。
    :button_link: https://github.com/pytorch/tutorials
-   :button_text: Go To GitHub
+   :button_text: 打开 GitHub
 
 .. customcalloutitem::
-   :header: Run Tutorials on Google Colab
-   :description: Learn how to copy tutorial data into Google Drive so that you can run tutorials on Google Colab.
+   :header: Google Colab 上运行教程
+   :description: 学习如何将教程数据复制到 Google Drive，以便您可以在 Google Colab 上运行教程。
    :button_link: beginner/colab.html
-   :button_text: Open
+   :button_text: 打开
 
 .. End of callout section
 
@@ -901,16 +901,16 @@ Additional Resources
    :maxdepth: 2
    :hidden:
    :includehidden:
-   :caption: PyTorch Recipes
+   :caption: PyTorch 示例
 
-   See All Recipes <recipes/recipes_index>
-   See All Prototype Recipes <prototype/prototype_index>
+   所有示例 <recipes/recipes_index>
+   原型示例 <prototype/prototype_index>
 
 .. toctree::
    :maxdepth: 2
    :hidden:
    :includehidden:
-   :caption: Introduction to PyTorch
+   :caption: PyTorch 入门
 
    beginner/basics/intro
    beginner/basics/quickstart_tutorial
@@ -926,7 +926,7 @@ Additional Resources
    :maxdepth: 2
    :hidden:
    :includehidden:
-   :caption: Introduction to PyTorch on YouTube
+   :caption: PyTorch 视频教程
 
    beginner/introyt
    beginner/introyt/introyt1_tutorial
@@ -941,7 +941,7 @@ Additional Resources
    :maxdepth: 2
    :hidden:
    :includehidden:
-   :caption: Learning PyTorch
+   :caption: 学习 PyTorch
 
    beginner/deep_learning_60min_blitz
    beginner/pytorch_with_examples
@@ -952,7 +952,7 @@ Additional Resources
    :maxdepth: 2
    :includehidden:
    :hidden:
-   :caption: Image and Video
+   :caption: 图片与视频
 
    intermediate/torchvision_tutorial
    beginner/transfer_learning_tutorial
@@ -966,7 +966,7 @@ Additional Resources
    :maxdepth: 2
    :includehidden:
    :hidden:
-   :caption: Audio
+   :caption: 音频
 
    beginner/audio_io_tutorial
    beginner/audio_resampling_tutorial
@@ -983,7 +983,7 @@ Additional Resources
    :maxdepth: 2
    :includehidden:
    :hidden:
-   :caption: Text
+   :caption: 文本
 
    beginner/bettertransformer_tutorial
    intermediate/char_rnn_classification_tutorial
@@ -998,7 +998,7 @@ Additional Resources
    :maxdepth: 2
    :includehidden:
    :hidden:
-   :caption: Backends
+   :caption: 后端
 
    beginner/onnx/intro_onnx
 
@@ -1006,7 +1006,7 @@ Additional Resources
    :maxdepth: 2
    :includehidden:
    :hidden:
-   :caption: Reinforcement Learning
+   :caption: 强化学习
 
    intermediate/reinforcement_q_learning
    intermediate/reinforcement_ppo
@@ -1017,7 +1017,7 @@ Additional Resources
    :maxdepth: 2
    :includehidden:
    :hidden:
-   :caption: Deploying PyTorch Models in Production
+   :caption: 部署 PyTorch 模型
 
    beginner/onnx/intro_onnx
    intermediate/flask_rest_api_tutorial
@@ -1030,7 +1030,7 @@ Additional Resources
    :maxdepth: 2
    :includehidden:
    :hidden:
-   :caption: Profiling PyTorch
+   :caption: 分析 PyTorch
 
    beginner/profiler
    beginner/hta_intro_tutorial
@@ -1040,7 +1040,7 @@ Additional Resources
    :maxdepth: 2
    :includehidden:
    :hidden:
-   :caption: Code Transforms with FX
+   :caption: FX 代码转换
 
    intermediate/fx_conv_bn_fuser
    intermediate/fx_profiling_tutorial
@@ -1049,7 +1049,7 @@ Additional Resources
    :maxdepth: 2
    :includehidden:
    :hidden:
-   :caption: Frontend APIs
+   :caption: 前端 APIs
 
    intermediate/memory_format_tutorial
    intermediate/forward_ad_usage
@@ -1065,7 +1065,7 @@ Additional Resources
    :maxdepth: 2
    :includehidden:
    :hidden:
-   :caption: Extending PyTorch
+   :caption: PyTorch 扩展
 
    intermediate/custom_function_double_backward_tutorial
    intermediate/custom_function_conv_bn_tutorial
@@ -1080,7 +1080,7 @@ Additional Resources
    :maxdepth: 2
    :includehidden:
    :hidden:
-   :caption: Model Optimization
+   :caption: 优化模型
 
    beginner/profiler
    intermediate/tensorboard_profiler_tutorial
@@ -1106,7 +1106,7 @@ Additional Resources
    :maxdepth: 2
    :includehidden:
    :hidden:
-   :caption: Parallel and Distributed Training
+   :caption: 分布式并行训练
 
    distributed/home
    beginner/dist_overview
@@ -1132,18 +1132,18 @@ Additional Resources
    :hidden:
    :caption: Edge with ExecuTorch
 
-   Exporting to ExecuTorch Tutorial <https://pytorch.org/executorch/stable/tutorials/export-to-executorch-tutorial.html>
-   Running an ExecuTorch Model in C++ Tutorial < https://pytorch.org/executorch/stable/running-a-model-cpp-tutorial.html>
-   Using the ExecuTorch SDK to Profile a Model <https://pytorch.org/executorch/stable/tutorials/sdk-integration-tutorial.html>
-   Building an ExecuTorch iOS Demo App <https://pytorch.org/executorch/stable/demo-apps-ios.html>
-   Building an ExecuTorch Android Demo App <https://pytorch.org/executorch/stable/demo-apps-android.html>
+   导出到 ExecuTorch 教程 <https://pytorch.org/executorch/stable/tutorials/export-to-executorch-tutorial.html>
+   使用C++运行 ExecuTorch 教程 < https://pytorch.org/executorch/stable/running-a-model-cpp-tutorial.html>
+   使用 ExecuTorch SDK 分析模型 <https://pytorch.org/executorch/stable/tutorials/sdk-integration-tutorial.html>
+   构建 ExecuTorch iOS Demo App <https://pytorch.org/executorch/stable/demo-apps-ios.html>
+   构建 ExecuTorch Android Demo App <https://pytorch.org/executorch/stable/demo-apps-android.html>
    Lowering a Model as a Delegate <https://pytorch.org/executorch/stable/examples-end-to-end-to-lower-model-to-delegate.html>   
 
 .. toctree::
    :maxdepth: 2
    :includehidden:
    :hidden:
-   :caption: Recommendation Systems
+   :caption: 推荐系统
 
    intermediate/torchrec_tutorial
    advanced/sharding
@@ -1152,6 +1152,6 @@ Additional Resources
    :maxdepth: 2
    :includehidden:
    :hidden:
-   :caption: Multimodality
+   :caption: 多模态
 
    beginner/flava_finetuning_tutorial

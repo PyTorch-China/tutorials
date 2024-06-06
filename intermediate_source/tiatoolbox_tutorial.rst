@@ -1,4 +1,4 @@
-Whole Slide Image Classification Using PyTorch and TIAToolbox
+PyTorch 和 TIAToolbox 进行全切片图像分类
 =============================================================
 
 .. tip::

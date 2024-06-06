@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-DCGAN Tutorial
+DCGAN 教程
 ==============
 
 **Author**: `Nathan Inkawhich <https://github.com/inkawhich>`__

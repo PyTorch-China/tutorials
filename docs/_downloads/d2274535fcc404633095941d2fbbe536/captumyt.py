@@ -1,13 +1,13 @@
 """
-`Introduction <introyt1_tutorial.html>`_ ||
-`Tensors <tensors_deeper_tutorial.html>`_ ||
-`Autograd <autogradyt_tutorial.html>`_ ||
-`Building Models <modelsyt_tutorial.html>`_ ||
-`TensorBoard Support <tensorboardyt_tutorial.html>`_ ||
-`Training Models <trainingyt.html>`_ ||
-**Model Understanding**
+`简介 <introyt1_tutorial.html>`_ ||
+`张量 <tensors_deeper_tutorial.html>`_ ||
+`自动微分 <autogradyt_tutorial.html>`_ ||
+`构建模型 <modelsyt_tutorial.html>`_ ||
+`TensorBoard支持 <tensorboardyt_tutorial.html>`_ ||
+`训练模型 <trainingyt.html>`_ ||
+**模型理解**
 
-Model Understanding with Captum
+使用 Captum 进行模型理解
 ===============================
 
 Follow along with the video below or on `youtube <https://www.youtube.com/watch?v=Am2EF9CLu-g>`__. Download the notebook and corresponding files

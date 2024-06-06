@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-TorchMultimodal Tutorial: Finetuning FLAVA
+TorchMultimodal 教程：微调 FLAVA
 ============================================
 """
 

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Preprocess custom text dataset using Torchtext
+Torchtext 预处理自定义文本数据集
 ===============================================
 
 **Author**: `Anupam Sharma <https://anp-scp.github.io/>`_

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-NLP From Scratch: Classifying Names with a Character-Level RNN
+从零开始的自然语言处理：字符级 RNN 进行姓名分类
 **************************************************************
 **Author**: `Sean Robertson <https://github.com/spro>`_
 

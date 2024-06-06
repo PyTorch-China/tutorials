@@ -1,15 +1,15 @@
 """
-**Learn the Basics** ||
-`Quickstart <quickstart_tutorial.html>`_ ||
-`Tensors <tensorqs_tutorial.html>`_ ||
-`Datasets & DataLoaders <data_tutorial.html>`_ ||
+**基础知识** ||
+`快速入门 <quickstart_tutorial.html>`_ ||
+`张量 <tensorqs_tutorial.html>`_ ||
+`数据集与数据加载器 <data_tutorial.html>`_ ||
 `Transforms <transforms_tutorial.html>`_ ||
-`Build Model <buildmodel_tutorial.html>`_ ||
-`Autograd <autogradqs_tutorial.html>`_ ||
-`Optimization <optimization_tutorial.html>`_ ||
-`Save & Load Model <saveloadrun_tutorial.html>`_
+`构建神经网络 <buildmodel_tutorial.html>`_ ||
+`自动微分 <autogradqs_tutorial.html>`_ ||
+`优化模型参数 <optimization_tutorial.html>`_ ||
+`保存和加载模型 <saveloadrun_tutorial.html>`_
 
-Learn the Basics
+基础知识
 ===================
 
 Authors:

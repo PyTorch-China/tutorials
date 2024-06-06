@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Knowledge Distillation Tutorial
+Knowledge Distillation 教程
 ===============================
 **Author**: `Alexandros Chariton <https://github.com/AlexandrosChrtn>`_
 """ 

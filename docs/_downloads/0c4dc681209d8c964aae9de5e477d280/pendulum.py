@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Pendulum: Writing your environment and transforms with TorchRL
+Pendulum：使用 TorchRL 编写环境和transforms
 ==============================================================
 
 **Author**: `Vincent Moens <https://github.com/vmoens>`_

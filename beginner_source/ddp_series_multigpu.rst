@@ -6,7 +6,7 @@
 `minGPT Training <../intermediate/ddp_series_minGPT.html>`__
 
 
-Multi GPU training with DDP
+使用 DDP 进行多 GPU 训练
 ===========================
 
 Authors: `Suraj Subramanian <https://github.com/suraj813>`__

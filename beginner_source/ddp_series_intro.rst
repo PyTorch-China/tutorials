@@ -4,7 +4,7 @@
 `Multi-Node training <../intermediate/ddp_series_multinode.html>`__ \|\|
 `minGPT Training <../intermediate/ddp_series_minGPT.html>`__
 
-Distributed Data Parallel in PyTorch - Video Tutorials
+PyTorch 分布式并行 - Video Tutorials
 ======================================================
 
 Authors: `Suraj Subramanian <https://github.com/suraj813>`__

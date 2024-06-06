@@ -1,5 +1,6 @@
 """
 Language Translation with ``nn.Transformer`` and torchtext
+使用 ``nn.Transformer`` 和 torchtext 进行语言翻译
 ==========================================================
 
 This tutorial shows:
@@ -9,7 +10,7 @@ This tutorial shows:
 
 
 ######################################################################
-# Data Sourcing and Processing
+# 数据获取和处理
 # ----------------------------
 #
 # `torchtext library <https://pytorch.org/text/stable/>`__ has utilities for creating datasets that can be easily
@@ -81,7 +82,7 @@ for ln in [SRC_LANGUAGE, TGT_LANGUAGE]:
   vocab_transform[ln].set_default_index(UNK_IDX)
 
 ######################################################################
-# Seq2Seq Network using Transformer
+# 使用 Transformer 的 Seq2Seq Network
 # ---------------------------------
 #
 # Transformer is a Seq2Seq model introduced in `“Attention is all you
@@ -236,7 +237,7 @@ loss_fn = torch.nn.CrossEntropyLoss(ignore_index=PAD_IDX)
 optimizer = torch.optim.Adam(transformer.parameters(), lr=0.0001, betas=(0.9, 0.98), eps=1e-9)
 
 ######################################################################
-# Collation
+# 数据整理
 # ---------
 #
 # As seen in the ``Data Sourcing and Processing`` section, our data iterator yields a pair of raw strings.
@@ -396,7 +397,7 @@ print(translate(transformer, "Eine Gruppe von Menschen steht vor einem Iglu ."))
 
 
 ######################################################################
-# References
+# 引用
 # ----------
 #
 # 1. Attention is all you need paper.

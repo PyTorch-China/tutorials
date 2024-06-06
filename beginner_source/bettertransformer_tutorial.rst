@@ -1,4 +1,4 @@
-Fast Transformer Inference with Better Transformer
+使用 Better Transformer 进行快速 Transformer 推断
 ===============================================================
 
 **Author**: `Michael Gschwind <https://github.com/mikekgfb>`__

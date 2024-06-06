@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Train a Mario-playing RL Agent
+训练一个马里奥游戏的 RL Agent
 ===============================
 
 **Authors:** `Yuansong Feng <https://github.com/YuansongFeng>`__, `Suraj Subramanian <https://github.com/suraj813>`__, `Howard Wang <https://github.com/hw26>`__, `Steven Guo <https://github.com/GuoYuzhang>`__.

@@ -1,13 +1,13 @@
 """
-`Introduction <introyt1_tutorial.html>`_ ||
-`Tensors <tensors_deeper_tutorial.html>`_ ||
-**Autograd** ||
-`Building Models <modelsyt_tutorial.html>`_ ||
-`TensorBoard Support <tensorboardyt_tutorial.html>`_ ||
-`Training Models <trainingyt.html>`_ ||
-`Model Understanding <captumyt.html>`_
+`简介 <introyt1_tutorial.html>`_ ||
+`张量 <tensors_deeper_tutorial.html>`_ ||
+**自动微分** ||
+`构建模型 <modelsyt_tutorial.html>`_ ||
+`TensorBoard支持 <tensorboardyt_tutorial.html>`_ ||
+`训练模型 <trainingyt.html>`_ ||
+`模型理解 <captumyt.html>`_
 
-The Fundamentals of Autograd
+自动微分基础
 ============================
 
 Follow along with the video below or on `youtube <https://www.youtube.com/watch?v=M0fX15_-xrY>`__.

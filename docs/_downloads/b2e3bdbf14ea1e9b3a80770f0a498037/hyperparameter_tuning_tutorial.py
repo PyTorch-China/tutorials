@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Hyperparameter tuning with Ray Tune
+Ray Tune 超参数调优
 ===================================
 
 Hyperparameter tuning can make the difference between an average model and a highly

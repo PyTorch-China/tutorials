@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-NLP From Scratch: Generating Names with a Character-Level RNN
+从零开始的自然语言处理：字符级 RNN 生成姓名
 *************************************************************
 **Author**: `Sean Robertson <https://github.com/spro>`_
 

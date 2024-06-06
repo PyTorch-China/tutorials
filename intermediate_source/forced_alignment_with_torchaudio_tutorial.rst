@@ -1,4 +1,4 @@
-Forced Alignment with Wav2Vec2
+Wav2Vec2 强制对齐
 ==============================
 
 This tutorial has been moved to https://pytorch.org/audio/stable/tutorials/forced_alignment_tutorial.html

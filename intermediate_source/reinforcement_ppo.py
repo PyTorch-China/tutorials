@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Reinforcement Learning (PPO) with TorchRL Tutorial
+使用 TorchRL 强化学习 (PPO) 教程
 ==================================================
 **Author**: `Vincent Moens <https://github.com/vmoens>`_
 

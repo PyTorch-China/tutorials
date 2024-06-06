@@ -193,5 +193,5 @@ Important Resources
 .. _pytorch.org: https://pytorch.org/
 .. _Introduction to TorchScript tutorial: https://pytorch.org/tutorials/beginner/Intro_to_TorchScript_tutorial.html
 .. _Full TorchScript documentation: https://pytorch.org/docs/stable/jit.html
-.. _Loading A TorchScript Model in C++ tutorial: https://pytorch.org/tutorials/advanced/cpp_export.html
+.. _在 C++ 中加载 TorchScript 模型教程: https://pytorch.org/tutorials/advanced/cpp_export.html
 .. _full TorchScript documentation: https://pytorch.org/docs/stable/jit.html

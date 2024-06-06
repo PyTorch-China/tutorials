@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Transfer Learning for Computer Vision Tutorial
+计算机视觉迁移学习教程
 ==============================================
 **Author**: `Sasank Chilamkurthy <https://chsasank.github.io>`_
 
