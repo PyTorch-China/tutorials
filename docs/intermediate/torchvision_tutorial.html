@@ -1,0 +1,1572 @@
+
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>TorchVision 对象检测微调教程 &mdash; PyTorch Tutorials 2.3.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!-- <link rel="stylesheet" href="../_static/pygments.css" type="text/css" /> -->
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/katex-math.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/sg_gallery.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/sg_gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/sg_gallery-dataframe.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/sg_gallery-rendered-html.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/sphinx-design.5ea377869091fd0449014c60fc090103.min.css" type="text/css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0-beta/dist/katex.min.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/custom2.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="计算机视觉迁移学习教程" href="../beginner/transfer_learning_tutorial.html" />
+    <link rel="prev" title="TensorBoard 可视化模型、数据和训练" href="tensorboard_tutorial.html" />
+  <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-T8XT4PS');</script>
+    <!-- End Google Tag Manager -->
+  
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+  <!-- Preload the theme fonts -->
+
+<link rel="preload" href="../_static/fonts/FreightSans/freight-sans-book.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../_static/fonts/FreightSans/freight-sans-medium.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../_static/fonts/IBMPlexMono/IBMPlexMono-Medium.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../_static/fonts/FreightSans/freight-sans-bold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../_static/fonts/FreightSans/freight-sans-medium-italic.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../_static/fonts/IBMPlexMono/IBMPlexMono-SemiBold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+
+<!-- Preload the katex fonts -->
+
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Math-Italic.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Main-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Main-Bold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size1-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size4-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size2-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size3-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Caligraphic-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.2/css/all.css" integrity="sha384-vSIIfh2YWi9wW0r9iZe7RJPrKwp6bG+s9QZMoITbCckVJqGCCRhc+ccxNcdpHuYu" crossorigin="anonymous">
+</head>
+
+<div class="container-fluid header-holder tutorials-header" id="header-holder">
+  <div class="container">
+    <div class="header-container">
+      <a class="header-logo" href="https://pytorch.org/" aria-label="PyTorch"></a>
+
+      <div class="main-menu">
+        <ul>
+
+          <li class="main-menu-item">
+          <div id="resourcesDropdownButton" data-toggle="resources-dropdown" class="resources-dropdown">
+              <a class="with-down-arrow">
+                Learn
+              </a>
+              <div class="resources-dropdown-menu">
+                <a class="nav-dropdown-item" href="https://pytorch.org/get-started">
+                  <span class=dropdown-title>Get Started</span>
+                  <p>Run PyTorch locally or get started quickly with one of the supported cloud platforms</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/tutorials">
+                  <span class="dropdown-title">Tutorials</span>
+                  <p>Whats new in PyTorch tutorials</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/tutorials/beginner/basics/intro.html">
+                  <span class="dropdown-title">Learn the Basics</span>
+                  <p>Familiarize yourself with PyTorch concepts and modules</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/tutorials/recipes/recipes_index.html">
+                  <span class="dropdown-title">PyTorch Recipes</span>
+                  <p>Bite-size, ready-to-deploy PyTorch code examples</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/tutorials/beginner/introyt.html">
+                  <span class="dropdown-title">Intro to PyTorch - YouTube Series</span>
+                  <p>Master PyTorch basics with our engaging YouTube tutorial series</p>
+                </a>
+              </div>
+            </div>
+          </li>
+
+          <li>
+          <div id="resourcesDropdownButton" data-toggle="resources-dropdown" class="resources-dropdown">
+              <a class="with-down-arrow">
+                Ecosystem
+              </a>
+              <div class="resources-dropdown-menu">
+                <a class="nav-dropdown-item" href="https://pytorch.org/ecosystem">
+                  <span class="dropdown-title">Tools</span>
+                  <p>Learn about the tools and frameworks in the PyTorch Ecosystem</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/#community-module">
+                  <span class=dropdown-title>Community</span>
+                  <p>Join the PyTorch developer community to contribute, learn, and get your questions answered</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://discuss.pytorch.org/" target="_blank">
+                  <span class=dropdown-title>Forums</span>
+                  <p>A place to discuss PyTorch code, issues, install, research</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/resources">
+                  <span class=dropdown-title>Developer Resources</span>
+                  <p>Find resources and get questions answered</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/ecosystem/contributor-awards-2023">
+                  <span class="dropdown-title">Contributor Awards - 2023</span>
+                  <p>Award winners announced at this year's PyTorch Conference</p>
+                </a>
+              </div>
+            </div>
+          </li>
+
+          <li>
+          <div id="resourcesDropdownButton" data-toggle="resources-dropdown" class="resources-dropdown">
+              <a class="with-down-arrow">
+                Edge
+              </a>
+              <div class="resources-dropdown-menu">
+                <a class="nav-dropdown-item" href="https://pytorch.org/edge">
+                  <span class="dropdown-title">About PyTorch Edge</span>
+                  <p>Build innovative and privacy-aware AI experiences for edge devices</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/executorch-overview">
+                  <span class="dropdown-title">ExecuTorch</span>
+                  <p>End-to-end solution for enabling on-device inference capabilities across mobile and edge devices</p>
+                </a>
+              </div>
+            </div>  
+          </li>
+
+          <li class="main-menu-item">
+            <div id="resourcesDropdownButton" data-toggle="resources-dropdown" class="resources-dropdown">
+              <a class="with-down-arrow">
+                Docs
+              </a>
+              <div class="resources-dropdown-menu">
+                <a class="nav-dropdown-item" href="https://pytorch.org/docs/stable/index.html">
+                  <span class="dropdown-title">PyTorch</span>
+                  <p>Explore the documentation for comprehensive guidance on how to use PyTorch</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/pytorch-domains">
+                  <span class="dropdown-title">PyTorch Domains</span>
+                  <p>Read the PyTorch Domains documentation to learn more about domain-specific libraries</p>
+                </a>
+              </div>
+            </div>
+          </li>
+
+          <li>
+            <div id="resourcesDropdownButton" data-toggle="resources-dropdown" class="resources-dropdown">
+              <a class="with-down-arrow">
+                Blogs & News 
+              </a>
+              <div class="resources-dropdown-menu">
+                <a class="nav-dropdown-item" href="https://pytorch.org/blog/">
+                  <span class="dropdown-title">PyTorch Blog</span>
+                  <p>Catch up on the latest technical news and happenings</p>
+                </a>
+                 <a class="nav-dropdown-item" href="https://pytorch.org/community-blog">
+                  <span class="dropdown-title">Community Blog</span>
+                  <p>Stories from the PyTorch ecosystem</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/videos">
+                  <span class="dropdown-title">Videos</span>
+                  <p>Learn about the latest PyTorch tutorials, new, and more </p>
+                <a class="nav-dropdown-item" href="https://pytorch.org/community-stories">
+                  <span class="dropdown-title">Community Stories</span>
+                  <p>Learn how our community solves real, everyday machine learning problems with PyTorch</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/events">
+                  <span class="dropdown-title">Events</span>
+                  <p>Find events, webinars, and podcasts</p>
+                </a>
+            </div>
+          </li>
+
+          <li>
+            <div id="resourcesDropdownButton" data-toggle="resources-dropdown" class="resources-dropdown">
+              <a class="with-down-arrow">
+                About
+              </a>
+              <div class="resources-dropdown-menu">
+                <a class="nav-dropdown-item" href="https://pytorch.org/foundation">
+                  <span class="dropdown-title">PyTorch Foundation</span>
+                  <p>Learn more about the PyTorch Foundation</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/governing-board">
+                  <span class="dropdown-title">Governing Board</span>
+                  <p></p>
+                </a>
+              </div>
+            </div>
+          </li>
+
+          <li class="main-menu-item">
+            <div class="no-dropdown">
+              <a href="https://pytorch.org/join" data-cta="join">
+                Become a Member
+              </a>
+            </div>
+          </li>
+          <li>
+           <div class="main-menu-item">
+             <a href="https://github.com/pytorch/pytorch" class="github-icon">
+             </a>
+           </div>
+          </li>
+          <!--- TODO: This block adds the search icon to the nav bar. We will enable it later. 
+          <li>
+            <div class="main-menu-item">
+             <a href="https://github.com/pytorch/pytorch" class="search-icon">
+             </a>
+            </div>
+          </li>
+          --->
+        </ul>
+      </div>
+
+      <a class="main-menu-open-button" href="#" data-behavior="open-mobile-menu"></a>
+    </div>
+  </div>
+</div>
+
+<body class="pytorch-body">
+
+   
+
+    
+
+    <div class="table-of-contents-link-wrapper">
+      <span>Table of Contents</span>
+      <a href="#" class="toggle-table-of-contents" data-behavior="toggle-table-of-contents"></a>
+    </div>
+
+    <nav data-toggle="wy-nav-shift" class="pytorch-left-menu" id="pytorch-left-menu">
+      <div class="pytorch-side-scroll">
+        <div class="pytorch-menu pytorch-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          <div class="pytorch-left-menu-search">
+            
+
+            
+              
+              
+                <div class="version">
+                  2.3.0
+                </div>
+              
+            
+
+            
+
+
+  
+
+
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search Tutorials" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+            
+          </div>
+
+          
+            
+            
+              
+            
+            
+              <p class="caption" role="heading"><span class="caption-text">PyTorch 示例</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../recipes/recipes_index.html">所有示例</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../prototype/prototype_index.html">原型示例</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">PyTorch 入门</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/basics/intro.html">基础知识</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/basics/quickstart_tutorial.html">快速入门</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/basics/tensorqs_tutorial.html">张量</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/basics/data_tutorial.html">数据集与数据加载器</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/basics/transforms_tutorial.html">Transforms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/basics/buildmodel_tutorial.html">构建神经网络</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/basics/autogradqs_tutorial.html">自动微分</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/basics/optimization_tutorial.html">优化模型参数</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/basics/saveloadrun_tutorial.html">保存和加载模型</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">PyTorch 视频教程</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/introyt.html">PyTorch 介绍 - YouTube</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/introyt/introyt1_tutorial.html">PyTorch 简介</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/introyt/tensors_deeper_tutorial.html">PyTorch Tensors 介绍</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/introyt/autogradyt_tutorial.html">自动微分基础</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/introyt/modelsyt_tutorial.html">使用 PyTorch 构建模型</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/introyt/tensorboardyt_tutorial.html">PyTorch TensorBoard 支持</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/introyt/trainingyt.html">使用 PyTorch 训练模型</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/introyt/captumyt.html">使用 Captum 进行模型理解</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">学习 PyTorch</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/deep_learning_60min_blitz.html">PyTorch 深度学习：60分钟入门</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/pytorch_with_examples.html">跟着示例学习 PyTorch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/nn_tutorial.html"><cite>torch.nn</cite> 具体是什么?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tensorboard_tutorial.html">TensorBoard 可视化模型、数据和训练</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">图片与视频</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">TorchVision 对象检测微调教程</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/transfer_learning_tutorial.html">计算机视觉迁移学习教程</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/fgsm_tutorial.html">对抗样本生成</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/dcgan_faces_tutorial.html">DCGAN 教程</a></li>
+<li class="toctree-l1"><a class="reference internal" href="spatial_transformer_tutorial.html">Spatial Transformer Networks 教程</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/vt_tutorial.html">优化视觉 Transformer 模型</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tiatoolbox_tutorial.html">PyTorch 和 TIAToolbox 进行全切片图像分类</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">音频</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/audio_io_tutorial.html">音频 I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/audio_resampling_tutorial.html">Audio 重采样</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/audio_data_augmentation_tutorial.html">音频数据增强</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/audio_feature_extractions_tutorial.html">音频特征提取</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/audio_feature_augmentation_tutorial.html">音频特征增强</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/audio_datasets_tutorial.html">音频数据集</a></li>
+<li class="toctree-l1"><a class="reference internal" href="speech_recognition_pipeline_tutorial.html">Wav2Vec2 进行语音识别</a></li>
+<li class="toctree-l1"><a class="reference internal" href="text_to_speech_with_torchaudio.html">Tacotron2 文本转语音</a></li>
+<li class="toctree-l1"><a class="reference internal" href="forced_alignment_with_torchaudio_tutorial.html">Wav2Vec2 强制对齐</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">文本</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/bettertransformer_tutorial.html">使用 Better Transformer 进行快速 Transformer 推断</a></li>
+<li class="toctree-l1"><a class="reference internal" href="char_rnn_classification_tutorial.html">从零开始的自然语言处理：字符级 RNN 进行姓名分类</a></li>
+<li class="toctree-l1"><a class="reference internal" href="char_rnn_generation_tutorial.html">从零开始的自然语言处理：字符级 RNN 生成姓名</a></li>
+<li class="toctree-l1"><a class="reference internal" href="seq2seq_translation_tutorial.html">从零开始的自然语言处理：序列到序列网络和注意力机制进行翻译</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/text_sentiment_ngrams_tutorial.html">torchtext 文本分类</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/translation_transformer.html">数据获取和处理</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/translation_transformer.html#transformer-seq2seq-network">使用 Transformer 的 Seq2Seq Network</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/translation_transformer.html#id2">数据整理</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/translation_transformer.html#id3">引用</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/torchtext_custom_dataset_tutorial.html">Torchtext 预处理自定义文本数据集</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">后端</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/onnx/intro_onnx.html">ONNX 介绍</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">强化学习</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="reinforcement_q_learning.html">强化学习 (DQN) 教程</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reinforcement_ppo.html">使用 TorchRL 强化学习 (PPO) 教程</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mario_rl_tutorial.html">训练一个马里奥游戏的 RL Agent</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/pendulum.html">Pendulum：使用 TorchRL 编写环境和transforms</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">部署 PyTorch 模型</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/onnx/intro_onnx.html">ONNX 介绍</a></li>
+<li class="toctree-l1"><a class="reference internal" href="flask_rest_api_tutorial.html">API 定义</a></li>
+<li class="toctree-l1"><a class="reference internal" href="flask_rest_api_tutorial.html#id1">依赖</a></li>
+<li class="toctree-l1"><a class="reference internal" href="flask_rest_api_tutorial.html#web-server">简单的 Web Server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="flask_rest_api_tutorial.html#id2">推理</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/Intro_to_TorchScript_tutorial.html">TorchScript 介绍</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/cpp_export.html">在 C++ 中加载 TorchScript 模型</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/super_resolution_with_onnxruntime.html">(optional) PyTorch 模型导出到 ONNX 并使用 ONNX Runtime 运行</a></li>
+<li class="toctree-l1"><a class="reference internal" href="realtime_rpi.html">在 Raspberry Pi 4 上进行实时推理 (30 fps!)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">分析 PyTorch</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/profiler.html">PyTorch 模型分析</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/hta_intro_tutorial.html">Holistic Trace Analysis 介绍</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/hta_trace_diff_tutorial.html">Holistic Trace Analysis 差异分析</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">FX 代码转换</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="fx_conv_bn_fuser.html">(beta) Building a Convolution/Batch Norm fuser in FX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fx_profiling_tutorial.html">(beta) Building a Simple CPU Performance Profiler with FX</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">前端 APIs</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="memory_format_tutorial.html">(beta) Channels Last Memory Format in PyTorch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="forward_ad_usage.html">Forward-mode Automatic Differentiation (Beta)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="jacobians_hessians.html">Jacobians, Hessians, hvp, vhp, and more: composing function transforms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ensembling.html">Model ensembling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="per_sample_grads.html">Per-sample-gradients</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/cpp_frontend.html">Using the PyTorch C++ Frontend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/torch-script-parallelism.html">Dynamic Parallelism in TorchScript</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/cpp_autograd.html">Autograd in C++ Frontend</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">PyTorch 扩展</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="custom_function_double_backward_tutorial.html">Double Backward with Custom Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="custom_function_conv_bn_tutorial.html">Fusing Convolution and Batch Norm using Custom Function</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/cpp_extension.html">Custom C++ and CUDA Extensions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/torch_script_custom_ops.html">Extending TorchScript with Custom C++ Operators</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/torch_script_custom_classes.html">Extending TorchScript with Custom C++ Classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/dispatcher.html">Registering a Dispatched Operator in C++</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/extend_dispatcher.html">Extending dispatcher for a new backend in C++</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/privateuseone.html">Facilitating New Backend Integration by PrivateUse1</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">优化模型</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/profiler.html">PyTorch 模型分析</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tensorboard_profiler_tutorial.html">PyTorch Profiler With TensorBoard</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/hyperparameter_tuning_tutorial.html">Ray Tune 超参数调优</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/vt_tutorial.html">优化视觉 Transformer 模型</a></li>
+<li class="toctree-l1"><a class="reference internal" href="parametrizations.html">Parametrizations Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pruning_tutorial.html">Pruning Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/dynamic_quantization_tutorial.html">(beta) Dynamic Quantization on an LSTM Word Language Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dynamic_quantization_bert_tutorial.html">(beta) Dynamic Quantization on BERT</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quantized_transfer_learning_tutorial.html">(beta) Quantized Transfer Learning for Computer Vision Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/static_quantization_tutorial.html">(beta) Static Quantization with Eager Mode in PyTorch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torchserve_with_ipex.html">Grokking PyTorch Intel CPU performance from first principles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torchserve_with_ipex_2.html">Grokking PyTorch Intel CPU performance from first principles (Part 2)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nvfuser_intro_tutorial.html">Getting Started - Accelerate Your Scripts with nvFuser</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ax_multiobjective_nas_tutorial.html">Multi-Objective NAS with Ax</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_compile_tutorial.html">Introduction to <code class="docutils literal notranslate"><span class="pre">torch.compile</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="inductor_debug_cpu.html">Inductor CPU backend debugging and profiling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="scaled_dot_product_attention_tutorial.html">(Beta) Implementing High-Performance Transformers with Scaled Dot Product Attention (SDPA)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="scaled_dot_product_attention_tutorial.html#using-sdpa-with-torch-compile">Using SDPA with <code class="docutils literal notranslate"><span class="pre">torch.compile</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="scaled_dot_product_attention_tutorial.html#using-sdpa-with-attn-bias-subclasses">Using SDPA with attn_bias subclasses`</a></li>
+<li class="toctree-l1"><a class="reference internal" href="scaled_dot_product_attention_tutorial.html#conclusion">Conclusion</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/knowledge_distillation_tutorial.html">Knowledge Distillation 教程</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">分布式并行训练</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../distributed/home.html">Distributed and Parallel Training Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/dist_overview.html">PyTorch 分布式概述</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/ddp_series_intro.html">PyTorch 分布式并行 - Video Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="model_parallel_tutorial.html">Single-Machine Model Parallel Best Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ddp_tutorial.html">Getting Started with Distributed Data Parallel</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dist_tuto.html">Writing Distributed Applications with PyTorch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="FSDP_tutorial.html">Getting Started with Fully Sharded Data Parallel(FSDP)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="FSDP_adavnced_tutorial.html">Advanced Model Training with Fully Sharded Data Parallel (FSDP)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="TP_tutorial.html">Large Scale Transformer model training with Tensor Parallel (TP)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="process_group_cpp_extension_tutorial.html">Customize Process Group Backends Using Cpp Extensions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rpc_tutorial.html">Getting Started with Distributed RPC Framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rpc_param_server_tutorial.html">Implementing a Parameter Server Using Distributed RPC Framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dist_pipeline_parallel_tutorial.html">Distributed Pipeline Parallelism Using RPC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rpc_async_execution.html">Implementing Batch RPC Processing Using Asynchronous Executions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/rpc_ddp_tutorial.html">Combining Distributed DataParallel with Distributed RPC Framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/ddp_pipeline.html">Training Transformer models using Distributed Data Parallel and Pipeline Parallelism</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/generic_join.html">Distributed Training with Uneven Inputs Using the Join Context Manager</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Edge with ExecuTorch</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/executorch/stable/tutorials/export-to-executorch-tutorial.html">导出到 ExecuTorch 教程</a></li>
+<li class="toctree-l1"><a class="reference external" href=" https://pytorch.org/executorch/stable/running-a-model-cpp-tutorial.html">使用C++运行 ExecuTorch 教程</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/executorch/stable/tutorials/sdk-integration-tutorial.html">使用 ExecuTorch SDK 分析模型</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/executorch/stable/demo-apps-ios.html">构建 ExecuTorch iOS Demo App</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/executorch/stable/demo-apps-android.html">构建 ExecuTorch Android Demo App</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/executorch/stable/examples-end-to-end-to-lower-model-to-delegate.html">Lowering a Model as a Delegate</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">推荐系统</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="torchrec_tutorial.html">Introduction to TorchRec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/sharding.html">Exploring TorchRec sharding</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">多模态</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/flava_finetuning_tutorial.html">TorchMultimodal 教程：微调 FLAVA</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <div class="pytorch-container">
+      <div class="pytorch-page-level-bar" id="pytorch-page-level-bar">
+        <div class="pytorch-breadcrumbs-wrapper">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="pytorch-breadcrumbs">
+    
+      <li>
+        <a href="../index.html">
+          
+            Tutorials
+          
+        </a> &gt;
+      </li>
+
+        
+      <li>TorchVision 对象检测微调教程</li>
+    
+    
+      <li class="pytorch-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/intermediate/torchvision_tutorial.rst.txt" rel="nofollow"><img src="../_static/images/view-page-source-icon.svg"></a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+</div>
+        </div>
+
+        <div class="pytorch-shortcuts-wrapper" id="pytorch-shortcuts-wrapper">
+          Shortcuts
+        </div>
+      </div>
+
+      <section data-toggle="wy-nav-shift" id="pytorch-content-wrap" class="pytorch-content-wrap">
+        <div class="pytorch-content-left">
+
+        
+
+          <div class="pytorch-call-to-action-links">
+            <div id="tutorial-type">intermediate/torchvision_tutorial</div>
+
+            <div id="google-colab-link">
+              <img class="call-to-action-img" src="../_static/images/pytorch-colab.svg"/>
+              <div class="call-to-action-desktop-view">Run in Google Colab</div>
+              <div class="call-to-action-mobile-view">Colab</div>
+            </div>
+            <div id="download-notebook-link">
+              <img class="call-to-action-notebook-img" src="../_static/images/pytorch-download.svg"/>
+              <div class="call-to-action-desktop-view">Download Notebook</div>
+              <div class="call-to-action-mobile-view">Notebook</div>
+            </div>
+            <div id="github-view-link">
+              <img class="call-to-action-img" src="../_static/images/pytorch-github.svg"/>
+              <div class="call-to-action-desktop-view">View on GitHub</div>
+              <div class="call-to-action-mobile-view">GitHub</div>
+            </div>
+          </div>
+
+        
+
+          <!-- Google Tag Manager (noscript) -->
+          <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-T8XT4PS"
+          height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+          <!-- End Google Tag Manager (noscript) -->
+          
+          <div class="rst-content">
+          
+            <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
+             <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
+              
+  <div class="sphx-glr-download-link-note admonition note">
+<p class="admonition-title">Note</p>
+<p>Click <a class="reference internal" href="#sphx-glr-download-intermediate-torchvision-tutorial-py"><span class="std std-ref">here</span></a>
+to download the full example code</p>
+</div>
+<div class="sphx-glr-example-title section" id="torchvision">
+<span id="sphx-glr-intermediate-torchvision-tutorial-py"></span><h1>TorchVision 对象检测微调教程<a class="headerlink" href="#torchvision" title="Permalink to this heading">¶</a></h1>
+<p>For this tutorial, we will be finetuning a pre-trained <a class="reference external" href="https://arxiv.org/abs/1703.06870">Mask
+R-CNN</a> model on the <a class="reference external" href="https://www.cis.upenn.edu/~jshi/ped_html/">Penn-Fudan
+Database for Pedestrian Detection and
+Segmentation</a>. It contains
+170 images with 345 instances of pedestrians, and we will use it to
+illustrate how to use the new features in torchvision in order to train
+an object detection and instance segmentation model on a custom dataset.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This tutorial works only with torchvision version &gt;=0.16 or nightly.
+If you’re using torchvision&lt;=0.15, please follow
+<a class="reference external" href="https://github.com/pytorch/tutorials/blob/d686b662932a380a58b7683425faa00c06bcf502/intermediate_source/torchvision_tutorial.rst">this tutorial instead</a>.</p>
+</div>
+<div class="section" id="defining-the-dataset">
+<h2>Defining the Dataset<a class="headerlink" href="#defining-the-dataset" title="Permalink to this heading">¶</a></h2>
+<p>The reference scripts for training object detection, instance
+segmentation and person keypoint detection allows for easily supporting
+adding new custom datasets. The dataset should inherit from the standard
+<a class="reference external" href="https://pytorch.org/docs/stable/data.html#torch.utils.data.Dataset" title="(in PyTorch v2.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">torch.utils.data.Dataset</span></code></a> class, and implement <code class="docutils literal notranslate"><span class="pre">__len__</span></code> and
+<code class="docutils literal notranslate"><span class="pre">__getitem__</span></code>.</p>
+<p>The only specificity that we require is that the dataset <code class="docutils literal notranslate"><span class="pre">__getitem__</span></code>
+should return a tuple:</p>
+<ul class="simple">
+<li><p>image: <a class="reference external" href="https://pytorch.org/vision/stable/generated/torchvision.tv_tensors.Image.html#torchvision.tv_tensors.Image" title="(in Torchvision v0.18)"><code class="xref py py-class docutils literal notranslate"><span class="pre">torchvision.tv_tensors.Image</span></code></a> of shape <code class="docutils literal notranslate"><span class="pre">[3,</span> <span class="pre">H,</span> <span class="pre">W]</span></code>, a pure tensor, or a PIL Image of size <code class="docutils literal notranslate"><span class="pre">(H,</span> <span class="pre">W)</span></code></p></li>
+<li><p>target: a dict containing the following fields</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">boxes</span></code>, <a class="reference external" href="https://pytorch.org/vision/stable/generated/torchvision.tv_tensors.BoundingBoxes.html#torchvision.tv_tensors.BoundingBoxes" title="(in Torchvision v0.18)"><code class="xref py py-class docutils literal notranslate"><span class="pre">torchvision.tv_tensors.BoundingBoxes</span></code></a> of shape <code class="docutils literal notranslate"><span class="pre">[N,</span> <span class="pre">4]</span></code>:
+the coordinates of the <code class="docutils literal notranslate"><span class="pre">N</span></code> bounding boxes in <code class="docutils literal notranslate"><span class="pre">[x0,</span> <span class="pre">y0,</span> <span class="pre">x1,</span> <span class="pre">y1]</span></code> format, ranging from <code class="docutils literal notranslate"><span class="pre">0</span></code>
+to <code class="docutils literal notranslate"><span class="pre">W</span></code> and <code class="docutils literal notranslate"><span class="pre">0</span></code> to <code class="docutils literal notranslate"><span class="pre">H</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">labels</span></code>, integer <a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">torch.Tensor</span></code></a> of shape <code class="docutils literal notranslate"><span class="pre">[N]</span></code>: the label for each bounding box.
+<code class="docutils literal notranslate"><span class="pre">0</span></code> represents always the background class.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">image_id</span></code>, int: an image identifier. It should be
+unique between all the images in the dataset, and is used during
+evaluation</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">area</span></code>, float <a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">torch.Tensor</span></code></a> of shape <code class="docutils literal notranslate"><span class="pre">[N]</span></code>: the area of the bounding box. This is used
+during evaluation with the COCO metric, to separate the metric
+scores between small, medium and large boxes.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">iscrowd</span></code>, uint8 <a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">torch.Tensor</span></code></a> of shape <code class="docutils literal notranslate"><span class="pre">[N]</span></code>: instances with <code class="docutils literal notranslate"><span class="pre">iscrowd=True</span></code> will be
+ignored during evaluation.</p></li>
+<li><p>(optionally) <code class="docutils literal notranslate"><span class="pre">masks</span></code>, <a class="reference external" href="https://pytorch.org/vision/stable/generated/torchvision.tv_tensors.Mask.html#torchvision.tv_tensors.Mask" title="(in Torchvision v0.18)"><code class="xref py py-class docutils literal notranslate"><span class="pre">torchvision.tv_tensors.Mask</span></code></a> of shape <code class="docutils literal notranslate"><span class="pre">[N,</span> <span class="pre">H,</span> <span class="pre">W]</span></code>: the segmentation
+masks for each one of the objects</p></li>
+</ul>
+</li>
+</ul>
+<p>If your dataset is compliant with above requirements then it will work for both
+training and evaluation codes from the reference script. Evaluation code will use scripts from
+<code class="docutils literal notranslate"><span class="pre">pycocotools</span></code> which can be installed with <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">pycocotools</span></code>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For Windows, please install <code class="docutils literal notranslate"><span class="pre">pycocotools</span></code> from <a class="reference external" href="https://github.com/gautamchitnis/cocoapi">gautamchitnis</a> with command</p>
+<p><code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">git+https://github.com/gautamchitnis/cocoapi.git&#64;cocodataset-master#subdirectory=PythonAPI</span></code></p>
+</div>
+<p>One note on the <code class="docutils literal notranslate"><span class="pre">labels</span></code>. The model considers class <code class="docutils literal notranslate"><span class="pre">0</span></code> as background. If your dataset does not contain the background class,
+you should not have <code class="docutils literal notranslate"><span class="pre">0</span></code> in your <code class="docutils literal notranslate"><span class="pre">labels</span></code>. For example, assuming you have just two classes, <em>cat</em> and <em>dog</em>, you can
+define <code class="docutils literal notranslate"><span class="pre">1</span></code> (not <code class="docutils literal notranslate"><span class="pre">0</span></code>) to represent <em>cats</em> and <code class="docutils literal notranslate"><span class="pre">2</span></code> to represent <em>dogs</em>. So, for instance, if one of the images has both
+classes, your <code class="docutils literal notranslate"><span class="pre">labels</span></code> tensor should look like <code class="docutils literal notranslate"><span class="pre">[1,</span> <span class="pre">2]</span></code>.</p>
+<p>Additionally, if you want to use aspect ratio grouping during training
+(so that each batch only contains images with similar aspect ratios),
+then it is recommended to also implement a <code class="docutils literal notranslate"><span class="pre">get_height_and_width</span></code>
+method, which returns the height and the width of the image. If this
+method is not provided, we query all elements of the dataset via
+<code class="docutils literal notranslate"><span class="pre">__getitem__</span></code> , which loads the image in memory and is slower than if
+a custom method is provided.</p>
+<div class="section" id="writing-a-custom-dataset-for-pennfudan">
+<h3>Writing a custom dataset for PennFudan<a class="headerlink" href="#writing-a-custom-dataset-for-pennfudan" title="Permalink to this heading">¶</a></h3>
+<p>Let’s write a dataset for the PennFudan dataset. First, let’s download the dataset and
+extract the <a class="reference external" href="https://www.cis.upenn.edu/~jshi/ped_html/PennFudanPed.zip">zip file</a>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">wget</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">www</span><span class="o">.</span><span class="n">cis</span><span class="o">.</span><span class="n">upenn</span><span class="o">.</span><span class="n">edu</span><span class="o">/~</span><span class="n">jshi</span><span class="o">/</span><span class="n">ped_html</span><span class="o">/</span><span class="n">PennFudanPed</span><span class="o">.</span><span class="n">zip</span> <span class="o">-</span><span class="n">P</span> <span class="n">data</span>
+<span class="n">cd</span> <span class="n">data</span> <span class="o">&amp;&amp;</span> <span class="n">unzip</span> <span class="n">PennFudanPed</span><span class="o">.</span><span class="n">zip</span>
+</pre></div>
+</div>
+<p>We have the following folder structure:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">PennFudanPed</span><span class="o">/</span>
+  <span class="n">PedMasks</span><span class="o">/</span>
+    <span class="n">FudanPed00001_mask</span><span class="o">.</span><span class="n">png</span>
+    <span class="n">FudanPed00002_mask</span><span class="o">.</span><span class="n">png</span>
+    <span class="n">FudanPed00003_mask</span><span class="o">.</span><span class="n">png</span>
+    <span class="n">FudanPed00004_mask</span><span class="o">.</span><span class="n">png</span>
+    <span class="o">...</span>
+  <span class="n">PNGImages</span><span class="o">/</span>
+    <span class="n">FudanPed00001</span><span class="o">.</span><span class="n">png</span>
+    <span class="n">FudanPed00002</span><span class="o">.</span><span class="n">png</span>
+    <span class="n">FudanPed00003</span><span class="o">.</span><span class="n">png</span>
+    <span class="n">FudanPed00004</span><span class="o">.</span><span class="n">png</span>
+</pre></div>
+</div>
+<p>Here is one example of a pair of images and segmentation masks</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">torchvision.io</span> <span class="kn">import</span> <a href="https://pytorch.org/vision/stable/generated/torchvision.io.read_image.html#torchvision.io.read_image" title="torchvision.io.read_image" class="sphx-glr-backref-module-torchvision-io sphx-glr-backref-type-py-function"><span class="n">read_image</span></a>
+
+
+<span class="n">image</span> <span class="o">=</span> <a href="https://pytorch.org/vision/stable/generated/torchvision.io.read_image.html#torchvision.io.read_image" title="torchvision.io.read_image" class="sphx-glr-backref-module-torchvision-io sphx-glr-backref-type-py-function"><span class="n">read_image</span></a><span class="p">(</span><span class="s2">&quot;data/PennFudanPed/PNGImages/FudanPed00046.png&quot;</span><span class="p">)</span>
+<span class="n">mask</span> <span class="o">=</span> <a href="https://pytorch.org/vision/stable/generated/torchvision.io.read_image.html#torchvision.io.read_image" title="torchvision.io.read_image" class="sphx-glr-backref-module-torchvision-io sphx-glr-backref-type-py-function"><span class="n">read_image</span></a><span class="p">(</span><span class="s2">&quot;data/PennFudanPed/PedMasks/FudanPed00046_mask.png&quot;</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">121</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Image&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">image</span><span class="o">.</span><span class="n">permute</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">122</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Mask&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">mask</span><span class="o">.</span><span class="n">permute</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>So each image has a corresponding
+segmentation mask, where each color correspond to a different instance.
+Let’s write a <a class="reference external" href="https://pytorch.org/docs/stable/data.html#torch.utils.data.Dataset" title="(in PyTorch v2.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">torch.utils.data.Dataset</span></code></a> class for this dataset.
+In the code below, we are wrapping images, bounding boxes and masks into
+<a class="reference external" href="https://pytorch.org/vision/stable/generated/torchvision.tv_tensors.TVTensor.html#torchvision.tv_tensors.TVTensor" title="(in Torchvision v0.18)"><code class="xref py py-class docutils literal notranslate"><span class="pre">torchvision.tv_tensors.TVTensor</span></code></a> classes so that we will be able to apply torchvision
+built-in transformations (<a class="reference external" href="https://pytorch.org/vision/stable/transforms.html">new Transforms API</a>)
+for the given object detection and segmentation task.
+Namely, image tensors will be wrapped by <a class="reference external" href="https://pytorch.org/vision/stable/generated/torchvision.tv_tensors.Image.html#torchvision.tv_tensors.Image" title="(in Torchvision v0.18)"><code class="xref py py-class docutils literal notranslate"><span class="pre">torchvision.tv_tensors.Image</span></code></a>, bounding boxes into
+<a class="reference external" href="https://pytorch.org/vision/stable/generated/torchvision.tv_tensors.BoundingBoxes.html#torchvision.tv_tensors.BoundingBoxes" title="(in Torchvision v0.18)"><code class="xref py py-class docutils literal notranslate"><span class="pre">torchvision.tv_tensors.BoundingBoxes</span></code></a> and masks into <a class="reference external" href="https://pytorch.org/vision/stable/generated/torchvision.tv_tensors.Mask.html#torchvision.tv_tensors.Mask" title="(in Torchvision v0.18)"><code class="xref py py-class docutils literal notranslate"><span class="pre">torchvision.tv_tensors.Mask</span></code></a>.
+As <a class="reference external" href="https://pytorch.org/vision/stable/generated/torchvision.tv_tensors.TVTensor.html#torchvision.tv_tensors.TVTensor" title="(in Torchvision v0.18)"><code class="xref py py-class docutils literal notranslate"><span class="pre">torchvision.tv_tensors.TVTensor</span></code></a> are <a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">torch.Tensor</span></code></a> subclasses, wrapped objects are also tensors and inherit the plain
+<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">torch.Tensor</span></code></a> API. For more information about torchvision <code class="docutils literal notranslate"><span class="pre">tv_tensors</span></code> see
+<a class="reference external" href="https://pytorch.org/vision/main/auto_examples/transforms/plot_transforms_getting_started.html#what-are-tvtensors">this documentation</a>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+
+<span class="kn">from</span> <span class="nn">torchvision.io</span> <span class="kn">import</span> <a href="https://pytorch.org/vision/stable/generated/torchvision.io.read_image.html#torchvision.io.read_image" title="torchvision.io.read_image" class="sphx-glr-backref-module-torchvision-io sphx-glr-backref-type-py-function"><span class="n">read_image</span></a>
+<span class="kn">from</span> <span class="nn">torchvision.ops.boxes</span> <span class="kn">import</span> <a href="https://pytorch.org/vision/stable/generated/torchvision.ops.masks_to_boxes.html#torchvision.ops.masks_to_boxes" title="torchvision.ops.masks_to_boxes" class="sphx-glr-backref-module-torchvision-ops sphx-glr-backref-type-py-function"><span class="n">masks_to_boxes</span></a>
+<span class="kn">from</span> <span class="nn">torchvision</span> <span class="kn">import</span> <span class="n">tv_tensors</span>
+<span class="kn">from</span> <span class="nn">torchvision.transforms.v2</span> <span class="kn">import</span> <span class="n">functional</span> <span class="k">as</span> <span class="n">F</span>
+
+
+<span class="k">class</span> <span class="nc">PennFudanDataset</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/data.html#torch.utils.data.Dataset" title="torch.utils.data.Dataset" class="sphx-glr-backref-module-torch-utils-data sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Dataset</span></a><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">root</span><span class="p">,</span> <span class="n">transforms</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">=</span> <span class="n">root</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">transforms</span> <span class="o">=</span> <span class="n">transforms</span>
+        <span class="c1"># load all image files, sorting them to</span>
+        <span class="c1"># ensure that they are aligned</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">imgs</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="s2">&quot;PNGImages&quot;</span><span class="p">))))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">masks</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="s2">&quot;PedMasks&quot;</span><span class="p">))))</span>
+
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">):</span>
+        <span class="c1"># load images and masks</span>
+        <span class="n">img_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span> <span class="s2">&quot;PNGImages&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">imgs</span><span class="p">[</span><span class="n">idx</span><span class="p">])</span>
+        <span class="n">mask_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span> <span class="s2">&quot;PedMasks&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">masks</span><span class="p">[</span><span class="n">idx</span><span class="p">])</span>
+        <span class="n">img</span> <span class="o">=</span> <a href="https://pytorch.org/vision/stable/generated/torchvision.io.read_image.html#torchvision.io.read_image" title="torchvision.io.read_image" class="sphx-glr-backref-module-torchvision-io sphx-glr-backref-type-py-function"><span class="n">read_image</span></a><span class="p">(</span><span class="n">img_path</span><span class="p">)</span>
+        <span class="n">mask</span> <span class="o">=</span> <a href="https://pytorch.org/vision/stable/generated/torchvision.io.read_image.html#torchvision.io.read_image" title="torchvision.io.read_image" class="sphx-glr-backref-module-torchvision-io sphx-glr-backref-type-py-function"><span class="n">read_image</span></a><span class="p">(</span><span class="n">mask_path</span><span class="p">)</span>
+        <span class="c1"># instances are encoded as different colors</span>
+        <span class="n">obj_ids</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.unique.html#torch.unique" title="torch.unique" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">unique</span></a><span class="p">(</span><span class="n">mask</span><span class="p">)</span>
+        <span class="c1"># first id is the background, so remove it</span>
+        <span class="n">obj_ids</span> <span class="o">=</span> <span class="n">obj_ids</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+        <span class="n">num_objs</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">obj_ids</span><span class="p">)</span>
+
+        <span class="c1"># split the color-encoded mask into a set</span>
+        <span class="c1"># of binary masks</span>
+        <span class="n">masks</span> <span class="o">=</span> <span class="p">(</span><span class="n">mask</span> <span class="o">==</span> <span class="n">obj_ids</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">])</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+
+        <span class="c1"># get bounding box coordinates for each mask</span>
+        <span class="n">boxes</span> <span class="o">=</span> <a href="https://pytorch.org/vision/stable/generated/torchvision.ops.masks_to_boxes.html#torchvision.ops.masks_to_boxes" title="torchvision.ops.masks_to_boxes" class="sphx-glr-backref-module-torchvision-ops sphx-glr-backref-type-py-function"><span class="n">masks_to_boxes</span></a><span class="p">(</span><span class="n">masks</span><span class="p">)</span>
+
+        <span class="c1"># there is only one class</span>
+        <span class="n">labels</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.ones.html#torch.ones" title="torch.ones" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">ones</span></a><span class="p">((</span><span class="n">num_objs</span><span class="p">,),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+
+        <span class="n">image_id</span> <span class="o">=</span> <span class="n">idx</span>
+        <span class="n">area</span> <span class="o">=</span> <span class="p">(</span><span class="n">boxes</span><span class="p">[:,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">-</span> <span class="n">boxes</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">])</span> <span class="o">*</span> <span class="p">(</span><span class="n">boxes</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">boxes</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])</span>
+        <span class="c1"># suppose all instances are not crowd</span>
+        <span class="n">iscrowd</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.zeros.html#torch.zeros" title="torch.zeros" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">zeros</span></a><span class="p">((</span><span class="n">num_objs</span><span class="p">,),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+
+        <span class="c1"># Wrap sample and targets into torchvision tv_tensors:</span>
+        <span class="n">img</span> <span class="o">=</span> <a href="https://pytorch.org/vision/stable/generated/torchvision.tv_tensors.Image.html#torchvision.tv_tensors.Image" title="torchvision.tv_tensors.Image" class="sphx-glr-backref-module-torchvision-tv_tensors sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">tv_tensors</span><span class="o">.</span><span class="n">Image</span></a><span class="p">(</span><span class="n">img</span><span class="p">)</span>
+
+        <span class="n">target</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">target</span><span class="p">[</span><span class="s2">&quot;boxes&quot;</span><span class="p">]</span> <span class="o">=</span> <a href="https://pytorch.org/vision/stable/generated/torchvision.tv_tensors.BoundingBoxes.html#torchvision.tv_tensors.BoundingBoxes" title="torchvision.tv_tensors.BoundingBoxes" class="sphx-glr-backref-module-torchvision-tv_tensors sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">tv_tensors</span><span class="o">.</span><span class="n">BoundingBoxes</span></a><span class="p">(</span><span class="n">boxes</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;XYXY&quot;</span><span class="p">,</span> <span class="n">canvas_size</span><span class="o">=</span><span class="n">F</span><span class="o">.</span><span class="n">get_size</span><span class="p">(</span><span class="n">img</span><span class="p">))</span>
+        <span class="n">target</span><span class="p">[</span><span class="s2">&quot;masks&quot;</span><span class="p">]</span> <span class="o">=</span> <a href="https://pytorch.org/vision/stable/generated/torchvision.tv_tensors.Mask.html#torchvision.tv_tensors.Mask" title="torchvision.tv_tensors.Mask" class="sphx-glr-backref-module-torchvision-tv_tensors sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">tv_tensors</span><span class="o">.</span><span class="n">Mask</span></a><span class="p">(</span><span class="n">masks</span><span class="p">)</span>
+        <span class="n">target</span><span class="p">[</span><span class="s2">&quot;labels&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">labels</span>
+        <span class="n">target</span><span class="p">[</span><span class="s2">&quot;image_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">image_id</span>
+        <span class="n">target</span><span class="p">[</span><span class="s2">&quot;area&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">area</span>
+        <span class="n">target</span><span class="p">[</span><span class="s2">&quot;iscrowd&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">iscrowd</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">transforms</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">img</span><span class="p">,</span> <span class="n">target</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transforms</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">img</span><span class="p">,</span> <span class="n">target</span>
+
+    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">imgs</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>That’s all for the dataset. Now let’s define a model that can perform
+predictions on this dataset.</p>
+</div>
+</div>
+<div class="section" id="defining-your-model">
+<h2>Defining your model<a class="headerlink" href="#defining-your-model" title="Permalink to this heading">¶</a></h2>
+<p>In this tutorial, we will be using <a class="reference external" href="https://arxiv.org/abs/1703.06870">Mask
+R-CNN</a>, which is based on top of
+<a class="reference external" href="https://arxiv.org/abs/1506.01497">Faster R-CNN</a>. Faster R-CNN is a
+model that predicts both bounding boxes and class scores for potential
+objects in the image.</p>
+<img alt="../_static/img/tv_tutorial/tv_image03.png" src="../_static/img/tv_tutorial/tv_image03.png" />
+<p>Mask R-CNN adds an extra branch
+into Faster R-CNN, which also predicts segmentation masks for each
+instance.</p>
+<img alt="../_static/img/tv_tutorial/tv_image04.png" src="../_static/img/tv_tutorial/tv_image04.png" />
+<p>There are two common
+situations where one might want
+to modify one of the available models in TorchVision Model Zoo. The first
+is when we want to start from a pre-trained model, and just finetune the
+last layer. The other is when we want to replace the backbone of the
+model with a different one (for faster predictions, for example).</p>
+<p>Let’s go see how we would do one or another in the following sections.</p>
+<div class="section" id="finetuning-from-a-pretrained-model">
+<h3>1 - Finetuning from a pretrained model<a class="headerlink" href="#finetuning-from-a-pretrained-model" title="Permalink to this heading">¶</a></h3>
+<p>Let’s suppose that you want to start from a model pre-trained on COCO
+and want to finetune it for your particular classes. Here is a possible
+way of doing it:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torchvision</span>
+<span class="kn">from</span> <span class="nn">torchvision.models.detection.faster_rcnn</span> <span class="kn">import</span> <span class="n">FastRCNNPredictor</span>
+
+<span class="c1"># load a model pre-trained on COCO</span>
+<span class="n">model</span> <span class="o">=</span> <a href="https://pytorch.org/vision/stable/models/generated/torchvision.models.detection.fasterrcnn_resnet50_fpn.html#torchvision.models.detection.fasterrcnn_resnet50_fpn" title="torchvision.models.detection.fasterrcnn_resnet50_fpn" class="sphx-glr-backref-module-torchvision-models-detection sphx-glr-backref-type-py-function"><span class="n">torchvision</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">detection</span><span class="o">.</span><span class="n">fasterrcnn_resnet50_fpn</span></a><span class="p">(</span><span class="n">weights</span><span class="o">=</span><span class="s2">&quot;DEFAULT&quot;</span><span class="p">)</span>
+
+<span class="c1"># replace the classifier with a new one, that has</span>
+<span class="c1"># num_classes which is user-defined</span>
+<span class="n">num_classes</span> <span class="o">=</span> <span class="mi">2</span>  <span class="c1"># 1 class (person) + background</span>
+<span class="c1"># get number of input features for the classifier</span>
+<span class="n">in_features</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">roi_heads</span><span class="o">.</span><span class="n">box_predictor</span><span class="o">.</span><span class="n">cls_score</span><span class="o">.</span><span class="n">in_features</span>
+<span class="c1"># replace the pre-trained head with a new one</span>
+<span class="n">model</span><span class="o">.</span><span class="n">roi_heads</span><span class="o">.</span><span class="n">box_predictor</span> <span class="o">=</span> <span class="n">FastRCNNPredictor</span><span class="p">(</span><span class="n">in_features</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="modifying-the-model-to-add-a-different-backbone">
+<h3>2 - Modifying the model to add a different backbone<a class="headerlink" href="#modifying-the-model-to-add-a-different-backbone" title="Permalink to this heading">¶</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torchvision</span>
+<span class="kn">from</span> <span class="nn">torchvision.models.detection</span> <span class="kn">import</span> <span class="n">FasterRCNN</span>
+<span class="kn">from</span> <span class="nn">torchvision.models.detection.rpn</span> <span class="kn">import</span> <span class="n">AnchorGenerator</span>
+
+<span class="c1"># load a pre-trained model for classification and return</span>
+<span class="c1"># only the features</span>
+<span class="n">backbone</span> <span class="o">=</span> <a href="https://pytorch.org/vision/stable/models/generated/torchvision.models.mobilenet_v2.html#torchvision.models.mobilenet_v2" title="torchvision.models.mobilenet_v2" class="sphx-glr-backref-module-torchvision-models sphx-glr-backref-type-py-function"><span class="n">torchvision</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">mobilenet_v2</span></a><span class="p">(</span><span class="n">weights</span><span class="o">=</span><span class="s2">&quot;DEFAULT&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">features</span>
+<span class="c1"># ``FasterRCNN`` needs to know the number of</span>
+<span class="c1"># output channels in a backbone. For mobilenet_v2, it&#39;s 1280</span>
+<span class="c1"># so we need to add it here</span>
+<span class="n">backbone</span><span class="o">.</span><span class="n">out_channels</span> <span class="o">=</span> <span class="mi">1280</span>
+
+<span class="c1"># let&#39;s make the RPN generate 5 x 3 anchors per spatial</span>
+<span class="c1"># location, with 5 different sizes and 3 different aspect</span>
+<span class="c1"># ratios. We have a Tuple[Tuple[int]] because each feature</span>
+<span class="c1"># map could potentially have different sizes and</span>
+<span class="c1"># aspect ratios</span>
+<span class="n">anchor_generator</span> <span class="o">=</span> <span class="n">AnchorGenerator</span><span class="p">(</span>
+    <span class="n">sizes</span><span class="o">=</span><span class="p">((</span><span class="mi">32</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">128</span><span class="p">,</span> <span class="mi">256</span><span class="p">,</span> <span class="mi">512</span><span class="p">),),</span>
+    <span class="n">aspect_ratios</span><span class="o">=</span><span class="p">((</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">),)</span>
+<span class="p">)</span>
+
+<span class="c1"># let&#39;s define what are the feature maps that we will</span>
+<span class="c1"># use to perform the region of interest cropping, as well as</span>
+<span class="c1"># the size of the crop after rescaling.</span>
+<span class="c1"># if your backbone returns a Tensor, featmap_names is expected to</span>
+<span class="c1"># be [0]. More generally, the backbone should return an</span>
+<span class="c1"># ``OrderedDict[Tensor]``, and in ``featmap_names`` you can choose which</span>
+<span class="c1"># feature maps to use.</span>
+<span class="n">roi_pooler</span> <span class="o">=</span> <a href="https://pytorch.org/vision/stable/generated/torchvision.ops.MultiScaleRoIAlign.html#torchvision.ops.MultiScaleRoIAlign" title="torchvision.ops.MultiScaleRoIAlign" class="sphx-glr-backref-module-torchvision-ops sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">torchvision</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">MultiScaleRoIAlign</span></a><span class="p">(</span>
+    <span class="n">featmap_names</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;0&#39;</span><span class="p">],</span>
+    <span class="n">output_size</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span>
+    <span class="n">sampling_ratio</span><span class="o">=</span><span class="mi">2</span>
+<span class="p">)</span>
+
+<span class="c1"># put the pieces together inside a Faster-RCNN model</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">FasterRCNN</span><span class="p">(</span>
+    <span class="n">backbone</span><span class="p">,</span>
+    <span class="n">num_classes</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+    <span class="n">rpn_anchor_generator</span><span class="o">=</span><span class="n">anchor_generator</span><span class="p">,</span>
+    <span class="n">box_roi_pool</span><span class="o">=</span><span class="n">roi_pooler</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="object-detection-and-instance-segmentation-model-for-pennfudan-dataset">
+<h3>Object detection and instance segmentation model for PennFudan Dataset<a class="headerlink" href="#object-detection-and-instance-segmentation-model-for-pennfudan-dataset" title="Permalink to this heading">¶</a></h3>
+<p>In our case, we want to finetune from a pre-trained model, given that
+our dataset is very small, so we will be following approach number 1.</p>
+<p>Here we want to also compute the instance segmentation masks, so we will
+be using Mask R-CNN:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torchvision</span>
+<span class="kn">from</span> <span class="nn">torchvision.models.detection.faster_rcnn</span> <span class="kn">import</span> <span class="n">FastRCNNPredictor</span>
+<span class="kn">from</span> <span class="nn">torchvision.models.detection.mask_rcnn</span> <span class="kn">import</span> <span class="n">MaskRCNNPredictor</span>
+
+
+<span class="k">def</span> <span class="nf">get_model_instance_segmentation</span><span class="p">(</span><span class="n">num_classes</span><span class="p">):</span>
+    <span class="c1"># load an instance segmentation model pre-trained on COCO</span>
+    <span class="n">model</span> <span class="o">=</span> <a href="https://pytorch.org/vision/stable/models/generated/torchvision.models.detection.maskrcnn_resnet50_fpn.html#torchvision.models.detection.maskrcnn_resnet50_fpn" title="torchvision.models.detection.maskrcnn_resnet50_fpn" class="sphx-glr-backref-module-torchvision-models-detection sphx-glr-backref-type-py-function"><span class="n">torchvision</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">detection</span><span class="o">.</span><span class="n">maskrcnn_resnet50_fpn</span></a><span class="p">(</span><span class="n">weights</span><span class="o">=</span><span class="s2">&quot;DEFAULT&quot;</span><span class="p">)</span>
+
+    <span class="c1"># get number of input features for the classifier</span>
+    <span class="n">in_features</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">roi_heads</span><span class="o">.</span><span class="n">box_predictor</span><span class="o">.</span><span class="n">cls_score</span><span class="o">.</span><span class="n">in_features</span>
+    <span class="c1"># replace the pre-trained head with a new one</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">roi_heads</span><span class="o">.</span><span class="n">box_predictor</span> <span class="o">=</span> <span class="n">FastRCNNPredictor</span><span class="p">(</span><span class="n">in_features</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">)</span>
+
+    <span class="c1"># now get the number of input features for the mask classifier</span>
+    <span class="n">in_features_mask</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">roi_heads</span><span class="o">.</span><span class="n">mask_predictor</span><span class="o">.</span><span class="n">conv5_mask</span><span class="o">.</span><span class="n">in_channels</span>
+    <span class="n">hidden_layer</span> <span class="o">=</span> <span class="mi">256</span>
+    <span class="c1"># and replace the mask predictor with a new one</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">roi_heads</span><span class="o">.</span><span class="n">mask_predictor</span> <span class="o">=</span> <span class="n">MaskRCNNPredictor</span><span class="p">(</span>
+        <span class="n">in_features_mask</span><span class="p">,</span>
+        <span class="n">hidden_layer</span><span class="p">,</span>
+        <span class="n">num_classes</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">model</span>
+</pre></div>
+</div>
+<p>That’s it, this will make <code class="docutils literal notranslate"><span class="pre">model</span></code> be ready to be trained and evaluated
+on your custom dataset.</p>
+</div>
+</div>
+<div class="section" id="putting-everything-together">
+<h2>Putting everything together<a class="headerlink" href="#putting-everything-together" title="Permalink to this heading">¶</a></h2>
+<p>In <code class="docutils literal notranslate"><span class="pre">references/detection/</span></code>, we have a number of helper functions to
+simplify training and evaluating detection models. Here, we will use
+<code class="docutils literal notranslate"><span class="pre">references/detection/engine.py</span></code> and <code class="docutils literal notranslate"><span class="pre">references/detection/utils.py</span></code>.
+Just download everything under <code class="docutils literal notranslate"><span class="pre">references/detection</span></code> to your folder and use them here.
+On Linux if you have <code class="docutils literal notranslate"><span class="pre">wget</span></code>, you can download them using below commands:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">&quot;wget https://raw.githubusercontent.com/pytorch/vision/main/references/detection/engine.py&quot;</span><span class="p">)</span>
+<span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">&quot;wget https://raw.githubusercontent.com/pytorch/vision/main/references/detection/utils.py&quot;</span><span class="p">)</span>
+<span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">&quot;wget https://raw.githubusercontent.com/pytorch/vision/main/references/detection/coco_utils.py&quot;</span><span class="p">)</span>
+<span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">&quot;wget https://raw.githubusercontent.com/pytorch/vision/main/references/detection/coco_eval.py&quot;</span><span class="p">)</span>
+<span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">&quot;wget https://raw.githubusercontent.com/pytorch/vision/main/references/detection/transforms.py&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Since v0.15.0 torchvision provides <a class="reference external" href="https://pytorch.org/vision/stable/transforms.html">new Transforms API</a>
+to easily write data augmentation pipelines for Object Detection and Segmentation tasks.</p>
+<p>Let’s write some helper functions for data augmentation /
+transformation:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torchvision.transforms</span> <span class="kn">import</span> <span class="n">v2</span> <span class="k">as</span> <span class="n">T</span>
+
+
+<span class="k">def</span> <span class="nf">get_transform</span><span class="p">(</span><span class="n">train</span><span class="p">):</span>
+    <span class="n">transforms</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="n">train</span><span class="p">:</span>
+        <span class="n">transforms</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><a href="https://pytorch.org/vision/stable/generated/torchvision.transforms.v2.RandomHorizontalFlip.html#torchvision.transforms.v2.RandomHorizontalFlip" title="torchvision.transforms.v2.RandomHorizontalFlip" class="sphx-glr-backref-module-torchvision-transforms-v2 sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">T</span><span class="o">.</span><span class="n">RandomHorizontalFlip</span></a><span class="p">(</span><span class="mf">0.5</span><span class="p">))</span>
+    <span class="n">transforms</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><a href="https://pytorch.org/vision/stable/generated/torchvision.transforms.v2.ToDtype.html#torchvision.transforms.v2.ToDtype" title="torchvision.transforms.v2.ToDtype" class="sphx-glr-backref-module-torchvision-transforms-v2 sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">T</span><span class="o">.</span><span class="n">ToDtype</span></a><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">float</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+    <span class="n">transforms</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><a href="https://pytorch.org/vision/stable/generated/torchvision.transforms.v2.ToPureTensor.html#torchvision.transforms.v2.ToPureTensor" title="torchvision.transforms.v2.ToPureTensor" class="sphx-glr-backref-module-torchvision-transforms-v2 sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">T</span><span class="o">.</span><span class="n">ToPureTensor</span></a><span class="p">())</span>
+    <span class="k">return</span> <a href="https://pytorch.org/vision/stable/generated/torchvision.transforms.v2.Compose.html#torchvision.transforms.v2.Compose" title="torchvision.transforms.v2.Compose" class="sphx-glr-backref-module-torchvision-transforms-v2 sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">T</span><span class="o">.</span><span class="n">Compose</span></a><span class="p">(</span><span class="n">transforms</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="testing-forward-method-optional">
+<h2>Testing <code class="docutils literal notranslate"><span class="pre">forward()</span></code> method (Optional)<a class="headerlink" href="#testing-forward-method-optional" title="Permalink to this heading">¶</a></h2>
+<p>Before iterating over the dataset, it’s good to see what the model
+expects during training and inference time on sample data.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">utils</span>
+
+
+<span class="n">model</span> <span class="o">=</span> <a href="https://pytorch.org/vision/stable/models/generated/torchvision.models.detection.fasterrcnn_resnet50_fpn.html#torchvision.models.detection.fasterrcnn_resnet50_fpn" title="torchvision.models.detection.fasterrcnn_resnet50_fpn" class="sphx-glr-backref-module-torchvision-models-detection sphx-glr-backref-type-py-function"><span class="n">torchvision</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">detection</span><span class="o">.</span><span class="n">fasterrcnn_resnet50_fpn</span></a><span class="p">(</span><span class="n">weights</span><span class="o">=</span><span class="s2">&quot;DEFAULT&quot;</span><span class="p">)</span>
+<span class="n">dataset</span> <span class="o">=</span> <span class="n">PennFudanDataset</span><span class="p">(</span><span class="s1">&#39;data/PennFudanPed&#39;</span><span class="p">,</span> <span class="n">get_transform</span><span class="p">(</span><span class="n">train</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+<span class="n">data_loader</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/data.html#torch.utils.data.DataLoader" title="torch.utils.data.DataLoader" class="sphx-glr-backref-module-torch-utils-data sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span></a><span class="p">(</span>
+    <span class="n">dataset</span><span class="p">,</span>
+    <span class="n">batch_size</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+    <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">num_workers</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+    <span class="n">collate_fn</span><span class="o">=</span><span class="n">utils</span><span class="o">.</span><span class="n">collate_fn</span>
+<span class="p">)</span>
+
+<span class="c1"># For Training</span>
+<span class="n">images</span><span class="p">,</span> <span class="n">targets</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">data_loader</span><span class="p">))</span>
+<span class="n">images</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">image</span> <span class="k">for</span> <span class="n">image</span> <span class="ow">in</span> <span class="n">images</span><span class="p">)</span>
+<span class="n">targets</span> <span class="o">=</span> <span class="p">[{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">t</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">targets</span><span class="p">]</span>
+<span class="n">output</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">images</span><span class="p">,</span> <span class="n">targets</span><span class="p">)</span>  <span class="c1"># Returns losses and detections</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+
+<span class="c1"># For inference</span>
+<span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+<span class="n">x</span> <span class="o">=</span> <span class="p">[</span><a href="https://pytorch.org/docs/stable/generated/torch.rand.html#torch.rand" title="torch.rand" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">rand</span></a><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">300</span><span class="p">,</span> <span class="mi">400</span><span class="p">),</span> <a href="https://pytorch.org/docs/stable/generated/torch.rand.html#torch.rand" title="torch.rand" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">rand</span></a><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">500</span><span class="p">,</span> <span class="mi">400</span><span class="p">)]</span>
+<span class="n">predictions</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>  <span class="c1"># Returns predictions</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">predictions</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>Let’s now write the main function which performs the training and the
+validation:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">engine</span> <span class="kn">import</span> <span class="n">train_one_epoch</span><span class="p">,</span> <span class="n">evaluate</span>
+
+<span class="c1"># train on the GPU or on the CPU, if a GPU is not available</span>
+<span class="n">device</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/tensor_attributes.html#torch.device" title="torch.device" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">torch</span><span class="o">.</span><span class="n">device</span></a><span class="p">(</span><span class="s1">&#39;cuda&#39;</span><span class="p">)</span> <span class="k">if</span> <a href="https://pytorch.org/docs/stable/generated/torch.cuda.is_available.html#torch.cuda.is_available" title="torch.cuda.is_available" class="sphx-glr-backref-module-torch-cuda sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span></a><span class="p">()</span> <span class="k">else</span> <a href="https://pytorch.org/docs/stable/tensor_attributes.html#torch.device" title="torch.device" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">torch</span><span class="o">.</span><span class="n">device</span></a><span class="p">(</span><span class="s1">&#39;cpu&#39;</span><span class="p">)</span>
+
+<span class="c1"># our dataset has two classes only - background and person</span>
+<span class="n">num_classes</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="c1"># use our dataset and defined transformations</span>
+<span class="n">dataset</span> <span class="o">=</span> <span class="n">PennFudanDataset</span><span class="p">(</span><span class="s1">&#39;data/PennFudanPed&#39;</span><span class="p">,</span> <span class="n">get_transform</span><span class="p">(</span><span class="n">train</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+<span class="n">dataset_test</span> <span class="o">=</span> <span class="n">PennFudanDataset</span><span class="p">(</span><span class="s1">&#39;data/PennFudanPed&#39;</span><span class="p">,</span> <span class="n">get_transform</span><span class="p">(</span><span class="n">train</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
+
+<span class="c1"># split the dataset in train and test set</span>
+<span class="n">indices</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.randperm.html#torch.randperm" title="torch.randperm" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">randperm</span></a><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">))</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+<span class="n">dataset</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/data.html#torch.utils.data.Subset" title="torch.utils.data.Subset" class="sphx-glr-backref-module-torch-utils-data sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Subset</span></a><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">indices</span><span class="p">[:</span><span class="o">-</span><span class="mi">50</span><span class="p">])</span>
+<span class="n">dataset_test</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/data.html#torch.utils.data.Subset" title="torch.utils.data.Subset" class="sphx-glr-backref-module-torch-utils-data sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Subset</span></a><span class="p">(</span><span class="n">dataset_test</span><span class="p">,</span> <span class="n">indices</span><span class="p">[</span><span class="o">-</span><span class="mi">50</span><span class="p">:])</span>
+
+<span class="c1"># define training and validation data loaders</span>
+<span class="n">data_loader</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/data.html#torch.utils.data.DataLoader" title="torch.utils.data.DataLoader" class="sphx-glr-backref-module-torch-utils-data sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span></a><span class="p">(</span>
+    <span class="n">dataset</span><span class="p">,</span>
+    <span class="n">batch_size</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+    <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">num_workers</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+    <span class="n">collate_fn</span><span class="o">=</span><span class="n">utils</span><span class="o">.</span><span class="n">collate_fn</span>
+<span class="p">)</span>
+
+<span class="n">data_loader_test</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/data.html#torch.utils.data.DataLoader" title="torch.utils.data.DataLoader" class="sphx-glr-backref-module-torch-utils-data sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span></a><span class="p">(</span>
+    <span class="n">dataset_test</span><span class="p">,</span>
+    <span class="n">batch_size</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">shuffle</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">num_workers</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+    <span class="n">collate_fn</span><span class="o">=</span><span class="n">utils</span><span class="o">.</span><span class="n">collate_fn</span>
+<span class="p">)</span>
+
+<span class="c1"># get the model using our helper function</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">get_model_instance_segmentation</span><span class="p">(</span><span class="n">num_classes</span><span class="p">)</span>
+
+<span class="c1"># move model to the right device</span>
+<span class="n">model</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+
+<span class="c1"># construct an optimizer</span>
+<span class="n">params</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">()</span> <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">requires_grad</span><span class="p">]</span>
+<span class="n">optimizer</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.optim.SGD.html#torch.optim.SGD" title="torch.optim.SGD" class="sphx-glr-backref-module-torch-optim sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">SGD</span></a><span class="p">(</span>
+    <span class="n">params</span><span class="p">,</span>
+    <span class="n">lr</span><span class="o">=</span><span class="mf">0.005</span><span class="p">,</span>
+    <span class="n">momentum</span><span class="o">=</span><span class="mf">0.9</span><span class="p">,</span>
+    <span class="n">weight_decay</span><span class="o">=</span><span class="mf">0.0005</span>
+<span class="p">)</span>
+
+<span class="c1"># and a learning rate scheduler</span>
+<span class="n">lr_scheduler</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.optim.lr_scheduler.StepLR.html#torch.optim.lr_scheduler.StepLR" title="torch.optim.lr_scheduler.StepLR" class="sphx-glr-backref-module-torch-optim-lr_scheduler sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">lr_scheduler</span><span class="o">.</span><span class="n">StepLR</span></a><span class="p">(</span>
+    <span class="n">optimizer</span><span class="p">,</span>
+    <span class="n">step_size</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+    <span class="n">gamma</span><span class="o">=</span><span class="mf">0.1</span>
+<span class="p">)</span>
+
+<span class="c1"># let&#39;s train it just for 2 epochs</span>
+<span class="n">num_epochs</span> <span class="o">=</span> <span class="mi">2</span>
+
+<span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_epochs</span><span class="p">):</span>
+    <span class="c1"># train for one epoch, printing every 10 iterations</span>
+    <span class="n">train_one_epoch</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">,</span> <span class="n">data_loader</span><span class="p">,</span> <span class="n">device</span><span class="p">,</span> <span class="n">epoch</span><span class="p">,</span> <span class="n">print_freq</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+    <span class="c1"># update the learning rate</span>
+    <span class="n">lr_scheduler</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+    <span class="c1"># evaluate on the test dataset</span>
+    <span class="n">evaluate</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">data_loader_test</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;That&#39;s it!&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>So after one epoch of training, we obtain a COCO-style mAP &gt; 50, and
+a mask mAP of 65.</p>
+<p>But what do the predictions look like? Let’s take one image in the
+dataset and verify</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="kn">from</span> <span class="nn">torchvision.utils</span> <span class="kn">import</span> <a href="https://pytorch.org/vision/stable/generated/torchvision.utils.draw_bounding_boxes.html#torchvision.utils.draw_bounding_boxes" title="torchvision.utils.draw_bounding_boxes" class="sphx-glr-backref-module-torchvision-utils sphx-glr-backref-type-py-function"><span class="n">draw_bounding_boxes</span></a><span class="p">,</span> <a href="https://pytorch.org/vision/stable/generated/torchvision.utils.draw_segmentation_masks.html#torchvision.utils.draw_segmentation_masks" title="torchvision.utils.draw_segmentation_masks" class="sphx-glr-backref-module-torchvision-utils sphx-glr-backref-type-py-function"><span class="n">draw_segmentation_masks</span></a>
+
+
+<span class="n">image</span> <span class="o">=</span> <a href="https://pytorch.org/vision/stable/generated/torchvision.io.read_image.html#torchvision.io.read_image" title="torchvision.io.read_image" class="sphx-glr-backref-module-torchvision-io sphx-glr-backref-type-py-function"><span class="n">read_image</span></a><span class="p">(</span><span class="s2">&quot;data/PennFudanPed/PNGImages/FudanPed00046.png&quot;</span><span class="p">)</span>
+<span class="n">eval_transform</span> <span class="o">=</span> <span class="n">get_transform</span><span class="p">(</span><span class="n">train</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+<span class="k">with</span> <a href="https://pytorch.org/docs/stable/generated/torch.no_grad.html#torch.no_grad" title="torch.no_grad" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span></a><span class="p">():</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">eval_transform</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
+    <span class="c1"># convert RGBA -&gt; RGB and move to device</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="p">[:</span><span class="mi">3</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+    <span class="n">predictions</span> <span class="o">=</span> <span class="n">model</span><span class="p">([</span><span class="n">x</span><span class="p">,</span> <span class="p">])</span>
+    <span class="n">pred</span> <span class="o">=</span> <span class="n">predictions</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+
+<span class="n">image</span> <span class="o">=</span> <span class="p">(</span><span class="mf">255.0</span> <span class="o">*</span> <span class="p">(</span><span class="n">image</span> <span class="o">-</span> <span class="n">image</span><span class="o">.</span><span class="n">min</span><span class="p">())</span> <span class="o">/</span> <span class="p">(</span><span class="n">image</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">-</span> <span class="n">image</span><span class="o">.</span><span class="n">min</span><span class="p">()))</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+<span class="n">image</span> <span class="o">=</span> <span class="n">image</span><span class="p">[:</span><span class="mi">3</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span>
+<span class="n">pred_labels</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;pedestrian: </span><span class="si">{</span><span class="n">score</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="n">score</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">pred</span><span class="p">[</span><span class="s2">&quot;labels&quot;</span><span class="p">],</span> <span class="n">pred</span><span class="p">[</span><span class="s2">&quot;scores&quot;</span><span class="p">])]</span>
+<span class="n">pred_boxes</span> <span class="o">=</span> <span class="n">pred</span><span class="p">[</span><span class="s2">&quot;boxes&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">long</span><span class="p">()</span>
+<span class="n">output_image</span> <span class="o">=</span> <a href="https://pytorch.org/vision/stable/generated/torchvision.utils.draw_bounding_boxes.html#torchvision.utils.draw_bounding_boxes" title="torchvision.utils.draw_bounding_boxes" class="sphx-glr-backref-module-torchvision-utils sphx-glr-backref-type-py-function"><span class="n">draw_bounding_boxes</span></a><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">pred_boxes</span><span class="p">,</span> <span class="n">pred_labels</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">)</span>
+
+<span class="n">masks</span> <span class="o">=</span> <span class="p">(</span><span class="n">pred</span><span class="p">[</span><span class="s2">&quot;masks&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mf">0.7</span><span class="p">)</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">output_image</span> <span class="o">=</span> <a href="https://pytorch.org/vision/stable/generated/torchvision.utils.draw_segmentation_masks.html#torchvision.utils.draw_segmentation_masks" title="torchvision.utils.draw_segmentation_masks" class="sphx-glr-backref-module-torchvision-utils sphx-glr-backref-type-py-function"><span class="n">draw_segmentation_masks</span></a><span class="p">(</span><span class="n">output_image</span><span class="p">,</span> <span class="n">masks</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s2">&quot;blue&quot;</span><span class="p">)</span>
+
+
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">12</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">output_image</span><span class="o">.</span><span class="n">permute</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>The results look good!</p>
+</div>
+<div class="section" id="wrapping-up">
+<h2>Wrapping up<a class="headerlink" href="#wrapping-up" title="Permalink to this heading">¶</a></h2>
+<p>In this tutorial, you have learned how to create your own training
+pipeline for object detection models on a custom dataset. For
+that, you wrote a <a class="reference external" href="https://pytorch.org/docs/stable/data.html#torch.utils.data.Dataset" title="(in PyTorch v2.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">torch.utils.data.Dataset</span></code></a> class that returns the
+images and the ground truth boxes and segmentation masks. You also
+leveraged a Mask R-CNN model pre-trained on COCO train2017 in order to
+perform transfer learning on this new dataset.</p>
+<p>For a more complete example, which includes multi-machine / multi-GPU
+training, check <code class="docutils literal notranslate"><span class="pre">references/detection/train.py</span></code>, which is present in
+the torchvision repository.</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.000 seconds)</p>
+<div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-intermediate-torchvision-tutorial-py">
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/7590258df9f28b5ae0994c3b5b035edf/torchvision_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">torchvision_tutorial.py</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/4a542c9f39bedbfe7de5061767181d36/torchvision_tutorial.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">torchvision_tutorial.ipynb</span></code></a></p>
+</div>
+</div>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
+</div>
+</div>
+
+
+             </article>
+             
+            </div>
+            <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../beginner/transfer_learning_tutorial.html" class="btn btn-neutral float-right" title="计算机视觉迁移学习教程" accesskey="n" rel="next">Next <img src="../_static/images/chevron-right-orange.svg" class="next-page"></a>
+      
+      
+        <a href="tensorboard_tutorial.html" class="btn btn-neutral" title="TensorBoard 可视化模型、数据和训练" accesskey="p" rel="prev"><img src="../_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
+      
+    </div>
+  
+
+  
+
+    <hr class="rating-hr hr-top">
+      <div class="rating-container">
+        <div class="rating-prompt">Rate this Tutorial</div>
+        <div class="stars-outer">
+          <i class="far fa-star" title="1 Star" data-behavior="tutorial-rating" data-count="1"></i>
+          <i class="far fa-star" title="2 Stars" data-behavior="tutorial-rating" data-count="2"></i>
+          <i class="far fa-star" title="3 Stars" data-behavior="tutorial-rating" data-count="3"></i>
+          <i class="far fa-star" title="4 Stars" data-behavior="tutorial-rating" data-count="4"></i>
+          <i class="far fa-star" title="5 Stars" data-behavior="tutorial-rating" data-count="5"></i>
+        </div>
+      </div>
+    <hr class="rating-hr hr-bottom"/>
+
+  
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2024, PyTorch.
+
+    </p>
+  </div>
+    
+      <div>
+        Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+      </div>
+     
+
+</footer>
+
+          </div>
+<script>
+if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.indexOf("/prototype/prototype_index")< 1))
+  {
+    var div = '<div class="admonition note"><p class="admonition-title">Note</p><p><i class="fa fa-flask" aria-hidden="true">&nbsp</i> This tutorial describes a prototype feature. Prototype features are typically not available as part of binary distributions like PyPI or Conda, except sometimes behind run-time flags, and are at an early stage for feedback and testing.</p></div>'
+    document.getElementById("pytorch-article").insertAdjacentHTML('afterBegin', div)
+  } 
+</script>
+        </div>
+
+        <div class="pytorch-content-right" id="pytorch-content-right">
+          <div class="pytorch-right-menu" id="pytorch-right-menu">
+            <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
+              <ul>
+<li><a class="reference internal" href="#">TorchVision 对象检测微调教程</a><ul>
+<li><a class="reference internal" href="#defining-the-dataset">Defining the Dataset</a><ul>
+<li><a class="reference internal" href="#writing-a-custom-dataset-for-pennfudan">Writing a custom dataset for PennFudan</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#defining-your-model">Defining your model</a><ul>
+<li><a class="reference internal" href="#finetuning-from-a-pretrained-model">1 - Finetuning from a pretrained model</a></li>
+<li><a class="reference internal" href="#modifying-the-model-to-add-a-different-backbone">2 - Modifying the model to add a different backbone</a></li>
+<li><a class="reference internal" href="#object-detection-and-instance-segmentation-model-for-pennfudan-dataset">Object detection and instance segmentation model for PennFudan Dataset</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#putting-everything-together">Putting everything together</a></li>
+<li><a class="reference internal" href="#testing-forward-method-optional">Testing <code class="docutils literal notranslate"><span class="pre">forward()</span></code> method (Optional)</a></li>
+<li><a class="reference internal" href="#wrapping-up">Wrapping up</a></li>
+</ul>
+</li>
+</ul>
+
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+  
+
+
+  
+
+     
+       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+         <script src="../_static/jquery.js"></script>
+         <script src="../_static/underscore.js"></script>
+         <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+         <script src="../_static/doctools.js"></script>
+         <script src="../_static/clipboard.min.js"></script>
+         <script src="../_static/copybutton.js"></script>
+         <script src="../_static/katex.min.js"></script>
+         <script src="../_static/auto-render.min.js"></script>
+         <script src="../_static/katex_autorenderer.js"></script>
+         <script src="../_static/design-tabs.js"></script>
+     
+
+  
+
+  <script type="text/javascript" src="../_static/js/vendor/popper.min.js"></script>
+  <script type="text/javascript" src="../_static/js/vendor/bootstrap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min.js"></script>
+  <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+ 
+<script>
+
+// Helper function to make it easier to call dataLayer.push() 
+function gtag(){window.dataLayer.push(arguments);}
+
+//add microsoft link
+
+if(window.location.href.indexOf("/beginner/basics/")!= -1)
+{
+  var url="https://docs.microsoft.com/learn/paths/pytorch-fundamentals/?wt.mc_id=aiml-7486-cxa";
+  switch(window.location.pathname.split("/").pop().replace('.html',''))
+  {
+    case"quickstart_tutorial":
+      url="https://docs.microsoft.com/learn/modules/intro-machine-learning-pytorch/9-quickstart?WT.mc_id=aiml-7486-cxa";
+      break;
+    case"tensorqs_tutorial":
+      url="https://docs.microsoft.com/learn/modules/intro-machine-learning-pytorch/2-tensors?WT.mc_id=aiml-7486-cxa";
+      break;
+    case"data_tutorial":
+      url="https://docs.microsoft.com/learn/modules/intro-machine-learning-pytorch/3-data?WT.mc_id=aiml-7486-cxa";
+      break;
+    case"transforms_tutorial":
+      url="https://docs.microsoft.com/learn/modules/intro-machine-learning-pytorch/4-transforms?WT.mc_id=aiml-7486-cxa";
+      break;
+    case"buildmodel_tutorial":
+      url="https://docs.microsoft.com/learn/modules/intro-machine-learning-pytorch/5-model?WT.mc_id=aiml-7486-cxa";
+      break;
+    case"autogradqs_tutorial":
+      url="https://docs.microsoft.com/learn/modules/intro-machine-learning-pytorch/6-autograd?WT.mc_id=aiml-7486-cxa";
+      break;
+    case"optimization_tutorial":
+      url="https://docs.microsoft.com/learn/modules/intro-machine-learning-pytorch/7-optimization?WT.mc_id=aiml-7486-cxa";
+      break;
+    case"saveloadrun_tutorial":
+      url="https://docs.microsoft.com/learn/modules/intro-machine-learning-pytorch/8-inference?WT.mc_id=aiml-7486-cxa";
+    }
+    
+    $(".pytorch-call-to-action-links").children().first().before("<a href="+url+' data-behavior="call-to-action-event" data-response="Run in Microsoft Learn" target="_blank"><div id="microsoft-learn-link" style="padding-bottom: 0.625rem;border-bottom: 1px solid #f3f4f7;padding-right: 2.5rem;display: -webkit-box;  display: -ms-flexbox; display: flex; -webkit-box-align: center;-ms-flex-align: center;align-items: center;"><img class="call-to-action-img" src="../../_static/images/microsoft-logo.svg"/><div class="call-to-action-desktop-view">Run in Microsoft Learn</div><div class="call-to-action-mobile-view">Learn</div></div></a>')
+  }
+
+  !function(f,b,e,v,n,t,s)
+  {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+  n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+  if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+  n.queue=[];t=b.createElement(e);t.async=!0;
+  t.src=v;s=b.getElementsByTagName(e)[0];
+  s.parentNode.insertBefore(t,s)}(window,document,'script',
+  'https://connect.facebook.net/en_US/fbevents.js');
+  fbq('init', '243028289693773');
+  fbq('track', 'PageView');
+
+  $("[data-behavior='call-to-action-event']").on('click', function(){
+    fbq('trackCustom', "Download", {
+      tutorialTitle: $('h1:first').text(),
+      downloadLink: this.href,
+      tutorialLink: window.location.href,
+      downloadTitle: $(this).attr("data-response")
+    });
+    gtag('event', 'click', {
+      'event_category': $(this).attr("data-response"),
+      'event_label': $("h1").first().text(),
+      'tutorial_link': window.location.href
+    });
+   });
+
+   $("[data-behavior='tutorial-rating']").on('click', function(){
+    fbq('trackCustom', "Tutorial Rating", {
+      tutorialLink: window.location.href,
+      tutorialTitle: $('h1:first').text(),
+      rating: $(this).attr("data-count")
+    });
+    gtag('event', 'click', {
+      'event_category': 'Tutorial Rating',
+      'event_label': $("h1").first().text(),
+      'value': $(this).attr("data-count"),
+      'customEvent:Rating': $(this).attr("data-count") // send to GA custom dimension customEvent:Rating.
+    });
+   });
+
+   if (location.pathname == "/") {
+     $(".rating-container").hide();
+     $(".hr-bottom").hide();
+   }
+
+
+</script>
+
+<noscript>
+  <img height="1" width="1"
+  src="https://www.facebook.com/tr?id=243028289693773&ev=PageView
+  &noscript=1"/>
+</noscript>
+
+<script type="text/javascript">
+  var collapsedSections = ['PyTorch Recipes', 'Learning PyTorch', 'Image and Video', 'Audio', 'Text', 'Backends', 'Reinforcement Learning', 'Deploying PyTorch Models in Production', 'Profiling PyTorch', 'Code Transforms with FX', 'Frontend APIs', 'Extending PyTorch', 'Model Optimization', 'Parallel and Distributed Training', 'Edge with ExecuTorch', 'Recommendation Systems', 'Multimodality'];
+</script>
+
+<img height="1" width="1" style="border-style:none;" alt="" src="https://www.googleadservices.com/pagead/conversion/795629140/?label=txkmCPmdtosBENSssfsC&amp;guid=ON&amp;script=0"/>
+
+
+  <!-- Begin Footer -->
+
+  <div class="container-fluid docs-tutorials-resources" id="docs-tutorials-resources">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-4 text-center">
+          <h2>Docs</h2>
+          <p>Access comprehensive developer documentation for PyTorch</p>
+          <a class="with-right-arrow" href="https://pytorch.org/docs/stable/index.html">View Docs</a>
+        </div>
+
+        <div class="col-md-4 text-center">
+          <h2>Tutorials</h2>
+          <p>Get in-depth tutorials for beginners and advanced developers</p>
+          <a class="with-right-arrow" href="https://pytorch.org/tutorials">View Tutorials</a>
+        </div>
+
+        <div class="col-md-4 text-center">
+          <h2>Resources</h2>
+          <p>Find development resources and get your questions answered</p>
+          <a class="with-right-arrow" href="https://pytorch.org/resources">View Resources</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="container footer-container">
+      <div class="footer-logo-wrapper">
+        <a href="https://pytorch.org/" class="footer-logo"></a>
+      </div>
+
+      <div class="footer-links-wrapper">
+        <div class="footer-links-col">
+          <ul>
+            <li class="list-title"><a href="https://pytorch.org/">PyTorch</a></li>
+            <li><a href="https://pytorch.org/get-started">Get Started</a></li>
+            <li><a href="https://pytorch.org/features">Features</a></li>
+            <li><a href="https://pytorch.org/ecosystem">Ecosystem</a></li>
+            <li><a href="https://pytorch.org/blog/">Blog</a></li>
+            <li><a href="https://github.com/pytorch/pytorch/blob/master/CONTRIBUTING.md">Contributing</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-links-col">
+          <ul>
+            <li class="list-title"><a href="https://pytorch.org/resources">Resources</a></li>
+            <li><a href="https://pytorch.org/tutorials">Tutorials</a></li>
+            <li><a href="https://pytorch.org/docs/stable/index.html">Docs</a></li>
+            <li><a href="https://discuss.pytorch.org" target="_blank">Discuss</a></li>
+            <li><a href="https://github.com/pytorch/pytorch/issues" target="_blank">Github Issues</a></li>
+            <li><a href="https://pytorch.org/assets/brand-guidelines/PyTorch-Brand-Guidelines.pdf" target="_blank">Brand Guidelines</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-links-col">
+          <ul>
+            <li class="list-title">Stay up to date</li>
+            <li><a href="https://www.facebook.com/pytorch" target="_blank">Facebook</a></li>
+            <li><a href="https://twitter.com/pytorch" target="_blank">Twitter</a></li>
+            <li><a href="https://www.youtube.com/pytorch" target="_blank">YouTube</a></li>
+            <li><a href="https://www.linkedin.com/company/pytorch" target="_blank">LinkedIn</a></li>
+          </ul>  
+          </div>
+
+        <div class="footer-links-col">
+          <ul>
+            <li class="list-title">PyTorch Podcasts</li>
+            <li><a href="https://open.spotify.com/show/6UzHKeiy368jKfQMKKvJY5" target="_blank">Spotify</a></li>
+            <li><a href="https://podcasts.apple.com/us/podcast/pytorch-developer-podcast/id1566080008" target="_blank">Apple</a></li>
+            <li><a href="https://www.google.com/podcasts?feed=aHR0cHM6Ly9mZWVkcy5zaW1wbGVjYXN0LmNvbS9PQjVGa0lsOA%3D%3D" target="_blank">Google</a></li>
+            <li><a href="https://music.amazon.com/podcasts/7a4e6f0e-26c2-49e9-a478-41bd244197d0/PyTorch-Developer-Podcast?" target="_blank">Amazon</a></li>
+          </ul>
+         </div>
+        </div>
+        
+        <div class="privacy-policy">
+          <ul>
+            <li class="privacy-policy-links"><a href="https://www.linuxfoundation.org/terms/" target="_blank">Terms</a></li>
+            <li class="privacy-policy-links">|</li>
+            <li class="privacy-policy-links"><a href="https://www.linuxfoundation.org/privacy-policy/" target="_blank">Privacy</a></li>
+          </ul>
+        </div>
+        <div class="copyright">
+        <p>© Copyright The Linux Foundation. The PyTorch Foundation is a project of The Linux Foundation.
+          For web site terms of use, trademark policy and other policies applicable to The PyTorch Foundation please see
+          <a href="https://www.linuxfoundation.org/policies/">www.linuxfoundation.org/policies/</a>. The PyTorch Foundation supports the PyTorch open source
+          project, which has been established as PyTorch Project a Series of LF Projects, LLC. For policies applicable to the PyTorch Project a Series of LF Projects, LLC,
+          please see <a href="https://www.lfprojects.org/policies/">www.lfprojects.org/policies/</a>.</p>
+      </div>
+     </div>
+
+  </footer>
+
+  <div class="cookie-banner-wrapper">
+  <div class="container">
+    <p class="gdpr-notice">To analyze traffic and optimize your experience, we serve cookies on this site. By clicking or navigating, you agree to allow our usage of cookies. As the current maintainers of this site, Facebook’s Cookies Policy applies. Learn more, including about available controls: <a href="https://www.facebook.com/policies/cookies/">Cookies Policy</a>.</p>
+    <img class="close-button" src="../_static/images/pytorch-x.svg">
+  </div>
+</div>
+
+  <!-- End Footer -->
+
+  <!-- Begin Mobile Menu -->
+
+  <div class="mobile-main-menu">
+    <div class="container-fluid">
+      <div class="container">
+        <div class="mobile-main-menu-header-container">
+          <a class="header-logo" href="https://pytorch.org/" aria-label="PyTorch"></a>
+          <a class="main-menu-close-button" href="#" data-behavior="close-mobile-menu"></a>
+        </div>
+      </div>
+    </div>
+
+    <div class="mobile-main-menu-links-container">
+      <div class="main-menu">
+        <ul>
+           <li class="resources-mobile-menu-title">
+             <a>Learn</a>
+           </li>
+           <ul class="resources-mobile-menu-items">
+             <li>
+               <a href="https://pytorch.org/get-started">Get Started</a>
+             </li>
+             <li>
+               <a href="https://pytorch.org/tutorials">Tutorials</a>
+             </li>
+             <li>
+               <a href="https://pytorch.org/tutorials/beginner/basics/intro.html">Learn the Basics</a>
+             </li>
+             <li>
+               <a href="https://pytorch.org/tutorials/recipes/recipes_index.html">PyTorch Recipes</a>
+             </li>
+             <li>
+               <a href="https://pytorch.org/tutorials/beginner/introyt.html">Introduction to PyTorch - YouTube Series</a>
+             </li>
+           </ul>
+           <li class="resources-mobile-menu-title">
+             <a>Ecosystem</a>
+           </li>
+           <ul class="resources-mobile-menu-items">
+             <li>
+               <a href="https://pytorch.org/ecosystem">Tools</a>
+             </li>
+             <li>
+               <a href="https://pytorch.org/#community-module">Community</a>
+             </li>
+             <li>
+               <a href="https://discuss.pytorch.org/">Forums</a>
+             </li>
+             <li>
+               <a href="https://pytorch.org/resources">Developer Resources</a>
+             </li>
+             <li>
+               <a href="https://pytorch.org/ecosystem/contributor-awards-2023">Contributor Awards - 2023</a>
+             </li>
+           </ul>
+
+           <li class="resources-mobile-menu-title">
+             <a>Edge</a>
+           </li>
+
+           <ul class="resources-mobile-menu-items">
+             <li>
+               <a href="https://pytorch.org/edge">About PyTorch Edge</a>
+             </li>
+             
+             <li>
+               <a href="https://pytorch.org/executorch-overview">ExecuTorch</a>
+             </li>
+           </ul>
+
+           <li class="resources-mobile-menu-title">
+             <a>Docs</a>
+           </li>
+
+           <ul class="resources-mobile-menu-items">
+            <li>
+              <a href="https://pytorch.org/docs/stable/index.html">PyTorch</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/pytorch-domains">PyTorch Domains</a>
+            </li>
+          </ul>
+
+          <li class="resources-mobile-menu-title">
+            <a>Blog & News</a>
+          </li>
+            
+           <ul class="resources-mobile-menu-items">
+            <li>
+              <a href="https://pytorch.org/blog/">PyTorch Blog</a>
+            </li>
+            <li>
+              <a href="https://pytorch.org/community-blog">Community Blog</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/videos">Videos</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/community-stories">Community Stories</a>
+            </li>
+            <li>
+              <a href="https://pytorch.org/events">Events</a>
+            </li>
+          </ul>
+          
+          <li class="resources-mobile-menu-title">
+            <a>About</a>
+          </li>
+
+          <ul class="resources-mobile-menu-items">
+            <li>
+              <a href="https://pytorch.org/foundation">PyTorch Foundation</a>
+            </li>
+            <li>
+              <a href="https://pytorch.org/governing-board">Governing Board</a>
+            </li>
+          </ul>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- End Mobile Menu -->
+
+  <script type="text/javascript" src="../_static/js/vendor/anchor.min.js"></script>
+
+  <script type="text/javascript">
+    $(document).ready(function() {
+      mobileMenu.bind();
+      mobileTOC.bind();
+      pytorchAnchors.bind();
+      sideMenus.bind();
+      scrollToAnchor.bind();
+      highlightNavigation.bind();
+      mainMenuDropdown.bind();
+      filterTags.bind();
+
+      // Add class to links that have code blocks, since we cannot create links in code blocks
+      $("article.pytorch-article a span.pre").each(function(e) {
+        $(this).closest("a").addClass("has-code");
+      });
+    })
+  </script>
+</body>
+</html>

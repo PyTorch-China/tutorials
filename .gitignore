@@ -1,10 +1,10 @@
 # sphinx things
-beginner
-intermediate
-advanced
-pytorch_basics
+/beginner
+/intermediate
+/advanced
+/pytorch_basics
 /recipes
-prototype
+/prototype
 
 #data things
 _data/

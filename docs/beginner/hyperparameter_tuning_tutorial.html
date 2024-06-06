@@ -1,0 +1,1536 @@
+
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Ray Tune 超参数调优 &mdash; PyTorch Tutorials 2.3.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!-- <link rel="stylesheet" href="../_static/pygments.css" type="text/css" /> -->
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/katex-math.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/sg_gallery.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/sg_gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/sg_gallery-dataframe.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/sg_gallery-rendered-html.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/sphinx-design.5ea377869091fd0449014c60fc090103.min.css" type="text/css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0-beta/dist/katex.min.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/custom2.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Parametrizations Tutorial" href="../intermediate/parametrizations.html" />
+    <link rel="prev" title="PyTorch Profiler With TensorBoard" href="../intermediate/tensorboard_profiler_tutorial.html" />
+  <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-T8XT4PS');</script>
+    <!-- End Google Tag Manager -->
+  
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+  <!-- Preload the theme fonts -->
+
+<link rel="preload" href="../_static/fonts/FreightSans/freight-sans-book.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../_static/fonts/FreightSans/freight-sans-medium.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../_static/fonts/IBMPlexMono/IBMPlexMono-Medium.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../_static/fonts/FreightSans/freight-sans-bold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../_static/fonts/FreightSans/freight-sans-medium-italic.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../_static/fonts/IBMPlexMono/IBMPlexMono-SemiBold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+
+<!-- Preload the katex fonts -->
+
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Math-Italic.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Main-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Main-Bold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size1-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size4-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size2-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size3-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Caligraphic-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.2/css/all.css" integrity="sha384-vSIIfh2YWi9wW0r9iZe7RJPrKwp6bG+s9QZMoITbCckVJqGCCRhc+ccxNcdpHuYu" crossorigin="anonymous">
+</head>
+
+<div class="container-fluid header-holder tutorials-header" id="header-holder">
+  <div class="container">
+    <div class="header-container">
+      <a class="header-logo" href="https://pytorch.org/" aria-label="PyTorch"></a>
+
+      <div class="main-menu">
+        <ul>
+
+          <li class="main-menu-item">
+          <div id="resourcesDropdownButton" data-toggle="resources-dropdown" class="resources-dropdown">
+              <a class="with-down-arrow">
+                Learn
+              </a>
+              <div class="resources-dropdown-menu">
+                <a class="nav-dropdown-item" href="https://pytorch.org/get-started">
+                  <span class=dropdown-title>Get Started</span>
+                  <p>Run PyTorch locally or get started quickly with one of the supported cloud platforms</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/tutorials">
+                  <span class="dropdown-title">Tutorials</span>
+                  <p>Whats new in PyTorch tutorials</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/tutorials/beginner/basics/intro.html">
+                  <span class="dropdown-title">Learn the Basics</span>
+                  <p>Familiarize yourself with PyTorch concepts and modules</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/tutorials/recipes/recipes_index.html">
+                  <span class="dropdown-title">PyTorch Recipes</span>
+                  <p>Bite-size, ready-to-deploy PyTorch code examples</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/tutorials/beginner/introyt.html">
+                  <span class="dropdown-title">Intro to PyTorch - YouTube Series</span>
+                  <p>Master PyTorch basics with our engaging YouTube tutorial series</p>
+                </a>
+              </div>
+            </div>
+          </li>
+
+          <li>
+          <div id="resourcesDropdownButton" data-toggle="resources-dropdown" class="resources-dropdown">
+              <a class="with-down-arrow">
+                Ecosystem
+              </a>
+              <div class="resources-dropdown-menu">
+                <a class="nav-dropdown-item" href="https://pytorch.org/ecosystem">
+                  <span class="dropdown-title">Tools</span>
+                  <p>Learn about the tools and frameworks in the PyTorch Ecosystem</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/#community-module">
+                  <span class=dropdown-title>Community</span>
+                  <p>Join the PyTorch developer community to contribute, learn, and get your questions answered</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://discuss.pytorch.org/" target="_blank">
+                  <span class=dropdown-title>Forums</span>
+                  <p>A place to discuss PyTorch code, issues, install, research</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/resources">
+                  <span class=dropdown-title>Developer Resources</span>
+                  <p>Find resources and get questions answered</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/ecosystem/contributor-awards-2023">
+                  <span class="dropdown-title">Contributor Awards - 2023</span>
+                  <p>Award winners announced at this year's PyTorch Conference</p>
+                </a>
+              </div>
+            </div>
+          </li>
+
+          <li>
+          <div id="resourcesDropdownButton" data-toggle="resources-dropdown" class="resources-dropdown">
+              <a class="with-down-arrow">
+                Edge
+              </a>
+              <div class="resources-dropdown-menu">
+                <a class="nav-dropdown-item" href="https://pytorch.org/edge">
+                  <span class="dropdown-title">About PyTorch Edge</span>
+                  <p>Build innovative and privacy-aware AI experiences for edge devices</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/executorch-overview">
+                  <span class="dropdown-title">ExecuTorch</span>
+                  <p>End-to-end solution for enabling on-device inference capabilities across mobile and edge devices</p>
+                </a>
+              </div>
+            </div>  
+          </li>
+
+          <li class="main-menu-item">
+            <div id="resourcesDropdownButton" data-toggle="resources-dropdown" class="resources-dropdown">
+              <a class="with-down-arrow">
+                Docs
+              </a>
+              <div class="resources-dropdown-menu">
+                <a class="nav-dropdown-item" href="https://pytorch.org/docs/stable/index.html">
+                  <span class="dropdown-title">PyTorch</span>
+                  <p>Explore the documentation for comprehensive guidance on how to use PyTorch</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/pytorch-domains">
+                  <span class="dropdown-title">PyTorch Domains</span>
+                  <p>Read the PyTorch Domains documentation to learn more about domain-specific libraries</p>
+                </a>
+              </div>
+            </div>
+          </li>
+
+          <li>
+            <div id="resourcesDropdownButton" data-toggle="resources-dropdown" class="resources-dropdown">
+              <a class="with-down-arrow">
+                Blogs & News 
+              </a>
+              <div class="resources-dropdown-menu">
+                <a class="nav-dropdown-item" href="https://pytorch.org/blog/">
+                  <span class="dropdown-title">PyTorch Blog</span>
+                  <p>Catch up on the latest technical news and happenings</p>
+                </a>
+                 <a class="nav-dropdown-item" href="https://pytorch.org/community-blog">
+                  <span class="dropdown-title">Community Blog</span>
+                  <p>Stories from the PyTorch ecosystem</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/videos">
+                  <span class="dropdown-title">Videos</span>
+                  <p>Learn about the latest PyTorch tutorials, new, and more </p>
+                <a class="nav-dropdown-item" href="https://pytorch.org/community-stories">
+                  <span class="dropdown-title">Community Stories</span>
+                  <p>Learn how our community solves real, everyday machine learning problems with PyTorch</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/events">
+                  <span class="dropdown-title">Events</span>
+                  <p>Find events, webinars, and podcasts</p>
+                </a>
+            </div>
+          </li>
+
+          <li>
+            <div id="resourcesDropdownButton" data-toggle="resources-dropdown" class="resources-dropdown">
+              <a class="with-down-arrow">
+                About
+              </a>
+              <div class="resources-dropdown-menu">
+                <a class="nav-dropdown-item" href="https://pytorch.org/foundation">
+                  <span class="dropdown-title">PyTorch Foundation</span>
+                  <p>Learn more about the PyTorch Foundation</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/governing-board">
+                  <span class="dropdown-title">Governing Board</span>
+                  <p></p>
+                </a>
+              </div>
+            </div>
+          </li>
+
+          <li class="main-menu-item">
+            <div class="no-dropdown">
+              <a href="https://pytorch.org/join" data-cta="join">
+                Become a Member
+              </a>
+            </div>
+          </li>
+          <li>
+           <div class="main-menu-item">
+             <a href="https://github.com/pytorch/pytorch" class="github-icon">
+             </a>
+           </div>
+          </li>
+          <!--- TODO: This block adds the search icon to the nav bar. We will enable it later. 
+          <li>
+            <div class="main-menu-item">
+             <a href="https://github.com/pytorch/pytorch" class="search-icon">
+             </a>
+            </div>
+          </li>
+          --->
+        </ul>
+      </div>
+
+      <a class="main-menu-open-button" href="#" data-behavior="open-mobile-menu"></a>
+    </div>
+  </div>
+</div>
+
+<body class="pytorch-body">
+
+   
+
+    
+
+    <div class="table-of-contents-link-wrapper">
+      <span>Table of Contents</span>
+      <a href="#" class="toggle-table-of-contents" data-behavior="toggle-table-of-contents"></a>
+    </div>
+
+    <nav data-toggle="wy-nav-shift" class="pytorch-left-menu" id="pytorch-left-menu">
+      <div class="pytorch-side-scroll">
+        <div class="pytorch-menu pytorch-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          <div class="pytorch-left-menu-search">
+            
+
+            
+              
+              
+                <div class="version">
+                  2.3.0
+                </div>
+              
+            
+
+            
+
+
+  
+
+
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search Tutorials" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+            
+          </div>
+
+          
+            
+            
+              
+            
+            
+              <p class="caption" role="heading"><span class="caption-text">PyTorch 示例</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../recipes/recipes_index.html">所有示例</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../prototype/prototype_index.html">原型示例</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">PyTorch 入门</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="basics/intro.html">基础知识</a></li>
+<li class="toctree-l1"><a class="reference internal" href="basics/quickstart_tutorial.html">快速入门</a></li>
+<li class="toctree-l1"><a class="reference internal" href="basics/tensorqs_tutorial.html">张量</a></li>
+<li class="toctree-l1"><a class="reference internal" href="basics/data_tutorial.html">数据集与数据加载器</a></li>
+<li class="toctree-l1"><a class="reference internal" href="basics/transforms_tutorial.html">Transforms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="basics/buildmodel_tutorial.html">构建神经网络</a></li>
+<li class="toctree-l1"><a class="reference internal" href="basics/autogradqs_tutorial.html">自动微分</a></li>
+<li class="toctree-l1"><a class="reference internal" href="basics/optimization_tutorial.html">优化模型参数</a></li>
+<li class="toctree-l1"><a class="reference internal" href="basics/saveloadrun_tutorial.html">保存和加载模型</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">PyTorch 视频教程</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="introyt.html">PyTorch 介绍 - YouTube</a></li>
+<li class="toctree-l1"><a class="reference internal" href="introyt/introyt1_tutorial.html">PyTorch 简介</a></li>
+<li class="toctree-l1"><a class="reference internal" href="introyt/tensors_deeper_tutorial.html">PyTorch Tensors 介绍</a></li>
+<li class="toctree-l1"><a class="reference internal" href="introyt/autogradyt_tutorial.html">自动微分基础</a></li>
+<li class="toctree-l1"><a class="reference internal" href="introyt/modelsyt_tutorial.html">使用 PyTorch 构建模型</a></li>
+<li class="toctree-l1"><a class="reference internal" href="introyt/tensorboardyt_tutorial.html">PyTorch TensorBoard 支持</a></li>
+<li class="toctree-l1"><a class="reference internal" href="introyt/trainingyt.html">使用 PyTorch 训练模型</a></li>
+<li class="toctree-l1"><a class="reference internal" href="introyt/captumyt.html">使用 Captum 进行模型理解</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">学习 PyTorch</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="deep_learning_60min_blitz.html">PyTorch 深度学习：60分钟入门</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pytorch_with_examples.html">跟着示例学习 PyTorch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nn_tutorial.html"><cite>torch.nn</cite> 具体是什么?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/tensorboard_tutorial.html">TensorBoard 可视化模型、数据和训练</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">图片与视频</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/torchvision_tutorial.html">TorchVision 对象检测微调教程</a></li>
+<li class="toctree-l1"><a class="reference internal" href="transfer_learning_tutorial.html">计算机视觉迁移学习教程</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fgsm_tutorial.html">对抗样本生成</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dcgan_faces_tutorial.html">DCGAN 教程</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/spatial_transformer_tutorial.html">Spatial Transformer Networks 教程</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vt_tutorial.html">优化视觉 Transformer 模型</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/tiatoolbox_tutorial.html">PyTorch 和 TIAToolbox 进行全切片图像分类</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">音频</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="audio_io_tutorial.html">音频 I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="audio_resampling_tutorial.html">Audio 重采样</a></li>
+<li class="toctree-l1"><a class="reference internal" href="audio_data_augmentation_tutorial.html">音频数据增强</a></li>
+<li class="toctree-l1"><a class="reference internal" href="audio_feature_extractions_tutorial.html">音频特征提取</a></li>
+<li class="toctree-l1"><a class="reference internal" href="audio_feature_augmentation_tutorial.html">音频特征增强</a></li>
+<li class="toctree-l1"><a class="reference internal" href="audio_datasets_tutorial.html">音频数据集</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/speech_recognition_pipeline_tutorial.html">Wav2Vec2 进行语音识别</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/text_to_speech_with_torchaudio.html">Tacotron2 文本转语音</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/forced_alignment_with_torchaudio_tutorial.html">Wav2Vec2 强制对齐</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">文本</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="bettertransformer_tutorial.html">使用 Better Transformer 进行快速 Transformer 推断</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/char_rnn_classification_tutorial.html">从零开始的自然语言处理：字符级 RNN 进行姓名分类</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/char_rnn_generation_tutorial.html">从零开始的自然语言处理：字符级 RNN 生成姓名</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/seq2seq_translation_tutorial.html">从零开始的自然语言处理：序列到序列网络和注意力机制进行翻译</a></li>
+<li class="toctree-l1"><a class="reference internal" href="text_sentiment_ngrams_tutorial.html">torchtext 文本分类</a></li>
+<li class="toctree-l1"><a class="reference internal" href="translation_transformer.html">数据获取和处理</a></li>
+<li class="toctree-l1"><a class="reference internal" href="translation_transformer.html#transformer-seq2seq-network">使用 Transformer 的 Seq2Seq Network</a></li>
+<li class="toctree-l1"><a class="reference internal" href="translation_transformer.html#id2">数据整理</a></li>
+<li class="toctree-l1"><a class="reference internal" href="translation_transformer.html#id3">引用</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torchtext_custom_dataset_tutorial.html">Torchtext 预处理自定义文本数据集</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">后端</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="onnx/intro_onnx.html">ONNX 介绍</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">强化学习</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/reinforcement_q_learning.html">强化学习 (DQN) 教程</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/reinforcement_ppo.html">使用 TorchRL 强化学习 (PPO) 教程</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/mario_rl_tutorial.html">训练一个马里奥游戏的 RL Agent</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/pendulum.html">Pendulum：使用 TorchRL 编写环境和transforms</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">部署 PyTorch 模型</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="onnx/intro_onnx.html">ONNX 介绍</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/flask_rest_api_tutorial.html">API 定义</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/flask_rest_api_tutorial.html#id1">依赖</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/flask_rest_api_tutorial.html#web-server">简单的 Web Server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/flask_rest_api_tutorial.html#id2">推理</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Intro_to_TorchScript_tutorial.html">TorchScript 介绍</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/cpp_export.html">在 C++ 中加载 TorchScript 模型</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/super_resolution_with_onnxruntime.html">(optional) PyTorch 模型导出到 ONNX 并使用 ONNX Runtime 运行</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/realtime_rpi.html">在 Raspberry Pi 4 上进行实时推理 (30 fps!)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">分析 PyTorch</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="profiler.html">PyTorch 模型分析</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hta_intro_tutorial.html">Holistic Trace Analysis 介绍</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hta_trace_diff_tutorial.html">Holistic Trace Analysis 差异分析</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">FX 代码转换</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/fx_conv_bn_fuser.html">(beta) Building a Convolution/Batch Norm fuser in FX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/fx_profiling_tutorial.html">(beta) Building a Simple CPU Performance Profiler with FX</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">前端 APIs</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/memory_format_tutorial.html">(beta) Channels Last Memory Format in PyTorch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/forward_ad_usage.html">Forward-mode Automatic Differentiation (Beta)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/jacobians_hessians.html">Jacobians, Hessians, hvp, vhp, and more: composing function transforms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/ensembling.html">Model ensembling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/per_sample_grads.html">Per-sample-gradients</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/cpp_frontend.html">Using the PyTorch C++ Frontend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/torch-script-parallelism.html">Dynamic Parallelism in TorchScript</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/cpp_autograd.html">Autograd in C++ Frontend</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">PyTorch 扩展</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/custom_function_double_backward_tutorial.html">Double Backward with Custom Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/custom_function_conv_bn_tutorial.html">Fusing Convolution and Batch Norm using Custom Function</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/cpp_extension.html">Custom C++ and CUDA Extensions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/torch_script_custom_ops.html">Extending TorchScript with Custom C++ Operators</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/torch_script_custom_classes.html">Extending TorchScript with Custom C++ Classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/dispatcher.html">Registering a Dispatched Operator in C++</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/extend_dispatcher.html">Extending dispatcher for a new backend in C++</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/privateuseone.html">Facilitating New Backend Integration by PrivateUse1</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">优化模型</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="profiler.html">PyTorch 模型分析</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/tensorboard_profiler_tutorial.html">PyTorch Profiler With TensorBoard</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Ray Tune 超参数调优</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vt_tutorial.html">优化视觉 Transformer 模型</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/parametrizations.html">Parametrizations Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/pruning_tutorial.html">Pruning Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/dynamic_quantization_tutorial.html">(beta) Dynamic Quantization on an LSTM Word Language Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/dynamic_quantization_bert_tutorial.html">(beta) Dynamic Quantization on BERT</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/quantized_transfer_learning_tutorial.html">(beta) Quantized Transfer Learning for Computer Vision Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/static_quantization_tutorial.html">(beta) Static Quantization with Eager Mode in PyTorch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/torchserve_with_ipex.html">Grokking PyTorch Intel CPU performance from first principles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/torchserve_with_ipex_2.html">Grokking PyTorch Intel CPU performance from first principles (Part 2)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/nvfuser_intro_tutorial.html">Getting Started - Accelerate Your Scripts with nvFuser</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/ax_multiobjective_nas_tutorial.html">Multi-Objective NAS with Ax</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/torch_compile_tutorial.html">Introduction to <code class="docutils literal notranslate"><span class="pre">torch.compile</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/inductor_debug_cpu.html">Inductor CPU backend debugging and profiling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/scaled_dot_product_attention_tutorial.html">(Beta) Implementing High-Performance Transformers with Scaled Dot Product Attention (SDPA)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/scaled_dot_product_attention_tutorial.html#using-sdpa-with-torch-compile">Using SDPA with <code class="docutils literal notranslate"><span class="pre">torch.compile</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/scaled_dot_product_attention_tutorial.html#using-sdpa-with-attn-bias-subclasses">Using SDPA with attn_bias subclasses`</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/scaled_dot_product_attention_tutorial.html#conclusion">Conclusion</a></li>
+<li class="toctree-l1"><a class="reference internal" href="knowledge_distillation_tutorial.html">Knowledge Distillation 教程</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">分布式并行训练</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../distributed/home.html">Distributed and Parallel Training Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dist_overview.html">PyTorch 分布式概述</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ddp_series_intro.html">PyTorch 分布式并行 - Video Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/model_parallel_tutorial.html">Single-Machine Model Parallel Best Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/ddp_tutorial.html">Getting Started with Distributed Data Parallel</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/dist_tuto.html">Writing Distributed Applications with PyTorch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/FSDP_tutorial.html">Getting Started with Fully Sharded Data Parallel(FSDP)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/FSDP_adavnced_tutorial.html">Advanced Model Training with Fully Sharded Data Parallel (FSDP)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/TP_tutorial.html">Large Scale Transformer model training with Tensor Parallel (TP)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/process_group_cpp_extension_tutorial.html">Customize Process Group Backends Using Cpp Extensions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/rpc_tutorial.html">Getting Started with Distributed RPC Framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/rpc_param_server_tutorial.html">Implementing a Parameter Server Using Distributed RPC Framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/dist_pipeline_parallel_tutorial.html">Distributed Pipeline Parallelism Using RPC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/rpc_async_execution.html">Implementing Batch RPC Processing Using Asynchronous Executions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/rpc_ddp_tutorial.html">Combining Distributed DataParallel with Distributed RPC Framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/ddp_pipeline.html">Training Transformer models using Distributed Data Parallel and Pipeline Parallelism</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/generic_join.html">Distributed Training with Uneven Inputs Using the Join Context Manager</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Edge with ExecuTorch</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/executorch/stable/tutorials/export-to-executorch-tutorial.html">导出到 ExecuTorch 教程</a></li>
+<li class="toctree-l1"><a class="reference external" href=" https://pytorch.org/executorch/stable/running-a-model-cpp-tutorial.html">使用C++运行 ExecuTorch 教程</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/executorch/stable/tutorials/sdk-integration-tutorial.html">使用 ExecuTorch SDK 分析模型</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/executorch/stable/demo-apps-ios.html">构建 ExecuTorch iOS Demo App</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/executorch/stable/demo-apps-android.html">构建 ExecuTorch Android Demo App</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/executorch/stable/examples-end-to-end-to-lower-model-to-delegate.html">Lowering a Model as a Delegate</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">推荐系统</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/torchrec_tutorial.html">Introduction to TorchRec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/sharding.html">Exploring TorchRec sharding</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">多模态</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="flava_finetuning_tutorial.html">TorchMultimodal 教程：微调 FLAVA</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <div class="pytorch-container">
+      <div class="pytorch-page-level-bar" id="pytorch-page-level-bar">
+        <div class="pytorch-breadcrumbs-wrapper">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="pytorch-breadcrumbs">
+    
+      <li>
+        <a href="../index.html">
+          
+            Tutorials
+          
+        </a> &gt;
+      </li>
+
+        
+      <li>Ray Tune 超参数调优</li>
+    
+    
+      <li class="pytorch-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/beginner/hyperparameter_tuning_tutorial.rst.txt" rel="nofollow"><img src="../_static/images/view-page-source-icon.svg"></a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+</div>
+        </div>
+
+        <div class="pytorch-shortcuts-wrapper" id="pytorch-shortcuts-wrapper">
+          Shortcuts
+        </div>
+      </div>
+
+      <section data-toggle="wy-nav-shift" id="pytorch-content-wrap" class="pytorch-content-wrap">
+        <div class="pytorch-content-left">
+
+        
+
+          <div class="pytorch-call-to-action-links">
+            <div id="tutorial-type">beginner/hyperparameter_tuning_tutorial</div>
+
+            <div id="google-colab-link">
+              <img class="call-to-action-img" src="../_static/images/pytorch-colab.svg"/>
+              <div class="call-to-action-desktop-view">Run in Google Colab</div>
+              <div class="call-to-action-mobile-view">Colab</div>
+            </div>
+            <div id="download-notebook-link">
+              <img class="call-to-action-notebook-img" src="../_static/images/pytorch-download.svg"/>
+              <div class="call-to-action-desktop-view">Download Notebook</div>
+              <div class="call-to-action-mobile-view">Notebook</div>
+            </div>
+            <div id="github-view-link">
+              <img class="call-to-action-img" src="../_static/images/pytorch-github.svg"/>
+              <div class="call-to-action-desktop-view">View on GitHub</div>
+              <div class="call-to-action-mobile-view">GitHub</div>
+            </div>
+          </div>
+
+        
+
+          <!-- Google Tag Manager (noscript) -->
+          <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-T8XT4PS"
+          height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+          <!-- End Google Tag Manager (noscript) -->
+          
+          <div class="rst-content">
+          
+            <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
+             <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
+              
+  <div class="sphx-glr-download-link-note admonition note">
+<p class="admonition-title">Note</p>
+<p>Click <a class="reference internal" href="#sphx-glr-download-beginner-hyperparameter-tuning-tutorial-py"><span class="std std-ref">here</span></a>
+to download the full example code</p>
+</div>
+<div class="sphx-glr-example-title section" id="ray-tune">
+<span id="sphx-glr-beginner-hyperparameter-tuning-tutorial-py"></span><h1>Ray Tune 超参数调优<a class="headerlink" href="#ray-tune" title="Permalink to this heading">¶</a></h1>
+<p>Hyperparameter tuning can make the difference between an average model and a highly
+accurate one. Often simple things like choosing a different learning rate or changing
+a network layer size can have a dramatic impact on your model performance.</p>
+<p>Fortunately, there are tools that help with finding the best combination of parameters.
+<a class="reference external" href="https://docs.ray.io/en/latest/tune.html">Ray Tune</a> is an industry standard tool for
+distributed hyperparameter tuning. Ray Tune includes the latest hyperparameter search
+algorithms, integrates with TensorBoard and other analysis libraries, and natively
+supports distributed training through <a class="reference external" href="https://ray.io/">Ray’s distributed machine learning engine</a>.</p>
+<p>In this tutorial, we will show you how to integrate Ray Tune into your PyTorch
+training workflow. We will extend <a class="reference external" href="https://pytorch.org/tutorials/beginner/blitz/cifar10_tutorial.html">this tutorial from the PyTorch documentation</a> for training
+a CIFAR10 image classifier.</p>
+<p>As you will see, we only need to add some slight modifications. In particular, we
+need to</p>
+<ol class="arabic simple">
+<li><p>wrap data loading and training in functions,</p></li>
+<li><p>make some network parameters configurable,</p></li>
+<li><p>add checkpointing (optional),</p></li>
+<li><p>and define the search space for the model tuning</p></li>
+</ol>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p>To run this tutorial, please make sure the following packages are
+installed:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">ray[tune]</span></code>: Distributed hyperparameter tuning library</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">torchvision</span></code>: For the data transformers</p></li>
+</ul>
+<div class="section" id="setup-imports">
+<h2>Setup / Imports<a class="headerlink" href="#setup-imports" title="Permalink to this heading">¶</a></h2>
+<p>Let’s start with the imports:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">tempfile</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
+<span class="kn">import</span> <span class="nn">torch.nn.functional</span> <span class="k">as</span> <span class="nn">F</span>
+<span class="kn">import</span> <span class="nn">torch.optim</span> <span class="k">as</span> <span class="nn">optim</span>
+<span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="kn">import</span> <a href="https://pytorch.org/docs/stable/data.html#torch.utils.data.random_split" title="torch.utils.data.random_split" class="sphx-glr-backref-module-torch-utils-data sphx-glr-backref-type-py-function"><span class="n">random_split</span></a>
+<span class="kn">import</span> <span class="nn">torchvision</span>
+<span class="kn">import</span> <span class="nn">torchvision.transforms</span> <span class="k">as</span> <span class="nn">transforms</span>
+<span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">tune</span>
+<span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">train</span>
+<span class="kn">from</span> <span class="nn">ray.train</span> <span class="kn">import</span> <span class="n">Checkpoint</span><span class="p">,</span> <span class="n">get_checkpoint</span>
+<span class="kn">from</span> <span class="nn">ray.tune.schedulers</span> <span class="kn">import</span> <span class="n">ASHAScheduler</span>
+<span class="kn">import</span> <span class="nn">ray.cloudpickle</span> <span class="k">as</span> <span class="nn">pickle</span>
+</pre></div>
+</div>
+<p>Most of the imports are needed for building the PyTorch model. Only the last
+imports are for Ray Tune.</p>
+</div>
+<div class="section" id="data-loaders">
+<h2>Data loaders<a class="headerlink" href="#data-loaders" title="Permalink to this heading">¶</a></h2>
+<p>We wrap the data loaders in their own function and pass a global data directory.
+This way we can share a data directory between different trials.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">load_data</span><span class="p">(</span><span class="n">data_dir</span><span class="o">=</span><span class="s2">&quot;./data&quot;</span><span class="p">):</span>
+    <span class="n">transform</span> <span class="o">=</span> <a href="https://pytorch.org/vision/stable/generated/torchvision.transforms.Compose.html#torchvision.transforms.Compose" title="torchvision.transforms.Compose" class="sphx-glr-backref-module-torchvision-transforms sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">transforms</span><span class="o">.</span><span class="n">Compose</span></a><span class="p">(</span>
+        <span class="p">[</span><a href="https://pytorch.org/vision/stable/generated/torchvision.transforms.ToTensor.html#torchvision.transforms.ToTensor" title="torchvision.transforms.ToTensor" class="sphx-glr-backref-module-torchvision-transforms sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">transforms</span><span class="o">.</span><span class="n">ToTensor</span></a><span class="p">(),</span> <a href="https://pytorch.org/vision/stable/generated/torchvision.transforms.Normalize.html#torchvision.transforms.Normalize" title="torchvision.transforms.Normalize" class="sphx-glr-backref-module-torchvision-transforms sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">transforms</span><span class="o">.</span><span class="n">Normalize</span></a><span class="p">((</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">),</span> <span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">))]</span>
+    <span class="p">)</span>
+
+    <span class="n">trainset</span> <span class="o">=</span> <a href="https://pytorch.org/vision/stable/generated/torchvision.datasets.CIFAR10.html#torchvision.datasets.CIFAR10" title="torchvision.datasets.CIFAR10" class="sphx-glr-backref-module-torchvision-datasets sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">torchvision</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">CIFAR10</span></a><span class="p">(</span>
+        <span class="n">root</span><span class="o">=</span><span class="n">data_dir</span><span class="p">,</span> <span class="n">train</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">download</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="n">transform</span>
+    <span class="p">)</span>
+
+    <span class="n">testset</span> <span class="o">=</span> <a href="https://pytorch.org/vision/stable/generated/torchvision.datasets.CIFAR10.html#torchvision.datasets.CIFAR10" title="torchvision.datasets.CIFAR10" class="sphx-glr-backref-module-torchvision-datasets sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">torchvision</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">CIFAR10</span></a><span class="p">(</span>
+        <span class="n">root</span><span class="o">=</span><span class="n">data_dir</span><span class="p">,</span> <span class="n">train</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">download</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="n">transform</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">trainset</span><span class="p">,</span> <span class="n">testset</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="configurable-neural-network">
+<h2>Configurable neural network<a class="headerlink" href="#configurable-neural-network" title="Permalink to this heading">¶</a></h2>
+<p>We can only tune those parameters that are configurable.
+In this example, we can specify
+the layer sizes of the fully connected layers:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Net</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/generated/torch.nn.Module.html#torch.nn.Module" title="torch.nn.Module" class="sphx-glr-backref-module-torch-nn sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">nn</span><span class="o">.</span><span class="n">Module</span></a><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">l1</span><span class="o">=</span><span class="mi">120</span><span class="p">,</span> <span class="n">l2</span><span class="o">=</span><span class="mi">84</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Net</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conv1</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.nn.Conv2d.html#torch.nn.Conv2d" title="torch.nn.Conv2d" class="sphx-glr-backref-module-torch-nn sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span></a><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pool</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.nn.MaxPool2d.html#torch.nn.MaxPool2d" title="torch.nn.MaxPool2d" class="sphx-glr-backref-module-torch-nn sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">nn</span><span class="o">.</span><span class="n">MaxPool2d</span></a><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conv2</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.nn.Conv2d.html#torch.nn.Conv2d" title="torch.nn.Conv2d" class="sphx-glr-backref-module-torch-nn sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span></a><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fc1</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.nn.Linear.html#torch.nn.Linear" title="torch.nn.Linear" class="sphx-glr-backref-module-torch-nn sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span></a><span class="p">(</span><span class="mi">16</span> <span class="o">*</span> <span class="mi">5</span> <span class="o">*</span> <span class="mi">5</span><span class="p">,</span> <span class="n">l1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fc2</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.nn.Linear.html#torch.nn.Linear" title="torch.nn.Linear" class="sphx-glr-backref-module-torch-nn sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span></a><span class="p">(</span><span class="n">l1</span><span class="p">,</span> <span class="n">l2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fc3</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.nn.Linear.html#torch.nn.Linear" title="torch.nn.Linear" class="sphx-glr-backref-module-torch-nn sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span></a><span class="p">(</span><span class="n">l2</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pool</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/generated/torch.nn.functional.relu.html#torch.nn.functional.relu" title="torch.nn.functional.relu" class="sphx-glr-backref-module-torch-nn-functional sphx-glr-backref-type-py-function"><span class="n">F</span><span class="o">.</span><span class="n">relu</span></a><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conv1</span><span class="p">(</span><span class="n">x</span><span class="p">)))</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pool</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/generated/torch.nn.functional.relu.html#torch.nn.functional.relu" title="torch.nn.functional.relu" class="sphx-glr-backref-module-torch-nn-functional sphx-glr-backref-type-py-function"><span class="n">F</span><span class="o">.</span><span class="n">relu</span></a><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conv2</span><span class="p">(</span><span class="n">x</span><span class="p">)))</span>
+        <span class="n">x</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.flatten.html#torch.flatten" title="torch.flatten" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">flatten</span></a><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>  <span class="c1"># flatten all dimensions except batch</span>
+        <span class="n">x</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.nn.functional.relu.html#torch.nn.functional.relu" title="torch.nn.functional.relu" class="sphx-glr-backref-module-torch-nn-functional sphx-glr-backref-type-py-function"><span class="n">F</span><span class="o">.</span><span class="n">relu</span></a><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fc1</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+        <span class="n">x</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.nn.functional.relu.html#torch.nn.functional.relu" title="torch.nn.functional.relu" class="sphx-glr-backref-module-torch-nn-functional sphx-glr-backref-type-py-function"><span class="n">F</span><span class="o">.</span><span class="n">relu</span></a><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fc2</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fc3</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">x</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="the-train-function">
+<h2>The train function<a class="headerlink" href="#the-train-function" title="Permalink to this heading">¶</a></h2>
+<p>Now it gets interesting, because we introduce some changes to the example <a class="reference external" href="https://pytorch.org/tutorials/beginner/blitz/cifar10_tutorial.html">from the PyTorch
+documentation</a>.</p>
+<p>We wrap the training script in a function <code class="docutils literal notranslate"><span class="pre">train_cifar(config,</span> <span class="pre">data_dir=None)</span></code>.
+The <code class="docutils literal notranslate"><span class="pre">config</span></code> parameter will receive the hyperparameters we would like to
+train with. The <code class="docutils literal notranslate"><span class="pre">data_dir</span></code> specifies the directory where we load and store the data,
+so that multiple runs can share the same data source.
+We also load the model and optimizer state at the start of the run, if a checkpoint
+is provided. Further down in this tutorial you will find information on how
+to save the checkpoint and what it is used for.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">net</span> <span class="o">=</span> <span class="n">Net</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;l1&quot;</span><span class="p">],</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;l2&quot;</span><span class="p">])</span>
+
+<span class="n">checkpoint</span> <span class="o">=</span> <span class="n">get_checkpoint</span><span class="p">()</span>
+<span class="k">if</span> <span class="n">checkpoint</span><span class="p">:</span>
+    <span class="k">with</span> <span class="n">checkpoint</span><span class="o">.</span><span class="n">as_directory</span><span class="p">()</span> <span class="k">as</span> <span class="n">checkpoint_dir</span><span class="p">:</span>
+        <span class="n">data_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">checkpoint_dir</span><span class="p">)</span> <span class="o">/</span> <span class="s2">&quot;data.pkl&quot;</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">data_path</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
+            <span class="n">checkpoint_state</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">fp</span><span class="p">)</span>
+        <span class="n">start_epoch</span> <span class="o">=</span> <span class="n">checkpoint_state</span><span class="p">[</span><span class="s2">&quot;epoch&quot;</span><span class="p">]</span>
+        <span class="n">net</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">checkpoint_state</span><span class="p">[</span><span class="s2">&quot;net_state_dict&quot;</span><span class="p">])</span>
+        <span class="n">optimizer</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">checkpoint_state</span><span class="p">[</span><span class="s2">&quot;optimizer_state_dict&quot;</span><span class="p">])</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">start_epoch</span> <span class="o">=</span> <span class="mi">0</span>
+</pre></div>
+</div>
+<p>The learning rate of the optimizer is made configurable, too:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">optimizer</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.optim.SGD.html#torch.optim.SGD" title="torch.optim.SGD" class="sphx-glr-backref-module-torch-optim sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">optim</span><span class="o">.</span><span class="n">SGD</span></a><span class="p">(</span><span class="n">net</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;lr&quot;</span><span class="p">],</span> <span class="n">momentum</span><span class="o">=</span><span class="mf">0.9</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>We also split the training data into a training and validation subset. We thus train on
+80% of the data and calculate the validation loss on the remaining 20%. The batch sizes
+with which we iterate through the training and test sets are configurable as well.</p>
+<div class="section" id="adding-multi-gpu-support-with-dataparallel">
+<h3>Adding (multi) GPU support with DataParallel<a class="headerlink" href="#adding-multi-gpu-support-with-dataparallel" title="Permalink to this heading">¶</a></h3>
+<p>Image classification benefits largely from GPUs. Luckily, we can continue to use
+PyTorch’s abstractions in Ray Tune. Thus, we can wrap our model in <code class="docutils literal notranslate"><span class="pre">nn.DataParallel</span></code>
+to support data parallel training on multiple GPUs:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">device</span> <span class="o">=</span> <span class="s2">&quot;cpu&quot;</span>
+<span class="k">if</span> <a href="https://pytorch.org/docs/stable/generated/torch.cuda.is_available.html#torch.cuda.is_available" title="torch.cuda.is_available" class="sphx-glr-backref-module-torch-cuda sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span></a><span class="p">():</span>
+    <span class="n">device</span> <span class="o">=</span> <span class="s2">&quot;cuda:0&quot;</span>
+    <span class="k">if</span> <a href="https://pytorch.org/docs/stable/generated/torch.cuda.device_count.html#torch.cuda.device_count" title="torch.cuda.device_count" class="sphx-glr-backref-module-torch-cuda sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">device_count</span></a><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">net</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.nn.DataParallel.html#torch.nn.DataParallel" title="torch.nn.DataParallel" class="sphx-glr-backref-module-torch-nn sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">nn</span><span class="o">.</span><span class="n">DataParallel</span></a><span class="p">(</span><span class="n">net</span><span class="p">)</span>
+<span class="n">net</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>By using a <code class="docutils literal notranslate"><span class="pre">device</span></code> variable we make sure that training also works when we have
+no GPUs available. PyTorch requires us to send our data to the GPU memory explicitly,
+like this:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">data</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">trainloader</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span>
+    <span class="n">inputs</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="n">data</span>
+    <span class="n">inputs</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="n">inputs</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">),</span> <span class="n">labels</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The code now supports training on CPUs, on a single GPU, and on multiple GPUs. Notably, Ray
+also supports <a class="reference external" href="https://docs.ray.io/en/master/using-ray-with-gpus.html#fractional-gpus">fractional GPUs</a>
+so we can share GPUs among trials, as long as the model still fits on the GPU memory. We’ll come back
+to that later.</p>
+</div>
+<div class="section" id="communicating-with-ray-tune">
+<h3>Communicating with Ray Tune<a class="headerlink" href="#communicating-with-ray-tune" title="Permalink to this heading">¶</a></h3>
+<p>The most interesting part is the communication with Ray Tune:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">checkpoint_data</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;epoch&quot;</span><span class="p">:</span> <span class="n">epoch</span><span class="p">,</span>
+    <span class="s2">&quot;net_state_dict&quot;</span><span class="p">:</span> <span class="n">net</span><span class="o">.</span><span class="n">state_dict</span><span class="p">(),</span>
+    <span class="s2">&quot;optimizer_state_dict&quot;</span><span class="p">:</span> <span class="n">optimizer</span><span class="o">.</span><span class="n">state_dict</span><span class="p">(),</span>
+<span class="p">}</span>
+<span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">checkpoint_dir</span><span class="p">:</span>
+    <span class="n">data_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">checkpoint_dir</span><span class="p">)</span> <span class="o">/</span> <span class="s2">&quot;data.pkl&quot;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">data_path</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
+        <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">checkpoint_data</span><span class="p">,</span> <span class="n">fp</span><span class="p">)</span>
+
+    <span class="n">checkpoint</span> <span class="o">=</span> <span class="n">Checkpoint</span><span class="o">.</span><span class="n">from_directory</span><span class="p">(</span><span class="n">checkpoint_dir</span><span class="p">)</span>
+    <span class="n">train</span><span class="o">.</span><span class="n">report</span><span class="p">(</span>
+        <span class="p">{</span><span class="s2">&quot;loss&quot;</span><span class="p">:</span> <span class="n">val_loss</span> <span class="o">/</span> <span class="n">val_steps</span><span class="p">,</span> <span class="s2">&quot;accuracy&quot;</span><span class="p">:</span> <span class="n">correct</span> <span class="o">/</span> <span class="n">total</span><span class="p">},</span>
+        <span class="n">checkpoint</span><span class="o">=</span><span class="n">checkpoint</span><span class="p">,</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+<p>Here we first save a checkpoint and then report some metrics back to Ray Tune. Specifically,
+we send the validation loss and accuracy back to Ray Tune. Ray Tune can then use these metrics
+to decide which hyperparameter configuration lead to the best results. These metrics
+can also be used to stop bad performing trials early in order to avoid wasting
+resources on those trials.</p>
+<p>The checkpoint saving is optional, however, it is necessary if we wanted to use advanced
+schedulers like
+<a class="reference external" href="https://docs.ray.io/en/latest/tune/examples/pbt_guide.html">Population Based Training</a>.
+Also, by saving the checkpoint we can later load the trained models and validate them
+on a test set. Lastly, saving checkpoints is useful for fault tolerance, and it allows
+us to interrupt training and continue training later.</p>
+</div>
+<div class="section" id="full-training-function">
+<h3>Full training function<a class="headerlink" href="#full-training-function" title="Permalink to this heading">¶</a></h3>
+<p>The full code example looks like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">train_cifar</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">data_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">net</span> <span class="o">=</span> <span class="n">Net</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;l1&quot;</span><span class="p">],</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;l2&quot;</span><span class="p">])</span>
+
+    <span class="n">device</span> <span class="o">=</span> <span class="s2">&quot;cpu&quot;</span>
+    <span class="k">if</span> <a href="https://pytorch.org/docs/stable/generated/torch.cuda.is_available.html#torch.cuda.is_available" title="torch.cuda.is_available" class="sphx-glr-backref-module-torch-cuda sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span></a><span class="p">():</span>
+        <span class="n">device</span> <span class="o">=</span> <span class="s2">&quot;cuda:0&quot;</span>
+        <span class="k">if</span> <a href="https://pytorch.org/docs/stable/generated/torch.cuda.device_count.html#torch.cuda.device_count" title="torch.cuda.device_count" class="sphx-glr-backref-module-torch-cuda sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">device_count</span></a><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">net</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.nn.DataParallel.html#torch.nn.DataParallel" title="torch.nn.DataParallel" class="sphx-glr-backref-module-torch-nn sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">nn</span><span class="o">.</span><span class="n">DataParallel</span></a><span class="p">(</span><span class="n">net</span><span class="p">)</span>
+    <span class="n">net</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+
+    <span class="n">criterion</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.nn.CrossEntropyLoss.html#torch.nn.CrossEntropyLoss" title="torch.nn.CrossEntropyLoss" class="sphx-glr-backref-module-torch-nn sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">nn</span><span class="o">.</span><span class="n">CrossEntropyLoss</span></a><span class="p">()</span>
+    <span class="n">optimizer</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.optim.SGD.html#torch.optim.SGD" title="torch.optim.SGD" class="sphx-glr-backref-module-torch-optim sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">optim</span><span class="o">.</span><span class="n">SGD</span></a><span class="p">(</span><span class="n">net</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;lr&quot;</span><span class="p">],</span> <span class="n">momentum</span><span class="o">=</span><span class="mf">0.9</span><span class="p">)</span>
+
+    <span class="n">checkpoint</span> <span class="o">=</span> <span class="n">get_checkpoint</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">checkpoint</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">checkpoint</span><span class="o">.</span><span class="n">as_directory</span><span class="p">()</span> <span class="k">as</span> <span class="n">checkpoint_dir</span><span class="p">:</span>
+            <span class="n">data_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">checkpoint_dir</span><span class="p">)</span> <span class="o">/</span> <span class="s2">&quot;data.pkl&quot;</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">data_path</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
+                <span class="n">checkpoint_state</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">fp</span><span class="p">)</span>
+            <span class="n">start_epoch</span> <span class="o">=</span> <span class="n">checkpoint_state</span><span class="p">[</span><span class="s2">&quot;epoch&quot;</span><span class="p">]</span>
+            <span class="n">net</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">checkpoint_state</span><span class="p">[</span><span class="s2">&quot;net_state_dict&quot;</span><span class="p">])</span>
+            <span class="n">optimizer</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">checkpoint_state</span><span class="p">[</span><span class="s2">&quot;optimizer_state_dict&quot;</span><span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">start_epoch</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="n">trainset</span><span class="p">,</span> <span class="n">testset</span> <span class="o">=</span> <span class="n">load_data</span><span class="p">(</span><span class="n">data_dir</span><span class="p">)</span>
+
+    <span class="n">test_abs</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">trainset</span><span class="p">)</span> <span class="o">*</span> <span class="mf">0.8</span><span class="p">)</span>
+    <span class="n">train_subset</span><span class="p">,</span> <span class="n">val_subset</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/data.html#torch.utils.data.random_split" title="torch.utils.data.random_split" class="sphx-glr-backref-module-torch-utils-data sphx-glr-backref-type-py-function"><span class="n">random_split</span></a><span class="p">(</span>
+        <span class="n">trainset</span><span class="p">,</span> <span class="p">[</span><span class="n">test_abs</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">trainset</span><span class="p">)</span> <span class="o">-</span> <span class="n">test_abs</span><span class="p">]</span>
+    <span class="p">)</span>
+
+    <span class="n">trainloader</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/data.html#torch.utils.data.DataLoader" title="torch.utils.data.DataLoader" class="sphx-glr-backref-module-torch-utils-data sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span></a><span class="p">(</span>
+        <span class="n">train_subset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;batch_size&quot;</span><span class="p">]),</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">num_workers</span><span class="o">=</span><span class="mi">8</span>
+    <span class="p">)</span>
+    <span class="n">valloader</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/data.html#torch.utils.data.DataLoader" title="torch.utils.data.DataLoader" class="sphx-glr-backref-module-torch-utils-data sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span></a><span class="p">(</span>
+        <span class="n">val_subset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;batch_size&quot;</span><span class="p">]),</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">num_workers</span><span class="o">=</span><span class="mi">8</span>
+    <span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">start_epoch</span><span class="p">,</span> <span class="mi">10</span><span class="p">):</span>  <span class="c1"># loop over the dataset multiple times</span>
+        <span class="n">running_loss</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="n">epoch_steps</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">data</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">trainloader</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span>
+            <span class="c1"># get the inputs; data is a list of [inputs, labels]</span>
+            <span class="n">inputs</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="n">data</span>
+            <span class="n">inputs</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="n">inputs</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">),</span> <span class="n">labels</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+
+            <span class="c1"># zero the parameter gradients</span>
+            <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
+
+            <span class="c1"># forward + backward + optimize</span>
+            <span class="n">outputs</span> <span class="o">=</span> <span class="n">net</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span>
+            <span class="n">loss</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">outputs</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span>
+            <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+            <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+
+            <span class="c1"># print statistics</span>
+            <span class="n">running_loss</span> <span class="o">+=</span> <span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+            <span class="n">epoch_steps</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">2000</span> <span class="o">==</span> <span class="mi">1999</span><span class="p">:</span>  <span class="c1"># print every 2000 mini-batches</span>
+                <span class="nb">print</span><span class="p">(</span>
+                    <span class="s2">&quot;[</span><span class="si">%d</span><span class="s2">, </span><span class="si">%5d</span><span class="s2">] loss: </span><span class="si">%.3f</span><span class="s2">&quot;</span>
+                    <span class="o">%</span> <span class="p">(</span><span class="n">epoch</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">running_loss</span> <span class="o">/</span> <span class="n">epoch_steps</span><span class="p">)</span>
+                <span class="p">)</span>
+                <span class="n">running_loss</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+        <span class="c1"># Validation loss</span>
+        <span class="n">val_loss</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="n">val_steps</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">total</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">correct</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">data</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">valloader</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span>
+            <span class="k">with</span> <a href="https://pytorch.org/docs/stable/generated/torch.no_grad.html#torch.no_grad" title="torch.no_grad" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span></a><span class="p">():</span>
+                <span class="n">inputs</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="n">data</span>
+                <span class="n">inputs</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="n">inputs</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">),</span> <span class="n">labels</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+
+                <span class="n">outputs</span> <span class="o">=</span> <span class="n">net</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span>
+                <span class="n">_</span><span class="p">,</span> <span class="n">predicted</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.max.html#torch.max" title="torch.max" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">max</span></a><span class="p">(</span><span class="n">outputs</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="n">total</span> <span class="o">+=</span> <span class="n">labels</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+                <span class="n">correct</span> <span class="o">+=</span> <span class="p">(</span><span class="n">predicted</span> <span class="o">==</span> <span class="n">labels</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+
+                <span class="n">loss</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">outputs</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span>
+                <span class="n">val_loss</span> <span class="o">+=</span> <span class="n">loss</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+                <span class="n">val_steps</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="n">checkpoint_data</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;epoch&quot;</span><span class="p">:</span> <span class="n">epoch</span><span class="p">,</span>
+            <span class="s2">&quot;net_state_dict&quot;</span><span class="p">:</span> <span class="n">net</span><span class="o">.</span><span class="n">state_dict</span><span class="p">(),</span>
+            <span class="s2">&quot;optimizer_state_dict&quot;</span><span class="p">:</span> <span class="n">optimizer</span><span class="o">.</span><span class="n">state_dict</span><span class="p">(),</span>
+        <span class="p">}</span>
+        <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">checkpoint_dir</span><span class="p">:</span>
+            <span class="n">data_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">checkpoint_dir</span><span class="p">)</span> <span class="o">/</span> <span class="s2">&quot;data.pkl&quot;</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">data_path</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
+                <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">checkpoint_data</span><span class="p">,</span> <span class="n">fp</span><span class="p">)</span>
+
+            <span class="n">checkpoint</span> <span class="o">=</span> <span class="n">Checkpoint</span><span class="o">.</span><span class="n">from_directory</span><span class="p">(</span><span class="n">checkpoint_dir</span><span class="p">)</span>
+            <span class="n">train</span><span class="o">.</span><span class="n">report</span><span class="p">(</span>
+                <span class="p">{</span><span class="s2">&quot;loss&quot;</span><span class="p">:</span> <span class="n">val_loss</span> <span class="o">/</span> <span class="n">val_steps</span><span class="p">,</span> <span class="s2">&quot;accuracy&quot;</span><span class="p">:</span> <span class="n">correct</span> <span class="o">/</span> <span class="n">total</span><span class="p">},</span>
+                <span class="n">checkpoint</span><span class="o">=</span><span class="n">checkpoint</span><span class="p">,</span>
+            <span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Finished Training&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>As you can see, most of the code is adapted directly from the original example.</p>
+</div>
+</div>
+<div class="section" id="test-set-accuracy">
+<h2>Test set accuracy<a class="headerlink" href="#test-set-accuracy" title="Permalink to this heading">¶</a></h2>
+<p>Commonly the performance of a machine learning model is tested on a hold-out test
+set with data that has not been used for training the model. We also wrap this in a
+function:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">test_accuracy</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cpu&quot;</span><span class="p">):</span>
+    <span class="n">trainset</span><span class="p">,</span> <span class="n">testset</span> <span class="o">=</span> <span class="n">load_data</span><span class="p">()</span>
+
+    <span class="n">testloader</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/data.html#torch.utils.data.DataLoader" title="torch.utils.data.DataLoader" class="sphx-glr-backref-module-torch-utils-data sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span></a><span class="p">(</span>
+        <span class="n">testset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">num_workers</span><span class="o">=</span><span class="mi">2</span>
+    <span class="p">)</span>
+
+    <span class="n">correct</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">total</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">with</span> <a href="https://pytorch.org/docs/stable/generated/torch.no_grad.html#torch.no_grad" title="torch.no_grad" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span></a><span class="p">():</span>
+        <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">testloader</span><span class="p">:</span>
+            <span class="n">images</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="n">data</span>
+            <span class="n">images</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="n">images</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">),</span> <span class="n">labels</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+            <span class="n">outputs</span> <span class="o">=</span> <span class="n">net</span><span class="p">(</span><span class="n">images</span><span class="p">)</span>
+            <span class="n">_</span><span class="p">,</span> <span class="n">predicted</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.max.html#torch.max" title="torch.max" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">max</span></a><span class="p">(</span><span class="n">outputs</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">total</span> <span class="o">+=</span> <span class="n">labels</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">correct</span> <span class="o">+=</span> <span class="p">(</span><span class="n">predicted</span> <span class="o">==</span> <span class="n">labels</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">correct</span> <span class="o">/</span> <span class="n">total</span>
+</pre></div>
+</div>
+<p>The function also expects a <code class="docutils literal notranslate"><span class="pre">device</span></code> parameter, so we can do the
+test set validation on a GPU.</p>
+</div>
+<div class="section" id="configuring-the-search-space">
+<h2>Configuring the search space<a class="headerlink" href="#configuring-the-search-space" title="Permalink to this heading">¶</a></h2>
+<p>Lastly, we need to define Ray Tune’s search space. Here is an example:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">config</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;l1&quot;</span><span class="p">:</span> <span class="n">tune</span><span class="o">.</span><span class="n">choice</span><span class="p">([</span><span class="mi">2</span> <span class="o">**</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">9</span><span class="p">)]),</span>
+    <span class="s2">&quot;l2&quot;</span><span class="p">:</span> <span class="n">tune</span><span class="o">.</span><span class="n">choice</span><span class="p">([</span><span class="mi">2</span> <span class="o">**</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">9</span><span class="p">)]),</span>
+    <span class="s2">&quot;lr&quot;</span><span class="p">:</span> <span class="n">tune</span><span class="o">.</span><span class="n">loguniform</span><span class="p">(</span><span class="mf">1e-4</span><span class="p">,</span> <span class="mf">1e-1</span><span class="p">),</span>
+    <span class="s2">&quot;batch_size&quot;</span><span class="p">:</span> <span class="n">tune</span><span class="o">.</span><span class="n">choice</span><span class="p">([</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">16</span><span class="p">])</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">tune.choice()</span></code> accepts a list of values that are uniformly sampled from.
+In this example, the <code class="docutils literal notranslate"><span class="pre">l1</span></code> and <code class="docutils literal notranslate"><span class="pre">l2</span></code> parameters
+should be powers of 2 between 4 and 256, so either 4, 8, 16, 32, 64, 128, or 256.
+The <code class="docutils literal notranslate"><span class="pre">lr</span></code> (learning rate) should be uniformly sampled between 0.0001 and 0.1. Lastly,
+the batch size is a choice between 2, 4, 8, and 16.</p>
+<p>At each trial, Ray Tune will now randomly sample a combination of parameters from these
+search spaces. It will then train a number of models in parallel and find the best
+performing one among these. We also use the <code class="docutils literal notranslate"><span class="pre">ASHAScheduler</span></code> which will terminate bad
+performing trials early.</p>
+<p>We wrap the <code class="docutils literal notranslate"><span class="pre">train_cifar</span></code> function with <code class="docutils literal notranslate"><span class="pre">functools.partial</span></code> to set the constant
+<code class="docutils literal notranslate"><span class="pre">data_dir</span></code> parameter. We can also tell Ray Tune what resources should be
+available for each trial:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">gpus_per_trial</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="c1"># ...</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">tune</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
+    <span class="n">partial</span><span class="p">(</span><span class="n">train_cifar</span><span class="p">,</span> <span class="n">data_dir</span><span class="o">=</span><span class="n">data_dir</span><span class="p">),</span>
+    <span class="n">resources_per_trial</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;cpu&quot;</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span> <span class="s2">&quot;gpu&quot;</span><span class="p">:</span> <span class="n">gpus_per_trial</span><span class="p">},</span>
+    <span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">,</span>
+    <span class="n">num_samples</span><span class="o">=</span><span class="n">num_samples</span><span class="p">,</span>
+    <span class="n">scheduler</span><span class="o">=</span><span class="n">scheduler</span><span class="p">,</span>
+    <span class="n">checkpoint_at_end</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>You can specify the number of CPUs, which are then available e.g.
+to increase the <code class="docutils literal notranslate"><span class="pre">num_workers</span></code> of the PyTorch <code class="docutils literal notranslate"><span class="pre">DataLoader</span></code> instances. The selected
+number of GPUs are made visible to PyTorch in each trial. Trials do not have access to
+GPUs that haven’t been requested for them - so you don’t have to care about two trials
+using the same set of resources.</p>
+<p>Here we can also specify fractional GPUs, so something like <code class="docutils literal notranslate"><span class="pre">gpus_per_trial=0.5</span></code> is
+completely valid. The trials will then share GPUs among each other.
+You just have to make sure that the models still fit in the GPU memory.</p>
+<p>After training the models, we will find the best performing one and load the trained
+network from the checkpoint file. We then obtain the test set accuracy and report
+everything by printing.</p>
+<p>The full main function looks like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">num_samples</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">max_num_epochs</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">gpus_per_trial</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+    <span class="n">data_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="s2">&quot;./data&quot;</span><span class="p">)</span>
+    <span class="n">load_data</span><span class="p">(</span><span class="n">data_dir</span><span class="p">)</span>
+    <span class="n">config</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;l1&quot;</span><span class="p">:</span> <span class="n">tune</span><span class="o">.</span><span class="n">choice</span><span class="p">([</span><span class="mi">2</span><span class="o">**</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">9</span><span class="p">)]),</span>
+        <span class="s2">&quot;l2&quot;</span><span class="p">:</span> <span class="n">tune</span><span class="o">.</span><span class="n">choice</span><span class="p">([</span><span class="mi">2</span><span class="o">**</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">9</span><span class="p">)]),</span>
+        <span class="s2">&quot;lr&quot;</span><span class="p">:</span> <span class="n">tune</span><span class="o">.</span><span class="n">loguniform</span><span class="p">(</span><span class="mf">1e-4</span><span class="p">,</span> <span class="mf">1e-1</span><span class="p">),</span>
+        <span class="s2">&quot;batch_size&quot;</span><span class="p">:</span> <span class="n">tune</span><span class="o">.</span><span class="n">choice</span><span class="p">([</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">16</span><span class="p">]),</span>
+    <span class="p">}</span>
+    <span class="n">scheduler</span> <span class="o">=</span> <span class="n">ASHAScheduler</span><span class="p">(</span>
+        <span class="n">metric</span><span class="o">=</span><span class="s2">&quot;loss&quot;</span><span class="p">,</span>
+        <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;min&quot;</span><span class="p">,</span>
+        <span class="n">max_t</span><span class="o">=</span><span class="n">max_num_epochs</span><span class="p">,</span>
+        <span class="n">grace_period</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">reduction_factor</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">tune</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
+        <span class="n">partial</span><span class="p">(</span><span class="n">train_cifar</span><span class="p">,</span> <span class="n">data_dir</span><span class="o">=</span><span class="n">data_dir</span><span class="p">),</span>
+        <span class="n">resources_per_trial</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;cpu&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;gpu&quot;</span><span class="p">:</span> <span class="n">gpus_per_trial</span><span class="p">},</span>
+        <span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">,</span>
+        <span class="n">num_samples</span><span class="o">=</span><span class="n">num_samples</span><span class="p">,</span>
+        <span class="n">scheduler</span><span class="o">=</span><span class="n">scheduler</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">best_trial</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">get_best_trial</span><span class="p">(</span><span class="s2">&quot;loss&quot;</span><span class="p">,</span> <span class="s2">&quot;min&quot;</span><span class="p">,</span> <span class="s2">&quot;last&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Best trial config: </span><span class="si">{</span><span class="n">best_trial</span><span class="o">.</span><span class="n">config</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Best trial final validation loss: </span><span class="si">{</span><span class="n">best_trial</span><span class="o">.</span><span class="n">last_result</span><span class="p">[</span><span class="s1">&#39;loss&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Best trial final validation accuracy: </span><span class="si">{</span><span class="n">best_trial</span><span class="o">.</span><span class="n">last_result</span><span class="p">[</span><span class="s1">&#39;accuracy&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="n">best_trained_model</span> <span class="o">=</span> <span class="n">Net</span><span class="p">(</span><span class="n">best_trial</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;l1&quot;</span><span class="p">],</span> <span class="n">best_trial</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;l2&quot;</span><span class="p">])</span>
+    <span class="n">device</span> <span class="o">=</span> <span class="s2">&quot;cpu&quot;</span>
+    <span class="k">if</span> <a href="https://pytorch.org/docs/stable/generated/torch.cuda.is_available.html#torch.cuda.is_available" title="torch.cuda.is_available" class="sphx-glr-backref-module-torch-cuda sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span></a><span class="p">():</span>
+        <span class="n">device</span> <span class="o">=</span> <span class="s2">&quot;cuda:0&quot;</span>
+        <span class="k">if</span> <span class="n">gpus_per_trial</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">best_trained_model</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.nn.DataParallel.html#torch.nn.DataParallel" title="torch.nn.DataParallel" class="sphx-glr-backref-module-torch-nn sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">nn</span><span class="o">.</span><span class="n">DataParallel</span></a><span class="p">(</span><span class="n">best_trained_model</span><span class="p">)</span>
+    <span class="n">best_trained_model</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+
+    <span class="n">best_checkpoint</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">get_best_checkpoint</span><span class="p">(</span><span class="n">trial</span><span class="o">=</span><span class="n">best_trial</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="s2">&quot;accuracy&quot;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;max&quot;</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">best_checkpoint</span><span class="o">.</span><span class="n">as_directory</span><span class="p">()</span> <span class="k">as</span> <span class="n">checkpoint_dir</span><span class="p">:</span>
+        <span class="n">data_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">checkpoint_dir</span><span class="p">)</span> <span class="o">/</span> <span class="s2">&quot;data.pkl&quot;</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">data_path</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
+            <span class="n">best_checkpoint_data</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">fp</span><span class="p">)</span>
+
+        <span class="n">best_trained_model</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">best_checkpoint_data</span><span class="p">[</span><span class="s2">&quot;net_state_dict&quot;</span><span class="p">])</span>
+        <span class="n">test_acc</span> <span class="o">=</span> <span class="n">test_accuracy</span><span class="p">(</span><span class="n">best_trained_model</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Best trial test set accuracy: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">test_acc</span><span class="p">))</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="c1"># You can change the number of GPUs per trial here:</span>
+    <span class="n">main</span><span class="p">(</span><span class="n">num_samples</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">max_num_epochs</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">gpus_per_trial</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>If you run the code, an example output could look like this:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>Number<span class="w"> </span>of<span class="w"> </span>trials:<span class="w"> </span><span class="m">10</span>/10<span class="w"> </span><span class="o">(</span><span class="m">10</span><span class="w"> </span>TERMINATED<span class="o">)</span>
++-----+--------------+------+------+-------------+--------+---------+------------+
+<span class="p">|</span><span class="w"> </span>...<span class="w"> </span><span class="p">|</span><span class="w">   </span>batch_size<span class="w"> </span><span class="p">|</span><span class="w">   </span>l1<span class="w"> </span><span class="p">|</span><span class="w">   </span>l2<span class="w"> </span><span class="p">|</span><span class="w">          </span>lr<span class="w"> </span><span class="p">|</span><span class="w">   </span>iter<span class="w"> </span><span class="p">|</span><span class="w">    </span>loss<span class="w"> </span><span class="p">|</span><span class="w">   </span>accuracy<span class="w"> </span><span class="p">|</span>
+<span class="p">|</span>-----+--------------+------+------+-------------+--------+---------+------------<span class="p">|</span>
+<span class="p">|</span><span class="w"> </span>...<span class="w"> </span><span class="p">|</span><span class="w">            </span><span class="m">2</span><span class="w"> </span><span class="p">|</span><span class="w">    </span><span class="m">1</span><span class="w"> </span><span class="p">|</span><span class="w">  </span><span class="m">256</span><span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="m">0</span>.000668163<span class="w"> </span><span class="p">|</span><span class="w">      </span><span class="m">1</span><span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="m">2</span>.31479<span class="w"> </span><span class="p">|</span><span class="w">     </span><span class="m">0</span>.0977<span class="w"> </span><span class="p">|</span>
+<span class="p">|</span><span class="w"> </span>...<span class="w"> </span><span class="p">|</span><span class="w">            </span><span class="m">4</span><span class="w"> </span><span class="p">|</span><span class="w">   </span><span class="m">64</span><span class="w"> </span><span class="p">|</span><span class="w">    </span><span class="m">8</span><span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="m">0</span>.0331514<span class="w">   </span><span class="p">|</span><span class="w">      </span><span class="m">1</span><span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="m">2</span>.31605<span class="w"> </span><span class="p">|</span><span class="w">     </span><span class="m">0</span>.0983<span class="w"> </span><span class="p">|</span>
+<span class="p">|</span><span class="w"> </span>...<span class="w"> </span><span class="p">|</span><span class="w">            </span><span class="m">4</span><span class="w"> </span><span class="p">|</span><span class="w">    </span><span class="m">2</span><span class="w"> </span><span class="p">|</span><span class="w">    </span><span class="m">1</span><span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="m">0</span>.000150295<span class="w"> </span><span class="p">|</span><span class="w">      </span><span class="m">1</span><span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="m">2</span>.30755<span class="w"> </span><span class="p">|</span><span class="w">     </span><span class="m">0</span>.1023<span class="w"> </span><span class="p">|</span>
+<span class="p">|</span><span class="w"> </span>...<span class="w"> </span><span class="p">|</span><span class="w">           </span><span class="m">16</span><span class="w"> </span><span class="p">|</span><span class="w">   </span><span class="m">32</span><span class="w"> </span><span class="p">|</span><span class="w">   </span><span class="m">32</span><span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="m">0</span>.0128248<span class="w">   </span><span class="p">|</span><span class="w">     </span><span class="m">10</span><span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="m">1</span>.66912<span class="w"> </span><span class="p">|</span><span class="w">     </span><span class="m">0</span>.4391<span class="w"> </span><span class="p">|</span>
+<span class="p">|</span><span class="w"> </span>...<span class="w"> </span><span class="p">|</span><span class="w">            </span><span class="m">4</span><span class="w"> </span><span class="p">|</span><span class="w">    </span><span class="m">8</span><span class="w"> </span><span class="p">|</span><span class="w">  </span><span class="m">128</span><span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="m">0</span>.00464561<span class="w">  </span><span class="p">|</span><span class="w">      </span><span class="m">2</span><span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="m">1</span>.7316<span class="w">  </span><span class="p">|</span><span class="w">     </span><span class="m">0</span>.3463<span class="w"> </span><span class="p">|</span>
+<span class="p">|</span><span class="w"> </span>...<span class="w"> </span><span class="p">|</span><span class="w">            </span><span class="m">8</span><span class="w"> </span><span class="p">|</span><span class="w">  </span><span class="m">256</span><span class="w"> </span><span class="p">|</span><span class="w">    </span><span class="m">8</span><span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="m">0</span>.00031556<span class="w">  </span><span class="p">|</span><span class="w">      </span><span class="m">1</span><span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="m">2</span>.19409<span class="w"> </span><span class="p">|</span><span class="w">     </span><span class="m">0</span>.1736<span class="w"> </span><span class="p">|</span>
+<span class="p">|</span><span class="w"> </span>...<span class="w"> </span><span class="p">|</span><span class="w">            </span><span class="m">4</span><span class="w"> </span><span class="p">|</span><span class="w">   </span><span class="m">16</span><span class="w"> </span><span class="p">|</span><span class="w">  </span><span class="m">256</span><span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="m">0</span>.00574329<span class="w">  </span><span class="p">|</span><span class="w">      </span><span class="m">2</span><span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="m">1</span>.85679<span class="w"> </span><span class="p">|</span><span class="w">     </span><span class="m">0</span>.3368<span class="w"> </span><span class="p">|</span>
+<span class="p">|</span><span class="w"> </span>...<span class="w"> </span><span class="p">|</span><span class="w">            </span><span class="m">8</span><span class="w"> </span><span class="p">|</span><span class="w">    </span><span class="m">2</span><span class="w"> </span><span class="p">|</span><span class="w">    </span><span class="m">2</span><span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="m">0</span>.00325652<span class="w">  </span><span class="p">|</span><span class="w">      </span><span class="m">1</span><span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="m">2</span>.30272<span class="w"> </span><span class="p">|</span><span class="w">     </span><span class="m">0</span>.0984<span class="w"> </span><span class="p">|</span>
+<span class="p">|</span><span class="w"> </span>...<span class="w"> </span><span class="p">|</span><span class="w">            </span><span class="m">2</span><span class="w"> </span><span class="p">|</span><span class="w">    </span><span class="m">2</span><span class="w"> </span><span class="p">|</span><span class="w">    </span><span class="m">2</span><span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="m">0</span>.000342987<span class="w"> </span><span class="p">|</span><span class="w">      </span><span class="m">2</span><span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="m">1</span>.76044<span class="w"> </span><span class="p">|</span><span class="w">     </span><span class="m">0</span>.292<span class="w">  </span><span class="p">|</span>
+<span class="p">|</span><span class="w"> </span>...<span class="w"> </span><span class="p">|</span><span class="w">            </span><span class="m">4</span><span class="w"> </span><span class="p">|</span><span class="w">   </span><span class="m">64</span><span class="w"> </span><span class="p">|</span><span class="w">   </span><span class="m">32</span><span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="m">0</span>.003734<span class="w">    </span><span class="p">|</span><span class="w">      </span><span class="m">8</span><span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="m">1</span>.53101<span class="w"> </span><span class="p">|</span><span class="w">     </span><span class="m">0</span>.4761<span class="w"> </span><span class="p">|</span>
++-----+--------------+------+------+-------------+--------+---------+------------+
+
+Best<span class="w"> </span>trial<span class="w"> </span>config:<span class="w"> </span><span class="o">{</span><span class="s1">&#39;l1&#39;</span>:<span class="w"> </span><span class="m">64</span>,<span class="w"> </span><span class="s1">&#39;l2&#39;</span>:<span class="w"> </span><span class="m">32</span>,<span class="w"> </span><span class="s1">&#39;lr&#39;</span>:<span class="w"> </span><span class="m">0</span>.0037339984519545164,<span class="w"> </span><span class="s1">&#39;batch_size&#39;</span>:<span class="w"> </span><span class="m">4</span><span class="o">}</span>
+Best<span class="w"> </span>trial<span class="w"> </span>final<span class="w"> </span>validation<span class="w"> </span>loss:<span class="w"> </span><span class="m">1</span>.5310075663924216
+Best<span class="w"> </span>trial<span class="w"> </span>final<span class="w"> </span>validation<span class="w"> </span>accuracy:<span class="w"> </span><span class="m">0</span>.4761
+Best<span class="w"> </span>trial<span class="w"> </span><span class="nb">test</span><span class="w"> </span><span class="nb">set</span><span class="w"> </span>accuracy:<span class="w"> </span><span class="m">0</span>.4737
+</pre></div>
+</div>
+<p>Most trials have been stopped early in order to avoid wasting resources.
+The best performing trial achieved a validation accuracy of about 47%, which could
+be confirmed on the test set.</p>
+<p>So that’s it! You can now tune the parameters of your PyTorch models.</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.000 seconds)</p>
+<div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-beginner-hyperparameter-tuning-tutorial-py">
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/b2e3bdbf14ea1e9b3a80770f0a498037/hyperparameter_tuning_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">hyperparameter_tuning_tutorial.py</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/30bcc2970bf630097b13789b5cdcea48/hyperparameter_tuning_tutorial.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">hyperparameter_tuning_tutorial.ipynb</span></code></a></p>
+</div>
+</div>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
+</div>
+</div>
+
+
+             </article>
+             
+            </div>
+            <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../intermediate/parametrizations.html" class="btn btn-neutral float-right" title="Parametrizations Tutorial" accesskey="n" rel="next">Next <img src="../_static/images/chevron-right-orange.svg" class="next-page"></a>
+      
+      
+        <a href="../intermediate/tensorboard_profiler_tutorial.html" class="btn btn-neutral" title="PyTorch Profiler With TensorBoard" accesskey="p" rel="prev"><img src="../_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
+      
+    </div>
+  
+
+  
+
+    <hr class="rating-hr hr-top">
+      <div class="rating-container">
+        <div class="rating-prompt">Rate this Tutorial</div>
+        <div class="stars-outer">
+          <i class="far fa-star" title="1 Star" data-behavior="tutorial-rating" data-count="1"></i>
+          <i class="far fa-star" title="2 Stars" data-behavior="tutorial-rating" data-count="2"></i>
+          <i class="far fa-star" title="3 Stars" data-behavior="tutorial-rating" data-count="3"></i>
+          <i class="far fa-star" title="4 Stars" data-behavior="tutorial-rating" data-count="4"></i>
+          <i class="far fa-star" title="5 Stars" data-behavior="tutorial-rating" data-count="5"></i>
+        </div>
+      </div>
+    <hr class="rating-hr hr-bottom"/>
+
+  
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2024, PyTorch.
+
+    </p>
+  </div>
+    
+      <div>
+        Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+      </div>
+     
+
+</footer>
+
+          </div>
+<script>
+if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.indexOf("/prototype/prototype_index")< 1))
+  {
+    var div = '<div class="admonition note"><p class="admonition-title">Note</p><p><i class="fa fa-flask" aria-hidden="true">&nbsp</i> This tutorial describes a prototype feature. Prototype features are typically not available as part of binary distributions like PyPI or Conda, except sometimes behind run-time flags, and are at an early stage for feedback and testing.</p></div>'
+    document.getElementById("pytorch-article").insertAdjacentHTML('afterBegin', div)
+  } 
+</script>
+        </div>
+
+        <div class="pytorch-content-right" id="pytorch-content-right">
+          <div class="pytorch-right-menu" id="pytorch-right-menu">
+            <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
+              <ul>
+<li><a class="reference internal" href="#">Ray Tune 超参数调优</a><ul>
+<li><a class="reference internal" href="#setup-imports">Setup / Imports</a></li>
+<li><a class="reference internal" href="#data-loaders">Data loaders</a></li>
+<li><a class="reference internal" href="#configurable-neural-network">Configurable neural network</a></li>
+<li><a class="reference internal" href="#the-train-function">The train function</a><ul>
+<li><a class="reference internal" href="#adding-multi-gpu-support-with-dataparallel">Adding (multi) GPU support with DataParallel</a></li>
+<li><a class="reference internal" href="#communicating-with-ray-tune">Communicating with Ray Tune</a></li>
+<li><a class="reference internal" href="#full-training-function">Full training function</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#test-set-accuracy">Test set accuracy</a></li>
+<li><a class="reference internal" href="#configuring-the-search-space">Configuring the search space</a></li>
+</ul>
+</li>
+</ul>
+
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+  
+
+
+  
+
+     
+       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+         <script src="../_static/jquery.js"></script>
+         <script src="../_static/underscore.js"></script>
+         <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+         <script src="../_static/doctools.js"></script>
+         <script src="../_static/clipboard.min.js"></script>
+         <script src="../_static/copybutton.js"></script>
+         <script src="../_static/katex.min.js"></script>
+         <script src="../_static/auto-render.min.js"></script>
+         <script src="../_static/katex_autorenderer.js"></script>
+         <script src="../_static/design-tabs.js"></script>
+     
+
+  
+
+  <script type="text/javascript" src="../_static/js/vendor/popper.min.js"></script>
+  <script type="text/javascript" src="../_static/js/vendor/bootstrap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min.js"></script>
+  <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+ 
+<script>
+
+// Helper function to make it easier to call dataLayer.push() 
+function gtag(){window.dataLayer.push(arguments);}
+
+//add microsoft link
+
+if(window.location.href.indexOf("/beginner/basics/")!= -1)
+{
+  var url="https://docs.microsoft.com/learn/paths/pytorch-fundamentals/?wt.mc_id=aiml-7486-cxa";
+  switch(window.location.pathname.split("/").pop().replace('.html',''))
+  {
+    case"quickstart_tutorial":
+      url="https://docs.microsoft.com/learn/modules/intro-machine-learning-pytorch/9-quickstart?WT.mc_id=aiml-7486-cxa";
+      break;
+    case"tensorqs_tutorial":
+      url="https://docs.microsoft.com/learn/modules/intro-machine-learning-pytorch/2-tensors?WT.mc_id=aiml-7486-cxa";
+      break;
+    case"data_tutorial":
+      url="https://docs.microsoft.com/learn/modules/intro-machine-learning-pytorch/3-data?WT.mc_id=aiml-7486-cxa";
+      break;
+    case"transforms_tutorial":
+      url="https://docs.microsoft.com/learn/modules/intro-machine-learning-pytorch/4-transforms?WT.mc_id=aiml-7486-cxa";
+      break;
+    case"buildmodel_tutorial":
+      url="https://docs.microsoft.com/learn/modules/intro-machine-learning-pytorch/5-model?WT.mc_id=aiml-7486-cxa";
+      break;
+    case"autogradqs_tutorial":
+      url="https://docs.microsoft.com/learn/modules/intro-machine-learning-pytorch/6-autograd?WT.mc_id=aiml-7486-cxa";
+      break;
+    case"optimization_tutorial":
+      url="https://docs.microsoft.com/learn/modules/intro-machine-learning-pytorch/7-optimization?WT.mc_id=aiml-7486-cxa";
+      break;
+    case"saveloadrun_tutorial":
+      url="https://docs.microsoft.com/learn/modules/intro-machine-learning-pytorch/8-inference?WT.mc_id=aiml-7486-cxa";
+    }
+    
+    $(".pytorch-call-to-action-links").children().first().before("<a href="+url+' data-behavior="call-to-action-event" data-response="Run in Microsoft Learn" target="_blank"><div id="microsoft-learn-link" style="padding-bottom: 0.625rem;border-bottom: 1px solid #f3f4f7;padding-right: 2.5rem;display: -webkit-box;  display: -ms-flexbox; display: flex; -webkit-box-align: center;-ms-flex-align: center;align-items: center;"><img class="call-to-action-img" src="../../_static/images/microsoft-logo.svg"/><div class="call-to-action-desktop-view">Run in Microsoft Learn</div><div class="call-to-action-mobile-view">Learn</div></div></a>')
+  }
+
+  !function(f,b,e,v,n,t,s)
+  {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+  n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+  if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+  n.queue=[];t=b.createElement(e);t.async=!0;
+  t.src=v;s=b.getElementsByTagName(e)[0];
+  s.parentNode.insertBefore(t,s)}(window,document,'script',
+  'https://connect.facebook.net/en_US/fbevents.js');
+  fbq('init', '243028289693773');
+  fbq('track', 'PageView');
+
+  $("[data-behavior='call-to-action-event']").on('click', function(){
+    fbq('trackCustom', "Download", {
+      tutorialTitle: $('h1:first').text(),
+      downloadLink: this.href,
+      tutorialLink: window.location.href,
+      downloadTitle: $(this).attr("data-response")
+    });
+    gtag('event', 'click', {
+      'event_category': $(this).attr("data-response"),
+      'event_label': $("h1").first().text(),
+      'tutorial_link': window.location.href
+    });
+   });
+
+   $("[data-behavior='tutorial-rating']").on('click', function(){
+    fbq('trackCustom', "Tutorial Rating", {
+      tutorialLink: window.location.href,
+      tutorialTitle: $('h1:first').text(),
+      rating: $(this).attr("data-count")
+    });
+    gtag('event', 'click', {
+      'event_category': 'Tutorial Rating',
+      'event_label': $("h1").first().text(),
+      'value': $(this).attr("data-count"),
+      'customEvent:Rating': $(this).attr("data-count") // send to GA custom dimension customEvent:Rating.
+    });
+   });
+
+   if (location.pathname == "/") {
+     $(".rating-container").hide();
+     $(".hr-bottom").hide();
+   }
+
+
+</script>
+
+<noscript>
+  <img height="1" width="1"
+  src="https://www.facebook.com/tr?id=243028289693773&ev=PageView
+  &noscript=1"/>
+</noscript>
+
+<script type="text/javascript">
+  var collapsedSections = ['PyTorch Recipes', 'Learning PyTorch', 'Image and Video', 'Audio', 'Text', 'Backends', 'Reinforcement Learning', 'Deploying PyTorch Models in Production', 'Profiling PyTorch', 'Code Transforms with FX', 'Frontend APIs', 'Extending PyTorch', 'Model Optimization', 'Parallel and Distributed Training', 'Edge with ExecuTorch', 'Recommendation Systems', 'Multimodality'];
+</script>
+
+<img height="1" width="1" style="border-style:none;" alt="" src="https://www.googleadservices.com/pagead/conversion/795629140/?label=txkmCPmdtosBENSssfsC&amp;guid=ON&amp;script=0"/>
+
+
+  <!-- Begin Footer -->
+
+  <div class="container-fluid docs-tutorials-resources" id="docs-tutorials-resources">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-4 text-center">
+          <h2>Docs</h2>
+          <p>Access comprehensive developer documentation for PyTorch</p>
+          <a class="with-right-arrow" href="https://pytorch.org/docs/stable/index.html">View Docs</a>
+        </div>
+
+        <div class="col-md-4 text-center">
+          <h2>Tutorials</h2>
+          <p>Get in-depth tutorials for beginners and advanced developers</p>
+          <a class="with-right-arrow" href="https://pytorch.org/tutorials">View Tutorials</a>
+        </div>
+
+        <div class="col-md-4 text-center">
+          <h2>Resources</h2>
+          <p>Find development resources and get your questions answered</p>
+          <a class="with-right-arrow" href="https://pytorch.org/resources">View Resources</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="container footer-container">
+      <div class="footer-logo-wrapper">
+        <a href="https://pytorch.org/" class="footer-logo"></a>
+      </div>
+
+      <div class="footer-links-wrapper">
+        <div class="footer-links-col">
+          <ul>
+            <li class="list-title"><a href="https://pytorch.org/">PyTorch</a></li>
+            <li><a href="https://pytorch.org/get-started">Get Started</a></li>
+            <li><a href="https://pytorch.org/features">Features</a></li>
+            <li><a href="https://pytorch.org/ecosystem">Ecosystem</a></li>
+            <li><a href="https://pytorch.org/blog/">Blog</a></li>
+            <li><a href="https://github.com/pytorch/pytorch/blob/master/CONTRIBUTING.md">Contributing</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-links-col">
+          <ul>
+            <li class="list-title"><a href="https://pytorch.org/resources">Resources</a></li>
+            <li><a href="https://pytorch.org/tutorials">Tutorials</a></li>
+            <li><a href="https://pytorch.org/docs/stable/index.html">Docs</a></li>
+            <li><a href="https://discuss.pytorch.org" target="_blank">Discuss</a></li>
+            <li><a href="https://github.com/pytorch/pytorch/issues" target="_blank">Github Issues</a></li>
+            <li><a href="https://pytorch.org/assets/brand-guidelines/PyTorch-Brand-Guidelines.pdf" target="_blank">Brand Guidelines</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-links-col">
+          <ul>
+            <li class="list-title">Stay up to date</li>
+            <li><a href="https://www.facebook.com/pytorch" target="_blank">Facebook</a></li>
+            <li><a href="https://twitter.com/pytorch" target="_blank">Twitter</a></li>
+            <li><a href="https://www.youtube.com/pytorch" target="_blank">YouTube</a></li>
+            <li><a href="https://www.linkedin.com/company/pytorch" target="_blank">LinkedIn</a></li>
+          </ul>  
+          </div>
+
+        <div class="footer-links-col">
+          <ul>
+            <li class="list-title">PyTorch Podcasts</li>
+            <li><a href="https://open.spotify.com/show/6UzHKeiy368jKfQMKKvJY5" target="_blank">Spotify</a></li>
+            <li><a href="https://podcasts.apple.com/us/podcast/pytorch-developer-podcast/id1566080008" target="_blank">Apple</a></li>
+            <li><a href="https://www.google.com/podcasts?feed=aHR0cHM6Ly9mZWVkcy5zaW1wbGVjYXN0LmNvbS9PQjVGa0lsOA%3D%3D" target="_blank">Google</a></li>
+            <li><a href="https://music.amazon.com/podcasts/7a4e6f0e-26c2-49e9-a478-41bd244197d0/PyTorch-Developer-Podcast?" target="_blank">Amazon</a></li>
+          </ul>
+         </div>
+        </div>
+        
+        <div class="privacy-policy">
+          <ul>
+            <li class="privacy-policy-links"><a href="https://www.linuxfoundation.org/terms/" target="_blank">Terms</a></li>
+            <li class="privacy-policy-links">|</li>
+            <li class="privacy-policy-links"><a href="https://www.linuxfoundation.org/privacy-policy/" target="_blank">Privacy</a></li>
+          </ul>
+        </div>
+        <div class="copyright">
+        <p>© Copyright The Linux Foundation. The PyTorch Foundation is a project of The Linux Foundation.
+          For web site terms of use, trademark policy and other policies applicable to The PyTorch Foundation please see
+          <a href="https://www.linuxfoundation.org/policies/">www.linuxfoundation.org/policies/</a>. The PyTorch Foundation supports the PyTorch open source
+          project, which has been established as PyTorch Project a Series of LF Projects, LLC. For policies applicable to the PyTorch Project a Series of LF Projects, LLC,
+          please see <a href="https://www.lfprojects.org/policies/">www.lfprojects.org/policies/</a>.</p>
+      </div>
+     </div>
+
+  </footer>
+
+  <div class="cookie-banner-wrapper">
+  <div class="container">
+    <p class="gdpr-notice">To analyze traffic and optimize your experience, we serve cookies on this site. By clicking or navigating, you agree to allow our usage of cookies. As the current maintainers of this site, Facebook’s Cookies Policy applies. Learn more, including about available controls: <a href="https://www.facebook.com/policies/cookies/">Cookies Policy</a>.</p>
+    <img class="close-button" src="../_static/images/pytorch-x.svg">
+  </div>
+</div>
+
+  <!-- End Footer -->
+
+  <!-- Begin Mobile Menu -->
+
+  <div class="mobile-main-menu">
+    <div class="container-fluid">
+      <div class="container">
+        <div class="mobile-main-menu-header-container">
+          <a class="header-logo" href="https://pytorch.org/" aria-label="PyTorch"></a>
+          <a class="main-menu-close-button" href="#" data-behavior="close-mobile-menu"></a>
+        </div>
+      </div>
+    </div>
+
+    <div class="mobile-main-menu-links-container">
+      <div class="main-menu">
+        <ul>
+           <li class="resources-mobile-menu-title">
+             <a>Learn</a>
+           </li>
+           <ul class="resources-mobile-menu-items">
+             <li>
+               <a href="https://pytorch.org/get-started">Get Started</a>
+             </li>
+             <li>
+               <a href="https://pytorch.org/tutorials">Tutorials</a>
+             </li>
+             <li>
+               <a href="https://pytorch.org/tutorials/beginner/basics/intro.html">Learn the Basics</a>
+             </li>
+             <li>
+               <a href="https://pytorch.org/tutorials/recipes/recipes_index.html">PyTorch Recipes</a>
+             </li>
+             <li>
+               <a href="https://pytorch.org/tutorials/beginner/introyt.html">Introduction to PyTorch - YouTube Series</a>
+             </li>
+           </ul>
+           <li class="resources-mobile-menu-title">
+             <a>Ecosystem</a>
+           </li>
+           <ul class="resources-mobile-menu-items">
+             <li>
+               <a href="https://pytorch.org/ecosystem">Tools</a>
+             </li>
+             <li>
+               <a href="https://pytorch.org/#community-module">Community</a>
+             </li>
+             <li>
+               <a href="https://discuss.pytorch.org/">Forums</a>
+             </li>
+             <li>
+               <a href="https://pytorch.org/resources">Developer Resources</a>
+             </li>
+             <li>
+               <a href="https://pytorch.org/ecosystem/contributor-awards-2023">Contributor Awards - 2023</a>
+             </li>
+           </ul>
+
+           <li class="resources-mobile-menu-title">
+             <a>Edge</a>
+           </li>
+
+           <ul class="resources-mobile-menu-items">
+             <li>
+               <a href="https://pytorch.org/edge">About PyTorch Edge</a>
+             </li>
+             
+             <li>
+               <a href="https://pytorch.org/executorch-overview">ExecuTorch</a>
+             </li>
+           </ul>
+
+           <li class="resources-mobile-menu-title">
+             <a>Docs</a>
+           </li>
+
+           <ul class="resources-mobile-menu-items">
+            <li>
+              <a href="https://pytorch.org/docs/stable/index.html">PyTorch</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/pytorch-domains">PyTorch Domains</a>
+            </li>
+          </ul>
+
+          <li class="resources-mobile-menu-title">
+            <a>Blog & News</a>
+          </li>
+            
+           <ul class="resources-mobile-menu-items">
+            <li>
+              <a href="https://pytorch.org/blog/">PyTorch Blog</a>
+            </li>
+            <li>
+              <a href="https://pytorch.org/community-blog">Community Blog</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/videos">Videos</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/community-stories">Community Stories</a>
+            </li>
+            <li>
+              <a href="https://pytorch.org/events">Events</a>
+            </li>
+          </ul>
+          
+          <li class="resources-mobile-menu-title">
+            <a>About</a>
+          </li>
+
+          <ul class="resources-mobile-menu-items">
+            <li>
+              <a href="https://pytorch.org/foundation">PyTorch Foundation</a>
+            </li>
+            <li>
+              <a href="https://pytorch.org/governing-board">Governing Board</a>
+            </li>
+          </ul>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- End Mobile Menu -->
+
+  <script type="text/javascript" src="../_static/js/vendor/anchor.min.js"></script>
+
+  <script type="text/javascript">
+    $(document).ready(function() {
+      mobileMenu.bind();
+      mobileTOC.bind();
+      pytorchAnchors.bind();
+      sideMenus.bind();
+      scrollToAnchor.bind();
+      highlightNavigation.bind();
+      mainMenuDropdown.bind();
+      filterTags.bind();
+
+      // Add class to links that have code blocks, since we cannot create links in code blocks
+      $("article.pytorch-article a span.pre").each(function(e) {
+        $(this).closest("a").addClass("has-code");
+      });
+    })
+  </script>
+</body>
+</html>

@@ -1,0 +1,57 @@
+
+
+.. _sphx_glr_beginner_examples_tensor:
+
+
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbnails">
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="一个三次多项式，从 -\pi 到 \pi 的 y=\sin(x)，通过最小化欧几里得距离的平方来训练预测。">
+
+.. only:: html
+
+  .. image:: /beginner/examples_tensor/images/thumb/sphx_glr_polynomial_numpy_thumb.png
+    :alt: Warm-up: numpy
+
+  :ref:`sphx_glr_beginner_examples_tensor_polynomial_numpy.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Warm-up: numpy</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="一个三次多项式，通过最小化欧几里得距离的平方来训练预测从 -\pi 到 \pi 的 y=\sin(x)。">
+
+.. only:: html
+
+  .. image:: /beginner/examples_tensor/images/thumb/sphx_glr_polynomial_tensor_thumb.png
+    :alt: PyTorch：张量(Tensors)
+
+  :ref:`sphx_glr_beginner_examples_tensor_polynomial_tensor.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">PyTorch：张量(Tensors)</div>
+    </div>
+
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /beginner/examples_tensor/polynomial_numpy
+   /beginner/examples_tensor/polynomial_tensor
+
