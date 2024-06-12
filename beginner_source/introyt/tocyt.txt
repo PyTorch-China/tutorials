@@ -1,7 +1,7 @@
-1. `Introduction to PyTorch <introyt/introyt1_tutorial.html>`_
-2. `Introduction to PyTorch Tensors <introyt/tensors_deeper_tutorial.html>`_
-3. `The Fundamentals of Autograd <introyt/autogradyt_tutorial.html>`_
-4. `Building Models with PyTorch <introyt/modelsyt_tutorial.html>`_
-5. `PyTorch TensorBoard Support <introyt/tensorboardyt_tutorial.html>`_
-6. `Training with PyTorch <introyt/trainingyt.html>`_
-7. `Model Understanding with Captum <introyt/captumyt.html>`_
+1. `PyTorch 简介 <introyt/introyt1_tutorial.html>`_
+2. `PyTorch Tensors 介绍 <introyt/tensors_deeper_tutorial.html>`_
+3. `自动微分基础 <introyt/autogradyt_tutorial.html>`_
+4. `使用 PyTorch 构建模型 <introyt/modelsyt_tutorial.html>`_
+5. `PyTorch TensorBoard 支持 <introyt/tensorboardyt_tutorial.html>`_
+6. `使用 PyTorch 训练模型 <introyt/trainingyt.html>`_
+7. `使用 Captum 进行模型理解 <introyt/captumyt.html>`_
