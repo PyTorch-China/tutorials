@@ -10,7 +10,7 @@
 PyTorch Tensors 介绍
 ===============================
 
-Follow along with the video below or on `youtube <https://www.youtube.com/watch?v=r7QDUPb2dCM>`__.
+跟随下面的视频或在 `youtube <https://www.youtube.com/watch?v=r7QDUPb2dCM>`__ 上观看。
 
 .. raw:: html
 
@@ -18,12 +18,9 @@ Follow along with the video below or on `youtube <https://www.youtube.com/watch?
      <iframe width="560" height="315" src="https://www.youtube.com/embed/r7QDUPb2dCM" frameborder="0" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
    </div>
 
-Tensors are the central data abstraction in PyTorch. This interactive
-notebook provides an in-depth introduction to the ``torch.Tensor``
-class.
+张量是PyTorch中的中心数据抽象。这个交互式笔记本提供了对 ``torch.Tensor`` 类的深入介绍。
 
-First things first, let’s import the PyTorch module. We’ll also add
-Python’s math module to facilitate some of the examples.
+首先,让我们导入PyTorch模块。我们还将添加Python的数学模块，以便于一些示例。
 
 """
 
@@ -32,10 +29,10 @@ import math
 
 
 #########################################################################
-# Creating Tensors
+# 创建张量
 # ----------------
 # 
-# The simplest way to create a tensor is with the ``torch.empty()`` call:
+# 创建张量最简单的方法是使用 ``torch.empty()`` 调用:
 # 
 
 x = torch.empty(3, 4)
@@ -44,34 +41,24 @@ print(x)
 
 
 ##########################################################################
-# Let’s unpack what we just did:
-# 
-# -  We created a tensor using one of the numerous factory methods
-#    attached to the ``torch`` module.
-# -  The tensor itself is 2-dimensional, having 3 rows and 4 columns.
-# -  The type of the object returned is ``torch.Tensor``, which is an
-#    alias for ``torch.FloatTensor``; by default, PyTorch tensors are
-#    populated with 32-bit floating point numbers. (More on data types
-#    below.)
-# -  You will probably see some random-looking values when printing your
-#    tensor. The ``torch.empty()`` call allocates memory for the tensor,
-#    but does not initialize it with any values - so what you’re seeing is
-#    whatever was in memory at the time of allocation.
-# 
-# A brief note about tensors and their number of dimensions, and
-# terminology:
-# 
-# -  You will sometimes see a 1-dimensional tensor called a
-#    *vector.* 
-# -  Likewise, a 2-dimensional tensor is often referred to as a
-#    *matrix.* 
-# -  Anything with more than two dimensions is generally just
-#    called a tensor.
-# 
-# More often than not, you’ll want to initialize your tensor with some
-# value. Common cases are all zeros, all ones, or random values, and the
-# ``torch`` module provides factory methods for all of these:
-# 
+# 让我们解释下刚才发生的事情:
+#
+# - 我们使用附加到 ``torch`` 模块的众多工厂方法之一创建了一个张量。
+# - 该张量是二维的,有3行4列。
+# - 返回对象的类型是 ``torch.Tensor``，这是 ``torch.FloatTensor`` 的别名；
+#   默认情况下，PyTorch张量用32位浮点数填充。(更多关于数据类型的内容见下文。)
+# - 当打印你的张量时，你可能会看到一些随机的值。``torch.empty()`` 调用为张量分配内存，
+#   但不会用任何值初始化它 - 所以你看到的是分配时内存中的任何值。
+#
+# 关于张量及其维数和术语的简要说明:
+#
+# - 你有时会看到一维张量被称为 *向量*。
+# - 同样,二维张量通常被称为 *矩阵*。
+# - 任何超过两个维度的张量通常都被称为张量。
+#
+# 大多数情况下,你会希望用一些值初始化你的张量。常见的情况是全零、全一或随机值，
+# ``torch`` 模块为所有这些情况提供了工厂方法:
+#
 
 zeros = torch.zeros(2, 3)
 print(zeros)
@@ -85,21 +72,15 @@ print(random)
 
 
 #########################################################################
-# The factory methods all do just what you’d expect - we have a tensor
-# full of zeros, another full of ones, and another with random values
-# between 0 and 1.
-# 
-# Random Tensors and Seeding
+# 工厂方法都做了你期望的事情 - 我们有一个全零张量、一个全一张量和一个随机值在0到1之间的张量。
+#
+# 随机张量和种子
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~
-# 
-# Speaking of the random tensor, did you notice the call to
-# ``torch.manual_seed()`` immediately preceding it? Initializing tensors,
-# such as a model’s learning weights, with random values is common but
-# there are times - especially in research settings - where you’ll want
-# some assurance of the reproducibility of your results. Manually setting
-# your random number generator’s seed is the way to do this. Let’s look
-# more closely:
-# 
+#
+# 说到随机张量,你是否注意到在它之前立即调用了 ``torch.manual_seed()``?
+# 用随机值初始化张量(如模型的学习权重)是很常见的，但在某些情况下 - 特别是在研究环境中 - 
+# 你可能希望对结果的可重复性有一些保证。手动设置随机数生成器的种子就是这样做的方法。让我们仔细看看:
+#
 
 torch.manual_seed(1729)
 random1 = torch.rand(2, 3)
@@ -117,22 +98,18 @@ print(random4)
 
 
 ############################################################################
-# What you should see above is that ``random1`` and ``random3`` carry
-# identical values, as do ``random2`` and ``random4``. Manually setting
-# the RNG’s seed resets it, so that identical computations depending on
-# random number should, in most settings, provide identical results.
-# 
-# For more information, see the `PyTorch documentation on
-# reproducibility <https://pytorch.org/docs/stable/notes/randomness.html>`__.
-# 
-# Tensor Shapes
+# 你应该看到上面 ``random1`` 和 ``random3`` 包含相同的值,``random2`` 和 ``random4`` 也是如此。
+# 手动设置RNG的种子会重置它,因此相同的随机数计算在大多数设置下应该提供相同的结果。
+#
+# 有关更多信息,请参阅PyTorch关于可重复性的 
+# `文档 <https://pytorch.org/docs/stable/notes/randomness.html>`__。
+#
+# 张量形状
 # ~~~~~~~~~~~~~
-# 
-# Often, when you’re performing operations on two or more tensors, they
-# will need to be of the same *shape* - that is, having the same number of
-# dimensions and the same number of cells in each dimension. For that, we
-# have the ``torch.*_like()`` methods:
-# 
+#
+# 当你在两个或多个张量上执行操作时,它们通常需要具有相同的 *形状* - 也就是说，
+# 具有相同的维数和每个维度中的相同数量的单元。为此,我们有 ``torch.*_like()`` 方法:
+#
 
 x = torch.empty(2, 2, 3)
 print(x.shape)
@@ -156,19 +133,14 @@ print(rand_like_x)
 
 
 #########################################################################
-# The first new thing in the code cell above is the use of the ``.shape``
-# property on a tensor. This property contains a list of the extent of
-# each dimension of a tensor - in our case, ``x`` is a three-dimensional
-# tensor with shape 2 x 2 x 3.
-# 
-# Below that, we call the ``.empty_like()``, ``.zeros_like()``,
-# ``.ones_like()``, and ``.rand_like()`` methods. Using the ``.shape``
-# property, we can verify that each of these methods returns a tensor of
-# identical dimensionality and extent.
-# 
-# The last way to create a tensor that will cover is to specify its data
-# directly from a PyTorch collection:
-# 
+# 上面代码单元中的第一个新事物是在张量上使用 ``.shape`` 属性。
+# 这个属性包含了每个维度张量的范围的列表 - 在我们的例子中，``x`` 是一个三维张量，形状为 2 x 2 x 3。
+#
+# 在下面,我们调用 ``.empty_like()``，``.zeros_like()``，``.ones_like()`` 和 ``.rand_like()`` 方法。
+# 使用 ``.shape`` 属性，我们可以验证每个这些方法都返回一个具有相同维数和范围的张量。
+#
+# 创建张量的最后一种方式是直接从PyTorch集合中指定其数据:
+#
 
 some_constants = torch.tensor([[3.1415926, 2.71828], [1.61803, 0.0072897]])
 print(some_constants)
@@ -181,19 +153,17 @@ print(more_integers)
 
 
 ######################################################################
-# Using ``torch.tensor()`` is the most straightforward way to create a
-# tensor if you already have data in a Python tuple or list. As shown
-# above, nesting the collections will result in a multi-dimensional
-# tensor.
-# 
+# 使用 ``torch.tensor()`` 是在你已经有Python元组或列表数据的情况下创建张量的最直接方式。
+# 如上所示，嵌套集合会生成多维张量。
+#
 # .. note::
-#      ``torch.tensor()`` creates a copy of the data.
-# 
-# Tensor Data Types
+#      ``torch.tensor()`` 创建数据的副本。
+#
+# 张量数据类型
 # ~~~~~~~~~~~~~~~~~
-# 
-# Setting the datatype of a tensor is possible a couple of ways:
-# 
+#
+# 设置张量的数据类型有两种方式:
+#
 
 a = torch.ones((2, 3), dtype=torch.int16)
 print(a)
@@ -206,50 +176,41 @@ print(c)
 
 
 ##########################################################################
-# The simplest way to set the underlying data type of a tensor is with an
-# optional argument at creation time. In the first line of the cell above,
-# we set ``dtype=torch.int16`` for the tensor ``a``. When we print ``a``,
-# we can see that it’s full of ``1`` rather than ``1.`` - Python’s subtle
-# cue that this is an integer type rather than floating point.
-# 
-# Another thing to notice about printing ``a`` is that, unlike when we
-# left ``dtype`` as the default (32-bit floating point), printing the
-# tensor also specifies its ``dtype``.
-# 
-# You may have also spotted that we went from specifying the tensor’s
-# shape as a series of integer arguments, to grouping those arguments in a
-# tuple. This is not strictly necessary - PyTorch will take a series of
-# initial, unlabeled integer arguments as a tensor shape - but when adding
-# the optional arguments, it can make your intent more readable.
-# 
-# The other way to set the datatype is with the ``.to()`` method. In the
-# cell above, we create a random floating point tensor ``b`` in the usual
-# way. Following that, we create ``c`` by converting ``b`` to a 32-bit
-# integer with the ``.to()`` method. Note that ``c`` contains all the same
-# values as ``b``, but truncated to integers.
-# 
-# Available data types include:
-# 
-# -  ``torch.bool``
-# -  ``torch.int8``
-# -  ``torch.uint8``
-# -  ``torch.int16``
-# -  ``torch.int32``
-# -  ``torch.int64``
-# -  ``torch.half``
-# -  ``torch.float``
-# -  ``torch.double``
-# -  ``torch.bfloat``
-# 
-# Math & Logic with PyTorch Tensors
+# 设置张量底层数据类型的最简单方式是在创建时使用可选参数。在上面单元格的第一行中，
+# 我们将 ``dtype=torch.int16`` 设置为张量 ``a``。当我们打印 ``a`` 时，
+# 我们可以看到它是由 ``1`` 而不是 ``1.`` 填充的 - Python的一个微妙提示，这是一个整数类型而不是浮点数。
+#
+# 你可能还注意到，打印 ``a`` 时，与我们将 ``dtype`` 保留为默认值(32位浮点数)时不同，
+# 打印张量时也指定了其 ``dtype``。
+#
+# 你可能还注意到,我们从指定张量形状为一系列整数参数，转为将这些参数分组到一个元组中。
+# 这不是绝对必要的 - PyTorch会将一系列初始的、未标记的整数参数视为张量形状 - 但是当添加可选参数时，
+# 它可以使你的意图更加可读。
+#
+# 设置数据类型的另一种方式是使用 ``.to()`` 方法。在上面的单元格中，
+# 我们以通常的方式创建了一个随机浮点张量 ``b``。接下来,我们通过将 ``b`` 转换为32位整数来创建 ``c``。
+# 注意 ``c`` 包含与 ``b`` 相同的值,但被截断为整数。
+#
+# 可用的数据类型包括:
+#
+# - ``torch.bool``
+# - ``torch.int8``
+# - ``torch.uint8``
+# - ``torch.int16``
+# - ``torch.int32``
+# - ``torch.int64``
+# - ``torch.half``
+# - ``torch.float``
+# - ``torch.double``
+# - ``torch.bfloat``
+#
+# 使用PyTorch张量进行数学和逻辑运算
 # ---------------------------------
-# 
-# Now that you know some of the ways to create a tensor… what can you do
-# with them?
-# 
-# Let’s look at basic arithmetic first, and how tensors interact with
-# simple scalars:
-# 
+#
+# 现在你知道了一些创建张量的方法，那你能对它们做什么呢?
+#
+# 让我们首先看基本算术运算，以及张量如何与简单的标量交互:
+#
 
 ones = torch.zeros(2, 2) + 1
 twos = torch.ones(2, 2) * 2
@@ -265,16 +226,12 @@ print(sqrt2s)
 
 
 ##########################################################################
-# As you can see above, arithmetic operations between tensors and scalars,
-# such as addition, subtraction, multiplication, division, and
-# exponentiation are distributed over every element of the tensor. Because
-# the output of such an operation will be a tensor, you can chain them
-# together with the usual operator precedence rules, as in the line where
-# we create ``threes``.
-# 
-# Similar operations between two tensors also behave like you’d
-# intuitively expect:
-# 
+# 如你所见，张量和标量之间的加法、减法、乘法、除法和指数运算都是在张量的每个元素上分布式进行的。
+# 由于这种操作的输出将是一个张量，你可以像通常的运算符优先级规则一样将它们链接在一起，
+# 就像我们在创建 ``threes`` 的那一行中所做的那样。
+#
+# 两个张量之间的类似运算也像你直觉上期望的那样:
+#
 
 powers2 = twos ** torch.tensor([[1, 2], [3, 4]])
 print(powers2)
@@ -287,12 +244,10 @@ print(dozens)
 
 
 ##########################################################################
-# It’s important to note here that all of the tensors in the previous code
-# cell were of identical shape. What happens when we try to perform a
-# binary operation on tensors if dissimilar shape?
+# 这里需要注意的是，前面代码单元中的所有张量都具有相同的形状。如果我们尝试在不同形状的张量上执行二元运算会怎样?
 # 
 # .. note::
-#    The following cell throws a run-time error. This is intentional.
+#    下面的单元格会抛出一个运行时错误，这是有意的。
 #
 #    .. code-block:: sh
 #
@@ -304,19 +259,15 @@ print(dozens)
 
 
 ##########################################################################
-# In the general case, you cannot operate on tensors of different shape
-# this way, even in a case like the cell above, where the tensors have an
-# identical number of elements.
+# 一般情况下，你不能以这种方式对不同形状的张量进行操作，即使在上面的单元格中，张量具有相同数量的元素。
 # 
-# In Brief: Tensor Broadcasting
+# 简要介绍:张量广播
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # 
 # .. note::
-#      If you are familiar with broadcasting semantics in NumPy
-#      ndarrays, you’ll find the same rules apply here.
+#      如果你熟悉NumPy ndarrays中的广播语义,你会发现这里应用的是相同的规则。
 # 
-# The exception to the same-shapes rule is *tensor broadcasting.* Here’s
-# an example:
+# 同形规则的例外是 *张量广播*。这里有一个例子:
 # 
 
 rand = torch.rand(2, 4)
@@ -327,94 +278,78 @@ print(doubled)
 
 
 #########################################################################
-# What’s the trick here? How is it we got to multiply a 2x4 tensor by a
-# 1x4 tensor?
-# 
-# Broadcasting is a way to perform an operation between tensors that have
-# similarities in their shapes. In the example above, the one-row,
-# four-column tensor is multiplied by *both rows* of the two-row,
-# four-column tensor.
-# 
-# This is an important operation in Deep Learning. The common example is
-# multiplying a tensor of learning weights by a *batch* of input tensors,
-# applying the operation to each instance in the batch separately, and
-# returning a tensor of identical shape - just like our (2, 4) \* (1, 4)
-# example above returned a tensor of shape (2, 4).
-# 
-# The rules for broadcasting are:
-# 
-# -  Each tensor must have at least one dimension - no empty tensors.
-# 
-# -  Comparing the dimension sizes of the two tensors, *going from last to
-#    first:*
-# 
-#    -  Each dimension must be equal, *or*
-# 
-#    -  One of the dimensions must be of size 1, *or*
-# 
-#    -  The dimension does not exist in one of the tensors
-# 
-# Tensors of identical shape, of course, are trivially “broadcastable”, as
-# you saw earlier.
-# 
-# Here are some examples of situations that honor the above rules and
-# allow broadcasting:
-# 
+# 这里的技巧是什么?我们是如何将 2 x 4 张量与 1 x 4 张量相乘的?
+#
+# 广播是一种在具有相似形状的张量之间执行操作的方式。在上面的例子中，一行四列的张量与两行四列张量的 *两行* 相乘。
+#
+# 这是深度学习中一个重要的操作。常见的例子是将一批输入张量的学习权重张量相乘，分别对批次中的每个实例应用该操作，
+# 并返回一个形状相同的张量 - 就像我们上面的(2,4) * (1,4)示例一样，返回了一个形状为(2,4)的张量。
+#
+# 广播的规则是:
+#
+# - 每个张量必须至少有一个维度 - 不允许空张量。
+#
+# - 比较两个张量的维度大小，*从最后一个到第一个:*
+#
+#    - 每个维度必须相等，*或*
+#
+#    - 其中一个维度必须为1，*或*
+#
+#    - 该维度在其中一个张量中不存在
+#
+# 当然，相同形状的张量是"可广播"的，正如你之前看到的那样。
+#
+# 这里有一些符合上述规则并允许广播的情况示例:
+#
 
 a =     torch.ones(4, 3, 2)
 
-b = a * torch.rand(   3, 2) # 3rd & 2nd dims identical to a, dim 1 absent
+b = a * torch.rand(   3, 2) # 第3和第2维与a相同，第1维不存在
 print(b)
 
-c = a * torch.rand(   3, 1) # 3rd dim = 1, 2nd dim identical to a
+c = a * torch.rand(   3, 1) # 第3维为1，第2维与a相同
 print(c)
 
-d = a * torch.rand(   1, 2) # 3rd dim identical to a, 2nd dim = 1
+d = a * torch.rand(   1, 2) # 第3维与a相同，第2维为1
 print(d)
 
 
 #############################################################################
-# Look closely at the values of each tensor above: 
+# 仔细观察上面每个张量的值:
 #
-# -  The multiplication operation that created ``b`` was 
-#    broadcast over every “layer” of ``a``.
-# -  For ``c``, the operation was broadcast over every layer and row of
-#    ``a`` - every 3-element column is identical. 
-# -  For ``d``, we switched it around - now every *row* is identical,
-#    across layers and columns.
-# 
-# For more information on broadcasting, see the `PyTorch
-# documentation <https://pytorch.org/docs/stable/notes/broadcasting.html>`__
-# on the topic.
-# 
-# Here are some examples of attempts at broadcasting that will fail:
-# 
+# - 创建 `b` 的乘法运算是在 `a` 的每一层上广播的。
+# - 对于 `c`，该运算在 `a` 的每一层和每一行上都进行了广播 - 每一列3个元素都是相同的。
+# - 对于 `d`，我们颠倒了一下 - 现在每一行在层与列之间都是相同的。
+#
+# 有关广播的更多信息,请参阅PyTorch关于此的
+# `文档 <https://pytorch.org/docs/stable/notes/broadcasting.html>`__。
+#
+# 这里有一些尝试广播但会失败的例子:
+#
 # .. note::
-#    The following cell throws a run-time error. This is intentional.
+#    下面的单元格会抛出一个运行时错误，这是有意的。
 #
 #    .. code-block:: python
 #
 #       a =     torch.ones(4, 3, 2)
 #
-#       b = a * torch.rand(4, 3)    # dimensions must match last-to-first
+#       b = a * torch.rand(4, 3)    # 维度必须从最后到第一个匹配
 #
-#       c = a * torch.rand(   2, 3) # both 3rd & 2nd dims different
+#       c = a * torch.rand(   2, 3) # 第3和第2维都不同
 #
-#       d = a * torch.rand((0, ))   # can't broadcast with an empty tensor
+#       d = a * torch.rand((0, ))   # 不能与空张量进行广播
 #
-
 
 ###########################################################################
-# More Math with Tensors
+# 更多张量数学运算
 # ~~~~~~~~~~~~~~~~~~~~~~
 # 
-# PyTorch tensors have over three hundred operations that can be performed
-# on them.
+# PyTorch 张量有超过三百种可以执行的操作。
 # 
-# Here is a small sample from some of the major categories of operations:
+# 这里是一些主要操作类别的示例:
 # 
 
-# common functions
+# 常用方法
 a = torch.rand(2, 4) * 2 - 1
 print('Common functions:')
 print(torch.abs(a))
@@ -422,7 +357,7 @@ print(torch.ceil(a))
 print(torch.floor(a))
 print(torch.clamp(a, -0.5, 0.5))
 
-# trigonometric functions and their inverses
+# 三角函数及其反函数
 angles = torch.tensor([0, math.pi / 4, math.pi / 2, 3 * math.pi / 4])
 sines = torch.sin(angles)
 inverses = torch.asin(sines)
@@ -431,78 +366,72 @@ print(angles)
 print(sines)
 print(inverses)
 
-# bitwise operations
+# 位运算
 print('\nBitwise XOR:')
 b = torch.tensor([1, 5, 11])
 c = torch.tensor([2, 7, 10])
 print(torch.bitwise_xor(b, c))
 
-# comparisons:
+# 比较操作
 print('\nBroadcasted, element-wise equality comparison:')
 d = torch.tensor([[1., 2.], [3., 4.]])
-e = torch.ones(1, 2)  # many comparison ops support broadcasting!
-print(torch.eq(d, e)) # returns a tensor of type bool
+e = torch.ones(1, 2)  
+print(torch.eq(d, e)) # 返回布尔类型张量
 
-# reductions:
-print('\nReduction ops:')
-print(torch.max(d))        # returns a single-element tensor
-print(torch.max(d).item()) # extracts the value from the returned tensor
-print(torch.mean(d))       # average
-print(torch.std(d))        # standard deviation
-print(torch.prod(d))       # product of all numbers
-print(torch.unique(torch.tensor([1, 2, 1, 2, 1, 2]))) # filter unique elements
+# 归约操作:
+print('\n归约操作:')
+print(torch.max(d))        # 返回单元素张量
+print(torch.max(d).item()) # 从返回的张量中提取值
+print(torch.mean(d))       # 平均值
+print(torch.std(d))        # 标准差
+print(torch.prod(d))       # 所有数字的乘积
+print(torch.unique(torch.tensor([1, 2, 1, 2, 1, 2]))) # 过滤唯一元素
 
-# vector and linear algebra operations
-v1 = torch.tensor([1., 0., 0.])         # x unit vector
-v2 = torch.tensor([0., 1., 0.])         # y unit vector
-m1 = torch.rand(2, 2)                   # random matrix
-m2 = torch.tensor([[3., 0.], [0., 3.]]) # three times identity matrix
+# 向量和线性代数运算
+v1 = torch.tensor([1., 0., 0.])         # x 单位向量
+v2 = torch.tensor([0., 1., 0.])         # y 单位向量
+m1 = torch.rand(2, 2)                   # 随机矩阵
+m2 = torch.tensor([[3., 0.], [0., 3.]]) # 三倍单位矩阵
 
-print('\nVectors & Matrices:')
-print(torch.cross(v2, v1)) # negative of z unit vector (v1 x v2 == -v2 x v1)
+print('\n向量和矩阵:')
+print(torch.cross(v2, v1)) # z 单位向量的负值 (v1 x v2 == -v2 x v1)
 print(m1)
 m3 = torch.matmul(m1, m2)
-print(m3)                  # 3 times m1
-print(torch.svd(m3))       # singular value decomposition
+print(m3)                  # m1 的三倍
+print(torch.svd(m3))       # 奇异值分解
 
 
 ##################################################################################
-# This is a small sample of operations. For more details and the full inventory of
-# math functions, have a look at the
-# `documentation <https://pytorch.org/docs/stable/torch.html#math-operations>`__.
-# 
-# Altering Tensors in Place
+# 有关更多详细信息和完整的数学函数清单,请查看
+# `文档 <https://pytorch.org/docs/stable/torch.html#math-operations>`__。
+#
+# 本地修改张量
 # ~~~~~~~~~~~~~~~~~~~~~~~~~
-# 
-# Most binary operations on tensors will return a third, new tensor. When
-# we say ``c = a * b`` (where ``a`` and ``b`` are tensors), the new tensor
-# ``c`` will occupy a region of memory distinct from the other tensors.
-# 
-# There are times, though, that you may wish to alter a tensor in place -
-# for example, if you’re doing an element-wise computation where you can
-# discard intermediate values. For this, most of the math functions have a
-# version with an appended underscore (``_``) that will alter a tensor in
-# place.
-# 
-# For example:
-# 
+#
+# 大多数张量的二元运算将返回第三个新张量。当我们说 `c = a * b` (其中 `a` 和 `b` 是张量)时,
+# 新张量 `c` 将占用与其他张量不同的内存区域。
+#
+# 但是,有时您可能希望就地修改张量 - 例如，如果您正在执行元素wise计算,可以丢弃中间值。
+# 为此，大多数数学函数都有一个带有附加下划线 (`_`) 的版本，它将就地修改张量。
+#
+# 例如:
+#
 
 a = torch.tensor([0, math.pi / 4, math.pi / 2, 3 * math.pi / 4])
 print('a:')
 print(a)
-print(torch.sin(a))   # this operation creates a new tensor in memory
-print(a)              # a has not changed
+print(torch.sin(a))   # 此操作在内存中创建新张量
+print(a)              # a 未更改
 
 b = torch.tensor([0, math.pi / 4, math.pi / 2, 3 * math.pi / 4])
 print('\nb:')
 print(b)
-print(torch.sin_(b))  # note the underscore
-print(b)              # b has changed
-
+print(torch.sin_(b))  # 注意下划线
+print(b)              # b 被修改
 
 #######################################################################
-# For arithmetic operations, there are functions that behave similarly:
-# 
+# 对于算术运算,有一些函数的行为类似:
+
 
 a = torch.ones(2, 2)
 b = torch.rand(2, 2)
@@ -520,19 +449,14 @@ print(b)
 
 
 ##########################################################################
-# Note that these in-place arithmetic functions are methods on the
-# ``torch.Tensor`` object, not attached to the ``torch`` module like many
-# other functions (e.g., ``torch.sin()``). As you can see from
-# ``a.add_(b)``, *the calling tensor is the one that gets changed in
-# place.*
-# 
-# There is another option for placing the result of a computation in an
-# existing, allocated tensor. Many of the methods and functions we’ve seen
-# so far - including creation methods! - have an ``out`` argument that
-# lets you specify a tensor to receive the output. If the ``out`` tensor
-# is the correct shape and ``dtype``, this can happen without a new memory
-# allocation:
-# 
+# 注意,这些就地算术函数是 `torch.Tensor` 对象上的方法，
+# 而不是像许多其他函数(例如 `torch.sin()`)那样附加到 `torch` 模块上。
+# 正如你从 `a.add_(b)` 中看到的，*被调用的张量是就地改变的那个*。
+#
+# 还有另一种选择，可以将计算结果放在一个已经分配的张量中。我们到目前为止看到的许多方法和函数
+#  - 包括创建方法! - 都有一个 `out` 参数，让你指定一个张量来接收输出。
+# 如果 `out` 张量的形状和 `dtype` 正确，这可以在不分配新内存的情况下发生:
+#
 
 a = torch.rand(2, 2)
 b = torch.rand(2, 2)
@@ -541,74 +465,60 @@ old_id = id(c)
 
 print(c)
 d = torch.matmul(a, b, out=c)
-print(c)                # contents of c have changed
+print(c)                # c 的内容已经改变
 
-assert c is d           # test c & d are same object, not just containing equal values
-assert id(c) == old_id  # make sure that our new c is the same object as the old one
+assert c is d           # 测试 c 和 d 是同一个对象,而不只是包含相等的值
+assert id(c) == old_id  # 确保我们的新 c 是旧 c 的同一个对象
 
-torch.rand(2, 2, out=c) # works for creation too!
-print(c)                # c has changed again
-assert id(c) == old_id  # still the same object!
-
+torch.rand(2, 2, out=c) # 对于创建也可以!
+print(c)                # c 又一次改变
+assert id(c) == old_id  # 仍然是同一个对象!
 
 ##########################################################################
-# Copying Tensors
+# 复制张量
 # ---------------
-# 
-# As with any object in Python, assigning a tensor to a variable makes the
-# variable a *label* of the tensor, and does not copy it. For example:
-# 
+#
+# 与 Python 中的任何对象一样，将张量赋值给变量会使该变量成为张量的 *标签*，而不会复制它。例如:
+#
 
 a = torch.ones(2, 2)
 b = a
 
-a[0][1] = 561  # we change a...
-print(b)       # ...and b is also altered
-
+a[0][1] = 561  # 我们改变 a...
+print(b)       # ...b 也被改变了
 
 ######################################################################
-# But what if you want a separate copy of the data to work on? The
-# ``clone()`` method is there for you:
-# 
+# 但是,如果你想要一个单独的数据副本来处理呢? 这时就可以使用 `clone()` 方法:
+#
+
 
 a = torch.ones(2, 2)
 b = a.clone()
 
-assert b is not a      # different objects in memory...
-print(torch.eq(a, b))  # ...but still with the same contents!
+assert b is not a      # 内存中的不同对象...
+print(torch.eq(a, b))  # ...但仍然具有相同的内容!
 
-a[0][1] = 561          # a changes...
-print(b)               # ...but b is still all ones
+a[0][1] = 561          # a 改变了...
+print(b)               # ...但 b 仍然是全 1
 
 
 #########################################################################
-# **There is an important thing to be aware of when using ``clone()``.**
-# If your source tensor has autograd, enabled then so will the clone.
-# **This will be covered more deeply in the video on autograd,** but if
-# you want the light version of the details, continue on.
-# 
-# *In many cases, this will be what you want.* For example, if your model
-# has multiple computation paths in its ``forward()`` method, and *both*
-# the original tensor and its clone contribute to the model’s output, then
-# to enable model learning you want autograd turned on for both tensors.
-# If your source tensor has autograd enabled (which it generally will if
-# it’s a set of learning weights or derived from a computation involving
-# the weights), then you’ll get the result you want.
-# 
-# On the other hand, if you’re doing a computation where *neither* the
-# original tensor nor its clone need to track gradients, then as long as
-# the source tensor has autograd turned off, you’re good to go.
-# 
-# *There is a third case,* though: Imagine you’re performing a computation
-# in your model’s ``forward()`` function, where gradients are turned on
-# for everything by default, but you want to pull out some values
-# mid-stream to generate some metrics. In this case, you *don’t* want the
-# cloned copy of your source tensor to track gradients - performance is
-# improved with autograd’s history tracking turned off. For this, you can
-# use the ``.detach()`` method on the source tensor:
-# 
+# **使用 `clone()` 时,有一个重要的事情需要注意。**
+# 如果你的源张量启用了自动求导,那么克隆张量也会启用自动求导。
+# **这将在关于自动求导的视频中更深入地介绍**， 但如果你想了解细节的简单版本,请继续阅读。
+#
+# *在许多情况下,这正是你所需要的。*例如,如果你的模型在其 `forward()` 方法中有多个计算路径，
+# 并且 *原始张量和它的克隆* 都会影响模型的输出，那么为了启用模型学习，你希望两个张量都启用自动求导。
+# 如果你的源张量启用了自动求导(通常如果它是一组学习权重或源自涉及权重的计算)，那么你就会得到所需的结果。
+#
+# 另一方面，如果你正在进行一个计算。其中 *原始张量和它的克隆* 都不需要跟踪梯度，那么只要源张量关闭了自动求导，你就可以继续了。
+#
+# *还有第三种情况:* 假设你在模型的 `forward()` 函数中执行一个计算，默认情况下所有内容的梯度都打开，
+# 但你想在中间提取一些值来生成一些指标。在这种情况下，你 *不希望* 克隆的源张量副本跟踪梯度
+#  - 关闭自动求导的历史记录跟踪可以提高性能。为此，你可以在源张量上使用 `.detach()` 方法:
+#
 
-a = torch.rand(2, 2, requires_grad=True) # turn on autograd
+a = torch.rand(2, 2, requires_grad=True) # 打开自动求导
 print(a)
 
 b = a.clone()
@@ -621,43 +531,31 @@ print(a)
 
 
 #########################################################################
-# What’s happening here?
-# 
-# -  We create ``a`` with ``requires_grad=True`` turned on. **We haven’t
-#    covered this optional argument yet, but will during the unit on
-#    autograd.**
-# -  When we print ``a``, it informs us that the property
-#    ``requires_grad=True`` - this means that autograd and computation
-#    history tracking are turned on.
-# -  We clone ``a`` and label it ``b``. When we print ``b``, we can see
-#    that it’s tracking its computation history - it has inherited
-#    ``a``\ ’s autograd settings, and added to the computation history.
-# -  We clone ``a`` into ``c``, but we call ``detach()`` first.
-# -  Printing ``c``, we see no computation history, and no
-#    ``requires_grad=True``.
-# 
-# The ``detach()`` method *detaches the tensor from its computation
-# history.* It says, “do whatever comes next as if autograd was off.” It
-# does this *without* changing ``a`` - you can see that when we print
-# ``a`` again at the end, it retains its ``requires_grad=True`` property.
-# 
-# Moving to GPU
+# 此处发生了什么?
+#
+# -  我们创建了 ``a`` 并将 ``requires_grad=True`` 打开。**我们还没有介绍这个可选参数，
+#    但将在关于自动求导的单元中介绍。**
+# -  当我们打印 ``a`` 时,它告诉我们属性 ``requires_grad=True`` - 这意味着自动求导和计算历史跟踪已打开。
+# -  我们克隆 ``a`` 并将其标记为 ``b``。当我们打印 ``b`` 时，我们可以看到它正在跟踪其计算历史 - 它继承了 ``a`` 的自动求导设置，
+#    并添加到了计算历史中。
+# -  我们克隆 ``a`` 到 ``c``,但首先调用 ``detach()``。
+# -  打印 `c`，我们看不到任何计算历史，也没有 `requires_grad=True`。
+#
+# ``detach()`` 方法*将张量与其计算历史分离。*它说,"无论接下来发生什么，都像自动求导关闭时那样进行。
+# "它这样做*并不会改变 ``a``* - 你可以看到,当我们在最后再次打印 `a` 时，它保留了其 ``requires_grad=True`` 属性。
+#
+# 移动到 GPU
 # -------------
-# 
-# One of the major advantages of PyTorch is its robust acceleration on
-# CUDA-compatible Nvidia GPUs. (“CUDA” stands for *Compute Unified Device
-# Architecture*, which is Nvidia’s platform for parallel computing.) So
-# far, everything we’ve done has been on CPU. How do we move to the faster
-# hardware?
-# 
-# First, we should check whether a GPU is available, with the
-# ``is_available()`` method.
-# 
+#
+# PyTorch 的主要优势之一是在 CUDA 兼容的 Nvidia GPU 上有强大的加速能力。
+# ("CUDA"代表*Compute Unified Device Architecture*,这是 Nvidia 的并行计算平台。)
+# 到目前为止，我们所做的一切都是在 CPU 上。我们如何移动到更快的硬件上呢?
+#
+# 首先,我们应该使用 `is_available()` 方法检查是否有 GPU 可用。
+#
 # .. note::
-#      If you do not have a CUDA-compatible GPU and CUDA drivers
-#      installed, the executable cells in this section will not execute any
-#      GPU-related code.
-# 
+#      如果你没有安装 CUDA 兼容的 GPU 和 CUDA 驱动程序，本节中的可执行单元格将不会执行任何 GPU 相关的代码。
+#
 
 if torch.cuda.is_available():
     print('We have a GPU!')
