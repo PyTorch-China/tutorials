@@ -10,7 +10,7 @@
 使用 PyTorch 训练模型
 =====================
 
-Follow along with the video below or on `youtube <https://www.youtube.com/watch?v=jF43_wj_DCQ>`__.
+跟随下面的视频或在 `youtube <https://www.youtube.com/watch?v=jF43_wj_DCQ>`__ 上观看。
 
 .. raw:: html
 
@@ -18,48 +18,34 @@ Follow along with the video below or on `youtube <https://www.youtube.com/watch?
      <iframe width="560" height="315" src="https://www.youtube.com/embed/jF43_wj_DCQ" frameborder="0" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
    </div>
 
-Introduction
+简介
 ------------
 
-In past videos, we’ve discussed and demonstrated:
+在过去的视频中,我们讨论并演示了:
 
-- Building models with the neural network layers and functions of the torch.nn module
-- The mechanics of automated gradient computation, which is central to
-  gradient-based model training 
-- Using TensorBoard to visualize training progress and other activities
+- 使用 torch.nn 模块中的神经网络层和函数构建模型
+- 自动梯度计算的机制,这是基于梯度的模型训练的核心
+- 使用 TensorBoard 可视化训练进度和其他活动
 
-In this video, we’ll be adding some new tools to your inventory:
+在本视频中,我们将为您的库存添加一些新工具:
 
-- We’ll get familiar with the dataset and dataloader abstractions, and how
-  they ease the process of feeding data to your model during a training loop 
-- We’ll discuss specific loss functions and when to use them
-- We’ll look at PyTorch optimizers, which implement algorithms to adjust
-  model weights based on the outcome of a loss function
+- 我们将熟悉数据集和数据加载器抽象,以及它们如何简化向模型训练循环提供数据的过程
+- 我们将讨论特定的损失函数以及何时使用它们
+- 我们将了解 PyTorch 优化器,它们实现了根据损失函数的结果调整模型权重的算法
 
-Finally, we’ll pull all of these together and see a full PyTorch
-training loop in action.
+最后,我们将把所有这些结合起来,看一个完整的 PyTorch 训练循环的实际运行。
 
 
-Dataset and DataLoader
+数据集和数据加载器
 ----------------------
  
-The ``Dataset`` and ``DataLoader`` classes encapsulate the process of
-pulling your data from storage and exposing it to your training loop in
-batches.
+``Dataset`` 和 ``DataLoader`` 类封装了从存储中提取数据并以批次形式暴露给训练循环的过程。
 
-The ``Dataset`` is responsible for accessing and processing single
-instances of data.
+``Dataset`` 负责访问和处理单个数据实例。
  
-The ``DataLoader`` pulls instances of data from the ``Dataset`` (either
-automatically or with a sampler that you define), collects them in
-batches, and returns them for consumption by your training loop. The
-``DataLoader`` works with all kinds of datasets, regardless of the type
-of data they contain.
+``DataLoader`` 从 ``Dataset`` 中提取数据实例(无论是自动提取还是使用您定义的采样器),将它们收集到批次中,并返回给您的训练循环进行消费。``DataLoader`` 可以与所有类型的数据集一起使用,无论它们包含什么类型的数据。
  
-For this tutorial, we’ll be using the Fashion-MNIST dataset provided by
-TorchVision. We use ``torchvision.transforms.Normalize()`` to
-zero-center and normalize the distribution of the image tile content,
-and download both training and validation data splits.
+对于本教程,我们将使用 TorchVision 提供的 Fashion-MNIST 数据集。我们使用 ``torchvision.transforms.Normalize()`` 来零中心和标准化图像瓦片内容的分布,并下载训练和验证数据分割。
 
 """ 
 
@@ -67,7 +53,7 @@ import torch
 import torchvision
 import torchvision.transforms as transforms
 
-# PyTorch TensorBoard support
+# PyTorch TensorBoard 支持
 from torch.utils.tensorboard import SummaryWriter
 from datetime import datetime
 
@@ -76,35 +62,35 @@ transform = transforms.Compose(
     [transforms.ToTensor(),
     transforms.Normalize((0.5,), (0.5,))])
 
-# Create datasets for training & validation, download if necessary
+# 创建训练和验证数据集,如果需要则下载
 training_set = torchvision.datasets.FashionMNIST('./data', train=True, transform=transform, download=True)
 validation_set = torchvision.datasets.FashionMNIST('./data', train=False, transform=transform, download=True)
 
-# Create data loaders for our datasets; shuffle for training, not for validation
+# 为我们的数据集创建数据加载器;训练时打乱,验证时不打乱
 training_loader = torch.utils.data.DataLoader(training_set, batch_size=4, shuffle=True)
 validation_loader = torch.utils.data.DataLoader(validation_set, batch_size=4, shuffle=False)
 
-# Class labels
+# 类别标签
 classes = ('T-shirt/top', 'Trouser', 'Pullover', 'Dress', 'Coat',
         'Sandal', 'Shirt', 'Sneaker', 'Bag', 'Ankle Boot')
 
-# Report split sizes
-print('Training set has {} instances'.format(len(training_set)))
-print('Validation set has {} instances'.format(len(validation_set)))
+# 报告分割大小
+print('训练集有 {} 个实例'.format(len(training_set)))
+print('验证集有 {} 个实例'.format(len(validation_set)))
 
 
 ######################################################################
-# As always, let’s visualize the data as a sanity check:
+# 像往常一样,让我们可视化数据作为健全性检查:
 # 
 
 import matplotlib.pyplot as plt
 import numpy as np
 
-# Helper function for inline image display
+# 内联图像显示的辅助函数
 def matplotlib_imshow(img, one_channel=False):
     if one_channel:
         img = img.mean(dim=0)
-    img = img / 2 + 0.5     # unnormalize
+    img = img / 2 + 0.5     # 反标准化
     npimg = img.numpy()
     if one_channel:
         plt.imshow(npimg, cmap="Greys")
@@ -114,24 +100,23 @@ def matplotlib_imshow(img, one_channel=False):
 dataiter = iter(training_loader)
 images, labels = next(dataiter)
 
-# Create a grid from the images and show them
+# 从图像创建网格并显示它们
 img_grid = torchvision.utils.make_grid(images)
 matplotlib_imshow(img_grid, one_channel=True)
 print('  '.join(classes[labels[j]] for j in range(4)))
 
 
 #########################################################################
-# The Model
+# 模型
 # ---------
 # 
-# The model we’ll use in this example is a variant of LeNet-5 - it should
-# be familiar if you’ve watched the previous videos in this series.
+# 我们在本例中使用的模型是 LeNet-5 的变体 - 如果您观看了本系列的前几个视频,应该会很熟悉。
 # 
 
 import torch.nn as nn
 import torch.nn.functional as F
 
-# PyTorch models inherit from torch.nn.Module
+# PyTorch 模型继承自 torch.nn.Module
 class GarmentClassifier(nn.Module):
     def __init__(self):
         super(GarmentClassifier, self).__init__()
@@ -156,102 +141,89 @@ model = GarmentClassifier()
 
 
 ##########################################################################
-# Loss Function
+# 损失函数
 # -------------
 # 
-# For this example, we’ll be using a cross-entropy loss. For demonstration
-# purposes, we’ll create batches of dummy output and label values, run
-# them through the loss function, and examine the result.
+# 对于本例,我们将使用交叉熵损失。为了演示目的,我们将创建虚拟输出和标签值的批次,将它们通过损失函数,并检查结果。
 # 
 
 loss_fn = torch.nn.CrossEntropyLoss()
 
-# NB: Loss functions expect data in batches, so we're creating batches of 4
-# Represents the model's confidence in each of the 10 classes for a given input
+# 注意:损失函数期望数据以批次形式,所以我们创建了 4 个批次
+# 表示模型对给定输入的 10 个类别中每一个的置信度
 dummy_outputs = torch.rand(4, 10)
-# Represents the correct class among the 10 being tested
+# 表示正确的类别在测试的 10 个类别中
 dummy_labels = torch.tensor([1, 5, 3, 7])
     
 print(dummy_outputs)
 print(dummy_labels)
 
 loss = loss_fn(dummy_outputs, dummy_labels)
-print('Total loss for this batch: {}'.format(loss.item()))
+print('此批次的总损失: {}'.format(loss.item()))
 
 
 #################################################################################
-# Optimizer
+# 优化器
 # ---------
 # 
-# For this example, we’ll be using simple `stochastic gradient
-# descent <https://pytorch.org/docs/stable/optim.html>`__ with momentum.
+# 对于本例,我们将使用带动量的简单随机梯度下降。
 # 
-# It can be instructive to try some variations on this optimization
-# scheme:
+# 尝试一些优化方案的变体会很有启发性:
 # 
-# - Learning rate determines the size of the steps the optimizer
-#   takes. What does a different learning rate do to the your training
-#   results, in terms of accuracy and convergence time?
-# - Momentum nudges the optimizer in the direction of strongest gradient over
-#   multiple steps. What does changing this value do to your results? 
-# - Try some different optimization algorithms, such as averaged SGD, Adagrad, or
-#   Adam. How do your results differ?
+# - 学习率决定了优化器采取的步长大小。不同的学习率对您的训练结果有何影响,在准确性和收敛时间方面?
+# - 动量在多个步骤中将优化器推向最强梯度的方向。改变这个值会对结果产生什么影响?
+# - 尝试一些不同的优化算法,如平均 SGD、Adagrad 或 Adam。您的结果有何不同?
 # 
 
-# Optimizers specified in the torch.optim package
+# 在 torch.optim 包中指定优化器
 optimizer = torch.optim.SGD(model.parameters(), lr=0.001, momentum=0.9)
 
 
 #######################################################################################
-# The Training Loop
+# 训练循环
 # -----------------
 # 
-# Below, we have a function that performs one training epoch. It
-# enumerates data from the DataLoader, and on each pass of the loop does
-# the following:
+# 下面,我们有一个执行一个训练周期的函数。它
+# 从 DataLoader 枚举数据,并在循环的每一次通过时执行以下操作:
 # 
-# - Gets a batch of training data from the DataLoader
-# - Zeros the optimizer’s gradients 
-# - Performs an inference - that is, gets predictions from the model for an input batch
-# - Calculates the loss for that set of predictions vs. the labels on the dataset
-# - Calculates the backward gradients over the learning weights
-# - Tells the optimizer to perform one learning step - that is, adjust the model’s
-#   learning weights based on the observed gradients for this batch, according to the
-#   optimization algorithm we chose
-# - It reports on the loss for every 1000 batches.
-# - Finally, it reports the average per-batch loss for the last
-#   1000 batches, for comparison with a validation run
+# - 从 DataLoader 获取一批训练数据
+# - 将优化器的梯度归零
+# - 执行推理 - 也就是从模型获取输入批次的预测
+# - 计算该组预测与数据集上的标签之间的损失
+# - 计算学习权重的反向梯度
+# - 告诉优化器执行一个学习步骤 - 也就是根据我们选择的优化算法,基于该批次观察到的梯度来调整模型的学习权重
+# - 它每 1000 个批次报告一次损失。
+# - 最后,它报告最后 1000 个批次的平均每批次损失,以便与验证运行进行比较
 # 
 
 def train_one_epoch(epoch_index, tb_writer):
     running_loss = 0.
     last_loss = 0.
     
-    # Here, we use enumerate(training_loader) instead of
-    # iter(training_loader) so that we can track the batch
-    # index and do some intra-epoch reporting
+    # 这里,我们使用 enumerate(training_loader) 而不是
+    # iter(training_loader),以便我们可以跟踪批次索引并进行一些周期内报告
     for i, data in enumerate(training_loader):
-        # Every data instance is an input + label pair
+        # 每个数据实例都是一个输入 + 标签对
         inputs, labels = data
         
-        # Zero your gradients for every batch!
+        # 对于每个批次,将梯度归零!
         optimizer.zero_grad()
         
-        # Make predictions for this batch
+        # 对该批次进行预测
         outputs = model(inputs)
         
-        # Compute the loss and its gradients
+        # 计算损失及其梯度
         loss = loss_fn(outputs, labels)
         loss.backward()
         
-        # Adjust learning weights
+        # 调整学习权重
         optimizer.step()
         
-        # Gather data and report
+        # 收集数据并报告
         running_loss += loss.item()
         if i % 1000 == 999:
-            last_loss = running_loss / 1000 # loss per batch
-            print('  batch {} loss: {}'.format(i + 1, last_loss))
+            last_loss = running_loss / 1000 # 每批次损失
+            print('  批次 {} 损失: {}'.format(i + 1, last_loss))
             tb_x = epoch_index * len(training_loader) + i + 1
             tb_writer.add_scalar('Loss/train', last_loss, tb_x)
             running_loss = 0.
@@ -260,21 +232,18 @@ def train_one_epoch(epoch_index, tb_writer):
 
 
 ##################################################################################
-# Per-Epoch Activity
+# 每周期活动
 # ~~~~~~~~~~~~~~~~~~
 # 
-# There are a couple of things we’ll want to do once per epoch: 
+# 我们每个周期需要做的事情有:
 #
-# - Perform validation by checking our relative loss on a set of data that was not
-#   used for training, and report this 
-# - Save a copy of the model
+# - 通过检查未用于训练的一组数据上的相对损失来执行验证,并报告这一点
+# - 保存模型的副本
 # 
-# Here, we’ll do our reporting in TensorBoard. This will require going to
-# the command line to start TensorBoard, and opening it in another browser
-# tab.
+# 在这里,我们将在 TensorBoard 中进行报告。这需要转到命令行启动 TensorBoard,并在另一个浏览器选项卡中打开它。
 # 
 
-# Initializing in a separate cell so we can easily add more epochs to the same run
+# 在单独的单元格中初始化,以便我们可以轻松地将更多周期添加到同一运行中
 timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
 writer = SummaryWriter('runs/fashion_trainer_{}'.format(timestamp))
 epoch_number = 0
@@ -284,19 +253,18 @@ EPOCHS = 5
 best_vloss = 1_000_000.
 
 for epoch in range(EPOCHS):
-    print('EPOCH {}:'.format(epoch_number + 1))
+    print('周期 {}:'.format(epoch_number + 1))
     
-    # Make sure gradient tracking is on, and do a pass over the data
+    # 确保梯度跟踪已打开,并对数据进行一次传递
     model.train(True)
     avg_loss = train_one_epoch(epoch_number, writer)
     
 
     running_vloss = 0.0
-    # Set the model to evaluation mode, disabling dropout and using population 
-    # statistics for batch normalization.
+    # 将模型设置为评估模式,禁用 dropout 并使用批量规范化的群体统计数据。
     model.eval()
 
-    # Disable gradient computation and reduce memory consumption.
+    # 禁用梯度计算并减少内存消耗。
     with torch.no_grad():
         for i, vdata in enumerate(validation_loader):
             vinputs, vlabels = vdata
@@ -305,16 +273,16 @@ for epoch in range(EPOCHS):
             running_vloss += vloss
     
     avg_vloss = running_vloss / (i + 1)
-    print('LOSS train {} valid {}'.format(avg_loss, avg_vloss))
+    print('损失 训练 {} 有效 {}'.format(avg_loss, avg_vloss))
     
-    # Log the running loss averaged per batch
-    # for both training and validation
-    writer.add_scalars('Training vs. Validation Loss',
-                    { 'Training' : avg_loss, 'Validation' : avg_vloss },
+    # 记录每批次平均的运行损失
+    # 对于训练和验证
+    writer.add_scalars('训练与验证损失',
+                    { '训练' : avg_loss, '验证' : avg_vloss },
                     epoch_number + 1)
     writer.flush()
     
-    # Track best performance, and save the model's state
+    # 跟踪最佳性能,并保存模型的状态
     if avg_vloss < best_vloss:
         best_vloss = avg_vloss
         model_path = 'model_{}_{}'.format(timestamp, epoch_number)
@@ -324,45 +292,22 @@ for epoch in range(EPOCHS):
 
 
 #########################################################################
-# To load a saved version of the model:
+# 要加载保存的模型版本:
 #
 # .. code:: python
 #
 #     saved_model = GarmentClassifier()
 #     saved_model.load_state_dict(torch.load(PATH))
 #
-# Once you’ve loaded the model, it’s ready for whatever you need it for -
-# more training, inference, or analysis.
+# 一旦加载了模型,它就可以用于您需要的任何事情 -
+# 更多训练、推理或分析。
 # 
-# Note that if your model has constructor parameters that affect model
-# structure, you’ll need to provide them and configure the model
-# identically to the state in which it was saved.
+# 请注意,如果您的模型有影响模型结构的构造函数参数,您需要提供它们并以与保存时相同的方式配置模型。
 # 
-# Other Resources
+# 其他资源
 # ---------------
 # 
-# -  Docs on the `data
-#    utilities <https://pytorch.org/docs/stable/data.html>`__, including
-#    Dataset and DataLoader, at pytorch.org
-# -  A `note on the use of pinned
-#    memory <https://pytorch.org/docs/stable/notes/cuda.html#cuda-memory-pinning>`__
-#    for GPU training
-# -  Documentation on the datasets available in
-#    `TorchVision <https://pytorch.org/vision/stable/datasets.html>`__,
-#    `TorchText <https://pytorch.org/text/stable/datasets.html>`__, and
-#    `TorchAudio <https://pytorch.org/audio/stable/datasets.html>`__
-# -  Documentation on the `loss
-#    functions <https://pytorch.org/docs/stable/nn.html#loss-functions>`__
-#    available in PyTorch
-# -  Documentation on the `torch.optim
-#    package <https://pytorch.org/docs/stable/optim.html>`__, which
-#    includes optimizers and related tools, such as learning rate
-#    scheduling
-# -  A detailed `tutorial on saving and loading
-#    models <https://pytorch.org/tutorials/beginner/saving_loading_models.html>`__
-# -  The `Tutorials section of
-#    pytorch.org <https://pytorch.org/tutorials/>`__ contains tutorials on
-#    a broad variety of training tasks, including classification in
-#    different domains, generative adversarial networks, reinforcement
-#    learning, and more 
-# 
+# -  pytorch.org 上的数据工具文档,包括 Dataset 和 DataLoader
+# -  关于使用固定内存进行 GPU 训练的说明
+# -  TorchVision、TorchText 和 TorchAudio 中可用数据集的文档
+# -  PyTorch 中可用损失
