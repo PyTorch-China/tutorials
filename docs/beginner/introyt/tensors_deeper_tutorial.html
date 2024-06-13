@@ -606,53 +606,40 @@ to download the full example code</p>
 <a class="reference external" href="captumyt.html">模型理解</a></p>
 <div class="section" id="pytorch-tensors">
 <h1>PyTorch Tensors 介绍<a class="headerlink" href="#pytorch-tensors" title="Permalink to this heading">¶</a></h1>
-<p>Follow along with the video below or on <a class="reference external" href="https://www.youtube.com/watch?v=r7QDUPb2dCM">youtube</a>.</p>
+<p>跟随下面的视频或在 <a class="reference external" href="https://www.youtube.com/watch?v=r7QDUPb2dCM">youtube</a> 上观看。</p>
 <div style="margin-top:10px; margin-bottom:10px;">
   <iframe width="560" height="315" src="https://www.youtube.com/embed/r7QDUPb2dCM" frameborder="0" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-</div><p>Tensors are the central data abstraction in PyTorch. This interactive
-notebook provides an in-depth introduction to the <code class="docutils literal notranslate"><span class="pre">torch.Tensor</span></code>
-class.</p>
-<p>First things first, let’s import the PyTorch module. We’ll also add
-Python’s math module to facilitate some of the examples.</p>
+</div><p>张量是PyTorch中的中心数据抽象。这个交互式笔记本提供了对 <code class="docutils literal notranslate"><span class="pre">torch.Tensor</span></code> 类的深入介绍。</p>
+<p>首先,让我们导入PyTorch模块。我们还将添加Python的数学模块，以便于一些示例。</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">import</span> <span class="nn">math</span>
 </pre></div>
 </div>
-<div class="section" id="creating-tensors">
-<h2>Creating Tensors<a class="headerlink" href="#creating-tensors" title="Permalink to this heading">¶</a></h2>
-<p>The simplest way to create a tensor is with the <code class="docutils literal notranslate"><span class="pre">torch.empty()</span></code> call:</p>
+<div class="section" id="id6">
+<h2>创建张量<a class="headerlink" href="#id6" title="Permalink to this heading">¶</a></h2>
+<p>创建张量最简单的方法是使用 <code class="docutils literal notranslate"><span class="pre">torch.empty()</span></code> 调用:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">x</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.empty.html#torch.empty" title="torch.empty" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">empty</span></a><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Let’s unpack what we just did:</p>
+<p>让我们解释下刚才发生的事情:</p>
 <ul class="simple">
-<li><p>We created a tensor using one of the numerous factory methods
-attached to the <code class="docutils literal notranslate"><span class="pre">torch</span></code> module.</p></li>
-<li><p>The tensor itself is 2-dimensional, having 3 rows and 4 columns.</p></li>
-<li><p>The type of the object returned is <code class="docutils literal notranslate"><span class="pre">torch.Tensor</span></code>, which is an
-alias for <code class="docutils literal notranslate"><span class="pre">torch.FloatTensor</span></code>; by default, PyTorch tensors are
-populated with 32-bit floating point numbers. (More on data types
-below.)</p></li>
-<li><p>You will probably see some random-looking values when printing your
-tensor. The <code class="docutils literal notranslate"><span class="pre">torch.empty()</span></code> call allocates memory for the tensor,
-but does not initialize it with any values - so what you’re seeing is
-whatever was in memory at the time of allocation.</p></li>
+<li><p>我们使用附加到 <code class="docutils literal notranslate"><span class="pre">torch</span></code> 模块的众多工厂方法之一创建了一个张量。</p></li>
+<li><p>该张量是二维的,有3行4列。</p></li>
+<li><p>返回对象的类型是 <code class="docutils literal notranslate"><span class="pre">torch.Tensor</span></code>，这是 <code class="docutils literal notranslate"><span class="pre">torch.FloatTensor</span></code> 的别名；
+默认情况下，PyTorch张量用32位浮点数填充。(更多关于数据类型的内容见下文。)</p></li>
+<li><p>当打印你的张量时，你可能会看到一些随机的值。<code class="docutils literal notranslate"><span class="pre">torch.empty()</span></code> 调用为张量分配内存，
+但不会用任何值初始化它 - 所以你看到的是分配时内存中的任何值。</p></li>
 </ul>
-<p>A brief note about tensors and their number of dimensions, and
-terminology:</p>
+<p>关于张量及其维数和术语的简要说明:</p>
 <ul class="simple">
-<li><p>You will sometimes see a 1-dimensional tensor called a
-<em>vector.</em></p></li>
-<li><p>Likewise, a 2-dimensional tensor is often referred to as a
-<em>matrix.</em></p></li>
-<li><p>Anything with more than two dimensions is generally just
-called a tensor.</p></li>
+<li><p>你有时会看到一维张量被称为 <em>向量</em>。</p></li>
+<li><p>同样,二维张量通常被称为 <em>矩阵</em>。</p></li>
+<li><p>任何超过两个维度的张量通常都被称为张量。</p></li>
 </ul>
-<p>More often than not, you’ll want to initialize your tensor with some
-value. Common cases are all zeros, all ones, or random values, and the
-<code class="docutils literal notranslate"><span class="pre">torch</span></code> module provides factory methods for all of these:</p>
+<p>大多数情况下,你会希望用一些值初始化你的张量。常见的情况是全零、全一或随机值，
+<code class="docutils literal notranslate"><span class="pre">torch</span></code> 模块为所有这些情况提供了工厂方法:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">zeros</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.zeros.html#torch.zeros" title="torch.zeros" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">zeros</span></a><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">zeros</span><span class="p">)</span>
 
@@ -664,18 +651,12 @@ value. Common cases are all zeros, all ones, or random values, and the
 <span class="nb">print</span><span class="p">(</span><span class="n">random</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>The factory methods all do just what you’d expect - we have a tensor
-full of zeros, another full of ones, and another with random values
-between 0 and 1.</p>
-<div class="section" id="random-tensors-and-seeding">
-<h3>Random Tensors and Seeding<a class="headerlink" href="#random-tensors-and-seeding" title="Permalink to this heading">¶</a></h3>
-<p>Speaking of the random tensor, did you notice the call to
-<code class="docutils literal notranslate"><span class="pre">torch.manual_seed()</span></code> immediately preceding it? Initializing tensors,
-such as a model’s learning weights, with random values is common but
-there are times - especially in research settings - where you’ll want
-some assurance of the reproducibility of your results. Manually setting
-your random number generator’s seed is the way to do this. Let’s look
-more closely:</p>
+<p>工厂方法都做了你期望的事情 - 我们有一个全零张量、一个全一张量和一个随机值在0到1之间的张量。</p>
+<div class="section" id="id7">
+<h3>随机张量和种子<a class="headerlink" href="#id7" title="Permalink to this heading">¶</a></h3>
+<p>说到随机张量,你是否注意到在它之前立即调用了 <code class="docutils literal notranslate"><span class="pre">torch.manual_seed()</span></code>?
+用随机值初始化张量(如模型的学习权重)是很常见的，但在某些情况下 - 特别是在研究环境中 -
+你可能希望对结果的可重复性有一些保证。手动设置随机数生成器的种子就是这样做的方法。让我们仔细看看:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://pytorch.org/docs/stable/generated/torch.manual_seed.html#torch.manual_seed" title="torch.manual_seed" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">manual_seed</span></a><span class="p">(</span><span class="mi">1729</span><span class="p">)</span>
 <span class="n">random1</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.rand.html#torch.rand" title="torch.rand" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">rand</span></a><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">random1</span><span class="p">)</span>
@@ -691,19 +672,15 @@ more closely:</p>
 <span class="nb">print</span><span class="p">(</span><span class="n">random4</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>What you should see above is that <code class="docutils literal notranslate"><span class="pre">random1</span></code> and <code class="docutils literal notranslate"><span class="pre">random3</span></code> carry
-identical values, as do <code class="docutils literal notranslate"><span class="pre">random2</span></code> and <code class="docutils literal notranslate"><span class="pre">random4</span></code>. Manually setting
-the RNG’s seed resets it, so that identical computations depending on
-random number should, in most settings, provide identical results.</p>
-<p>For more information, see the <a class="reference external" href="https://pytorch.org/docs/stable/notes/randomness.html">PyTorch documentation on
-reproducibility</a>.</p>
+<p>你应该看到上面 <code class="docutils literal notranslate"><span class="pre">random1</span></code> 和 <code class="docutils literal notranslate"><span class="pre">random3</span></code> 包含相同的值,``random2`` 和 <code class="docutils literal notranslate"><span class="pre">random4</span></code> 也是如此。
+手动设置RNG的种子会重置它,因此相同的随机数计算在大多数设置下应该提供相同的结果。</p>
+<p>有关更多信息,请参阅PyTorch关于可重复性的
+<a class="reference external" href="https://pytorch.org/docs/stable/notes/randomness.html">文档</a>。</p>
 </div>
-<div class="section" id="tensor-shapes">
-<h3>Tensor Shapes<a class="headerlink" href="#tensor-shapes" title="Permalink to this heading">¶</a></h3>
-<p>Often, when you’re performing operations on two or more tensors, they
-will need to be of the same <em>shape</em> - that is, having the same number of
-dimensions and the same number of cells in each dimension. For that, we
-have the <code class="docutils literal notranslate"><span class="pre">torch.*_like()</span></code> methods:</p>
+<div class="section" id="id8">
+<h3>张量形状<a class="headerlink" href="#id8" title="Permalink to this heading">¶</a></h3>
+<p>当你在两个或多个张量上执行操作时,它们通常需要具有相同的 <em>形状</em> - 也就是说，
+具有相同的维数和每个维度中的相同数量的单元。为此,我们有 <code class="docutils literal notranslate"><span class="pre">torch.*_like()</span></code> 方法:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">x</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.empty.html#torch.empty" title="torch.empty" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">empty</span></a><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
@@ -725,16 +702,11 @@ have the <code class="docutils literal notranslate"><span class="pre">torch.*_li
 <span class="nb">print</span><span class="p">(</span><span class="n">rand_like_x</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>The first new thing in the code cell above is the use of the <code class="docutils literal notranslate"><span class="pre">.shape</span></code>
-property on a tensor. This property contains a list of the extent of
-each dimension of a tensor - in our case, <code class="docutils literal notranslate"><span class="pre">x</span></code> is a three-dimensional
-tensor with shape 2 x 2 x 3.</p>
-<p>Below that, we call the <code class="docutils literal notranslate"><span class="pre">.empty_like()</span></code>, <code class="docutils literal notranslate"><span class="pre">.zeros_like()</span></code>,
-<code class="docutils literal notranslate"><span class="pre">.ones_like()</span></code>, and <code class="docutils literal notranslate"><span class="pre">.rand_like()</span></code> methods. Using the <code class="docutils literal notranslate"><span class="pre">.shape</span></code>
-property, we can verify that each of these methods returns a tensor of
-identical dimensionality and extent.</p>
-<p>The last way to create a tensor that will cover is to specify its data
-directly from a PyTorch collection:</p>
+<p>上面代码单元中的第一个新事物是在张量上使用 <code class="docutils literal notranslate"><span class="pre">.shape</span></code> 属性。
+这个属性包含了每个维度张量的范围的列表 - 在我们的例子中，<code class="docutils literal notranslate"><span class="pre">x</span></code> 是一个三维张量，形状为 2 x 2 x 3。</p>
+<p>在下面,我们调用 <code class="docutils literal notranslate"><span class="pre">.empty_like()</span></code>，<code class="docutils literal notranslate"><span class="pre">.zeros_like()</span></code>，<code class="docutils literal notranslate"><span class="pre">.ones_like()</span></code> 和 <code class="docutils literal notranslate"><span class="pre">.rand_like()</span></code> 方法。
+使用 <code class="docutils literal notranslate"><span class="pre">.shape</span></code> 属性，我们可以验证每个这些方法都返回一个具有相同维数和范围的张量。</p>
+<p>创建张量的最后一种方式是直接从PyTorch集合中指定其数据:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">some_constants</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.tensor.html#torch.tensor" title="torch.tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span></a><span class="p">([[</span><span class="mf">3.1415926</span><span class="p">,</span> <span class="mf">2.71828</span><span class="p">],</span> <span class="p">[</span><span class="mf">1.61803</span><span class="p">,</span> <span class="mf">0.0072897</span><span class="p">]])</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">some_constants</span><span class="p">)</span>
 
@@ -745,18 +717,16 @@ directly from a PyTorch collection:</p>
 <span class="nb">print</span><span class="p">(</span><span class="n">more_integers</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Using <code class="docutils literal notranslate"><span class="pre">torch.tensor()</span></code> is the most straightforward way to create a
-tensor if you already have data in a Python tuple or list. As shown
-above, nesting the collections will result in a multi-dimensional
-tensor.</p>
+<p>使用 <code class="docutils literal notranslate"><span class="pre">torch.tensor()</span></code> 是在你已经有Python元组或列表数据的情况下创建张量的最直接方式。
+如上所示，嵌套集合会生成多维张量。</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p><code class="docutils literal notranslate"><span class="pre">torch.tensor()</span></code> creates a copy of the data.</p>
+<p><code class="docutils literal notranslate"><span class="pre">torch.tensor()</span></code> 创建数据的副本。</p>
 </div>
 </div>
-<div class="section" id="tensor-data-types">
-<h3>Tensor Data Types<a class="headerlink" href="#tensor-data-types" title="Permalink to this heading">¶</a></h3>
-<p>Setting the datatype of a tensor is possible a couple of ways:</p>
+<div class="section" id="id9">
+<h3>张量数据类型<a class="headerlink" href="#id9" title="Permalink to this heading">¶</a></h3>
+<p>设置张量的数据类型有两种方式:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">a</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.ones.html#torch.ones" title="torch.ones" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">ones</span></a><span class="p">((</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">int16</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
 
@@ -767,25 +737,18 @@ tensor.</p>
 <span class="nb">print</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>The simplest way to set the underlying data type of a tensor is with an
-optional argument at creation time. In the first line of the cell above,
-we set <code class="docutils literal notranslate"><span class="pre">dtype=torch.int16</span></code> for the tensor <code class="docutils literal notranslate"><span class="pre">a</span></code>. When we print <code class="docutils literal notranslate"><span class="pre">a</span></code>,
-we can see that it’s full of <code class="docutils literal notranslate"><span class="pre">1</span></code> rather than <code class="docutils literal notranslate"><span class="pre">1.</span></code> - Python’s subtle
-cue that this is an integer type rather than floating point.</p>
-<p>Another thing to notice about printing <code class="docutils literal notranslate"><span class="pre">a</span></code> is that, unlike when we
-left <code class="docutils literal notranslate"><span class="pre">dtype</span></code> as the default (32-bit floating point), printing the
-tensor also specifies its <code class="docutils literal notranslate"><span class="pre">dtype</span></code>.</p>
-<p>You may have also spotted that we went from specifying the tensor’s
-shape as a series of integer arguments, to grouping those arguments in a
-tuple. This is not strictly necessary - PyTorch will take a series of
-initial, unlabeled integer arguments as a tensor shape - but when adding
-the optional arguments, it can make your intent more readable.</p>
-<p>The other way to set the datatype is with the <code class="docutils literal notranslate"><span class="pre">.to()</span></code> method. In the
-cell above, we create a random floating point tensor <code class="docutils literal notranslate"><span class="pre">b</span></code> in the usual
-way. Following that, we create <code class="docutils literal notranslate"><span class="pre">c</span></code> by converting <code class="docutils literal notranslate"><span class="pre">b</span></code> to a 32-bit
-integer with the <code class="docutils literal notranslate"><span class="pre">.to()</span></code> method. Note that <code class="docutils literal notranslate"><span class="pre">c</span></code> contains all the same
-values as <code class="docutils literal notranslate"><span class="pre">b</span></code>, but truncated to integers.</p>
-<p>Available data types include:</p>
+<p>设置张量底层数据类型的最简单方式是在创建时使用可选参数。在上面单元格的第一行中，
+我们将 <code class="docutils literal notranslate"><span class="pre">dtype=torch.int16</span></code> 设置为张量 <code class="docutils literal notranslate"><span class="pre">a</span></code>。当我们打印 <code class="docutils literal notranslate"><span class="pre">a</span></code> 时，
+我们可以看到它是由 <code class="docutils literal notranslate"><span class="pre">1</span></code> 而不是 <code class="docutils literal notranslate"><span class="pre">1.</span></code> 填充的 - Python的一个微妙提示，这是一个整数类型而不是浮点数。</p>
+<p>你可能还注意到，打印 <code class="docutils literal notranslate"><span class="pre">a</span></code> 时，与我们将 <code class="docutils literal notranslate"><span class="pre">dtype</span></code> 保留为默认值(32位浮点数)时不同，
+打印张量时也指定了其 <code class="docutils literal notranslate"><span class="pre">dtype</span></code>。</p>
+<p>你可能还注意到,我们从指定张量形状为一系列整数参数，转为将这些参数分组到一个元组中。
+这不是绝对必要的 - PyTorch会将一系列初始的、未标记的整数参数视为张量形状 - 但是当添加可选参数时，
+它可以使你的意图更加可读。</p>
+<p>设置数据类型的另一种方式是使用 <code class="docutils literal notranslate"><span class="pre">.to()</span></code> 方法。在上面的单元格中，
+我们以通常的方式创建了一个随机浮点张量 <code class="docutils literal notranslate"><span class="pre">b</span></code>。接下来,我们通过将 <code class="docutils literal notranslate"><span class="pre">b</span></code> 转换为32位整数来创建 <code class="docutils literal notranslate"><span class="pre">c</span></code>。
+注意 <code class="docutils literal notranslate"><span class="pre">c</span></code> 包含与 <code class="docutils literal notranslate"><span class="pre">b</span></code> 相同的值,但被截断为整数。</p>
+<p>可用的数据类型包括:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">torch.bool</span></code></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">torch.int8</span></code></p></li>
@@ -800,12 +763,10 @@ values as <code class="docutils literal notranslate"><span class="pre">b</span><
 </ul>
 </div>
 </div>
-<div class="section" id="math-logic-with-pytorch-tensors">
-<h2>Math &amp; Logic with PyTorch Tensors<a class="headerlink" href="#math-logic-with-pytorch-tensors" title="Permalink to this heading">¶</a></h2>
-<p>Now that you know some of the ways to create a tensor… what can you do
-with them?</p>
-<p>Let’s look at basic arithmetic first, and how tensors interact with
-simple scalars:</p>
+<div class="section" id="pytorch">
+<h2>使用PyTorch张量进行数学和逻辑运算<a class="headerlink" href="#pytorch" title="Permalink to this heading">¶</a></h2>
+<p>现在你知道了一些创建张量的方法，那你能对它们做什么呢?</p>
+<p>让我们首先看基本算术运算，以及张量如何与简单的标量交互:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ones</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.zeros.html#torch.zeros" title="torch.zeros" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">zeros</span></a><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
 <span class="n">twos</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.ones.html#torch.ones" title="torch.ones" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">ones</span></a><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span>
 <span class="n">threes</span> <span class="o">=</span> <span class="p">(</span><a href="https://pytorch.org/docs/stable/generated/torch.ones.html#torch.ones" title="torch.ones" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">ones</span></a><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="mi">7</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
@@ -819,14 +780,10 @@ simple scalars:</p>
 <span class="nb">print</span><span class="p">(</span><span class="n">sqrt2s</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>As you can see above, arithmetic operations between tensors and scalars,
-such as addition, subtraction, multiplication, division, and
-exponentiation are distributed over every element of the tensor. Because
-the output of such an operation will be a tensor, you can chain them
-together with the usual operator precedence rules, as in the line where
-we create <code class="docutils literal notranslate"><span class="pre">threes</span></code>.</p>
-<p>Similar operations between two tensors also behave like you’d
-intuitively expect:</p>
+<p>如你所见，张量和标量之间的加法、减法、乘法、除法和指数运算都是在张量的每个元素上分布式进行的。
+由于这种操作的输出将是一个张量，你可以像通常的运算符优先级规则一样将它们链接在一起，
+就像我们在创建 <code class="docutils literal notranslate"><span class="pre">threes</span></code> 的那一行中所做的那样。</p>
+<p>两个张量之间的类似运算也像你直觉上期望的那样:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">powers2</span> <span class="o">=</span> <span class="n">twos</span> <span class="o">**</span> <a href="https://pytorch.org/docs/stable/generated/torch.tensor.html#torch.tensor" title="torch.tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span></a><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">]])</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">powers2</span><span class="p">)</span>
 
@@ -837,12 +794,10 @@ intuitively expect:</p>
 <span class="nb">print</span><span class="p">(</span><span class="n">dozens</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>It’s important to note here that all of the tensors in the previous code
-cell were of identical shape. What happens when we try to perform a
-binary operation on tensors if dissimilar shape?</p>
+<p>这里需要注意的是，前面代码单元中的所有张量都具有相同的形状。如果我们尝试在不同形状的张量上执行二元运算会怎样?</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>The following cell throws a run-time error. This is intentional.</p>
+<p>下面的单元格会抛出一个运行时错误，这是有意的。</p>
 <div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><span class="nv">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>torch.rand<span class="o">(</span><span class="m">2</span>,<span class="w"> </span><span class="m">3</span><span class="o">)</span>
 <span class="nv">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>torch.rand<span class="o">(</span><span class="m">3</span>,<span class="w"> </span><span class="m">2</span><span class="o">)</span>
 
@@ -850,18 +805,14 @@ print<span class="o">(</span>a<span class="w"> </span>*<span class="w"> </span>b
 </pre></div>
 </div>
 </div>
-<p>In the general case, you cannot operate on tensors of different shape
-this way, even in a case like the cell above, where the tensors have an
-identical number of elements.</p>
-<div class="section" id="in-brief-tensor-broadcasting">
-<h3>In Brief: Tensor Broadcasting<a class="headerlink" href="#in-brief-tensor-broadcasting" title="Permalink to this heading">¶</a></h3>
+<p>一般情况下，你不能以这种方式对不同形状的张量进行操作，即使在上面的单元格中，张量具有相同数量的元素。</p>
+<div class="section" id="id10">
+<h3>简介: 张量广播<a class="headerlink" href="#id10" title="Permalink to this heading">¶</a></h3>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>If you are familiar with broadcasting semantics in NumPy
-ndarrays, you’ll find the same rules apply here.</p>
+<p>如果你熟悉NumPy ndarrays中的广播语义，你会发现这里应用的是相同的规则。</p>
 </div>
-<p>The exception to the same-shapes rule is <em>tensor broadcasting.</em> Here’s
-an example:</p>
+<p>同形规则的例外是 <em>张量广播</em>。这里有一个例子:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">rand</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.rand.html#torch.rand" title="torch.rand" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">rand</span></a><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
 <span class="n">doubled</span> <span class="o">=</span> <span class="n">rand</span> <span class="o">*</span> <span class="p">(</span><a href="https://pytorch.org/docs/stable/generated/torch.ones.html#torch.ones" title="torch.ones" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">ones</span></a><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span><span class="p">)</span>
 
@@ -869,78 +820,65 @@ an example:</p>
 <span class="nb">print</span><span class="p">(</span><span class="n">doubled</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>What’s the trick here? How is it we got to multiply a 2x4 tensor by a
-1x4 tensor?</p>
-<p>Broadcasting is a way to perform an operation between tensors that have
-similarities in their shapes. In the example above, the one-row,
-four-column tensor is multiplied by <em>both rows</em> of the two-row,
-four-column tensor.</p>
-<p>This is an important operation in Deep Learning. The common example is
-multiplying a tensor of learning weights by a <em>batch</em> of input tensors,
-applying the operation to each instance in the batch separately, and
-returning a tensor of identical shape - just like our (2, 4) * (1, 4)
-example above returned a tensor of shape (2, 4).</p>
-<p>The rules for broadcasting are:</p>
-<ul class="simple">
-<li><p>Each tensor must have at least one dimension - no empty tensors.</p></li>
-<li><p>Comparing the dimension sizes of the two tensors, <em>going from last to
-first:</em></p>
+<p>这里的技巧是什么?我们是如何将 2 x 4 张量与 1 x 4 张量相乘的?</p>
+<p>广播是一种在具有相似形状的张量之间执行操作的方式。在上面的例子中，一行四列的张量与两行四列张量的 <em>两行</em> 相乘。</p>
+<p>这是深度学习中一个重要的操作。常见的例子是将一批输入张量的学习权重张量相乘，分别对批次中的每个实例应用该操作，
+并返回一个形状相同的张量 - 就像我们上面的(2,4) * (1,4)示例一样，返回了一个形状为(2,4)的张量。</p>
+<p>广播的规则是:</p>
 <ul>
-<li><p>Each dimension must be equal, <em>or</em></p></li>
-<li><p>One of the dimensions must be of size 1, <em>or</em></p></li>
-<li><p>The dimension does not exist in one of the tensors</p></li>
+<li><p>每个张量必须至少有一个维度 - 不允许空张量。</p></li>
+<li><p>比较两个张量的维度大小，<em>从最后一个到第一个:</em></p>
+<blockquote>
+<div><ul class="simple">
+<li><p>每个维度必须相等，<em>或</em></p></li>
+<li><p>其中一个维度必须为1，<em>或</em></p></li>
+<li><p>该维度在其中一个张量中不存在</p></li>
 </ul>
+</div></blockquote>
 </li>
 </ul>
-<p>Tensors of identical shape, of course, are trivially “broadcastable”, as
-you saw earlier.</p>
-<p>Here are some examples of situations that honor the above rules and
-allow broadcasting:</p>
+<p>当然，相同形状的张量是”可广播”的，正如你之前看到的那样。</p>
+<p>这里有一些符合上述规则并允许广播的情况示例:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">a</span> <span class="o">=</span>     <a href="https://pytorch.org/docs/stable/generated/torch.ones.html#torch.ones" title="torch.ones" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">ones</span></a><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
 
-<span class="n">b</span> <span class="o">=</span> <span class="n">a</span> <span class="o">*</span> <a href="https://pytorch.org/docs/stable/generated/torch.rand.html#torch.rand" title="torch.rand" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">rand</span></a><span class="p">(</span>   <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="c1"># 3rd &amp; 2nd dims identical to a, dim 1 absent</span>
+<span class="n">b</span> <span class="o">=</span> <span class="n">a</span> <span class="o">*</span> <a href="https://pytorch.org/docs/stable/generated/torch.rand.html#torch.rand" title="torch.rand" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">rand</span></a><span class="p">(</span>   <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="c1"># 第3和第2维与a相同，第1维不存在</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
 
-<span class="n">c</span> <span class="o">=</span> <span class="n">a</span> <span class="o">*</span> <a href="https://pytorch.org/docs/stable/generated/torch.rand.html#torch.rand" title="torch.rand" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">rand</span></a><span class="p">(</span>   <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="c1"># 3rd dim = 1, 2nd dim identical to a</span>
+<span class="n">c</span> <span class="o">=</span> <span class="n">a</span> <span class="o">*</span> <a href="https://pytorch.org/docs/stable/generated/torch.rand.html#torch.rand" title="torch.rand" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">rand</span></a><span class="p">(</span>   <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="c1"># 第3维为1，第2维与a相同</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
 
-<span class="n">d</span> <span class="o">=</span> <span class="n">a</span> <span class="o">*</span> <a href="https://pytorch.org/docs/stable/generated/torch.rand.html#torch.rand" title="torch.rand" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">rand</span></a><span class="p">(</span>   <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="c1"># 3rd dim identical to a, 2nd dim = 1</span>
+<span class="n">d</span> <span class="o">=</span> <span class="n">a</span> <span class="o">*</span> <a href="https://pytorch.org/docs/stable/generated/torch.rand.html#torch.rand" title="torch.rand" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">rand</span></a><span class="p">(</span>   <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="c1"># 第3维与a相同，第2维为1</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Look closely at the values of each tensor above:</p>
+<p>仔细观察上面每个张量的值:</p>
 <ul class="simple">
-<li><p>The multiplication operation that created <code class="docutils literal notranslate"><span class="pre">b</span></code> was
-broadcast over every “layer” of <code class="docutils literal notranslate"><span class="pre">a</span></code>.</p></li>
-<li><p>For <code class="docutils literal notranslate"><span class="pre">c</span></code>, the operation was broadcast over every layer and row of
-<code class="docutils literal notranslate"><span class="pre">a</span></code> - every 3-element column is identical.</p></li>
-<li><p>For <code class="docutils literal notranslate"><span class="pre">d</span></code>, we switched it around - now every <em>row</em> is identical,
-across layers and columns.</p></li>
+<li><p>创建 <cite>b</cite> 的乘法运算是在 <cite>a</cite> 的每一层上广播的。</p></li>
+<li><p>对于 <cite>c</cite>，该运算在 <cite>a</cite> 的每一层和每一行上都进行了广播 - 每一列3个元素都是相同的。</p></li>
+<li><p>对于 <cite>d</cite>，我们颠倒了一下 - 现在每一行在层与列之间都是相同的。</p></li>
 </ul>
-<p>For more information on broadcasting, see the <a class="reference external" href="https://pytorch.org/docs/stable/notes/broadcasting.html">PyTorch
-documentation</a>
-on the topic.</p>
-<p>Here are some examples of attempts at broadcasting that will fail:</p>
+<p>有关广播的更多信息,请参阅PyTorch关于此的
+<a class="reference external" href="https://pytorch.org/docs/stable/notes/broadcasting.html">文档</a>。</p>
+<p>这里有一些尝试广播但会失败的例子:</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>The following cell throws a run-time error. This is intentional.</p>
+<p>下面的单元格会抛出一个运行时错误，这是有意的。</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">a</span> <span class="o">=</span>     <a href="https://pytorch.org/docs/stable/generated/torch.ones.html#torch.ones" title="torch.ones" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">ones</span></a><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
 
-<span class="n">b</span> <span class="o">=</span> <span class="n">a</span> <span class="o">*</span> <a href="https://pytorch.org/docs/stable/generated/torch.rand.html#torch.rand" title="torch.rand" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">rand</span></a><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>    <span class="c1"># dimensions must match last-to-first</span>
+<span class="n">b</span> <span class="o">=</span> <span class="n">a</span> <span class="o">*</span> <a href="https://pytorch.org/docs/stable/generated/torch.rand.html#torch.rand" title="torch.rand" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">rand</span></a><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>    <span class="c1"># 维度必须从最后到第一个匹配</span>
 
-<span class="n">c</span> <span class="o">=</span> <span class="n">a</span> <span class="o">*</span> <a href="https://pytorch.org/docs/stable/generated/torch.rand.html#torch.rand" title="torch.rand" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">rand</span></a><span class="p">(</span>   <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span> <span class="c1"># both 3rd &amp; 2nd dims different</span>
+<span class="n">c</span> <span class="o">=</span> <span class="n">a</span> <span class="o">*</span> <a href="https://pytorch.org/docs/stable/generated/torch.rand.html#torch.rand" title="torch.rand" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">rand</span></a><span class="p">(</span>   <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span> <span class="c1"># 第3和第2维都不同</span>
 
-<span class="n">d</span> <span class="o">=</span> <span class="n">a</span> <span class="o">*</span> <a href="https://pytorch.org/docs/stable/generated/torch.rand.html#torch.rand" title="torch.rand" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">rand</span></a><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="p">))</span>   <span class="c1"># can&#39;t broadcast with an empty tensor</span>
+<span class="n">d</span> <span class="o">=</span> <span class="n">a</span> <span class="o">*</span> <a href="https://pytorch.org/docs/stable/generated/torch.rand.html#torch.rand" title="torch.rand" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">rand</span></a><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="p">))</span>   <span class="c1"># 不能与空张量进行广播</span>
 </pre></div>
 </div>
 </div>
 </div>
-<div class="section" id="more-math-with-tensors">
-<h3>More Math with Tensors<a class="headerlink" href="#more-math-with-tensors" title="Permalink to this heading">¶</a></h3>
-<p>PyTorch tensors have over three hundred operations that can be performed
-on them.</p>
-<p>Here is a small sample from some of the major categories of operations:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># common functions</span>
+<div class="section" id="id11">
+<h3>更多张量数学运算<a class="headerlink" href="#id11" title="Permalink to this heading">¶</a></h3>
+<p>PyTorch 张量有超过三百种可以执行的操作。</p>
+<p>这里是一些主要操作类别的示例:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># 常用方法</span>
 <span class="n">a</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.rand.html#torch.rand" title="torch.rand" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">rand</span></a><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">-</span> <span class="mi">1</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Common functions:&#39;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/generated/torch.abs.html#torch.abs" title="torch.abs" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">abs</span></a><span class="p">(</span><span class="n">a</span><span class="p">))</span>
@@ -948,7 +886,7 @@ on them.</p>
 <span class="nb">print</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/generated/torch.floor.html#torch.floor" title="torch.floor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">floor</span></a><span class="p">(</span><span class="n">a</span><span class="p">))</span>
 <span class="nb">print</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/generated/torch.clamp.html#torch.clamp" title="torch.clamp" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">clamp</span></a><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">))</span>
 
-<span class="c1"># trigonometric functions and their inverses</span>
+<span class="c1"># 三角函数及其反函数</span>
 <span class="n">angles</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.tensor.html#torch.tensor" title="torch.tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span></a><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">4</span><span class="p">,</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">4</span><span class="p">])</span>
 <span class="n">sines</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.sin.html#torch.sin" title="torch.sin" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">sin</span></a><span class="p">(</span><span class="n">angles</span><span class="p">)</span>
 <span class="n">inverses</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.asin.html#torch.asin" title="torch.asin" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">asin</span></a><span class="p">(</span><span class="n">sines</span><span class="p">)</span>
@@ -957,70 +895,65 @@ on them.</p>
 <span class="nb">print</span><span class="p">(</span><span class="n">sines</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">inverses</span><span class="p">)</span>
 
-<span class="c1"># bitwise operations</span>
+<span class="c1"># 位运算</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Bitwise XOR:&#39;</span><span class="p">)</span>
 <span class="n">b</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.tensor.html#torch.tensor" title="torch.tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span></a><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">11</span><span class="p">])</span>
 <span class="n">c</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.tensor.html#torch.tensor" title="torch.tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span></a><span class="p">([</span><span class="mi">2</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">10</span><span class="p">])</span>
 <span class="nb">print</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/generated/torch.bitwise_xor.html#torch.bitwise_xor" title="torch.bitwise_xor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">bitwise_xor</span></a><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">))</span>
 
-<span class="c1"># comparisons:</span>
+<span class="c1"># 比较操作</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Broadcasted, element-wise equality comparison:&#39;</span><span class="p">)</span>
 <span class="n">d</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.tensor.html#torch.tensor" title="torch.tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span></a><span class="p">([[</span><span class="mf">1.</span><span class="p">,</span> <span class="mf">2.</span><span class="p">],</span> <span class="p">[</span><span class="mf">3.</span><span class="p">,</span> <span class="mf">4.</span><span class="p">]])</span>
-<span class="n">e</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.ones.html#torch.ones" title="torch.ones" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">ones</span></a><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>  <span class="c1"># many comparison ops support broadcasting!</span>
-<span class="nb">print</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/generated/torch.eq.html#torch.eq" title="torch.eq" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">eq</span></a><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">e</span><span class="p">))</span> <span class="c1"># returns a tensor of type bool</span>
+<span class="n">e</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.ones.html#torch.ones" title="torch.ones" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">ones</span></a><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/generated/torch.eq.html#torch.eq" title="torch.eq" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">eq</span></a><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">e</span><span class="p">))</span> <span class="c1"># 返回布尔类型张量</span>
 
-<span class="c1"># reductions:</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Reduction ops:&#39;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/generated/torch.max.html#torch.max" title="torch.max" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">max</span></a><span class="p">(</span><span class="n">d</span><span class="p">))</span>        <span class="c1"># returns a single-element tensor</span>
-<span class="nb">print</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/generated/torch.max.html#torch.max" title="torch.max" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">max</span></a><span class="p">(</span><span class="n">d</span><span class="p">)</span><span class="o">.</span><span class="n">item</span><span class="p">())</span> <span class="c1"># extracts the value from the returned tensor</span>
-<span class="nb">print</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/generated/torch.mean.html#torch.mean" title="torch.mean" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">mean</span></a><span class="p">(</span><span class="n">d</span><span class="p">))</span>       <span class="c1"># average</span>
-<span class="nb">print</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/generated/torch.std.html#torch.std" title="torch.std" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">std</span></a><span class="p">(</span><span class="n">d</span><span class="p">))</span>        <span class="c1"># standard deviation</span>
-<span class="nb">print</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/generated/torch.prod.html#torch.prod" title="torch.prod" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">prod</span></a><span class="p">(</span><span class="n">d</span><span class="p">))</span>       <span class="c1"># product of all numbers</span>
-<span class="nb">print</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/generated/torch.unique.html#torch.unique" title="torch.unique" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">unique</span></a><span class="p">(</span><a href="https://pytorch.org/docs/stable/generated/torch.tensor.html#torch.tensor" title="torch.tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span></a><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">])))</span> <span class="c1"># filter unique elements</span>
+<span class="c1"># 归约操作:</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">归约操作:&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/generated/torch.max.html#torch.max" title="torch.max" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">max</span></a><span class="p">(</span><span class="n">d</span><span class="p">))</span>        <span class="c1"># 返回单元素张量</span>
+<span class="nb">print</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/generated/torch.max.html#torch.max" title="torch.max" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">max</span></a><span class="p">(</span><span class="n">d</span><span class="p">)</span><span class="o">.</span><span class="n">item</span><span class="p">())</span> <span class="c1"># 从返回的张量中提取值</span>
+<span class="nb">print</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/generated/torch.mean.html#torch.mean" title="torch.mean" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">mean</span></a><span class="p">(</span><span class="n">d</span><span class="p">))</span>       <span class="c1"># 平均值</span>
+<span class="nb">print</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/generated/torch.std.html#torch.std" title="torch.std" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">std</span></a><span class="p">(</span><span class="n">d</span><span class="p">))</span>        <span class="c1"># 标准差</span>
+<span class="nb">print</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/generated/torch.prod.html#torch.prod" title="torch.prod" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">prod</span></a><span class="p">(</span><span class="n">d</span><span class="p">))</span>       <span class="c1"># 所有数字的乘积</span>
+<span class="nb">print</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/generated/torch.unique.html#torch.unique" title="torch.unique" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">unique</span></a><span class="p">(</span><a href="https://pytorch.org/docs/stable/generated/torch.tensor.html#torch.tensor" title="torch.tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span></a><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">])))</span> <span class="c1"># 过滤唯一元素</span>
 
-<span class="c1"># vector and linear algebra operations</span>
-<span class="n">v1</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.tensor.html#torch.tensor" title="torch.tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span></a><span class="p">([</span><span class="mf">1.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">])</span>         <span class="c1"># x unit vector</span>
-<span class="n">v2</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.tensor.html#torch.tensor" title="torch.tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span></a><span class="p">([</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">])</span>         <span class="c1"># y unit vector</span>
-<span class="n">m1</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.rand.html#torch.rand" title="torch.rand" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">rand</span></a><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>                   <span class="c1"># random matrix</span>
-<span class="n">m2</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.tensor.html#torch.tensor" title="torch.tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span></a><span class="p">([[</span><span class="mf">3.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">3.</span><span class="p">]])</span> <span class="c1"># three times identity matrix</span>
+<span class="c1"># 向量和线性代数运算</span>
+<span class="n">v1</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.tensor.html#torch.tensor" title="torch.tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span></a><span class="p">([</span><span class="mf">1.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">])</span>         <span class="c1"># x 单位向量</span>
+<span class="n">v2</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.tensor.html#torch.tensor" title="torch.tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span></a><span class="p">([</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">])</span>         <span class="c1"># y 单位向量</span>
+<span class="n">m1</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.rand.html#torch.rand" title="torch.rand" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">rand</span></a><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>                   <span class="c1"># 随机矩阵</span>
+<span class="n">m2</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.tensor.html#torch.tensor" title="torch.tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span></a><span class="p">([[</span><span class="mf">3.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">3.</span><span class="p">]])</span> <span class="c1"># 三倍单位矩阵</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Vectors &amp; Matrices:&#39;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/generated/torch.cross.html#torch.cross" title="torch.cross" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">cross</span></a><span class="p">(</span><span class="n">v2</span><span class="p">,</span> <span class="n">v1</span><span class="p">))</span> <span class="c1"># negative of z unit vector (v1 x v2 == -v2 x v1)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">向量和矩阵:&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/generated/torch.cross.html#torch.cross" title="torch.cross" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">cross</span></a><span class="p">(</span><span class="n">v2</span><span class="p">,</span> <span class="n">v1</span><span class="p">))</span> <span class="c1"># z 单位向量的负值 (v1 x v2 == -v2 x v1)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">m1</span><span class="p">)</span>
 <span class="n">m3</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.matmul.html#torch.matmul" title="torch.matmul" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">matmul</span></a><span class="p">(</span><span class="n">m1</span><span class="p">,</span> <span class="n">m2</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">m3</span><span class="p">)</span>                  <span class="c1"># 3 times m1</span>
-<span class="nb">print</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/generated/torch.svd.html#torch.svd" title="torch.svd" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">svd</span></a><span class="p">(</span><span class="n">m3</span><span class="p">))</span>       <span class="c1"># singular value decomposition</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">m3</span><span class="p">)</span>                  <span class="c1"># m1 的三倍</span>
+<span class="nb">print</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/generated/torch.svd.html#torch.svd" title="torch.svd" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">svd</span></a><span class="p">(</span><span class="n">m3</span><span class="p">))</span>       <span class="c1"># 奇异值分解</span>
 </pre></div>
 </div>
-<p>This is a small sample of operations. For more details and the full inventory of
-math functions, have a look at the
-<a class="reference external" href="https://pytorch.org/docs/stable/torch.html#math-operations">documentation</a>.</p>
+<p>有关更多详细信息和完整的数学函数清单,请查看
+<a class="reference external" href="https://pytorch.org/docs/stable/torch.html#math-operations">文档</a>。</p>
 </div>
-<div class="section" id="altering-tensors-in-place">
-<h3>Altering Tensors in Place<a class="headerlink" href="#altering-tensors-in-place" title="Permalink to this heading">¶</a></h3>
-<p>Most binary operations on tensors will return a third, new tensor. When
-we say <code class="docutils literal notranslate"><span class="pre">c</span> <span class="pre">=</span> <span class="pre">a</span> <span class="pre">*</span> <span class="pre">b</span></code> (where <code class="docutils literal notranslate"><span class="pre">a</span></code> and <code class="docutils literal notranslate"><span class="pre">b</span></code> are tensors), the new tensor
-<code class="docutils literal notranslate"><span class="pre">c</span></code> will occupy a region of memory distinct from the other tensors.</p>
-<p>There are times, though, that you may wish to alter a tensor in place -
-for example, if you’re doing an element-wise computation where you can
-discard intermediate values. For this, most of the math functions have a
-version with an appended underscore (<code class="docutils literal notranslate"><span class="pre">_</span></code>) that will alter a tensor in
-place.</p>
-<p>For example:</p>
+<div class="section" id="id12">
+<h3>本地修改张量<a class="headerlink" href="#id12" title="Permalink to this heading">¶</a></h3>
+<p>大多数张量的二元运算将返回第三个新张量。当我们说 <cite>c = a * b</cite> (其中 <cite>a</cite> 和 <cite>b</cite> 是张量)时,
+新张量 <cite>c</cite> 将占用与其他张量不同的内存区域。</p>
+<p>但是,有时您可能希望就地修改张量 - 例如，如果您正在执行元素wise计算,可以丢弃中间值。
+为此，大多数数学函数都有一个带有附加下划线 (<cite>_</cite>) 的版本，它将就地修改张量。</p>
+<p>例如:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">a</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.tensor.html#torch.tensor" title="torch.tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span></a><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">4</span><span class="p">,</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">4</span><span class="p">])</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;a:&#39;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/generated/torch.sin.html#torch.sin" title="torch.sin" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">sin</span></a><span class="p">(</span><span class="n">a</span><span class="p">))</span>   <span class="c1"># this operation creates a new tensor in memory</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>              <span class="c1"># a has not changed</span>
+<span class="nb">print</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/generated/torch.sin.html#torch.sin" title="torch.sin" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">sin</span></a><span class="p">(</span><span class="n">a</span><span class="p">))</span>   <span class="c1"># 此操作在内存中创建新张量</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>              <span class="c1"># a 未更改</span>
 
 <span class="n">b</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.tensor.html#torch.tensor" title="torch.tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span></a><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">4</span><span class="p">,</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">4</span><span class="p">])</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">b:&#39;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">sin_</span><span class="p">(</span><span class="n">b</span><span class="p">))</span>  <span class="c1"># note the underscore</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>              <span class="c1"># b has changed</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">sin_</span><span class="p">(</span><span class="n">b</span><span class="p">))</span>  <span class="c1"># 注意下划线</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>              <span class="c1"># b 被修改</span>
 </pre></div>
 </div>
-<p>For arithmetic operations, there are functions that behave similarly:</p>
+<p>对于算术运算,有一些函数的行为类似:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">a</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.ones.html#torch.ones" title="torch.ones" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">ones</span></a><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
 <span class="n">b</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.rand.html#torch.rand" title="torch.rand" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">rand</span></a><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
 
@@ -1036,17 +969,16 @@ place.</p>
 <span class="nb">print</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Note that these in-place arithmetic functions are methods on the
-<code class="docutils literal notranslate"><span class="pre">torch.Tensor</span></code> object, not attached to the <code class="docutils literal notranslate"><span class="pre">torch</span></code> module like many
-other functions (e.g., <code class="docutils literal notranslate"><span class="pre">torch.sin()</span></code>). As you can see from
-<code class="docutils literal notranslate"><span class="pre">a.add_(b)</span></code>, <em>the calling tensor is the one that gets changed in
-place.</em></p>
-<p>There is another option for placing the result of a computation in an
-existing, allocated tensor. Many of the methods and functions we’ve seen
-so far - including creation methods! - have an <code class="docutils literal notranslate"><span class="pre">out</span></code> argument that
-lets you specify a tensor to receive the output. If the <code class="docutils literal notranslate"><span class="pre">out</span></code> tensor
-is the correct shape and <code class="docutils literal notranslate"><span class="pre">dtype</span></code>, this can happen without a new memory
-allocation:</p>
+<p>注意,这些就地算术函数是 <cite>torch.Tensor</cite> 对象上的方法，
+而不是像许多其他函数(例如 <cite>torch.sin()</cite>)那样附加到 <cite>torch</cite> 模块上。
+正如你从 <cite>a.add_(b)</cite> 中看到的，<em>被调用的张量是就地改变的那个</em>。</p>
+<dl class="simple">
+<dt>还有另一种选择，可以将计算结果放在一个已经分配的张量中。我们到目前为止看到的许多方法和函数</dt><dd><ul class="simple">
+<li><p>包括创建方法! - 都有一个 <cite>out</cite> 参数，让你指定一个张量来接收输出。</p></li>
+</ul>
+</dd>
+</dl>
+<p>如果 <cite>out</cite> 张量的形状和 <cite>dtype</cite> 正确，这可以在不分配新内存的情况下发生:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">a</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.rand.html#torch.rand" title="torch.rand" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">rand</span></a><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
 <span class="n">b</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.rand.html#torch.rand" title="torch.rand" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">rand</span></a><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
 <span class="n">c</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.zeros.html#torch.zeros" title="torch.zeros" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">zeros</span></a><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
@@ -1054,63 +986,54 @@ allocation:</p>
 
 <span class="nb">print</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
 <span class="n">d</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.matmul.html#torch.matmul" title="torch.matmul" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">matmul</span></a><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">c</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>                <span class="c1"># contents of c have changed</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>                <span class="c1"># c 的内容已经改变</span>
 
-<span class="k">assert</span> <span class="n">c</span> <span class="ow">is</span> <span class="n">d</span>           <span class="c1"># test c &amp; d are same object, not just containing equal values</span>
-<span class="k">assert</span> <span class="nb">id</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="o">==</span> <span class="n">old_id</span>  <span class="c1"># make sure that our new c is the same object as the old one</span>
+<span class="k">assert</span> <span class="n">c</span> <span class="ow">is</span> <span class="n">d</span>           <span class="c1"># 测试 c 和 d 是同一个对象,而不只是包含相等的值</span>
+<span class="k">assert</span> <span class="nb">id</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="o">==</span> <span class="n">old_id</span>  <span class="c1"># 确保我们的新 c 是旧 c 的同一个对象</span>
 
-<a href="https://pytorch.org/docs/stable/generated/torch.rand.html#torch.rand" title="torch.rand" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">rand</span></a><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">c</span><span class="p">)</span> <span class="c1"># works for creation too!</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>                <span class="c1"># c has changed again</span>
-<span class="k">assert</span> <span class="nb">id</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="o">==</span> <span class="n">old_id</span>  <span class="c1"># still the same object!</span>
+<a href="https://pytorch.org/docs/stable/generated/torch.rand.html#torch.rand" title="torch.rand" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">rand</span></a><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">c</span><span class="p">)</span> <span class="c1"># 对于创建也可以!</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>                <span class="c1"># c 又一次改变</span>
+<span class="k">assert</span> <span class="nb">id</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="o">==</span> <span class="n">old_id</span>  <span class="c1"># 仍然是同一个对象!</span>
 </pre></div>
 </div>
 </div>
 </div>
-<div class="section" id="copying-tensors">
-<h2>Copying Tensors<a class="headerlink" href="#copying-tensors" title="Permalink to this heading">¶</a></h2>
-<p>As with any object in Python, assigning a tensor to a variable makes the
-variable a <em>label</em> of the tensor, and does not copy it. For example:</p>
+<div class="section" id="id13">
+<h2>复制张量<a class="headerlink" href="#id13" title="Permalink to this heading">¶</a></h2>
+<p>与 Python 中的任何对象一样，将张量赋值给变量会使该变量成为张量的 <em>标签</em>，而不会复制它。例如:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">a</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.ones.html#torch.ones" title="torch.ones" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">ones</span></a><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
 <span class="n">b</span> <span class="o">=</span> <span class="n">a</span>
 
-<span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">561</span>  <span class="c1"># we change a...</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>       <span class="c1"># ...and b is also altered</span>
+<span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">561</span>  <span class="c1"># 我们改变 a...</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>       <span class="c1"># ...b 也被改变了</span>
 </pre></div>
 </div>
-<p>But what if you want a separate copy of the data to work on? The
-<code class="docutils literal notranslate"><span class="pre">clone()</span></code> method is there for you:</p>
+<p>但是,如果你想要一个单独的数据副本来处理呢? 这时就可以使用 <cite>clone()</cite> 方法:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">a</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.ones.html#torch.ones" title="torch.ones" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">ones</span></a><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
 <span class="n">b</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span>
 
-<span class="k">assert</span> <span class="n">b</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">a</span>      <span class="c1"># different objects in memory...</span>
-<span class="nb">print</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/generated/torch.eq.html#torch.eq" title="torch.eq" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">eq</span></a><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">))</span>  <span class="c1"># ...but still with the same contents!</span>
+<span class="k">assert</span> <span class="n">b</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">a</span>      <span class="c1"># 内存中的不同对象...</span>
+<span class="nb">print</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/generated/torch.eq.html#torch.eq" title="torch.eq" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">eq</span></a><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">))</span>  <span class="c1"># ...但仍然具有相同的内容!</span>
 
-<span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">561</span>          <span class="c1"># a changes...</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>               <span class="c1"># ...but b is still all ones</span>
+<span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">561</span>          <span class="c1"># a 改变了...</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>               <span class="c1"># ...但 b 仍然是全 1</span>
 </pre></div>
 </div>
-<p><strong>There is an important thing to be aware of when using ``clone()``.</strong>
-If your source tensor has autograd, enabled then so will the clone.
-<strong>This will be covered more deeply in the video on autograd,</strong> but if
-you want the light version of the details, continue on.</p>
-<p><em>In many cases, this will be what you want.</em> For example, if your model
-has multiple computation paths in its <code class="docutils literal notranslate"><span class="pre">forward()</span></code> method, and <em>both</em>
-the original tensor and its clone contribute to the model’s output, then
-to enable model learning you want autograd turned on for both tensors.
-If your source tensor has autograd enabled (which it generally will if
-it’s a set of learning weights or derived from a computation involving
-the weights), then you’ll get the result you want.</p>
-<p>On the other hand, if you’re doing a computation where <em>neither</em> the
-original tensor nor its clone need to track gradients, then as long as
-the source tensor has autograd turned off, you’re good to go.</p>
-<p><em>There is a third case,</em> though: Imagine you’re performing a computation
-in your model’s <code class="docutils literal notranslate"><span class="pre">forward()</span></code> function, where gradients are turned on
-for everything by default, but you want to pull out some values
-mid-stream to generate some metrics. In this case, you <em>don’t</em> want the
-cloned copy of your source tensor to track gradients - performance is
-improved with autograd’s history tracking turned off. For this, you can
-use the <code class="docutils literal notranslate"><span class="pre">.detach()</span></code> method on the source tensor:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">a</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.rand.html#torch.rand" title="torch.rand" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">rand</span></a><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">requires_grad</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="c1"># turn on autograd</span>
+<p><strong>使用 `clone()` 时,有一个重要的事情需要注意。</strong>
+如果你的源张量启用了自动求导,那么克隆张量也会启用自动求导。
+<strong>这将在关于自动求导的视频中更深入地介绍</strong>， 但如果你想了解细节的简单版本,请继续阅读。</p>
+<p><em>在许多情况下,这正是你所需要的。*例如,如果你的模型在其 `forward()` 方法中有多个计算路径，
+并且 *原始张量和它的克隆</em> 都会影响模型的输出，那么为了启用模型学习，你希望两个张量都启用自动求导。
+如果你的源张量启用了自动求导(通常如果它是一组学习权重或源自涉及权重的计算)，那么你就会得到所需的结果。</p>
+<p>另一方面，如果你正在进行一个计算。其中 <em>原始张量和它的克隆</em> 都不需要跟踪梯度，那么只要源张量关闭了自动求导，你就可以继续了。</p>
+<p><em>还有第三种情况:</em> 假设你在模型的 <cite>forward()</cite> 函数中执行一个计算，默认情况下所有内容的梯度都打开，
+但你想在中间提取一些值来生成一些指标。在这种情况下，你 <em>不希望</em> 克隆的源张量副本跟踪梯度</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>关闭自动求导的历史记录跟踪可以提高性能。为此，你可以在源张量上使用 <cite>.detach()</cite> 方法:</p></li>
+</ul>
+</div></blockquote>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">a</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.rand.html#torch.rand" title="torch.rand" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">rand</span></a><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">requires_grad</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="c1"># 打开自动求导</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
 
 <span class="n">b</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span>
@@ -1122,40 +1045,28 @@ use the <code class="docutils literal notranslate"><span class="pre">.detach()</
 <span class="nb">print</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>What’s happening here?</p>
+<p>此处发生了什么?</p>
 <ul class="simple">
-<li><p>We create <code class="docutils literal notranslate"><span class="pre">a</span></code> with <code class="docutils literal notranslate"><span class="pre">requires_grad=True</span></code> turned on. <strong>We haven’t
-covered this optional argument yet, but will during the unit on
-autograd.</strong></p></li>
-<li><p>When we print <code class="docutils literal notranslate"><span class="pre">a</span></code>, it informs us that the property
-<code class="docutils literal notranslate"><span class="pre">requires_grad=True</span></code> - this means that autograd and computation
-history tracking are turned on.</p></li>
-<li><p>We clone <code class="docutils literal notranslate"><span class="pre">a</span></code> and label it <code class="docutils literal notranslate"><span class="pre">b</span></code>. When we print <code class="docutils literal notranslate"><span class="pre">b</span></code>, we can see
-that it’s tracking its computation history - it has inherited
-<code class="docutils literal notranslate"><span class="pre">a</span></code>’s autograd settings, and added to the computation history.</p></li>
-<li><p>We clone <code class="docutils literal notranslate"><span class="pre">a</span></code> into <code class="docutils literal notranslate"><span class="pre">c</span></code>, but we call <code class="docutils literal notranslate"><span class="pre">detach()</span></code> first.</p></li>
-<li><p>Printing <code class="docutils literal notranslate"><span class="pre">c</span></code>, we see no computation history, and no
-<code class="docutils literal notranslate"><span class="pre">requires_grad=True</span></code>.</p></li>
+<li><p>我们创建了 <code class="docutils literal notranslate"><span class="pre">a</span></code> 并将 <code class="docutils literal notranslate"><span class="pre">requires_grad=True</span></code> 打开。<strong>我们还没有介绍这个可选参数，
+但将在关于自动求导的单元中介绍。</strong></p></li>
+<li><p>当我们打印 <code class="docutils literal notranslate"><span class="pre">a</span></code> 时,它告诉我们属性 <code class="docutils literal notranslate"><span class="pre">requires_grad=True</span></code> - 这意味着自动求导和计算历史跟踪已打开。</p></li>
+<li><p>我们克隆 <code class="docutils literal notranslate"><span class="pre">a</span></code> 并将其标记为 <code class="docutils literal notranslate"><span class="pre">b</span></code>。当我们打印 <code class="docutils literal notranslate"><span class="pre">b</span></code> 时，我们可以看到它正在跟踪其计算历史 - 它继承了 <code class="docutils literal notranslate"><span class="pre">a</span></code> 的自动求导设置，
+并添加到了计算历史中。</p></li>
+<li><p>我们克隆 <code class="docutils literal notranslate"><span class="pre">a</span></code> 到 <code class="docutils literal notranslate"><span class="pre">c</span></code>,但首先调用 <code class="docutils literal notranslate"><span class="pre">detach()</span></code>。</p></li>
+<li><p>打印 <cite>c</cite>，我们看不到任何计算历史，也没有 <cite>requires_grad=True</cite>。</p></li>
 </ul>
-<p>The <code class="docutils literal notranslate"><span class="pre">detach()</span></code> method <em>detaches the tensor from its computation
-history.</em> It says, “do whatever comes next as if autograd was off.” It
-does this <em>without</em> changing <code class="docutils literal notranslate"><span class="pre">a</span></code> - you can see that when we print
-<code class="docutils literal notranslate"><span class="pre">a</span></code> again at the end, it retains its <code class="docutils literal notranslate"><span class="pre">requires_grad=True</span></code> property.</p>
+<p><code class="docutils literal notranslate"><span class="pre">detach()</span></code> 方法*将张量与其计算历史分离。<em>它说,”无论接下来发生什么，都像自动求导关闭时那样进行。
+“它这样做*并不会改变 ``a``</em> - 你可以看到,当我们在最后再次打印 <cite>a</cite> 时，它保留了其 <code class="docutils literal notranslate"><span class="pre">requires_grad=True</span></code> 属性。</p>
 </div>
-<div class="section" id="moving-to-gpu">
-<h2>Moving to GPU<a class="headerlink" href="#moving-to-gpu" title="Permalink to this heading">¶</a></h2>
-<p>One of the major advantages of PyTorch is its robust acceleration on
-CUDA-compatible Nvidia GPUs. (“CUDA” stands for <em>Compute Unified Device
-Architecture</em>, which is Nvidia’s platform for parallel computing.) So
-far, everything we’ve done has been on CPU. How do we move to the faster
-hardware?</p>
-<p>First, we should check whether a GPU is available, with the
-<code class="docutils literal notranslate"><span class="pre">is_available()</span></code> method.</p>
+<div class="section" id="gpu">
+<h2>移动到 GPU<a class="headerlink" href="#gpu" title="Permalink to this heading">¶</a></h2>
+<p>PyTorch 的主要优势之一是在 CUDA 兼容的 Nvidia GPU 上有强大的加速能力。
+(“CUDA”代表*Compute Unified Device Architecture*,这是 Nvidia 的并行计算平台。)
+到目前为止，我们所做的一切都是在 CPU 上。我们如何移动到更快的硬件上呢?</p>
+<p>首先,我们应该使用 <cite>is_available()</cite> 方法检查是否有 GPU 可用。</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>If you do not have a CUDA-compatible GPU and CUDA drivers
-installed, the executable cells in this section will not execute any
-GPU-related code.</p>
+<p>如果你没有安装 CUDA 兼容的 GPU 和 CUDA 驱动程序，本节中的可执行单元格将不会执行任何 GPU 相关的代码。</p>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <a href="https://pytorch.org/docs/stable/generated/torch.cuda.is_available.html#torch.cuda.is_available" title="torch.cuda.is_available" class="sphx-glr-backref-module-torch-cuda sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span></a><span class="p">():</span>
     <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;We have a GPU!&#39;</span><span class="p">)</span>
@@ -1163,15 +1074,10 @@ GPU-related code.</p>
     <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Sorry, CPU only.&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Once we’ve determined that one or more GPUs is available, we need to put
-our data someplace where the GPU can see it. Your CPU does computation
-on data in your computer’s RAM. Your GPU has dedicated memory attached
-to it. Whenever you want to perform a computation on a device, you must
-move <em>all</em> the data needed for that computation to memory accessible by
-that device. (Colloquially, “moving the data to memory accessible by the
-GPU” is shorted to, “moving the data to the GPU”.)</p>
-<p>There are multiple ways to get your data onto your target device. You
-may do it at creation time:</p>
+<p>一旦我们确定有一个或多个GPU可用，我们需要将数据放在GPU可以访问的地方。你的CPU在计算机的RAM上对数据进行计算。
+你的GPU有专用的内存连接到它。每当你想在一个设备上执行计算时，你必须将该计算所需的 <em>所有</em> 数据移动到该设备可访问的内存中。
+(俗称,”将数据移动到GPU可访问的内存”被简称为”将数据移动到GPU”)。</p>
+<p>有多种方式可以将数据移动到目标设备。你可以在创建时这样做:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <a href="https://pytorch.org/docs/stable/generated/torch.cuda.is_available.html#torch.cuda.is_available" title="torch.cuda.is_available" class="sphx-glr-backref-module-torch-cuda sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span></a><span class="p">():</span>
     <span class="n">gpu_rand</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.rand.html#torch.rand" title="torch.rand" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">rand</span></a><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s1">&#39;cuda&#39;</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">gpu_rand</span><span class="p">)</span>
@@ -1179,18 +1085,12 @@ may do it at creation time:</p>
     <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Sorry, CPU only.&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>By default, new tensors are created on the CPU, so we have to specify
-when we want to create our tensor on the GPU with the optional
-<code class="docutils literal notranslate"><span class="pre">device</span></code> argument. You can see when we print the new tensor, PyTorch
-informs us which device it’s on (if it’s not on CPU).</p>
-<p>You can query the number of GPUs with <code class="docutils literal notranslate"><span class="pre">torch.cuda.device_count()</span></code>. If
-you have more than one GPU, you can specify them by index:
-<code class="docutils literal notranslate"><span class="pre">device='cuda:0'</span></code>, <code class="docutils literal notranslate"><span class="pre">device='cuda:1'</span></code>, etc.</p>
-<p>As a coding practice, specifying our devices everywhere with string
-constants is pretty fragile. In an ideal world, your code would perform
-robustly whether you’re on CPU or GPU hardware. You can do this by
-creating a device handle that can be passed to your tensors instead of a
-string:</p>
+<p>默认情况下,新的张量是在CPU上创建的，所以我们必须使用可选的``device``参数来指定我们想在GPU上创建张量。
+当我们打印新的张量时，你可以看到PyTorch会告诉我们它在哪个设备上(如果不在CPU上)。</p>
+<p>你可以使用``torch.cuda.device_count()``查询GPU的数量。如果你有多个GPU,你可以通过索引指定它们:
+<code class="docutils literal notranslate"><span class="pre">device='cuda:0'</span></code>、<a href="#id14"><span class="problematic" id="id15">``</span></a>device=’cuda:1’<a href="#id16"><span class="problematic" id="id17">``</span></a>等。</p>
+<p>作为编码实践,在任何地方都使用字符串常量来指定设备是相当脆弱的。在理想情况下，无论你在CPU还是GPU硬件上，
+你的代码都应该稳健地执行。你可以通过创建一个设备句柄来实现这一点，而不是使用字符串传递给你的张量:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <a href="https://pytorch.org/docs/stable/generated/torch.cuda.is_available.html#torch.cuda.is_available" title="torch.cuda.is_available" class="sphx-glr-backref-module-torch-cuda sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span></a><span class="p">():</span>
     <span class="n">my_device</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/tensor_attributes.html#torch.device" title="torch.device" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">torch</span><span class="o">.</span><span class="n">device</span></a><span class="p">(</span><span class="s1">&#39;cuda&#39;</span><span class="p">)</span>
 <span class="k">else</span><span class="p">:</span>
@@ -1201,38 +1101,32 @@ string:</p>
 <span class="nb">print</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>If you have an existing tensor living on one device, you can move it to
-another with the <code class="docutils literal notranslate"><span class="pre">to()</span></code> method. The following line of code creates a
-tensor on CPU, and moves it to whichever device handle you acquired in
-the previous cell.</p>
+<p>如果你有一个已经存在于一个设备上的张量，你可以使用``to()``方法将它移动到另一个设备。
+下面一行代码在CPU上创建一个张量，并将它移动到你在上一个单元格中获取的任何设备句柄上。</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">y</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.rand.html#torch.rand" title="torch.rand" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">rand</span></a><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
 <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">my_device</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>It is important to know that in order to do computation involving two or
-more tensors, <em>all of the tensors must be on the same device</em>. The
-following code will throw a runtime error, regardless of whether you
-have a GPU device available:</p>
+<p>重要的是要知道，为了进行涉及两个或多个张量的计算，<em>所有张量必须在同一设备上</em>。
+无论你是否有GPU设备可用，以下代码都会抛出运行时错误:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">x</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.rand.html#torch.rand" title="torch.rand" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">rand</span></a><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
 <span class="n">y</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.rand.html#torch.rand" title="torch.rand" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">rand</span></a><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s1">&#39;gpu&#39;</span><span class="p">)</span>
 <span class="n">z</span> <span class="o">=</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span>  <span class="c1"># exception will be thrown</span>
 </pre></div>
 </div>
 </div>
-<div class="section" id="manipulating-tensor-shapes">
-<h2>Manipulating Tensor Shapes<a class="headerlink" href="#manipulating-tensor-shapes" title="Permalink to this heading">¶</a></h2>
-<p>Sometimes, you’ll need to change the shape of your tensor. Below, we’ll
-look at a few common cases, and how to handle them.</p>
-<div class="section" id="changing-the-number-of-dimensions">
-<h3>Changing the Number of Dimensions<a class="headerlink" href="#changing-the-number-of-dimensions" title="Permalink to this heading">¶</a></h3>
-<p>One case where you might need to change the number of dimensions is
-passing a single instance of input to your model. PyTorch models
-generally expect <em>batches</em> of input.</p>
-<p>For example, imagine having a model that works on 3 x 226 x 226 images -
-a 226-pixel square with 3 color channels. When you load and transform
-it, you’ll get a tensor of shape <code class="docutils literal notranslate"><span class="pre">(3,</span> <span class="pre">226,</span> <span class="pre">226)</span></code>. Your model, though,
-is expecting input of shape <code class="docutils literal notranslate"><span class="pre">(N,</span> <span class="pre">3,</span> <span class="pre">226,</span> <span class="pre">226)</span></code>, where <code class="docutils literal notranslate"><span class="pre">N</span></code> is the
-number of images in the batch. So how do you make a batch of one?</p>
+<div class="section" id="id18">
+<h2>操作张量形状<a class="headerlink" href="#id18" title="Permalink to this heading">¶</a></h2>
+<p>有时,你需要改变张量的形状。下面,我们将看一些常见的情况,以及如何处理它们。</p>
+<div class="section" id="id19">
+<h3>改变维度数量<a class="headerlink" href="#id19" title="Permalink to this heading">¶</a></h3>
+<p>你可能需要改变维度数量的一种情况是将单个实例输入到你的模型中。PyTorch模型
+通常期望输入 <em>批次</em> 数据。</p>
+<p>例如,假设有一个模型可以处理3x226x226的图像 -
+一个226像素的正方形,有3个颜色通道。当你加载和转换它时,
+你会得到一个形状为 <code class="docutils literal notranslate"><span class="pre">(3,</span> <span class="pre">226,</span> <span class="pre">226)</span></code> 的张量。但是你的模型
+期望输入形状为 <code class="docutils literal notranslate"><span class="pre">(N,</span> <span class="pre">3,</span> <span class="pre">226,</span> <span class="pre">226)</span></code>，其中 <code class="docutils literal notranslate"><span class="pre">N</span></code> 是批次中图像的数量。
+那么如何创建一个批次大小为1的输入呢?</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">a</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.rand.html#torch.rand" title="torch.rand" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">rand</span></a><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">226</span><span class="p">,</span> <span class="mi">226</span><span class="p">)</span>
 <span class="n">b</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 
@@ -1240,23 +1134,19 @@ number of images in the batch. So how do you make a batch of one?</p>
 <span class="nb">print</span><span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>The <code class="docutils literal notranslate"><span class="pre">unsqueeze()</span></code> method adds a dimension of extent 1.
-<code class="docutils literal notranslate"><span class="pre">unsqueeze(0)</span></code> adds it as a new zeroth dimension - now you have a
-batch of one!</p>
-<p>So if that’s <em>un</em>squeezing? What do we mean by squeezing? We’re taking
-advantage of the fact that any dimension of extent 1 <em>does not</em> change
-the number of elements in the tensor.</p>
+<p><code class="docutils literal notranslate"><span class="pre">unsqueeze()</span></code> 方法添加了一个大小为1的维度。
+<code class="docutils literal notranslate"><span class="pre">unsqueeze(0)</span></code> 在最前面添加了一个新的0维度 - 现在你有了一个批次大小为1的输入!</p>
+<p>那么如果是 <em>去除</em> 多余的1维度呢?我们所说的挤压(squeeze)就是利用了
+任何大小为1的维度 <em>不会</em> 改变张量中元素的数量这一事实。</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">c</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.rand.html#torch.rand" title="torch.rand" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">rand</span></a><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Continuing the example above, let’s say the model’s output is a
-20-element vector for each input. You would then expect the output to
-have shape <code class="docutils literal notranslate"><span class="pre">(N,</span> <span class="pre">20)</span></code>, where <code class="docutils literal notranslate"><span class="pre">N</span></code> is the number of instances in the
-input batch. That means that for our single-input batch, we’ll get an
-output of shape <code class="docutils literal notranslate"><span class="pre">(1,</span> <span class="pre">20)</span></code>.</p>
-<p>What if you want to do some <em>non-batched</em> computation with that output -
-something that’s just expecting a 20-element vector?</p>
+<p>继续上面的例子,假设模型的输出是一个20元素的向量,对于每个输入。
+那么你会期望输出的形状为 <code class="docutils literal notranslate"><span class="pre">(N,</span> <span class="pre">20)</span></code>，其中 <code class="docutils literal notranslate"><span class="pre">N</span></code> 是输入批次中的实例数量。
+这意味着对于我们的单输入批次,我们会得到形状为 <code class="docutils literal notranslate"><span class="pre">(1,</span> <span class="pre">20)</span></code> 的输出。</p>
+<p>如果你想对该输出进行一些*非批次*计算 -
+一些只期望20元素向量的计算,该怎么办?</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">a</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.rand.html#torch.rand" title="torch.rand" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">rand</span></a><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
@@ -1272,54 +1162,41 @@ something that’s just expecting a 20-element vector?</p>
 <span class="nb">print</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>You can see from the shapes that our 2-dimensional tensor is now
-1-dimensional, and if you look closely at the output of the cell above
-you’ll see that printing <code class="docutils literal notranslate"><span class="pre">a</span></code> shows an “extra” set of square brackets
-<code class="docutils literal notranslate"><span class="pre">[]</span></code> due to having an extra dimension.</p>
-<p>You may only <code class="docutils literal notranslate"><span class="pre">squeeze()</span></code> dimensions of extent 1. See above where we
-try to squeeze a dimension of size 2 in <code class="docutils literal notranslate"><span class="pre">c</span></code>, and get back the same
-shape we started with. Calls to <code class="docutils literal notranslate"><span class="pre">squeeze()</span></code> and <code class="docutils literal notranslate"><span class="pre">unsqueeze()</span></code> can
-only act on dimensions of extent 1 because to do otherwise would change
-the number of elements in the tensor.</p>
-<p>Another place you might use <code class="docutils literal notranslate"><span class="pre">unsqueeze()</span></code> is to ease broadcasting.
-Recall the example above where we had the following code:</p>
+<p>你可以从形状看出,我们的二维张量现在变成了一维的,如果你仔细观察上面单元格的输出,
+你会发现打印 <cite>a</cite> 时会显示一组”额外”的方括号 <cite>[]</cite>,这是因为多了一个维度。</p>
+<p>你只能对大小为1的维度执行 <cite>squeeze()</cite>。看上面我们尝试对大小为2的维度 <cite>c</cite> 进行挤压,
+得到的形状与开始时相同。<cite>squeeze()</cite> 和 <cite>unsqueeze()</cite> 的调用只能作用于大小为1的维度,
+因为对其他维度操作会改变张量中元素的数量。</p>
+<p>你可能会使用 <cite>unsqueeze()</cite> 的另一个场景是为了方便广播操作。
+回想一下上面的例子,我们有以下代码:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">a</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.ones.html#torch.ones" title="torch.ones" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">ones</span></a><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
 
-<span class="n">c</span> <span class="o">=</span> <span class="n">a</span> <span class="o">*</span> <a href="https://pytorch.org/docs/stable/generated/torch.rand.html#torch.rand" title="torch.rand" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">rand</span></a><span class="p">(</span>   <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="c1"># 3rd dim = 1, 2nd dim identical to a</span>
+<span class="n">c</span> <span class="o">=</span> <span class="n">a</span> <span class="o">*</span> <a href="https://pytorch.org/docs/stable/generated/torch.rand.html#torch.rand" title="torch.rand" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">rand</span></a><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="c1"># 第3维为1,第2维与a相同</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>The net effect of that was to broadcast the operation over dimensions 0
-and 2, causing the random, 3 x 1 tensor to be multiplied element-wise by
-every 3-element column in <code class="docutils literal notranslate"><span class="pre">a</span></code>.</p>
-<p>What if the random vector had just been 3-element vector? We’d lose the
-ability to do the broadcast, because the final dimensions would not
-match up according to the broadcasting rules. <code class="docutils literal notranslate"><span class="pre">unsqueeze()</span></code> comes to
-the rescue:</p>
+<p>其净效果是在维度0和2上进行广播操作,导致形状为3x1的随机张量与 <cite>a</cite> 中的每一列3元素逐元素相乘。</p>
+<p>如果随机向量只是一个3元素向量呢?我们就失去了广播的能力,因为最后的维度不会根据广播规则匹配。
+<cite>unsqueeze()</cite> 可以解救我们:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">a</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.ones.html#torch.ones" title="torch.ones" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">ones</span></a><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
-<span class="n">b</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.rand.html#torch.rand" title="torch.rand" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">rand</span></a><span class="p">(</span>   <span class="mi">3</span><span class="p">)</span>     <span class="c1"># trying to multiply a * b will give a runtime error</span>
-<span class="n">c</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>       <span class="c1"># change to a 2-dimensional tensor, adding new dim at the end</span>
+<span class="n">b</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.rand.html#torch.rand" title="torch.rand" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">rand</span></a><span class="p">(</span>   <span class="mi">3</span><span class="p">)</span>     <span class="c1"># 试图将 a * b 会导致运行时错误</span>
+<span class="n">c</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>       <span class="c1"># 变成二维张量,在末尾添加新维度</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">a</span> <span class="o">*</span> <span class="n">c</span><span class="p">)</span>             <span class="c1"># broadcasting works again!</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">a</span> <span class="o">*</span> <span class="n">c</span><span class="p">)</span>             <span class="c1"># 广播再次生效!</span>
 </pre></div>
 </div>
-<p>The <code class="docutils literal notranslate"><span class="pre">squeeze()</span></code> and <code class="docutils literal notranslate"><span class="pre">unsqueeze()</span></code> methods also have in-place
-versions, <code class="docutils literal notranslate"><span class="pre">squeeze_()</span></code> and <code class="docutils literal notranslate"><span class="pre">unsqueeze_()</span></code>:</p>
+<p><cite>squeeze()</cite> 和 <cite>unsqueeze()</cite> 方法也有本地版本 <cite>squeeze_()</cite> 和 <cite>unsqueeze_()</cite>：</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">batch_me</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.rand.html#torch.rand" title="torch.rand" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">rand</span></a><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">226</span><span class="p">,</span> <span class="mi">226</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">batch_me</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
 <span class="n">batch_me</span><span class="o">.</span><span class="n">unsqueeze_</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">batch_me</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Sometimes you’ll want to change the shape of a tensor more radically,
-while still preserving the number of elements and their contents. One
-case where this happens is at the interface between a convolutional
-layer of a model and a linear layer of the model - this is common in
-image classification models. A convolution kernel will yield an output
-tensor of shape <em>features x width x height,</em> but the following linear
-layer expects a 1-dimensional input. <code class="docutils literal notranslate"><span class="pre">reshape()</span></code> will do this for you,
-provided that the dimensions you request yield the same number of
-elements as the input tensor has:</p>
+<p>有时你需要更彻底地改变张量的形状,同时保留元素数量和内容不变。
+一种情况是在模型的卷积层和线性层之间的接口 - 这在图像分类模型中很常见。
+卷积核会产生形状为 <em>features x width x height</em> 的输出张量,
+但接下来的线性层期望一维输入。<cite>reshape()</cite> 可以为你做这件事,
+只要你请求的维度与输入张量具有相同数量的元素即可:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">output3d</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.rand.html#torch.rand" title="torch.rand" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">rand</span></a><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">output3d</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
 
@@ -1332,22 +1209,17 @@ elements as the input tensor has:</p>
 </div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>The <code class="docutils literal notranslate"><span class="pre">(6</span> <span class="pre">*</span> <span class="pre">20</span> <span class="pre">*</span> <span class="pre">20,)</span></code> argument in the final line of the cell
-above is because PyTorch expects a <strong>tuple</strong> when specifying a
-tensor shape - but when the shape is the first argument of a method, it
-lets us cheat and just use a series of integers. Here, we had to add the
-parentheses and comma to convince the method that this is really a
-one-element tuple.</p>
+<p>上面最后一行单元格中的 <cite>(6 * 20 * 20,)</cite> 参数是因为PyTorch在指定张量形状时
+期望一个 <strong>元组</strong> - 但当形状是方法的第一个参数时,它允许我们只使用一系列整数。
+这里,我们必须添加括号和逗号来说服该方法这确实是一个单元素元组。</p>
 </div>
-<p>When it can, <code class="docutils literal notranslate"><span class="pre">reshape()</span></code> will return a <em>view</em> on the tensor to be
-changed - that is, a separate tensor object looking at the same
-underlying region of memory. <em>This is important:</em> That means any change
-made to the source tensor will be reflected in the view on that tensor,
-unless you <code class="docutils literal notranslate"><span class="pre">clone()</span></code> it.</p>
-<p>There <em>are</em> conditions, beyond the scope of this introduction, where
-<code class="docutils literal notranslate"><span class="pre">reshape()</span></code> has to return a tensor carrying a copy of the data. For
-more information, see the
-<a class="reference external" href="https://pytorch.org/docs/stable/torch.html#torch.reshape">docs</a>.</p>
+<p>当可能时,`reshape()` 会返回该张量的*视图* -
+也就是一个单独的张量对象,查看相同的底层内存区域。
+<em>这一点很重要:</em> 这意味着对源张量所做的任何更改都会反映在该张量的视图上,
+除非你 <cite>clone()</cite> 它。</p>
+<p>确实有一些条件(超出了本介绍的范围),`reshape()` 必须返回数据的副本。
+有关更多信息,请参阅
+<a class="reference external" href="https://pytorch.org/docs/stable/torch.html#torch.reshape">文档</a>。</p>
 </div>
 </div>
 <div class="section" id="numpy-bridge">
@@ -1465,22 +1337,22 @@ if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.i
             <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
               <ul>
 <li><a class="reference internal" href="#">PyTorch Tensors 介绍</a><ul>
-<li><a class="reference internal" href="#creating-tensors">Creating Tensors</a><ul>
-<li><a class="reference internal" href="#random-tensors-and-seeding">Random Tensors and Seeding</a></li>
-<li><a class="reference internal" href="#tensor-shapes">Tensor Shapes</a></li>
-<li><a class="reference internal" href="#tensor-data-types">Tensor Data Types</a></li>
+<li><a class="reference internal" href="#id6">创建张量</a><ul>
+<li><a class="reference internal" href="#id7">随机张量和种子</a></li>
+<li><a class="reference internal" href="#id8">张量形状</a></li>
+<li><a class="reference internal" href="#id9">张量数据类型</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#math-logic-with-pytorch-tensors">Math &amp; Logic with PyTorch Tensors</a><ul>
-<li><a class="reference internal" href="#in-brief-tensor-broadcasting">In Brief: Tensor Broadcasting</a></li>
-<li><a class="reference internal" href="#more-math-with-tensors">More Math with Tensors</a></li>
-<li><a class="reference internal" href="#altering-tensors-in-place">Altering Tensors in Place</a></li>
+<li><a class="reference internal" href="#pytorch">使用PyTorch张量进行数学和逻辑运算</a><ul>
+<li><a class="reference internal" href="#id10">简介: 张量广播</a></li>
+<li><a class="reference internal" href="#id11">更多张量数学运算</a></li>
+<li><a class="reference internal" href="#id12">本地修改张量</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#copying-tensors">Copying Tensors</a></li>
-<li><a class="reference internal" href="#moving-to-gpu">Moving to GPU</a></li>
-<li><a class="reference internal" href="#manipulating-tensor-shapes">Manipulating Tensor Shapes</a><ul>
-<li><a class="reference internal" href="#changing-the-number-of-dimensions">Changing the Number of Dimensions</a></li>
+<li><a class="reference internal" href="#id13">复制张量</a></li>
+<li><a class="reference internal" href="#gpu">移动到 GPU</a></li>
+<li><a class="reference internal" href="#id18">操作张量形状</a><ul>
+<li><a class="reference internal" href="#id19">改变维度数量</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#numpy-bridge">NumPy Bridge</a></li>

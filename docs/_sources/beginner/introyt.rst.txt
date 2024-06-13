@@ -1,27 +1,28 @@
-`Introduction <introyt/introyt1_tutorial.html>`_ ||
-`Tensors <introyt/tensors_deeper_tutorial.html>`_ ||
-`Autograd <introyt/autogradyt_tutorial.html>`_ ||
-`Building Models <introyt/modelsyt_tutorial.html>`_ ||
-`TensorBoard Support <introyt/tensorboardyt_tutorial.html>`_ ||
-`Training Models <introyt/trainingyt.html>`_ ||
-`Model Understanding <introyt/captumyt.html>`_
+`简介 <introyt/introyt1_tutorial.html>`_ ||
+`张量 <introyt/tensors_deeper_tutorial.html>`_ ||
+`自动微分 <introyt/autogradyt_tutorial.html>`_ ||
+`构建模型 <introyt/modelsyt_tutorial.html>`_ ||
+`TensorBoard支持 <introyt/tensorboardyt_tutorial.html>`_ ||
+`训练模型 <introyt/trainingyt.html>`_ ||
+`模型理解 <introyt/captumyt.html>`_
 
 PyTorch 介绍 - YouTube
 ========================================
 
-Authors: 
+作者: 
 `Brad Heintz <https://github.com/fbbradheintz>`_
 
-This tutorial follows along with the `PyTorch Beginner Series <https://www.youtube.com/playlist?list=PL_lsbAsL_o2CTlGHgMxNrKhzP97BaG9ZN>`_ on YouTube.
+本教程与YouTube上的 `PyTorch 初学者系列 <https://www.youtube.com/playlist?list=PL_lsbAsL_o2CTlGHgMxNrKhzP97BaG9ZN>`_ 同步。
 
-`This tutorial assumes a basic familiarity with Python and Deep Learning concepts.`
+`本教程假设您对Python和深度学习概念有基本的了解。`
 
-Running the Tutorial Code
+运行教程代码
 -------------------------
-You can run this tutorial in a couple of ways:
+您可以通过以下几种方式运行本教程:
 
-- **In the cloud**: This is the easiest way to get started! Each section has a Colab link at the top, which opens a notebook with the code in a fully-hosted environment. Pro tip: Use Colab with a GPU runtime to speed up operations *Runtime > Change runtime type > GPU*
-- **Locally**: This option requires you to setup PyTorch and torchvision first on your local machine (`installation instructions <https://pytorch.org/get-started/locally/>`_). Download the notebook or copy the code into your favorite IDE.
+- **在云端**: 这是开始的最简单方式!每个部分的顶部都有一个Colab链接,它会在完全托管的环境中打开一个包含代码的笔记本。专业提示:使用GPU运行时的Colab可以加速操作 *运行时 > 更改运行时类型 > GPU*
+- **本地**: 此选项需要您首先在本地机器上设置PyTorch和torchvision(`安装说明 <https://pytorch.org/get-started/locally/>`_)。下载notebook或将代码复制到您喜欢的IDE中。
+
 
 .. include:: /beginner_source/introyt/tocyt.txt
 

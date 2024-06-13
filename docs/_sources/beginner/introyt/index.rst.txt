@@ -63,7 +63,7 @@ Introduction to PyTorch on YouTube
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="自动微分基础 ============================">
+    <div class="sphx-glr-thumbcontainer" tooltip="自动微分基础 ============================ 跟随下面的视频或在 `youtube &lt;https://www.youtube.com/watch?v=M0fX15_...">
 
 .. only:: html
 
@@ -114,14 +114,14 @@ Introduction to PyTorch on YouTube
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="使用 Captum 进行模型理解 ===============================">
+    <div class="sphx-glr-thumbcontainer" tooltip="PyTorch Tensors 介绍 ===============================">
 
 .. only:: html
 
-  .. image:: /beginner/introyt/images/thumb/sphx_glr_captumyt_thumb.png
+  .. image:: /beginner/introyt/images/thumb/sphx_glr_tensors_deeper_tutorial_thumb.png
     :alt: `简介 <introyt1_tutorial.html>`_ ||
 
-  :ref:`sphx_glr_beginner_introyt_captumyt.py`
+  :ref:`sphx_glr_beginner_introyt_tensors_deeper_tutorial.py`
 
 .. raw:: html
 
@@ -131,14 +131,14 @@ Introduction to PyTorch on YouTube
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="PyTorch Tensors 介绍 ===============================">
+    <div class="sphx-glr-thumbcontainer" tooltip="使用 Captum 进行模型理解 ===============================">
 
 .. only:: html
 
-  .. image:: /beginner/introyt/images/thumb/sphx_glr_tensors_deeper_tutorial_thumb.png
+  .. image:: /beginner/introyt/images/thumb/sphx_glr_captumyt_thumb.png
     :alt: `简介 <introyt1_tutorial.html>`_ ||
 
-  :ref:`sphx_glr_beginner_introyt_tensors_deeper_tutorial.py`
+  :ref:`sphx_glr_beginner_introyt_captumyt.py`
 
 .. raw:: html
 
@@ -175,7 +175,7 @@ Introduction to PyTorch on YouTube
    /beginner/introyt/autogradyt_tutorial
    /beginner/introyt/trainingyt
    /beginner/introyt/tensorboardyt_tutorial
-   /beginner/introyt/captumyt
    /beginner/introyt/tensors_deeper_tutorial
+   /beginner/introyt/captumyt
    /beginner/introyt/introyt1_tutorial
 
