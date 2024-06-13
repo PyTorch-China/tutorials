@@ -29,7 +29,7 @@
 PyTorch TensorBoard 支持
 ===========================
 
-Follow along with the video below or on `youtube <https://www.youtube.com/watch?v=6CEld3hZgqc>`__.
+跟随下面的视频或在 `youtube <https://www.youtube.com/watch?v=6CEld3hZgqc>`__ 上观看。
 
 .. raw:: html
 
@@ -37,87 +37,81 @@ Follow along with the video below or on `youtube <https://www.youtube.com/watch?
      <iframe width="560" height="315" src="https://www.youtube.com/embed/6CEld3hZgqc" frameborder="0" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
    </div>
 
-Before You Start
+开始之前
 ----------------
 
-To run this tutorial, you’ll need to install PyTorch, TorchVision,
-Matplotlib, and TensorBoard.
+要运行此教程，您需要安装PyTorch、TorchVision、Matplotlib和TensorBoard。
 
-With ``conda``:
+使用 ``conda``：
 
 .. code-block:: sh
 
     conda install pytorch torchvision -c pytorch
     conda install matplotlib tensorboard
 
-With ``pip``:
+使用 ``pip``：
 
 .. code-block:: sh
 
     pip install torch torchvision matplotlib tensorboard
 
-Once the dependencies are installed, restart this notebook in the Python
-environment where you installed them.
+安装完依赖项后，请在安装它们的Python环境中重新启动此笔记本。
 
 
-Introduction
+介绍
 ------------
  
-In this notebook, we’ll be training a variant of LeNet-5 against the
-Fashion-MNIST dataset. Fashion-MNIST is a set of image tiles depicting
-various garments, with ten class labels indicating the type of garment
-depicted. 
+在本笔记本中，我们将训练LeNet-5的变体，针对Fashion-MNIST数据集。
+Fashion-MNIST是一组描绘各种服装的图像瓦片，有十个类标签指示所描绘的服装类型。
 
-.. GENERATED FROM PYTHON SOURCE LINES 53-79
+.. GENERATED FROM PYTHON SOURCE LINES 49-73
 
 .. code-block:: default
 
 
-    # PyTorch model and training necessities
+    # PyTorch模型和训练必需品
     import torch
     import torch.nn as nn
     import torch.nn.functional as F
     import torch.optim as optim
 
-    # Image datasets and image manipulation
+    # 图像数据集和图像操作
     import torchvision
     import torchvision.transforms as transforms
 
-    # Image display
+    # 图像显示
     import matplotlib.pyplot as plt
     import numpy as np
 
-    # PyTorch TensorBoard support
+    # PyTorch TensorBoard支持
     from torch.utils.tensorboard import SummaryWriter
 
-    # In case you are using an environment that has TensorFlow installed,
-    # such as Google Colab, uncomment the following code to avoid
-    # a bug with saving embeddings to your TensorBoard directory
+    # 如果您使用的环境安装了TensorFlow（如Google Colab），请取消注释以下代码以避免将嵌入保存到TensorBoard目录时出现错误
 
     # import tensorflow as tf
     # import tensorboard as tb
     # tf.io.gfile = tb.compat.tensorflow_stub.io.gfile
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 80-85
+.. GENERATED FROM PYTHON SOURCE LINES 74-79
 
-Showing Images in TensorBoard
+在TensorBoard中显示图像
 -----------------------------
 
-Let’s start by adding sample images from our dataset to TensorBoard:
+让我们从将数据集中的示例图像添加到TensorBoard开始：
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 85-136
+.. GENERATED FROM PYTHON SOURCE LINES 79-130
 
 .. code-block:: default
 
 
-    # Gather datasets and prepare them for consumption
+    # 收集数据集并准备消费
     transform = transforms.Compose(
         [transforms.ToTensor(),
         transforms.Normalize((0.5,), (0.5,))])
 
-    # Store separate training and validations splits in ./data
+    # 在./data中存储单独的训练和验证分割
     training_set = torchvision.datasets.FashionMNIST('./data',
         download=True,
         train=True,
@@ -138,76 +132,68 @@ Let’s start by adding sample images from our dataset to TensorBoard:
                                                     shuffle=False,
                                                     num_workers=2)
 
-    # Class labels
+    # 类标签
     classes = ('T-shirt/top', 'Trouser', 'Pullover', 'Dress', 'Coat',
             'Sandal', 'Shirt', 'Sneaker', 'Bag', 'Ankle Boot')
 
-    # Helper function for inline image display
+    # 内联图像显示的辅助函数
     def matplotlib_imshow(img, one_channel=False):
         if one_channel:
             img = img.mean(dim=0)
-        img = img / 2 + 0.5     # unnormalize
+        img = img / 2 + 0.5     # 反归一化
         npimg = img.numpy()
         if one_channel:
             plt.imshow(npimg, cmap="Greys")
         else:
             plt.imshow(np.transpose(npimg, (1, 2, 0)))
 
-    # Extract a batch of 4 images
+    # 提取一批4张图像
     dataiter = iter(training_loader)
     images, labels = next(dataiter)
 
-    # Create a grid from the images and show them
+    # 从图像创建网格并显示它们
     img_grid = torchvision.utils.make_grid(images)
     matplotlib_imshow(img_grid, one_channel=True)
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 137-142
+.. GENERATED FROM PYTHON SOURCE LINES 131-133
 
-Above, we used TorchVision and Matplotlib to create a visual grid of a
-minibatch of our input data. Below, we use the ``add_image()`` call on
-``SummaryWriter`` to log the image for consumption by TensorBoard, and
-we also call ``flush()`` to make sure it’s written to disk right away.
+上面，我们使用TorchVision和Matplotlib创建了一个输入数据小批量的可视网格。下面，我们在``SummaryWriter``上使用``add_image()``调用来记录图像，以供TensorBoard使用，我们还调用``flush()``以确保它立即写入磁盘。
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 142-156
+.. GENERATED FROM PYTHON SOURCE LINES 133-147
 
 .. code-block:: default
 
 
-    # Default log_dir argument is "runs" - but it's good to be specific
-    # torch.utils.tensorboard.SummaryWriter is imported above
+    # 默认log_dir参数为"runs" - 但最好明确指定
+    # torch.utils.tensorboard.SummaryWriter在上面导入
     writer = SummaryWriter('runs/fashion_mnist_experiment_1')
 
-    # Write image data to TensorBoard log dir
+    # 将图像数据写入TensorBoard日志目录
     writer.add_image('Four Fashion-MNIST Images', img_grid)
     writer.flush()
 
-    # To view, start TensorBoard on the command line with:
+    # 要查看，请在命令行上启动TensorBoard：
     #   tensorboard --logdir=runs
-    # ...and open a browser tab to http://localhost:6006/
+    # ...并在新的浏览器选项卡中打开http://localhost:6006/
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 157-171
+.. GENERATED FROM PYTHON SOURCE LINES 148-157
 
-If you start TensorBoard at the command line and open it in a new
-browser tab (usually at `localhost:6006 <localhost:6006>`__), you should
-see the image grid under the IMAGES tab.
+如果您在命令行启动TensorBoard并在新的浏览器选项卡中打开它（通常在`localhost:6006 <localhost:6006>`__），您应该在IMAGES选项卡下看到图像网格。
 
-Graphing Scalars to Visualize Training
+绘制标量以可视化训练
 --------------------------------------
 
-TensorBoard is useful for tracking the progress and efficacy of your
-training. Below, we’ll run a training loop, track some metrics, and save
-the data for TensorBoard’s consumption.
+TensorBoard对于跟踪训练的进度和效果很有用。下面，我们将运行一个训练循环，跟踪一些指标，并保存数据以供TensorBoard使用。
 
-Let’s define a model to categorize our image tiles, and an optimizer and
-loss function for training:
+让我们定义一个模型来对我们的图像瓦片进行分类，以及用于训练的优化器和损失函数：
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 171-197
+.. GENERATED FROM PYTHON SOURCE LINES 157-183
 
 .. code-block:: default
 
@@ -238,23 +224,22 @@ loss function for training:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 198-201
+.. GENERATED FROM PYTHON SOURCE LINES 184-186
 
-Now let’s train a single epoch, and evaluate the training vs. validation
-set losses every 1000 batches:
+现在让我们训练一个epoch，并每1000批次评估一次训练与验证集的损失：
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 201-244
+.. GENERATED FROM PYTHON SOURCE LINES 186-229
 
 .. code-block:: default
 
 
     print(len(validation_loader))
-    for epoch in range(1):  # loop over the dataset multiple times
+    for epoch in range(1):  # 在数据集上循环多次
         running_loss = 0.0
 
         for i, data in enumerate(training_loader, 0):
-            # basic training loop
+            # 基本训练循环
             inputs, labels = data
             optimizer.zero_grad()
             outputs = net(inputs)
@@ -263,24 +248,24 @@ set losses every 1000 batches:
             optimizer.step()
 
             running_loss += loss.item()
-            if i % 1000 == 999:    # Every 1000 mini-batches...
+            if i % 1000 == 999:    # 每1000个小批量...
                 print('Batch {}'.format(i + 1))
-                # Check against the validation set
+                # 对照验证集
                 running_vloss = 0.0
             
-                # In evaluation mode some model specific operations can be omitted eg. dropout layer
-                net.train(False) # Switching to evaluation mode, eg. turning off regularisation
+                # 在评估模式下，可以省略一些特定于模型的操作，例如dropout层
+                net.train(False) # 切换到评估模式，例如关闭正则化
                 for j, vdata in enumerate(validation_loader, 0):
                     vinputs, vlabels = vdata
                     voutputs = net(vinputs)
                     vloss = criterion(voutputs, vlabels)
                     running_vloss += vloss.item()
-                net.train(True) # Switching back to training mode, eg. turning on regularisation
+                net.train(True) # 切换回训练模式，例如打开正则化
             
                 avg_loss = running_loss / 1000
                 avg_vloss = running_vloss / len(validation_loader)
             
-                # Log the running loss averaged per batch
+                # 记录每批次平均的运行损失
                 writer.add_scalars('Training vs. Validation Loss',
                                 { 'Training' : avg_loss, 'Validation' : avg_vloss },
                                 epoch * len(training_loader) + i)
@@ -292,73 +277,63 @@ set losses every 1000 batches:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 245-254
+.. GENERATED FROM PYTHON SOURCE LINES 230-237
 
-Switch to your open TensorBoard and have a look at the SCALARS tab.
+切换到您打开的TensorBoard，查看SCALARS选项卡。
 
-Visualizing Your Model
+可视化您的模型
 ----------------------
 
-TensorBoard can also be used to examine the data flow within your model.
-To do this, call the ``add_graph()`` method with a model and sample
-input:
+TensorBoard还可用于检查模型内的数据流。为此，请使用模型和示例输入调用``add_graph()``方法：
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 254-265
+.. GENERATED FROM PYTHON SOURCE LINES 237-248
 
 .. code-block:: default
 
 
-    # Again, grab a single mini-batch of images
+    # 再次获取一个小批量的图像
     dataiter = iter(training_loader)
     images, labels = next(dataiter)
 
-    # add_graph() will trace the sample input through your model,
-    # and render it as a graph.
+    # add_graph()将通过您的模型跟踪示例输入，
+    # 并将其渲染为图形。
     writer.add_graph(net, images)
     writer.flush()
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 266-283
+.. GENERATED FROM PYTHON SOURCE LINES 249-258
 
-When you switch over to TensorBoard, you should see a GRAPHS tab.
-Double-click the “NET” node to see the layers and data flow within your
-model.
+当您切换到TensorBoard时，您应该会看到一个GRAPHS选项卡。双击"NET"节点可查看模型内的层和数据流。
 
-Visualizing Your Dataset with Embeddings
+使用嵌入可视化您的数据集
 ----------------------------------------
 
-The 28-by-28 image tiles we’re using can be modeled as 784-dimensional
-vectors (28 \* 28 = 784). It can be instructive to project this to a
-lower-dimensional representation. The ``add_embedding()`` method will
-project a set of data onto the three dimensions with highest variance,
-and display them as an interactive 3D chart. The ``add_embedding()``
-method does this automatically by projecting to the three dimensions
-with highest variance.
+我们使用的28x28图像瓦片可以建模为784维向量（28 * 28 = 784）。将其投影到较低维度的表示形式可能会很有启发性。``add_embedding()``方法将一组数据投影到具有最高方差的三个维度上，并将它们显示为交互式3D图表。``add_embedding()``方法通过投影到具有最高方差的三个维度来自动执行此操作。
 
-Below, we’ll take a sample of our data, and generate such an embedding:
+下面，我们将采样数据，并生成这样一个嵌入：
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 283-306
+.. GENERATED FROM PYTHON SOURCE LINES 258-281
 
 .. code-block:: default
 
 
-    # Select a random subset of data and corresponding labels
+    # 选择随机子集的数据和相应的标签
     def select_n_random(data, labels, n=100):
         assert len(data) == len(labels)
 
         perm = torch.randperm(len(data))
         return data[perm][:n], labels[perm][:n]
 
-    # Extract a random subset of data
+    # 提取随机子集的数据
     images, labels = select_n_random(training_set.data, training_set.targets)
 
-    # get the class labels for each image
+    # 获取每个图像的类标签
     class_labels = [classes[label] for label in labels]
 
-    # log embeddings
+    # 记录嵌入
     features = images.view(-1, 28 * 28)
     writer.add_embedding(features,
                         metadata=class_labels,
@@ -368,29 +343,23 @@ Below, we’ll take a sample of our data, and generate such an embedding:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 307-328
+.. GENERATED FROM PYTHON SOURCE LINES 282-297
 
-Now if you switch to TensorBoard and select the PROJECTOR tab, you
-should see a 3D representation of the projection. You can rotate and
-zoom the model. Examine it at large and small scales, and see whether
-you can spot patterns in the projected data and the clustering of
-labels.
+现在，如果您切换到TensorBoard并选择PROJECTOR选项卡，您应该会看到投影的3D表示。您可以旋转和缩放模型。在大小不同的尺度上检查它，看看您是否可以发现投影数据和标签聚类中的模式。
 
-For better visibility, it’s recommended to:
+为了更好的可见性，建议：
 
-- Select “label” from the “Color by” drop-down on the left.
-- Toggle the Night Mode icon along the top to place the
-  light-colored images on a dark background.
+- 从左侧的"Color by"下拉菜单中选择"label"。
+- 切换顶部的Night Mode图标，将浅色图像置于深色背景上。
 
-Other Resources
+其他资源
 ---------------
 
-For more information, have a look at:
+有关更多信息，请查看：
 
-- PyTorch documentation on `torch.utils.tensorboard.SummaryWriter <https://pytorch.org/docs/stable/tensorboard.html?highlight=summarywriter>`__
-- Tensorboard tutorial content in the `PyTorch.org Tutorials <https://pytorch.org/tutorials/>`__ 
-- For more information about TensorBoard, see the `TensorBoard
-  documentation <https://www.tensorflow.org/tensorboard>`__
+- PyTorch关于`torch.utils.tensorboard.SummaryWriter <https://pytorch.org/docs/stable/tensorboard.html?highlight=summarywriter>`__的文档
+- `PyTorch.org教程 <https://pytorch.org/tutorials/>`__ 中的TensorBoard教程内容
+- 有关TensorBoard的更多信息，请参阅`TensorBoard文档 <https://www.tensorflow.org/tensorboard>`__
 
 
 .. rst-class:: sphx-glr-timing

@@ -606,111 +606,60 @@ to download the full example code</p>
 <strong>模型理解</strong></p>
 <div class="section" id="captum">
 <h1>使用 Captum 进行模型理解<a class="headerlink" href="#captum" title="Permalink to this heading">¶</a></h1>
-<p>Follow along with the video below or on <a class="reference external" href="https://www.youtube.com/watch?v=Am2EF9CLu-g">youtube</a>. Download the notebook and corresponding files
-<a class="reference external" href="https://pytorch-tutorial-assets.s3.amazonaws.com/youtube-series/video7.zip">here</a>.</p>
+<p>跟随下面的视频或在 <a class="reference external" href="https://www.youtube.com/watch?v=Am2EF9CLu-g">youtube</a> 上观看。从 <a class="reference external" href="https://pytorch-tutorial-assets.s3.amazonaws.com/youtube-series/video7.zip">这里</a> 下载笔记本和相应文件。</p>
 <div style="margin-top:10px; margin-bottom:10px;">
   <iframe width="560" height="315" src="https://www.youtube.com/embed/Am2EF9CLu-g" frameborder="0" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-</div><p><a class="reference external" href="https://captum.ai/">Captum</a> (“comprehension” in Latin) is an open
-source, extensible library for model interpretability built on PyTorch.</p>
-<p>With the increase in model complexity and the resulting lack of
-transparency, model interpretability methods have become increasingly
-important. Model understanding is both an active area of research as
-well as an area of focus for practical applications across industries
-using machine learning. Captum provides state-of-the-art algorithms,
-including Integrated Gradients, to provide researchers and developers
-with an easy way to understand which features are contributing to a
-model’s output.</p>
-<p>Full documentation, an API reference, and a suite of tutorials on
-specific topics are available at the <a class="reference external" href="https://captum.ai/">captum.ai</a>
-website.</p>
-<div class="section" id="introduction">
-<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this heading">¶</a></h2>
-<p>Captum’s approach to model interpretability is in terms of
-<em>attributions.</em> There are three kinds of attributions available in
-Captum:</p>
+</div><p><a class="reference external" href="https://captum.ai/">Captum</a> (拉丁语中的”理解”)是一个开源的、可扩展的模型可解释性库,建立在PyTorch之上。</p>
+<p>随着模型复杂性的增加和由此带来的透明度的缺乏,模型可解释性方法变得越来越重要。模型理解是一个活跃的研究领域,也是跨行业使用机器学习的实际应用的一个关注领域。Captum提供了最先进的算法,包括集成梯度,为研究人员和开发人员提供了一种简单的方式来理解哪些特征对模型的输出做出了贡献。</p>
+<p>完整的文档、API参考和一套关于特定主题的教程可在 <a class="reference external" href="https://captum.ai/">captum.ai</a> 网站上找到。</p>
+<div class="section" id="id6">
+<h2>介绍<a class="headerlink" href="#id6" title="Permalink to this heading">¶</a></h2>
+<p>Captum对模型可解释性的方法是基于*归因*的。Captum中有三种类型的归因:</p>
 <ul class="simple">
-<li><p><strong>Feature Attribution</strong> seeks to explain a particular output in terms
-of features of the input that generated it. Explaining whether a
-movie review was positive or negative in terms of certain words in
-the review is an example of feature attribution.</p></li>
-<li><p><strong>Layer Attribution</strong> examines the activity of a model’s hidden layer
-subsequent to a particular input. Examining the spatially-mapped
-output of a convolutional layer in response to an input image in an
-example of layer attribution.</p></li>
-<li><p><strong>Neuron Attribution</strong> is analagous to layer attribution, but focuses
-on the activity of a single neuron.</p></li>
+<li><p><a href="#id7"><span class="problematic" id="id8">**</span></a>特征归因**试图解释特定输出是由生成它的输入的哪些特征产生的。用某些词来解释一篇电影评论是正面还是负面的,就是特征归因的一个例子。</p></li>
+<li><p><a href="#id9"><span class="problematic" id="id10">**</span></a>层归因**检查模型的隐藏层在特定输入下的活动。检查卷积层对输入图像的空间映射输出就是层归因的一个例子。</p></li>
+<li><p><a href="#id11"><span class="problematic" id="id12">**</span></a>神经元归因**类似于层归因,但关注单个神经元的活动。</p></li>
 </ul>
-<p>In this interactive notebook, we’ll look at Feature Attribution and
-Layer Attribution.</p>
-<p>Each of the three attribution types has multiple <strong>attribution
-algorithms</strong> associated with it. Many attribution algorithms fall into
-two broad categories:</p>
+<p>在这个交互式笔记本中,我们将看看特征归因和层归因。</p>
+<p>每种归因类型都有多种**归因算法**与之相关联。许多归因算法可分为两大类:</p>
 <ul class="simple">
-<li><p><strong>Gradient-based algorithms</strong> calculate the backward gradients of a
-model output, layer output, or neuron activation with respect to the
-input. <strong>Integrated Gradients</strong> (for features), <strong>Layer Gradient *
-Activation</strong>, and <strong>Neuron Conductance</strong> are all gradient-based
-algorithms.</p></li>
-<li><p><strong>Perturbation-based algorithms</strong> examine the changes in the output
-of a model, layer, or neuron in response to changes in the input. The
-input perturbations may be directed or random. <strong>Occlusion,</strong>
-<strong>Feature Ablation,</strong> and <strong>Feature Permutation</strong> are all
-perturbation-based algorithms.</p></li>
+<li><p><a href="#id13"><span class="problematic" id="id14">**</span></a>基于梯度的算法**计算模型输出、层输出或神经元激活相对于输入的反向梯度。<a href="#id15"><span class="problematic" id="id16">**</span></a>集成梯度**(用于特征)、<a href="#id17"><span class="problematic" id="id18">**</span></a>层梯度 * 激活**和**神经元传导**都是基于梯度的算法。</p></li>
+<li><p><strong>基于扰动的算法**检查模型、层或神经元的输出在输入发生变化时的变化情况。输入扰动可能是有针对性的或随机的。**遮挡</strong>、<a href="#id19"><span class="problematic" id="id20">**</span></a>特征消融**和**特征置换**都是基于扰动的算法。</p></li>
 </ul>
-<p>We’ll be examining algorithms of both types below.</p>
-<p>Especially where large models are involved, it can be valuable to
-visualize attribution data in ways that relate it easily to the input
-features being examined. While it is certainly possible to create your
-own visualizations with Matplotlib, Plotly, or similar tools, Captum
-offers enhanced tools specific to its attributions:</p>
+<p>我们将在下面检查这两种类型的算法。</p>
+<p>特别是对于大型模型,以与被检查的输入特征直接相关的方式可视化归因数据是很有价值的。虽然当然可以使用Matplotlib、Plotly或类似工具创建自己的可视化,但Captum提供了专门用于其归因的增强工具:</p>
 <ul class="simple">
-<li><p>The <code class="docutils literal notranslate"><span class="pre">captum.attr.visualization</span></code> module (imported below as <code class="docutils literal notranslate"><span class="pre">viz</span></code>)
-provides helpful functions for visualizing attributions related to
-images.</p></li>
-<li><p><strong>Captum Insights</strong> is an easy-to-use API on top of Captum that
-provides a visualization widget with ready-made visualizations for
-image, text, and arbitrary model types.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">captum.attr.visualization``模块(下面导入为``viz</span></code>)提供了有助于可视化与图像相关的归因的函数。</p></li>
+<li><p><a href="#id21"><span class="problematic" id="id22">**</span></a>Captum Insights**是建立在Captum之上的一个易于使用的可解释性可视化小部件,提供了一个带有现成可视化工具的小部件,用于图像、文本和任意模型类型。</p></li>
 </ul>
-<p>Both of these visualization toolsets will be demonstrated in this
-notebook. The first few examples will focus on computer vision use
-cases, but the Captum Insights section at the end will demonstrate
-visualization of attributions in a multi-model, visual
-question-and-answer model.</p>
+<p>这两种可视化工具集都将在本笔记本中进行演示。前几个示例将集中在计算机视觉用例上,但最后的Captum Insights部分将演示视觉问答模型中的归因可视化。</p>
 </div>
-<div class="section" id="installation">
-<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this heading">¶</a></h2>
-<p>Before you get started, you need to have a Python environment with:</p>
+<div class="section" id="id23">
+<h2>安装<a class="headerlink" href="#id23" title="Permalink to this heading">¶</a></h2>
+<p>在开始之前,你需要有一个Python环境,包括:</p>
 <ul class="simple">
-<li><p>Python version 3.6 or higher</p></li>
-<li><p>For the Captum Insights example, Flask 1.1 or higher and Flask-Compress
-(the latest version is recommended)</p></li>
-<li><p>PyTorch version 1.2 or higher (the latest version is recommended)</p></li>
-<li><p>TorchVision version 0.6 or higher (the latest version is recommended)</p></li>
-<li><p>Captum (the latest version is recommended)</p></li>
-<li><p>Matplotlib version 3.3.4, since Captum currently uses a Matplotlib
-function whose arguments have been renamed in later versions</p></li>
+<li><p>Python 3.6或更高版本</p></li>
+<li><p>对于Captum Insights示例,需要Flask 1.1或更高版本和Flask-Compress(推荐使用最新版本)</p></li>
+<li><p>PyTorch 1.2或更高版本(推荐使用最新版本)</p></li>
+<li><p>TorchVision 0.6或更高版本(推荐使用最新版本)</p></li>
+<li><p>Captum(推荐使用最新版本)</p></li>
+<li><p>Matplotlib 3.3.4版本,因为Captum目前使用了一个在更高版本中参数已被重命名的Matplotlib函数</p></li>
 </ul>
-<p>To install Captum in an Anaconda or pip virtual environment, use the
-appropriate command for your environment below:</p>
-<p>With <code class="docutils literal notranslate"><span class="pre">conda</span></code>:</p>
+<p>要在Anaconda或pip虚拟环境中安装Captum,请使用下面适用于您环境的命令:</p>
+<p>使用``conda``:</p>
 <div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>conda<span class="w"> </span>install<span class="w"> </span>pytorch<span class="w"> </span>torchvision<span class="w"> </span>captum<span class="w"> </span>flask-compress<span class="w"> </span><span class="nv">matplotlib</span><span class="o">=</span><span class="m">3</span>.3.4<span class="w"> </span>-c<span class="w"> </span>pytorch
 </pre></div>
 </div>
-<p>With <code class="docutils literal notranslate"><span class="pre">pip</span></code>:</p>
+<p>使用``pip``:</p>
 <div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>torch<span class="w"> </span>torchvision<span class="w"> </span>captum<span class="w"> </span><span class="nv">matplotlib</span><span class="o">==</span><span class="m">3</span>.3.4<span class="w"> </span>Flask-Compress
 </pre></div>
 </div>
-<p>Restart this notebook in the environment you set up, and you’re ready to
-go!</p>
+<p>在您设置的环境中重新启动此笔记本,您就可以开始了!</p>
 </div>
-<div class="section" id="a-first-example">
-<h2>A First Example<a class="headerlink" href="#a-first-example" title="Permalink to this heading">¶</a></h2>
-<p>To start, let’s take a simple, visual example. We’ll start with a ResNet
-model pretrained on the ImageNet dataset. We’ll get a test input, and
-use different <strong>Feature Attribution</strong> algorithms to examine how the
-input images affect the output, and see a helpful visualization of this
-input attribution map for some test images.</p>
-<p>First, some imports:</p>
+<div class="section" id="id24">
+<h2>第一个示例<a class="headerlink" href="#id24" title="Permalink to this heading">¶</a></h2>
+<p>首先,让我们看一个简单的视觉示例。我们将从一个在ImageNet数据集上预训练的ResNet模型开始。我们将获取一个测试输入,并使用不同的**特征归因**算法来检查输入图像如何影响输出,并查看一些测试图像的输入归因映射的有用可视化。</p>
+<p>首先,导入一些包:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">import</span> <span class="nn">torch.nn.functional</span> <span class="k">as</span> <span class="nn">F</span>
 <span class="kn">import</span> <span class="nn">torchvision.transforms</span> <span class="k">as</span> <span class="nn">transforms</span>
@@ -729,34 +678,27 @@ input attribution map for some test images.</p>
 <span class="kn">from</span> <span class="nn">matplotlib.colors</span> <span class="kn">import</span> <span class="n">LinearSegmentedColormap</span>
 </pre></div>
 </div>
-<p>Now we’ll use the TorchVision model library to download a pretrained
-ResNet. Since we’re not training, we’ll place it in evaluation mode for
-now.</p>
+<p>现在我们将使用TorchVision模型库下载一个预训练的ResNet。由于我们不进行训练,我们将暂时将其置于评估模式。</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">model</span> <span class="o">=</span> <a href="https://pytorch.org/vision/stable/models/generated/torchvision.models.resnet18.html#torchvision.models.resnet18" title="torchvision.models.resnet18" class="sphx-glr-backref-module-torchvision-models sphx-glr-backref-type-py-function"><span class="n">models</span><span class="o">.</span><span class="n">resnet18</span></a><span class="p">(</span><span class="n">weights</span><span class="o">=</span><span class="s1">&#39;IMAGENET1K_V1&#39;</span><span class="p">)</span>
 <span class="n">model</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
 </pre></div>
 </div>
-<p>The place where you got this interactive notebook should also have an
-<code class="docutils literal notranslate"><span class="pre">img</span></code> folder with a file <code class="docutils literal notranslate"><span class="pre">cat.jpg</span></code> in it.</p>
+<p>你从中获取这个交互式笔记本的地方应该也有一个``img``文件夹,其中包含一个``cat.jpg``文件。</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">test_img</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;img/cat.jpg&#39;</span><span class="p">)</span>
 <span class="n">test_img_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">test_img</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">test_img_data</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
-<p>Our ResNet model was trained on the ImageNet dataset, and expects images
-to be of a certain size, with the channel data normalized to a specific
-range of values. We’ll also pull in the list of human-readable labels
-for the categories our model recognizes - that should be in the <code class="docutils literal notranslate"><span class="pre">img</span></code>
-folder as well.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># model expects 224x224 3-color image</span>
+<p>我们的ResNet模型是在ImageNet数据集上训练的,它期望图像具有一定的大小,并且通道数据被归一化到特定的值范围。我们还将获取模型识别的类别的人类可读标签列表 - 它应该也在``img``文件夹中。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># 模型期望224x224 3色彩图像</span>
 <span class="n">transform</span> <span class="o">=</span> <a href="https://pytorch.org/vision/stable/generated/torchvision.transforms.Compose.html#torchvision.transforms.Compose" title="torchvision.transforms.Compose" class="sphx-glr-backref-module-torchvision-transforms sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">transforms</span><span class="o">.</span><span class="n">Compose</span></a><span class="p">([</span>
  <a href="https://pytorch.org/vision/stable/generated/torchvision.transforms.Resize.html#torchvision.transforms.Resize" title="torchvision.transforms.Resize" class="sphx-glr-backref-module-torchvision-transforms sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">transforms</span><span class="o">.</span><span class="n">Resize</span></a><span class="p">(</span><span class="mi">224</span><span class="p">),</span>
  <a href="https://pytorch.org/vision/stable/generated/torchvision.transforms.CenterCrop.html#torchvision.transforms.CenterCrop" title="torchvision.transforms.CenterCrop" class="sphx-glr-backref-module-torchvision-transforms sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">transforms</span><span class="o">.</span><span class="n">CenterCrop</span></a><span class="p">(</span><span class="mi">224</span><span class="p">),</span>
  <a href="https://pytorch.org/vision/stable/generated/torchvision.transforms.ToTensor.html#torchvision.transforms.ToTensor" title="torchvision.transforms.ToTensor" class="sphx-glr-backref-module-torchvision-transforms sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">transforms</span><span class="o">.</span><span class="n">ToTensor</span></a><span class="p">()</span>
 <span class="p">])</span>
 
-<span class="c1"># standard ImageNet normalization</span>
+<span class="c1"># 标准ImageNet归一化</span>
 <span class="n">transform_normalize</span> <span class="o">=</span> <a href="https://pytorch.org/vision/stable/generated/torchvision.transforms.Normalize.html#torchvision.transforms.Normalize" title="torchvision.transforms.Normalize" class="sphx-glr-backref-module-torchvision-transforms sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">transforms</span><span class="o">.</span><span class="n">Normalize</span></a><span class="p">(</span>
      <span class="n">mean</span><span class="o">=</span><span class="p">[</span><span class="mf">0.485</span><span class="p">,</span> <span class="mf">0.456</span><span class="p">,</span> <span class="mf">0.406</span><span class="p">],</span>
      <span class="n">std</span><span class="o">=</span><span class="p">[</span><span class="mf">0.229</span><span class="p">,</span> <span class="mf">0.224</span><span class="p">,</span> <span class="mf">0.225</span><span class="p">]</span>
@@ -764,57 +706,39 @@ folder as well.</p>
 
 <span class="n">transformed_img</span> <span class="o">=</span> <span class="n">transform</span><span class="p">(</span><span class="n">test_img</span><span class="p">)</span>
 <span class="n">input_img</span> <span class="o">=</span> <span class="n">transform_normalize</span><span class="p">(</span><span class="n">transformed_img</span><span class="p">)</span>
-<span class="n">input_img</span> <span class="o">=</span> <span class="n">input_img</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="c1"># the model requires a dummy batch dimension</span>
+<span class="n">input_img</span> <span class="o">=</span> <span class="n">input_img</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="c1"># 模型需要一个虚拟的批次维度</span>
 
 <span class="n">labels_path</span> <span class="o">=</span> <span class="s1">&#39;img/imagenet_class_index.json&#39;</span>
 <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">labels_path</span><span class="p">)</span> <span class="k">as</span> <span class="n">json_data</span><span class="p">:</span>
     <span class="n">idx_to_labels</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">json_data</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Now, we can ask the question: What does our model think this image
-represents?</p>
+<p>现在,我们可以问:这个模型认为这张图像代表什么?</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">output</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">input_img</span><span class="p">)</span>
 <span class="n">output</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.nn.functional.softmax.html#torch.nn.functional.softmax" title="torch.nn.functional.softmax" class="sphx-glr-backref-module-torch-nn-functional sphx-glr-backref-type-py-function"><span class="n">F</span><span class="o">.</span><span class="n">softmax</span></a><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 <span class="n">prediction_score</span><span class="p">,</span> <span class="n">pred_label_idx</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.topk.html#torch.topk" title="torch.topk" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">topk</span></a><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 <span class="n">pred_label_idx</span><span class="o">.</span><span class="n">squeeze_</span><span class="p">()</span>
 <span class="n">predicted_label</span> <span class="o">=</span> <span class="n">idx_to_labels</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">pred_label_idx</span><span class="o">.</span><span class="n">item</span><span class="p">())][</span><span class="mi">1</span><span class="p">]</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Predicted:&#39;</span><span class="p">,</span> <span class="n">predicted_label</span><span class="p">,</span> <span class="s1">&#39;(&#39;</span><span class="p">,</span> <span class="n">prediction_score</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">(),</span> <span class="s1">&#39;)&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;预测:&#39;</span><span class="p">,</span> <span class="n">predicted_label</span><span class="p">,</span> <span class="s1">&#39;(&#39;</span><span class="p">,</span> <span class="n">prediction_score</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">(),</span> <span class="s1">&#39;)&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>We’ve confirmed that ResNet thinks our image of a cat is, in fact, a
-cat. But <em>why</em> does the model think this is an image of a cat?</p>
-<p>For the answer to that, we turn to Captum.</p>
+<p>我们已经确认ResNet认为我们的猫的图像确实是一只猫。但是*为什么*模型认为这是一张猫的图像呢?</p>
+<p>要回答这个问题,我们就要求助于Captum。</p>
 </div>
-<div class="section" id="feature-attribution-with-integrated-gradients">
-<h2>Feature Attribution with Integrated Gradients<a class="headerlink" href="#feature-attribution-with-integrated-gradients" title="Permalink to this heading">¶</a></h2>
-<p><strong>Feature attribution</strong> attributes a particular output to features of
-the input. It uses a specific input - here, our test image - to generate
-a map of the relative importance of each input feature to a particular
-output feature.</p>
-<p><a class="reference external" href="https://captum.ai/api/integrated_gradients.html">Integrated
-Gradients</a> is one of
-the feature attribution algorithms available in Captum. Integrated
-Gradients assigns an importance score to each input feature by
-approximating the integral of the gradients of the model’s output with
-respect to the inputs.</p>
-<p>In our case, we’re going to be taking a specific element of the output
-vector - that is, the one indicating the model’s confidence in its
-chosen category - and use Integrated Gradients to understand what parts
-of the input image contributed to this output.</p>
-<p>Once we have the importance map from Integrated Gradients, we’ll use the
-visualization tools in Captum to give a helpful representation of the
-importance map. Captum’s <code class="docutils literal notranslate"><span class="pre">visualize_image_attr()</span></code> function provides a
-variety of options for customizing display of your attribution data.
-Here, we pass in a custom Matplotlib color map.</p>
-<p>Running the cell with the <code class="docutils literal notranslate"><span class="pre">integrated_gradients.attribute()</span></code> call will
-usually take a minute or two.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Initialize the attribution algorithm with the model</span>
+<div class="section" id="id25">
+<h2>使用集成梯度进行特征归因<a class="headerlink" href="#id25" title="Permalink to this heading">¶</a></h2>
+<p><a href="#id26"><span class="problematic" id="id27">**</span></a>特征归因**试图用生成特定输出的输入的特征来解释该输出。它使用特定的输入 - 在这里是我们的测试图像 - 来生成一个输入特征对特定输出特征的相对重要性的映射。</p>
+<p><a class="reference external" href="https://captum.ai/api/integrated_gradients.html">集成梯度</a> 是Captum中可用的特征归因算法之一。集成梯度通过近似模型输出相对于输入的梯度的积分,为每个输入特征分配一个重要性分数。</p>
+<p>在我们的例子中,我们将使用输出向量的一个特定元素 - 也就是表示模型对所选类别的置信度的那个元素 - 并使用集成梯度来理解哪些输入图像部分对这个输出做出了贡献。</p>
+<p>一旦我们从集成梯度获得了重要性映射,我们将使用Captum中的可视化工具来提供与被检查的输入特征直接相关的重要性映射的有用表示。Captum的``visualize_image_attr()``函数提供了各种自定义显示归因数据的选项。在这里,我们传入一个自定义的Matplotlib颜色映射。</p>
+<p>运行带有``integrated_gradients.attribute()``调用的单元格通常需要一两分钟。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># 用模型初始化归因算法</span>
 <span class="n">integrated_gradients</span> <span class="o">=</span> <span class="n">IntegratedGradients</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
 
-<span class="c1"># Ask the algorithm to attribute our output target to</span>
+<span class="c1"># 要求算法将我们的输出目标归因于</span>
 <span class="n">attributions_ig</span> <span class="o">=</span> <span class="n">integrated_gradients</span><span class="o">.</span><span class="n">attribute</span><span class="p">(</span><span class="n">input_img</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="n">pred_label_idx</span><span class="p">,</span> <span class="n">n_steps</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span>
 
-<span class="c1"># Show the original image for comparison</span>
+<span class="c1"># 显示原始图像以供比较</span>
 <span class="n">_</span> <span class="o">=</span> <span class="n">viz</span><span class="o">.</span><span class="n">visualize_image_attr</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">transformed_img</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">)),</span>
                       <span class="n">method</span><span class="o">=</span><span class="s2">&quot;original_image&quot;</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Original Image&quot;</span><span class="p">)</span>
 
@@ -829,30 +753,16 @@ usually take a minute or two.</p>
                              <span class="n">cmap</span><span class="o">=</span><span class="n">default_cmap</span><span class="p">,</span>
                              <span class="n">show_colorbar</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                              <span class="n">sign</span><span class="o">=</span><span class="s1">&#39;positive&#39;</span><span class="p">,</span>
-                             <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Integrated Gradients&#39;</span><span class="p">)</span>
+                             <span class="n">title</span><span class="o">=</span><span class="s1">&#39;集成梯度&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>In the image above, you should see that Integrated Gradients gives us
-the strongest signal around the cat’s location in the image.</p>
+<p>在上面的图像中,你应该可以看到集成梯度在图像中猫的位置给出了最强的信号。</p>
 </div>
-<div class="section" id="feature-attribution-with-occlusion">
-<h2>Feature Attribution with Occlusion<a class="headerlink" href="#feature-attribution-with-occlusion" title="Permalink to this heading">¶</a></h2>
-<p>Gradient-based attribution methods help to understand the model in terms
-of directly computing out the output changes with respect to the input.
-<em>Perturbation-based attribution</em> methods approach this more directly, by
-introducing changes to the input to measure the effect on the output.
-<a class="reference external" href="https://captum.ai/api/occlusion.html">Occlusion</a> is one such method.
-It involves replacing sections of the input image, and examining the
-effect on the output signal.</p>
-<p>Below, we set up Occlusion attribution. Similarly to configuring a
-convolutional neural network, you can specify the size of the target
-region, and a stride length to determine the spacing of individual
-measurements. We’ll visualize the output of our Occlusion attribution
-with <code class="docutils literal notranslate"><span class="pre">visualize_image_attr_multiple()</span></code>, showing heat maps of both
-positive and negative attribution by region, and by masking the original
-image with the positive attribution regions. The masking gives a very
-instructive view of what regions of our cat photo the model found to be
-most “cat-like”.</p>
+<div class="section" id="id28">
+<h2>使用遮挡进行特征归因<a class="headerlink" href="#id28" title="Permalink to this heading">¶</a></h2>
+<p>基于梯度的归因方法有助于通过直接计算输出相对于输入的变化来理解模型。<a href="#id29"><span class="problematic" id="id30">*</span></a>基于扰动的归因*方法则更直接地解决这个问题,通过对输入进行变化来测量对输出的影响。
+<a class="reference external" href="https://captum.ai/api/occlusion.html">遮挡</a> 就是这样一种方法。它涉及替换输入图像的部分区域,并检查对输出信号的影响。</p>
+<p>下面,我们设置遮挡归因。与配置卷积神经网络类似,你可以指定目标区域的大小,以及确定单个测量间距的步长长度。我们将使用``visualize_image_attr_multiple()``来可视化我们的遮挡归因输出,显示每个区域的正面和负面归因的热图,并用正面归因区域掩码原始图像。掩码可以给出一个非常有启发性的视图,显示模型发现哪些区域最”像猫”。</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">occlusion</span> <span class="o">=</span> <span class="n">Occlusion</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
 
 <span class="n">attributions_occ</span> <span class="o">=</span> <span class="n">occlusion</span><span class="o">.</span><span class="n">attribute</span><span class="p">(</span><span class="n">input_img</span><span class="p">,</span>
@@ -872,26 +782,18 @@ most “cat-like”.</p>
                                      <span class="p">)</span>
 </pre></div>
 </div>
-<p>Again, we see greater significance placed on the region of the image
-that contains the cat.</p>
+<p>同样,我们看到图像中包含猫的区域被赋予了更大的重要性。</p>
 </div>
-<div class="section" id="layer-attribution-with-layer-gradcam">
-<h2>Layer Attribution with Layer GradCAM<a class="headerlink" href="#layer-attribution-with-layer-gradcam" title="Permalink to this heading">¶</a></h2>
-<p><strong>Layer Attribution</strong> allows you to attribute the activity of hidden
-layers within your model to features of your input. Below, we’ll use a
-layer attribution algorithm to examine the activity of one of the
-convolutional layers within our model.</p>
-<p>GradCAM computes the gradients of the target output with respect to the
-given layer, averages for each output channel (dimension 2 of output),
-and multiplies the average gradient for each channel by the layer
-activations. The results are summed over all channels. GradCAM is
-designed for convnets; since the activity of convolutional layers often
-maps spatially to the input, GradCAM attributions are often upsampled
-and used to mask the input.</p>
-<p>Layer attribution is set up similarly to input attribution, except that
-in addition to the model, you must specify a hidden layer within the
-model that you wish to examine. As above, when we call <code class="docutils literal notranslate"><span class="pre">attribute()</span></code>,
-we specify the target class of interest.</p>
+<div class="section" id="layer-gradcam">
+<h2>使用层梯度类激活映射(Layer GradCAM)进行层归因<a class="headerlink" href="#layer-gradcam" title="Permalink to this heading">¶</a></h2>
+<p><a href="#id31"><span class="problematic" id="id32">**</span></a>层归因**允许你将模型中隐藏层的活动归因于输入的特征。下面,我们将使用
+层归因算法来检查模型中一个卷积层的活动。</p>
+<p>GradCAM计算目标输出相对于给定层的梯度,对每个输出通道(输出的第2维)进行平均,
+并将每个通道的平均梯度乘以层激活。结果在所有通道上求和。GradCAM专为卷积网络
+设计;由于卷积层的活动通常在空间上映射到输入,因此GradCAM归因通常会被上采样
+并用于掩盖输入。</p>
+<p>层归因的设置类似于输入归因,除了除了模型之外,你还必须指定模型中你希望检查的
+隐藏层。与上面一样,当我们调用`attribute()`时,我们指定感兴趣的目标类。</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">layer_gradcam</span> <span class="o">=</span> <span class="n">LayerGradCam</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">model</span><span class="o">.</span><span class="n">layer3</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">conv2</span><span class="p">)</span>
 <span class="n">attributions_lgc</span> <span class="o">=</span> <span class="n">layer_gradcam</span><span class="o">.</span><span class="n">attribute</span><span class="p">(</span><span class="n">input_img</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="n">pred_label_idx</span><span class="p">)</span>
 
@@ -900,10 +802,8 @@ we specify the target class of interest.</p>
                              <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Layer 3 Block 1 Conv 2&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>We’ll use the convenience method <code class="docutils literal notranslate"><span class="pre">interpolate()</span></code> in the
-<a class="reference external" href="https://captum.ai/api/base_classes.html?highlight=layerattribution#captum.attr.LayerAttribution">LayerAttribution</a>
-base class to upsample this attribution data for comparison to the input
-image.</p>
+<p>我们将使用`LayerAttribution &lt;<a class="reference external" href="https://captum.ai/api/base_classes.html?highlight=layerattribution#captum.attr.LayerAttribution">https://captum.ai/api/base_classes.html?highlight=layerattribution#captum.attr.LayerAttribution</a>&gt;`__
+基类中的便利方法`interpolate()`来上采样这些归因数据,以便与输入图像进行比较。</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">upsamp_attr_lgc</span> <span class="o">=</span> <span class="n">LayerAttribution</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">attributions_lgc</span><span class="p">,</span> <span class="n">input_img</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">:])</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="n">attributions_lgc</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
@@ -919,28 +819,23 @@ image.</p>
                                       <span class="n">fig_size</span><span class="o">=</span><span class="p">(</span><span class="mi">18</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
 </pre></div>
 </div>
-<p>Visualizations such as this can give you novel insights into how your
-hidden layers respond to your input.</p>
+<p>这样的可视化可以让你深入了解隐藏层如何响应你的输入。</p>
 </div>
-<div class="section" id="visualization-with-captum-insights">
-<h2>Visualization with Captum Insights<a class="headerlink" href="#visualization-with-captum-insights" title="Permalink to this heading">¶</a></h2>
-<p>Captum Insights is an interpretability visualization widget built on top
-of Captum to facilitate model understanding. Captum Insights works
-across images, text, and other features to help users understand feature
-attribution. It allows you to visualize attribution for multiple
-input/output pairs, and provides visualization tools for image, text,
-and arbitrary data.</p>
-<p>In this section of the notebook, we’ll visualize multiple image
-classification inferences with Captum Insights.</p>
-<p>First, let’s gather some image and see what the model thinks of them.
-For variety, we’ll take our cat, a teapot, and a trilobite fossil:</p>
+<div class="section" id="captum-insights">
+<h2>使用Captum Insights进行可视化<a class="headerlink" href="#captum-insights" title="Permalink to this heading">¶</a></h2>
+<p>Captum Insights是一个建立在Captum之上的可解释性可视化小部件,旨在促进模型理解。
+Captum Insights可用于图像、文本和其他特征,帮助用户理解特征归因。它允许你可视化
+多个输入/输出对的归因,并提供用于图像、文本和任意数据的可视化工具。</p>
+<p>在本笔记本的这一部分,我们将使用Captum Insights可视化多个图像分类推理。</p>
+<p>首先,让我们收集一些图像,看看模型对它们的看法。为了增加多样性,我们将使用猫、
+茶壶和三叶虫化石:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">imgs</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;img/cat.jpg&#39;</span><span class="p">,</span> <span class="s1">&#39;img/teapot.jpg&#39;</span><span class="p">,</span> <span class="s1">&#39;img/trilobite.jpg&#39;</span><span class="p">]</span>
 
 <span class="k">for</span> <span class="n">img</span> <span class="ow">in</span> <span class="n">imgs</span><span class="p">:</span>
     <span class="n">img</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">img</span><span class="p">)</span>
     <span class="n">transformed_img</span> <span class="o">=</span> <span class="n">transform</span><span class="p">(</span><span class="n">img</span><span class="p">)</span>
     <span class="n">input_img</span> <span class="o">=</span> <span class="n">transform_normalize</span><span class="p">(</span><span class="n">transformed_img</span><span class="p">)</span>
-    <span class="n">input_img</span> <span class="o">=</span> <span class="n">input_img</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="c1"># the model requires a dummy batch dimension</span>
+    <span class="n">input_img</span> <span class="o">=</span> <span class="n">input_img</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="c1"># 模型需要一个虚拟的批次维度</span>
 
     <span class="n">output</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">input_img</span><span class="p">)</span>
     <span class="n">output</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.nn.functional.softmax.html#torch.nn.functional.softmax" title="torch.nn.functional.softmax" class="sphx-glr-backref-module-torch-nn-functional sphx-glr-backref-type-py-function"><span class="n">F</span><span class="o">.</span><span class="n">softmax</span></a><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
@@ -950,30 +845,26 @@ For variety, we’ll take our cat, a teapot, and a trilobite fossil:</p>
     <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Predicted:&#39;</span><span class="p">,</span> <span class="n">predicted_label</span><span class="p">,</span> <span class="s1">&#39;/&#39;</span><span class="p">,</span> <span class="n">pred_label_idx</span><span class="o">.</span><span class="n">item</span><span class="p">(),</span> <span class="s1">&#39; (&#39;</span><span class="p">,</span> <span class="n">prediction_score</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">(),</span> <span class="s1">&#39;)&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>…and it looks like our model is identifying them all correctly - but of
-course, we want to dig deeper. For that we’ll use the Captum Insights
-widget, which we configure with an <code class="docutils literal notranslate"><span class="pre">AttributionVisualizer</span></code> object,
-imported below. The <code class="docutils literal notranslate"><span class="pre">AttributionVisualizer</span></code> expects batches of data,
-so we’ll bring in Captum’s <code class="docutils literal notranslate"><span class="pre">Batch</span></code> helper class. And we’ll be looking
-at images specifically, so well also import <code class="docutils literal notranslate"><span class="pre">ImageFeature</span></code>.</p>
-<p>We configure the <code class="docutils literal notranslate"><span class="pre">AttributionVisualizer</span></code> with the following arguments:</p>
+<p>…看起来我们的模型都正确识别了它们 - 但是,我们当然希望深入挖掘。为此,我们将
+使用Captum Insights小部件,我们用下面导入的`AttributionVisualizer`对象对其进行配置。
+<cite>AttributionVisualizer`期望批量数据,所以我们将引入Captum的`Batch`辅助类。
+我们将查看图像,因此我们还将导入`ImageFeature</cite>。</p>
+<p>我们使用以下参数配置`AttributionVisualizer`:</p>
 <ul class="simple">
-<li><p>An array of models to be examined (in our case, just the one)</p></li>
-<li><p>A scoring function, which allows Captum Insights to pull out the
-top-k predictions from a model</p></li>
-<li><p>An ordered, human-readable list of classes our model is trained on</p></li>
-<li><p>A list of features to look for - in our case, an <code class="docutils literal notranslate"><span class="pre">ImageFeature</span></code></p></li>
-<li><p>A dataset, which is an iterable object returning batches of inputs
-and labels - just like you’d use for training</p></li>
+<li><p>要检查的模型数组(在我们的例子中,只有一个)</p></li>
+<li><p>一个评分函数,允许Captum Insights从模型中提取前k个预测</p></li>
+<li><p>我们模型训练的类别的有序、人类可读列表</p></li>
+<li><p>要查找的特征列表 - 在我们的例子中,是一个`ImageFeature`</p></li>
+<li><p>一个数据集,它是一个可迭代对象,返回输入和标签的批次 - 就像你用于训练一样</p></li>
 </ul>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">captum.insights</span> <span class="kn">import</span> <span class="n">AttributionVisualizer</span><span class="p">,</span> <span class="n">Batch</span>
 <span class="kn">from</span> <span class="nn">captum.insights.attr_vis.features</span> <span class="kn">import</span> <span class="n">ImageFeature</span>
 
-<span class="c1"># Baseline is all-zeros input - this may differ depending on your data</span>
+<span class="c1"># 基线是全零输入 - 这可能会因你的数据而有所不同</span>
 <span class="k">def</span> <span class="nf">baseline_func</span><span class="p">(</span><span class="nb">input</span><span class="p">):</span>
     <span class="k">return</span> <span class="nb">input</span> <span class="o">*</span> <span class="mi">0</span>
 
-<span class="c1"># merging our image transforms from above</span>
+<span class="c1"># 合并上面的图像变换</span>
 <span class="k">def</span> <span class="nf">full_img_transform</span><span class="p">(</span><span class="nb">input</span><span class="p">):</span>
     <span class="n">i</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span>
     <span class="n">i</span> <span class="o">=</span> <span class="n">transform</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
@@ -990,7 +881,7 @@ and labels - just like you’d use for training</p></li>
     <span class="n">classes</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">k</span><span class="p">:</span> <span class="n">idx_to_labels</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span> <span class="n">idx_to_labels</span><span class="o">.</span><span class="n">keys</span><span class="p">())),</span>
     <span class="n">features</span><span class="o">=</span><span class="p">[</span>
         <span class="n">ImageFeature</span><span class="p">(</span>
-            <span class="s2">&quot;Photo&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;照片&quot;</span><span class="p">,</span>
             <span class="n">baseline_transforms</span><span class="o">=</span><span class="p">[</span><span class="n">baseline_func</span><span class="p">],</span>
             <span class="n">input_transforms</span><span class="o">=</span><span class="p">[],</span>
         <span class="p">)</span>
@@ -999,16 +890,12 @@ and labels - just like you’d use for training</p></li>
 <span class="p">)</span>
 </pre></div>
 </div>
-<p>Note that running the cell above didn’t take much time at all, unlike
-our attributions above. That’s because Captum Insights lets you
-configure different attribution algorithms in a visual widget, after
-which it will compute and display the attributions. <em>That</em> process will
-take a few minutes.</p>
-<p>Running the cell below will render the Captum Insights widget. You can
-then choose attributions methods and their arguments, filter model
-responses based on predicted class or prediction correctness, see the
-model’s predictions with associated probabilities, and view heatmaps of
-the attribution compared with the original image.</p>
+<p>注意,运行上面的单元格并没有花费太多时间,不像我们之前的归因那样。这是因为
+Captum Insights允许你在可视化小部件中配置不同的归因算法,之后它将计算并显示
+归因。<a href="#id33"><span class="problematic" id="id34">*</span></a>那个*过程将需要几分钟时间。</p>
+<p>运行下面的单元格将渲染Captum Insights小部件。然后你可以选择归因方法及其参数、
+根据预测的类或预测的正确性过滤模型响应、查看模型的预测及相关概率、查看归因与
+原始图像的热力图。</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">visualizer</span><span class="o">.</span><span class="n">render</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -1087,13 +974,13 @@ if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.i
             <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
               <ul>
 <li><a class="reference internal" href="#">使用 Captum 进行模型理解</a><ul>
-<li><a class="reference internal" href="#introduction">Introduction</a></li>
-<li><a class="reference internal" href="#installation">Installation</a></li>
-<li><a class="reference internal" href="#a-first-example">A First Example</a></li>
-<li><a class="reference internal" href="#feature-attribution-with-integrated-gradients">Feature Attribution with Integrated Gradients</a></li>
-<li><a class="reference internal" href="#feature-attribution-with-occlusion">Feature Attribution with Occlusion</a></li>
-<li><a class="reference internal" href="#layer-attribution-with-layer-gradcam">Layer Attribution with Layer GradCAM</a></li>
-<li><a class="reference internal" href="#visualization-with-captum-insights">Visualization with Captum Insights</a></li>
+<li><a class="reference internal" href="#id6">介绍</a></li>
+<li><a class="reference internal" href="#id23">安装</a></li>
+<li><a class="reference internal" href="#id24">第一个示例</a></li>
+<li><a class="reference internal" href="#id25">使用集成梯度进行特征归因</a></li>
+<li><a class="reference internal" href="#id28">使用遮挡进行特征归因</a></li>
+<li><a class="reference internal" href="#layer-gradcam">使用层梯度类激活映射(Layer GradCAM)进行层归因</a></li>
+<li><a class="reference internal" href="#captum-insights">使用Captum Insights进行可视化</a></li>
 </ul>
 </li>
 </ul>

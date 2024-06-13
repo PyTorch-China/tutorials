@@ -606,51 +606,45 @@ to download the full example code</p>
 <a class="reference external" href="captumyt.html">模型理解</a></p>
 <div class="section" id="pytorch-tensorboard">
 <h1>PyTorch TensorBoard 支持<a class="headerlink" href="#pytorch-tensorboard" title="Permalink to this heading">¶</a></h1>
-<p>Follow along with the video below or on <a class="reference external" href="https://www.youtube.com/watch?v=6CEld3hZgqc">youtube</a>.</p>
+<p>跟随下面的视频或在 <a class="reference external" href="https://www.youtube.com/watch?v=6CEld3hZgqc">youtube</a> 上观看。</p>
 <div style="margin-top:10px; margin-bottom:10px;">
   <iframe width="560" height="315" src="https://www.youtube.com/embed/6CEld3hZgqc" frameborder="0" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-</div><div class="section" id="before-you-start">
-<h2>Before You Start<a class="headerlink" href="#before-you-start" title="Permalink to this heading">¶</a></h2>
-<p>To run this tutorial, you’ll need to install PyTorch, TorchVision,
-Matplotlib, and TensorBoard.</p>
-<p>With <code class="docutils literal notranslate"><span class="pre">conda</span></code>:</p>
+</div><div class="section" id="id7">
+<h2>开始之前<a class="headerlink" href="#id7" title="Permalink to this heading">¶</a></h2>
+<p>要运行此教程，您需要安装PyTorch、TorchVision、Matplotlib和TensorBoard。</p>
+<p>使用 <code class="docutils literal notranslate"><span class="pre">conda</span></code>：</p>
 <div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>conda<span class="w"> </span>install<span class="w"> </span>pytorch<span class="w"> </span>torchvision<span class="w"> </span>-c<span class="w"> </span>pytorch
 conda<span class="w"> </span>install<span class="w"> </span>matplotlib<span class="w"> </span>tensorboard
 </pre></div>
 </div>
-<p>With <code class="docutils literal notranslate"><span class="pre">pip</span></code>:</p>
+<p>使用 <code class="docutils literal notranslate"><span class="pre">pip</span></code>：</p>
 <div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>torch<span class="w"> </span>torchvision<span class="w"> </span>matplotlib<span class="w"> </span>tensorboard
 </pre></div>
 </div>
-<p>Once the dependencies are installed, restart this notebook in the Python
-environment where you installed them.</p>
+<p>安装完依赖项后，请在安装它们的Python环境中重新启动此笔记本。</p>
 </div>
-<div class="section" id="introduction">
-<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this heading">¶</a></h2>
-<p>In this notebook, we’ll be training a variant of LeNet-5 against the
-Fashion-MNIST dataset. Fashion-MNIST is a set of image tiles depicting
-various garments, with ten class labels indicating the type of garment
-depicted.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># PyTorch model and training necessities</span>
+<div class="section" id="id8">
+<h2>介绍<a class="headerlink" href="#id8" title="Permalink to this heading">¶</a></h2>
+<p>在本笔记本中，我们将训练LeNet-5的变体，针对Fashion-MNIST数据集。
+Fashion-MNIST是一组描绘各种服装的图像瓦片，有十个类标签指示所描绘的服装类型。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># PyTorch模型和训练必需品</span>
 <span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
 <span class="kn">import</span> <span class="nn">torch.nn.functional</span> <span class="k">as</span> <span class="nn">F</span>
 <span class="kn">import</span> <span class="nn">torch.optim</span> <span class="k">as</span> <span class="nn">optim</span>
 
-<span class="c1"># Image datasets and image manipulation</span>
+<span class="c1"># 图像数据集和图像操作</span>
 <span class="kn">import</span> <span class="nn">torchvision</span>
 <span class="kn">import</span> <span class="nn">torchvision.transforms</span> <span class="k">as</span> <span class="nn">transforms</span>
 
-<span class="c1"># Image display</span>
+<span class="c1"># 图像显示</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
-<span class="c1"># PyTorch TensorBoard support</span>
+<span class="c1"># PyTorch TensorBoard支持</span>
 <span class="kn">from</span> <span class="nn">torch.utils.tensorboard</span> <span class="kn">import</span> <span class="n">SummaryWriter</span>
 
-<span class="c1"># In case you are using an environment that has TensorFlow installed,</span>
-<span class="c1"># such as Google Colab, uncomment the following code to avoid</span>
-<span class="c1"># a bug with saving embeddings to your TensorBoard directory</span>
+<span class="c1"># 如果您使用的环境安装了TensorFlow（如Google Colab），请取消注释以下代码以避免将嵌入保存到TensorBoard目录时出现错误</span>
 
 <span class="c1"># import tensorflow as tf</span>
 <span class="c1"># import tensorboard as tb</span>
@@ -658,15 +652,15 @@ depicted.</p>
 </pre></div>
 </div>
 </div>
-<div class="section" id="showing-images-in-tensorboard">
-<h2>Showing Images in TensorBoard<a class="headerlink" href="#showing-images-in-tensorboard" title="Permalink to this heading">¶</a></h2>
-<p>Let’s start by adding sample images from our dataset to TensorBoard:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Gather datasets and prepare them for consumption</span>
+<div class="section" id="tensorboard">
+<h2>在TensorBoard中显示图像<a class="headerlink" href="#tensorboard" title="Permalink to this heading">¶</a></h2>
+<p>让我们从将数据集中的示例图像添加到TensorBoard开始：</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># 收集数据集并准备消费</span>
 <span class="n">transform</span> <span class="o">=</span> <a href="https://pytorch.org/vision/stable/generated/torchvision.transforms.Compose.html#torchvision.transforms.Compose" title="torchvision.transforms.Compose" class="sphx-glr-backref-module-torchvision-transforms sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">transforms</span><span class="o">.</span><span class="n">Compose</span></a><span class="p">(</span>
     <span class="p">[</span><a href="https://pytorch.org/vision/stable/generated/torchvision.transforms.ToTensor.html#torchvision.transforms.ToTensor" title="torchvision.transforms.ToTensor" class="sphx-glr-backref-module-torchvision-transforms sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">transforms</span><span class="o">.</span><span class="n">ToTensor</span></a><span class="p">(),</span>
     <a href="https://pytorch.org/vision/stable/generated/torchvision.transforms.Normalize.html#torchvision.transforms.Normalize" title="torchvision.transforms.Normalize" class="sphx-glr-backref-module-torchvision-transforms sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">transforms</span><span class="o">.</span><span class="n">Normalize</span></a><span class="p">((</span><span class="mf">0.5</span><span class="p">,),</span> <span class="p">(</span><span class="mf">0.5</span><span class="p">,))])</span>
 
-<span class="c1"># Store separate training and validations splits in ./data</span>
+<span class="c1"># 在./data中存储单独的训练和验证分割</span>
 <span class="n">training_set</span> <span class="o">=</span> <a href="https://pytorch.org/vision/stable/generated/torchvision.datasets.FashionMNIST.html#torchvision.datasets.FashionMNIST" title="torchvision.datasets.FashionMNIST" class="sphx-glr-backref-module-torchvision-datasets sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">torchvision</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">FashionMNIST</span></a><span class="p">(</span><span class="s1">&#39;./data&#39;</span><span class="p">,</span>
     <span class="n">download</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">train</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
@@ -687,58 +681,50 @@ depicted.</p>
                                                 <span class="n">shuffle</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                                                 <span class="n">num_workers</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 
-<span class="c1"># Class labels</span>
+<span class="c1"># 类标签</span>
 <span class="n">classes</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;T-shirt/top&#39;</span><span class="p">,</span> <span class="s1">&#39;Trouser&#39;</span><span class="p">,</span> <span class="s1">&#39;Pullover&#39;</span><span class="p">,</span> <span class="s1">&#39;Dress&#39;</span><span class="p">,</span> <span class="s1">&#39;Coat&#39;</span><span class="p">,</span>
         <span class="s1">&#39;Sandal&#39;</span><span class="p">,</span> <span class="s1">&#39;Shirt&#39;</span><span class="p">,</span> <span class="s1">&#39;Sneaker&#39;</span><span class="p">,</span> <span class="s1">&#39;Bag&#39;</span><span class="p">,</span> <span class="s1">&#39;Ankle Boot&#39;</span><span class="p">)</span>
 
-<span class="c1"># Helper function for inline image display</span>
+<span class="c1"># 内联图像显示的辅助函数</span>
 <span class="k">def</span> <span class="nf">matplotlib_imshow</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">one_channel</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">one_channel</span><span class="p">:</span>
         <span class="n">img</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-    <span class="n">img</span> <span class="o">=</span> <span class="n">img</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">+</span> <span class="mf">0.5</span>     <span class="c1"># unnormalize</span>
+    <span class="n">img</span> <span class="o">=</span> <span class="n">img</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">+</span> <span class="mf">0.5</span>     <span class="c1"># 反归一化</span>
     <span class="n">npimg</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
     <span class="k">if</span> <span class="n">one_channel</span><span class="p">:</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">npimg</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;Greys&quot;</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">npimg</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">)))</span>
 
-<span class="c1"># Extract a batch of 4 images</span>
+<span class="c1"># 提取一批4张图像</span>
 <span class="n">dataiter</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">training_loader</span><span class="p">)</span>
 <span class="n">images</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">dataiter</span><span class="p">)</span>
 
-<span class="c1"># Create a grid from the images and show them</span>
+<span class="c1"># 从图像创建网格并显示它们</span>
 <span class="n">img_grid</span> <span class="o">=</span> <a href="https://pytorch.org/vision/stable/generated/torchvision.utils.make_grid.html#torchvision.utils.make_grid" title="torchvision.utils.make_grid" class="sphx-glr-backref-module-torchvision-utils sphx-glr-backref-type-py-function"><span class="n">torchvision</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">make_grid</span></a><span class="p">(</span><span class="n">images</span><span class="p">)</span>
 <span class="n">matplotlib_imshow</span><span class="p">(</span><span class="n">img_grid</span><span class="p">,</span> <span class="n">one_channel</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Above, we used TorchVision and Matplotlib to create a visual grid of a
-minibatch of our input data. Below, we use the <code class="docutils literal notranslate"><span class="pre">add_image()</span></code> call on
-<code class="docutils literal notranslate"><span class="pre">SummaryWriter</span></code> to log the image for consumption by TensorBoard, and
-we also call <code class="docutils literal notranslate"><span class="pre">flush()</span></code> to make sure it’s written to disk right away.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Default log_dir argument is &quot;runs&quot; - but it&#39;s good to be specific</span>
-<span class="c1"># torch.utils.tensorboard.SummaryWriter is imported above</span>
+<p>上面，我们使用TorchVision和Matplotlib创建了一个输入数据小批量的可视网格。下面，我们在``SummaryWriter``上使用``add_image()``调用来记录图像，以供TensorBoard使用，我们还调用``flush()``以确保它立即写入磁盘。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># 默认log_dir参数为&quot;runs&quot; - 但最好明确指定</span>
+<span class="c1"># torch.utils.tensorboard.SummaryWriter在上面导入</span>
 <span class="n">writer</span> <span class="o">=</span> <span class="n">SummaryWriter</span><span class="p">(</span><span class="s1">&#39;runs/fashion_mnist_experiment_1&#39;</span><span class="p">)</span>
 
-<span class="c1"># Write image data to TensorBoard log dir</span>
+<span class="c1"># 将图像数据写入TensorBoard日志目录</span>
 <span class="n">writer</span><span class="o">.</span><span class="n">add_image</span><span class="p">(</span><span class="s1">&#39;Four Fashion-MNIST Images&#39;</span><span class="p">,</span> <span class="n">img_grid</span><span class="p">)</span>
 <span class="n">writer</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
 
-<span class="c1"># To view, start TensorBoard on the command line with:</span>
+<span class="c1"># 要查看，请在命令行上启动TensorBoard：</span>
 <span class="c1">#   tensorboard --logdir=runs</span>
-<span class="c1"># ...and open a browser tab to http://localhost:6006/</span>
+<span class="c1"># ...并在新的浏览器选项卡中打开http://localhost:6006/</span>
 </pre></div>
 </div>
-<p>If you start TensorBoard at the command line and open it in a new
-browser tab (usually at <a class="reference external" href="localhost:6006">localhost:6006</a>), you should
-see the image grid under the IMAGES tab.</p>
+<p>如果您在命令行启动TensorBoard并在新的浏览器选项卡中打开它（通常在`localhost:6006 &lt;localhost:6006&gt;`__），您应该在IMAGES选项卡下看到图像网格。</p>
 </div>
-<div class="section" id="graphing-scalars-to-visualize-training">
-<h2>Graphing Scalars to Visualize Training<a class="headerlink" href="#graphing-scalars-to-visualize-training" title="Permalink to this heading">¶</a></h2>
-<p>TensorBoard is useful for tracking the progress and efficacy of your
-training. Below, we’ll run a training loop, track some metrics, and save
-the data for TensorBoard’s consumption.</p>
-<p>Let’s define a model to categorize our image tiles, and an optimizer and
-loss function for training:</p>
+<div class="section" id="id9">
+<h2>绘制标量以可视化训练<a class="headerlink" href="#id9" title="Permalink to this heading">¶</a></h2>
+<p>TensorBoard对于跟踪训练的进度和效果很有用。下面，我们将运行一个训练循环，跟踪一些指标，并保存数据以供TensorBoard使用。</p>
+<p>让我们定义一个模型来对我们的图像瓦片进行分类，以及用于训练的优化器和损失函数：</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Net</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/generated/torch.nn.Module.html#torch.nn.Module" title="torch.nn.Module" class="sphx-glr-backref-module-torch-nn sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">nn</span><span class="o">.</span><span class="n">Module</span></a><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">Net</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
@@ -764,14 +750,13 @@ loss function for training:</p>
 <span class="n">optimizer</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.optim.SGD.html#torch.optim.SGD" title="torch.optim.SGD" class="sphx-glr-backref-module-torch-optim sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">optim</span><span class="o">.</span><span class="n">SGD</span></a><span class="p">(</span><span class="n">net</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span> <span class="n">momentum</span><span class="o">=</span><span class="mf">0.9</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Now let’s train a single epoch, and evaluate the training vs. validation
-set losses every 1000 batches:</p>
+<p>现在让我们训练一个epoch，并每1000批次评估一次训练与验证集的损失：</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">validation_loader</span><span class="p">))</span>
-<span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">):</span>  <span class="c1"># loop over the dataset multiple times</span>
+<span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">):</span>  <span class="c1"># 在数据集上循环多次</span>
     <span class="n">running_loss</span> <span class="o">=</span> <span class="mf">0.0</span>
 
     <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">data</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">training_loader</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span>
-        <span class="c1"># basic training loop</span>
+        <span class="c1"># 基本训练循环</span>
         <span class="n">inputs</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="n">data</span>
         <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
         <span class="n">outputs</span> <span class="o">=</span> <span class="n">net</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span>
@@ -780,24 +765,24 @@ set losses every 1000 batches:</p>
         <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
 
         <span class="n">running_loss</span> <span class="o">+=</span> <span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
-        <span class="k">if</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">1000</span> <span class="o">==</span> <span class="mi">999</span><span class="p">:</span>    <span class="c1"># Every 1000 mini-batches...</span>
+        <span class="k">if</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">1000</span> <span class="o">==</span> <span class="mi">999</span><span class="p">:</span>    <span class="c1"># 每1000个小批量...</span>
             <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Batch </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
-            <span class="c1"># Check against the validation set</span>
+            <span class="c1"># 对照验证集</span>
             <span class="n">running_vloss</span> <span class="o">=</span> <span class="mf">0.0</span>
 
-            <span class="c1"># In evaluation mode some model specific operations can be omitted eg. dropout layer</span>
-            <span class="n">net</span><span class="o">.</span><span class="n">train</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span> <span class="c1"># Switching to evaluation mode, eg. turning off regularisation</span>
+            <span class="c1"># 在评估模式下，可以省略一些特定于模型的操作，例如dropout层</span>
+            <span class="n">net</span><span class="o">.</span><span class="n">train</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span> <span class="c1"># 切换到评估模式，例如关闭正则化</span>
             <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">vdata</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">validation_loader</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span>
                 <span class="n">vinputs</span><span class="p">,</span> <span class="n">vlabels</span> <span class="o">=</span> <span class="n">vdata</span>
                 <span class="n">voutputs</span> <span class="o">=</span> <span class="n">net</span><span class="p">(</span><span class="n">vinputs</span><span class="p">)</span>
                 <span class="n">vloss</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">voutputs</span><span class="p">,</span> <span class="n">vlabels</span><span class="p">)</span>
                 <span class="n">running_vloss</span> <span class="o">+=</span> <span class="n">vloss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
-            <span class="n">net</span><span class="o">.</span><span class="n">train</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span> <span class="c1"># Switching back to training mode, eg. turning on regularisation</span>
+            <span class="n">net</span><span class="o">.</span><span class="n">train</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span> <span class="c1"># 切换回训练模式，例如打开正则化</span>
 
             <span class="n">avg_loss</span> <span class="o">=</span> <span class="n">running_loss</span> <span class="o">/</span> <span class="mi">1000</span>
             <span class="n">avg_vloss</span> <span class="o">=</span> <span class="n">running_vloss</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">validation_loader</span><span class="p">)</span>
 
-            <span class="c1"># Log the running loss averaged per batch</span>
+            <span class="c1"># 记录每批次平均的运行损失</span>
             <span class="n">writer</span><span class="o">.</span><span class="n">add_scalars</span><span class="p">(</span><span class="s1">&#39;Training vs. Validation Loss&#39;</span><span class="p">,</span>
                             <span class="p">{</span> <span class="s1">&#39;Training&#39;</span> <span class="p">:</span> <span class="n">avg_loss</span><span class="p">,</span> <span class="s1">&#39;Validation&#39;</span> <span class="p">:</span> <span class="n">avg_vloss</span> <span class="p">},</span>
                             <span class="n">epoch</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">training_loader</span><span class="p">)</span> <span class="o">+</span> <span class="n">i</span><span class="p">)</span>
@@ -808,51 +793,41 @@ set losses every 1000 batches:</p>
 <span class="n">writer</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
 </pre></div>
 </div>
-<p>Switch to your open TensorBoard and have a look at the SCALARS tab.</p>
+<p>切换到您打开的TensorBoard，查看SCALARS选项卡。</p>
 </div>
-<div class="section" id="visualizing-your-model">
-<h2>Visualizing Your Model<a class="headerlink" href="#visualizing-your-model" title="Permalink to this heading">¶</a></h2>
-<p>TensorBoard can also be used to examine the data flow within your model.
-To do this, call the <code class="docutils literal notranslate"><span class="pre">add_graph()</span></code> method with a model and sample
-input:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Again, grab a single mini-batch of images</span>
+<div class="section" id="id10">
+<h2>可视化您的模型<a class="headerlink" href="#id10" title="Permalink to this heading">¶</a></h2>
+<p>TensorBoard还可用于检查模型内的数据流。为此，请使用模型和示例输入调用``add_graph()``方法：</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># 再次获取一个小批量的图像</span>
 <span class="n">dataiter</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">training_loader</span><span class="p">)</span>
 <span class="n">images</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">dataiter</span><span class="p">)</span>
 
-<span class="c1"># add_graph() will trace the sample input through your model,</span>
-<span class="c1"># and render it as a graph.</span>
+<span class="c1"># add_graph()将通过您的模型跟踪示例输入，</span>
+<span class="c1"># 并将其渲染为图形。</span>
 <span class="n">writer</span><span class="o">.</span><span class="n">add_graph</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">images</span><span class="p">)</span>
 <span class="n">writer</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
 </pre></div>
 </div>
-<p>When you switch over to TensorBoard, you should see a GRAPHS tab.
-Double-click the “NET” node to see the layers and data flow within your
-model.</p>
+<p>当您切换到TensorBoard时，您应该会看到一个GRAPHS选项卡。双击”NET”节点可查看模型内的层和数据流。</p>
 </div>
-<div class="section" id="visualizing-your-dataset-with-embeddings">
-<h2>Visualizing Your Dataset with Embeddings<a class="headerlink" href="#visualizing-your-dataset-with-embeddings" title="Permalink to this heading">¶</a></h2>
-<p>The 28-by-28 image tiles we’re using can be modeled as 784-dimensional
-vectors (28 * 28 = 784). It can be instructive to project this to a
-lower-dimensional representation. The <code class="docutils literal notranslate"><span class="pre">add_embedding()</span></code> method will
-project a set of data onto the three dimensions with highest variance,
-and display them as an interactive 3D chart. The <code class="docutils literal notranslate"><span class="pre">add_embedding()</span></code>
-method does this automatically by projecting to the three dimensions
-with highest variance.</p>
-<p>Below, we’ll take a sample of our data, and generate such an embedding:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Select a random subset of data and corresponding labels</span>
+<div class="section" id="id11">
+<h2>使用嵌入可视化您的数据集<a class="headerlink" href="#id11" title="Permalink to this heading">¶</a></h2>
+<p>我们使用的28x28图像瓦片可以建模为784维向量（28 * 28 = 784）。将其投影到较低维度的表示形式可能会很有启发性。<a href="#id12"><span class="problematic" id="id13">``</span></a>add_embedding()``方法将一组数据投影到具有最高方差的三个维度上，并将它们显示为交互式3D图表。<a href="#id14"><span class="problematic" id="id15">``</span></a>add_embedding()``方法通过投影到具有最高方差的三个维度来自动执行此操作。</p>
+<p>下面，我们将采样数据，并生成这样一个嵌入：</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># 选择随机子集的数据和相应的标签</span>
 <span class="k">def</span> <span class="nf">select_n_random</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">100</span><span class="p">):</span>
     <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span>
 
     <span class="n">perm</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.randperm.html#torch.randperm" title="torch.randperm" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">randperm</span></a><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
     <span class="k">return</span> <span class="n">data</span><span class="p">[</span><span class="n">perm</span><span class="p">][:</span><span class="n">n</span><span class="p">],</span> <span class="n">labels</span><span class="p">[</span><span class="n">perm</span><span class="p">][:</span><span class="n">n</span><span class="p">]</span>
 
-<span class="c1"># Extract a random subset of data</span>
+<span class="c1"># 提取随机子集的数据</span>
 <span class="n">images</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="n">select_n_random</span><span class="p">(</span><span class="n">training_set</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">training_set</span><span class="o">.</span><span class="n">targets</span><span class="p">)</span>
 
-<span class="c1"># get the class labels for each image</span>
+<span class="c1"># 获取每个图像的类标签</span>
 <span class="n">class_labels</span> <span class="o">=</span> <span class="p">[</span><span class="n">classes</span><span class="p">[</span><span class="n">label</span><span class="p">]</span> <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">labels</span><span class="p">]</span>
 
-<span class="c1"># log embeddings</span>
+<span class="c1"># 记录嵌入</span>
 <span class="n">features</span> <span class="o">=</span> <span class="n">images</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">28</span> <span class="o">*</span> <span class="mi">28</span><span class="p">)</span>
 <span class="n">writer</span><span class="o">.</span><span class="n">add_embedding</span><span class="p">(</span><span class="n">features</span><span class="p">,</span>
                     <span class="n">metadata</span><span class="o">=</span><span class="n">class_labels</span><span class="p">,</span>
@@ -861,26 +836,20 @@ with highest variance.</p>
 <span class="n">writer</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 </pre></div>
 </div>
-<p>Now if you switch to TensorBoard and select the PROJECTOR tab, you
-should see a 3D representation of the projection. You can rotate and
-zoom the model. Examine it at large and small scales, and see whether
-you can spot patterns in the projected data and the clustering of
-labels.</p>
-<p>For better visibility, it’s recommended to:</p>
+<p>现在，如果您切换到TensorBoard并选择PROJECTOR选项卡，您应该会看到投影的3D表示。您可以旋转和缩放模型。在大小不同的尺度上检查它，看看您是否可以发现投影数据和标签聚类中的模式。</p>
+<p>为了更好的可见性，建议：</p>
 <ul class="simple">
-<li><p>Select “label” from the “Color by” drop-down on the left.</p></li>
-<li><p>Toggle the Night Mode icon along the top to place the
-light-colored images on a dark background.</p></li>
+<li><p>从左侧的”Color by”下拉菜单中选择”label”。</p></li>
+<li><p>切换顶部的Night Mode图标，将浅色图像置于深色背景上。</p></li>
 </ul>
 </div>
-<div class="section" id="other-resources">
-<h2>Other Resources<a class="headerlink" href="#other-resources" title="Permalink to this heading">¶</a></h2>
-<p>For more information, have a look at:</p>
+<div class="section" id="id16">
+<h2>其他资源<a class="headerlink" href="#id16" title="Permalink to this heading">¶</a></h2>
+<p>有关更多信息，请查看：</p>
 <ul class="simple">
-<li><p>PyTorch documentation on <a class="reference external" href="https://pytorch.org/docs/stable/tensorboard.html?highlight=summarywriter">torch.utils.tensorboard.SummaryWriter</a></p></li>
-<li><p>Tensorboard tutorial content in the <a class="reference external" href="https://pytorch.org/tutorials/">PyTorch.org Tutorials</a></p></li>
-<li><p>For more information about TensorBoard, see the <a class="reference external" href="https://www.tensorflow.org/tensorboard">TensorBoard
-documentation</a></p></li>
+<li><p>PyTorch关于`torch.utils.tensorboard.SummaryWriter &lt;<a class="reference external" href="https://pytorch.org/docs/stable/tensorboard.html?highlight=summarywriter">https://pytorch.org/docs/stable/tensorboard.html?highlight=summarywriter</a>&gt;`__的文档</p></li>
+<li><p><a class="reference external" href="https://pytorch.org/tutorials/">PyTorch.org教程</a> 中的TensorBoard教程内容</p></li>
+<li><p>有关TensorBoard的更多信息，请参阅`TensorBoard文档 &lt;<a class="reference external" href="https://www.tensorflow.org/tensorboard">https://www.tensorflow.org/tensorboard</a>&gt;`__</p></li>
 </ul>
 <p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.000 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-beginner-introyt-tensorboardyt-tutorial-py">
@@ -957,13 +926,13 @@ if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.i
             <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
               <ul>
 <li><a class="reference internal" href="#">PyTorch TensorBoard 支持</a><ul>
-<li><a class="reference internal" href="#before-you-start">Before You Start</a></li>
-<li><a class="reference internal" href="#introduction">Introduction</a></li>
-<li><a class="reference internal" href="#showing-images-in-tensorboard">Showing Images in TensorBoard</a></li>
-<li><a class="reference internal" href="#graphing-scalars-to-visualize-training">Graphing Scalars to Visualize Training</a></li>
-<li><a class="reference internal" href="#visualizing-your-model">Visualizing Your Model</a></li>
-<li><a class="reference internal" href="#visualizing-your-dataset-with-embeddings">Visualizing Your Dataset with Embeddings</a></li>
-<li><a class="reference internal" href="#other-resources">Other Resources</a></li>
+<li><a class="reference internal" href="#id7">开始之前</a></li>
+<li><a class="reference internal" href="#id8">介绍</a></li>
+<li><a class="reference internal" href="#tensorboard">在TensorBoard中显示图像</a></li>
+<li><a class="reference internal" href="#id9">绘制标量以可视化训练</a></li>
+<li><a class="reference internal" href="#id10">可视化您的模型</a></li>
+<li><a class="reference internal" href="#id11">使用嵌入可视化您的数据集</a></li>
+<li><a class="reference internal" href="#id16">其他资源</a></li>
 </ul>
 </li>
 </ul>
