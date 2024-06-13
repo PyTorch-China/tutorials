@@ -610,26 +610,26 @@ to download the full example code</p>
 <div style="margin-top:10px; margin-bottom:10px;">
   <iframe width="560" height="315" src="https://www.youtube.com/embed/M0fX15_-xrY" frameborder="0" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 </div><p>PyTorch 的 <em>Autograd</em> 功能是使 PyTorch 在构建机器学习项目时灵活且快速的部分原因。
-它允许对复杂计算快速轻松地计算多个偏导数(也称为*梯度*)。这个操作是基于反向传播的神经网络学习的核心。</p>
-<p>Autograd 的强大之处在于它在运行时动态地*跟踪你的计算*,这意味着如果你的模型有决策分支或长度在运行时才知道的循环,
+它允许对复杂计算快速轻松地计算多个偏导数(也称为 <em>梯度</em> )。这个操作是基于反向传播的神经网络学习的核心。</p>
+<p>Autograd 的强大之处在于它在运行时动态地 <em>跟踪你的计算</em> ,这意味着如果你的模型有决策分支或长度在运行时才知道的循环,
 计算仍然会被正确跟踪,你会得到正确的梯度来驱动学习。结合你的模型是用 Python 构建的事实,
 这比依赖于对更加严格结构化的模型进行静态分析来计算梯度的框架提供了更大的灵活性。</p>
 <div class="section" id="autograd">
 <h2>我们为什么需要 Autograd?<a class="headerlink" href="#autograd" title="Permalink to this heading">¶</a></h2>
-<p>机器学习模型是一个*函数*,有输入和输出。在本讨论中,我们将把输入视为一个 <em>i</em> 维向量
+<p>机器学习模型是一个 <em>函数</em> ,有输入和输出。在本讨论中,我们将把输入视为一个 <em>i</em> 维向量
 <span class="math">\(\vec{x}\)</span>，其元素为 <span class="math">\(x_{i}\)</span>。然后我们可以将模型 <em>M</em> 表示为输入的向量值函数:
 <span class="math">\(\vec{y} = \vec{M}(\vec{x})\)</span>。(我们将模型 M 的输出值视为向量,因为一般来说,
 一个模型可能有任意数量的输出。)</p>
 <p>由于我们主要在训练的背景下讨论自动微分,我们感兴趣的输出将是模型的损失。<em>损失函数</em>
 L(<span class="math">\(\vec{y}\)</span>) = L(<span class="math">\(\vec{M}\)</span>(<span class="math">\(\vec{x}\)</span>))是模型输出的单值标量函数。
-该函数表示我们模型对特定输入的*理想*输出的预测偏差有多大。<em>注意:从这一点开始,
+该函数表示我们模型对特定输入的 <em>理想</em> 输出的预测偏差有多大。 <em>注意:从这一点开始,
 我们通常会省略向量符号,例如使用</em> <span class="math">\(y\)</span> 而不是 <span class="math">\(\vec y\)</span>。</p>
 <p>在训练模型时,我们希望最小化损失。在理想情况下,即完美模型的情况下,这意味着调整其学习权重 -
 也就是该函数的可调参数 - 使得对于所有输入,损失为零。在现实世界中,这意味着一个迭代过程,
 不断微调学习权重,直到我们看到对于广泛的输入,得到可接受的损失。</p>
-<p>我们如何决定权重应该朝哪个方向微调多远呢?我们希望*最小化*损失,这意味着使其关于输入的一阶导数等于0:
+<p>我们如何决定权重应该朝哪个方向微调多远呢?我们希望 <em>最小化</em> 损失,这意味着使其关于输入的一阶导数等于0:
 <span class="math">\(\frac{\partial L}{\partial x} = 0\)</span>。</p>
-<p>但是请记住,损失不是*直接*由输入导出的,而是由模型输出的函数导出的(而模型输出又是输入的直接函数),
+<p>但是请记住,损失不是 <em>直接</em> 由输入导出的,而是由模型输出的函数导出的(而模型输出又是输入的直接函数),
 <span class="math">\(\frac{\partial L}{\partial x}\)</span> = <span class="math">\(\frac{\partial {L({\vec y})}}{\partial x}\)</span>。
 根据微积分的链式法则,我们有 <span class="math">\(\frac{\partial {L({\vec y})}}{\partial x}\)</span> =
 <span class="math">\(\frac{\partial L}{\partial y}\frac{\partial y}{\partial x}\)</span> =
@@ -637,7 +637,7 @@ L(<span class="math">\(\vec{y}\)</span>) = L(<span class="math">\(\vec{M}\)</spa
 <p><span class="math">\(\frac{\partial M(x)}{\partial x}\)</span> 是复杂的地方。如果我们再次使用链式法则展开模型输出关于输入的偏导数的表达式,
 它将涉及每个乘以的学习权重、每个激活函数以及模型中的每个其他数学变换的许多局部偏导数。
 我们试图测量其梯度的每个变量的完整表达式,都是通过计算图中所有可能路径的局部梯度之和的乘积。</p>
-<p>特别感兴趣的是学习权重上的梯度 - 它们告诉我们*应该朝哪个方向改变每个权重*,以使损失函数更接近于零。</p>
+<p>特别感兴趣的是学习权重上的梯度 - 它们告诉我们 <em>应该朝哪个方向改变每个权重</em> ,以使损失函数更接近于零。</p>
 <p>由于这些局部导数的数量(每个对应于计算图中的单独路径)往往会随着神经网络的深度呈指数增长,
 因此计算它们的复杂度也会增加。这就是自动微分发挥作用的地方:它跟踪每一步计算的历史。
 你在PyTorch模型中计算的每个张量都保留了其输入张量和创建它的函数的历史记录。
@@ -723,7 +723,7 @@ L(<span class="math">\(\vec{y}\)</span>) = L(<span class="math">\(\vec{M}\)</spa
 </div>
 <p>添加一个常数,就像我们计算 <cite>d</cite> 时所做的那样,不会改变导数。剩下的就是 <span class="math">\(c = 2 * b = 2 * \sin(a)\)</span>,
 它的导数应该是 <span class="math">\(2 * \cos(a)\)</span>。从上面的图中可以看出,这正是我们所看到的。</p>
-<p>请注意,只有计算图的*叶子节点*才会计算它们的梯度。如果你尝试,例如, <cite>print(c.grad)</cite> 你会得到
+<p>请注意,只有计算图的 <em>叶子节点</em> 才会计算它们的梯度。如果你尝试,例如, <cite>print(c.grad)</cite> 你会得到
 <cite>None</cite>。在这个简单的例子中,只有输入是叶子节点,所以只有它有计算梯度。</p>
 </div>
 <div class="section" id="id8">
@@ -886,14 +886,14 @@ L(<span class="math">\(\vec{y}\)</span>) = L(<span class="math">\(\vec{M}\)</spa
 <div class="section" id="id12">
 <h3>Autograd 和原位操作<a class="headerlink" href="#id12" title="Permalink to this heading">¶</a></h3>
 <p>在本练习中到目前为止的每个示例中,我们都使用了变量来捕获计算的中间值。
-Autograd 需要这些中间值来执行梯度计算。<a href="#id13"><span class="problematic" id="id14">*</span></a>因此,在使用 autograd 时,你必须
-小心使用原位操作。<a href="#id15"><span class="problematic" id="id16">*</span></a>这样做可能会破坏计算导数所需的信息,在 <code class="docutils literal notranslate"><span class="pre">backward()</span></code>
+Autograd 需要这些中间值来执行梯度计算。 <em>因此,在使用 autograd 时,你必须
+小心使用原位操作。</em> 这样做可能会破坏计算导数所需的信息,在 <code class="docutils literal notranslate"><span class="pre">backward()</span></code>
 调用时需要这些信息。如果你尝试对需要 autograd 的叶变量进行原位操作,
 PyTorch 甚至会阻止你,如下所示。</p>
 </div>
 </div>
-<div class="section" id="id17">
-<h2>Autograd 分析器<a class="headerlink" href="#id17" title="Permalink to this heading">¶</a></h2>
+<div class="section" id="id13">
+<h2>Autograd 分析器<a class="headerlink" href="#id13" title="Permalink to this heading">¶</a></h2>
 <p>Autograd 会详细跟踪你的每一步计算。这种计算历史,结合时间信息,
 将构成一个方便的分析器 - 而 autograd 就内置了这个功能。
 这里有一个快速使用示例:</p>
@@ -956,11 +956,11 @@ Chrome 跟踪工具文件。有关 API 的完整详细信息,请参阅
 \end{array}\right)\]</div>
 <p>注意:你也可以使用等价的操作 <span class="math">\(v^{T}\cdot J\)</span>,
 并得到一个行向量。</p>
-<p>所得到的列向量就是*第二个函数相对于第一个函数的输入的梯度* - 或者在我们的
+<p>所得到的列向量就是 <em>第二个函数相对于第一个函数的输入的梯度</em> - 或者在我们的
 模型和损失函数的情况下,就是损失相对于模型输入的梯度。</p>
-<p><a href="#id18"><span class="problematic" id="id19">**</span></a><code class="docutils literal notranslate"><span class="pre">torch.autograd</span></code> 是一个用于计算这些乘积的引擎。<a href="#id20"><span class="problematic" id="id21">**</span></a>这就是我们在
+<p>** <code class="docutils literal notranslate"><span class="pre">torch.autograd</span></code> 是一个用于计算这些乘积的引擎。** 这就是我们在
 反向传播过程中如何累积学习权重的梯度。</p>
-<p>因此,``backward()`` 调用也可以*接受一个可选的向量输入*。该向量表示
+<p>因此,``backward()`` 调用也可以 <em>接受一个可选的向量输入</em>。该向量表示
 张量上的一组梯度,这些梯度将乘以前面的 autograd 跟踪张量的 Jacobian。
 让我们用一个小向量尝试一个具体的例子:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">x</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.randn.html#torch.randn" title="torch.randn" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">randn</span></a><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">requires_grad</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -973,7 +973,7 @@ Chrome 跟踪工具文件。有关 API 的完整详细信息,请参阅
 </pre></div>
 </div>
 <p>如果我们尝试现在调用 <code class="docutils literal notranslate"><span class="pre">y.backward()</span></code>,我们会得到一个运行时错误和一条
-消息,说明只能*隐式地*为标量输出计算梯度。对于多维输出,autograd 期望我们
+消息,说明只能 <em>隐式地</em> 为标量输出计算梯度。对于多维输出,autograd 期望我们
 提供这三个输出的梯度,它可以将这些梯度乘以Jacobian矩阵:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">v</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.tensor.html#torch.tensor" title="torch.tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span></a><span class="p">([</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0001</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">float</span><span class="p">)</span> <span class="c1"># 代替梯度</span>
 <span class="n">y</span><span class="o">.</span><span class="n">backward</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
@@ -985,8 +985,8 @@ Chrome 跟踪工具文件。有关 API 的完整详细信息,请参阅
 <div class="section" id="api">
 <h3>高级 API<a class="headerlink" href="#api" title="Permalink to this heading">¶</a></h3>
 <p>autograd 有一个 API,可以直接访问重要的差分矩阵和向量运算。特别是,
-它允许你计算特定函数在特定输入下的Jacobian矩阵和*Hessian矩阵*。(Hessian矩阵
-类似于Jacobian矩阵,但表示所有偏导数的*第二阶*导数。)它还提供了与这些矩阵
+它允许你计算特定函数在特定输入下的Jacobian矩阵和 <em>Hessian矩阵</em> 。(Hessian矩阵
+类似于Jacobian矩阵,但表示所有偏导数的 <em>第二阶</em> 导数。)它还提供了与这些矩阵
 进行向量乘积的方法。</p>
 <p>让我们计算一个简单函数的Jacobian矩阵,对于两个单元素输入进行评估:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">exp_adder</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
@@ -1106,7 +1106,7 @@ if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.i
 <li><a class="reference internal" href="#id12">Autograd 和原位操作</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#id17">Autograd 分析器</a></li>
+<li><a class="reference internal" href="#id13">Autograd 分析器</a></li>
 <li><a class="reference internal" href="#autograd-api">高级主题:更多 Autograd 细节和高级 API</a><ul>
 <li><a class="reference internal" href="#api">高级 API</a></li>
 </ul>

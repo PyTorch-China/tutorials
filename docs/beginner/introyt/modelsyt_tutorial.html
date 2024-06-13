@@ -606,27 +606,20 @@ to download the full example code</p>
 <a class="reference external" href="captumyt.html">模型理解</a></p>
 <div class="section" id="pytorch">
 <h1>使用 PyTorch 构建模型<a class="headerlink" href="#pytorch" title="Permalink to this heading">¶</a></h1>
-<p>Follow along with the video below or on <a class="reference external" href="https://www.youtube.com/watch?v=OSqIP-mOWOI">youtube</a>.</p>
+<p>跟随下面的视频或在 <a class="reference external" href="https://www.youtube.com/watch?v=OSqIP-mOWOI">youtube</a> 上观看.</p>
 <div style="margin-top:10px; margin-bottom:10px;">
   <iframe width="560" height="315" src="https://www.youtube.com/embed/OSqIP-mOWOI" frameborder="0" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-</div><div class="section" id="torch-nn-module-and-torch-nn-parameter">
-<h2><code class="docutils literal notranslate"><span class="pre">torch.nn.Module</span></code> and <code class="docutils literal notranslate"><span class="pre">torch.nn.Parameter</span></code><a class="headerlink" href="#torch-nn-module-and-torch-nn-parameter" title="Permalink to this heading">¶</a></h2>
-<p>In this video, we’ll be discussing some of the tools PyTorch makes
-available for building deep learning networks.</p>
-<p>Except for <code class="docutils literal notranslate"><span class="pre">Parameter</span></code>, the classes we discuss in this video are all
-subclasses of <code class="docutils literal notranslate"><span class="pre">torch.nn.Module</span></code>. This is the PyTorch base class meant
-to encapsulate behaviors specific to PyTorch Models and their
-components.</p>
-<p>One important behavior of <code class="docutils literal notranslate"><span class="pre">torch.nn.Module</span></code> is registering parameters.
-If a particular <code class="docutils literal notranslate"><span class="pre">Module</span></code> subclass has learning weights, these weights
-are expressed as instances of <code class="docutils literal notranslate"><span class="pre">torch.nn.Parameter</span></code>. The <code class="docutils literal notranslate"><span class="pre">Parameter</span></code>
-class is a subclass of <code class="docutils literal notranslate"><span class="pre">torch.Tensor</span></code>, with the special behavior that
-when they are assigned as attributes of a <code class="docutils literal notranslate"><span class="pre">Module</span></code>, they are added to
-the list of that modules parameters. These parameters may be accessed
-through the <code class="docutils literal notranslate"><span class="pre">parameters()</span></code> method on the <code class="docutils literal notranslate"><span class="pre">Module</span></code> class.</p>
-<p>As a simple example, here’s a very simple model with two linear layers
-and an activation function. We’ll create an instance of it and ask it to
-report on its parameters:</p>
+</div><div class="section" id="torch-nn-module-torch-nn-parameter">
+<h2><code class="docutils literal notranslate"><span class="pre">torch.nn.Module</span></code> 和 <code class="docutils literal notranslate"><span class="pre">torch.nn.Parameter</span></code><a class="headerlink" href="#torch-nn-module-torch-nn-parameter" title="Permalink to this heading">¶</a></h2>
+<p>在这个视频中,我们将讨论 PyTorch 提供的一些用于构建深度学习网络的工具。</p>
+<p>除了 <code class="docutils literal notranslate"><span class="pre">Parameter</span></code> 之外,我们在本视频中讨论的所有类都是 <code class="docutils literal notranslate"><span class="pre">torch.nn.Module</span></code> 的子类。
+这是 PyTorch 的基类,旨在封装特定于 PyTorch 模型及其组件的行为。</p>
+<p><code class="docutils literal notranslate"><span class="pre">torch.nn.Module</span></code> 的一个重要行为是注册参数。如果特定的 <code class="docutils literal notranslate"><span class="pre">Module</span></code> 子类具有学习权重,
+这些权重将表示为 <code class="docutils literal notranslate"><span class="pre">torch.nn.Parameter</span></code> 的实例。<code class="docutils literal notranslate"><span class="pre">Parameter</span></code> 类是 <code class="docutils literal notranslate"><span class="pre">torch.Tensor</span></code> 的子类,
+具有特殊行为,即当它们被分配为 <code class="docutils literal notranslate"><span class="pre">Module</span></code> 的属性时,它们将被添加到该模块的参数列表中。
+可以通过 <code class="docutils literal notranslate"><span class="pre">Module</span></code> 类上的 <code class="docutils literal notranslate"><span class="pre">parameters()</span></code> 方法访问这些参数。</p>
+<p>作为一个简单的例子,这里有一个非常简单的模型,包含两个线性层和一个激活函数。
+我们将创建它的一个实例,并要求它报告其参数:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
 
 <span class="k">class</span> <span class="nc">TinyModel</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/generated/torch.nn.Module.html#torch.nn.Module" title="torch.nn.Module" class="sphx-glr-backref-module-torch-nn sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span></a><span class="p">):</span>
@@ -663,21 +656,16 @@ report on its parameters:</p>
     <span class="nb">print</span><span class="p">(</span><span class="n">param</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>This shows the fundamental structure of a PyTorch model: there is an
-<code class="docutils literal notranslate"><span class="pre">__init__()</span></code> method that defines the layers and other components of a
-model, and a <code class="docutils literal notranslate"><span class="pre">forward()</span></code> method where the computation gets done. Note
-that we can print the model, or any of its submodules, to learn about
-its structure.</p>
+<p>这显示了 PyTorch 模型的基本结构:有一个 <code class="docutils literal notranslate"><span class="pre">__init__()</span></code> 方法定义模型的层和其他组件,
+还有一个 <code class="docutils literal notranslate"><span class="pre">forward()</span></code> 方法执行计算。注意我们可以打印模型或任何子模块,以了解其结构。</p>
 </div>
-<div class="section" id="common-layer-types">
-<h2>Common Layer Types<a class="headerlink" href="#common-layer-types" title="Permalink to this heading">¶</a></h2>
-<div class="section" id="linear-layers">
-<h3>Linear Layers<a class="headerlink" href="#linear-layers" title="Permalink to this heading">¶</a></h3>
-<p>The most basic type of neural network layer is a <em>linear</em> or <em>fully
-connected</em> layer. This is a layer where every input influences every
-output of the layer to a degree specified by the layer’s weights. If a
-model has <em>m</em> inputs and <em>n</em> outputs, the weights will be an <em>m</em> x <em>n</em>
-matrix. For example:</p>
+<div class="section" id="id6">
+<h2>常见层类型<a class="headerlink" href="#id6" title="Permalink to this heading">¶</a></h2>
+<div class="section" id="id7">
+<h3>线性层<a class="headerlink" href="#id7" title="Permalink to this heading">¶</a></h3>
+<p>最基本的神经网络层类型是 <em>线性</em> 或 <em>全连接</em> 层。这是一种每个输入都会影响该层每个输出的层,
+其影响程度由层的权重指定。如果一个模型有 <em>m</em> 个输入和 <em>n</em> 个输出,
+权重将是一个 <em>m</em> x <em>n</em> 矩阵。例如:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">lin</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.nn.Linear.html#torch.nn.Linear" title="torch.nn.Linear" class="sphx-glr-backref-module-torch-nn sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span></a><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
 <span class="n">x</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.rand.html#torch.rand" title="torch.rand" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">rand</span></a><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Input:&#39;</span><span class="p">)</span>
@@ -692,30 +680,19 @@ matrix. For example:</p>
 <span class="nb">print</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>If you do the matrix multiplication of <code class="docutils literal notranslate"><span class="pre">x</span></code> by the linear layer’s
-weights, and add the biases, you’ll find that you get the output vector
-<code class="docutils literal notranslate"><span class="pre">y</span></code>.</p>
-<p>One other important feature to note: When we checked the weights of our
-layer with <code class="docutils literal notranslate"><span class="pre">lin.weight</span></code>, it reported itself as a <code class="docutils literal notranslate"><span class="pre">Parameter</span></code> (which
-is a subclass of <code class="docutils literal notranslate"><span class="pre">Tensor</span></code>), and let us know that it’s tracking
-gradients with autograd. This is a default behavior for <code class="docutils literal notranslate"><span class="pre">Parameter</span></code>
-that differs from <code class="docutils literal notranslate"><span class="pre">Tensor</span></code>.</p>
-<p>Linear layers are used widely in deep learning models. One of the most
-common places you’ll see them is in classifier models, which will
-usually have one or more linear layers at the end, where the last layer
-will have <em>n</em> outputs, where <em>n</em> is the number of classes the classifier
-addresses.</p>
+<p>如果你将 <code class="docutils literal notranslate"><span class="pre">x</span></code> 与线性层的权重相乘,并加上偏置,你会发现得到的是输出向量 <code class="docutils literal notranslate"><span class="pre">y</span></code>。</p>
+<p>另一个需要注意的重要特性是:当我们用 <code class="docutils literal notranslate"><span class="pre">lin.weight</span></code> 检查层的权重时,
+它将自己报告为一个 <code class="docutils literal notranslate"><span class="pre">Parameter``(这是</span> <span class="pre">``Tensor</span></code> 的子类),
+并让我们知道它正在使用 autograd 跟踪梯度。这是 <code class="docutils literal notranslate"><span class="pre">Parameter</span></code> 与 <code class="docutils literal notranslate"><span class="pre">Tensor</span></code> 不同的默认行为。</p>
+<p>线性层在深度学习模型中被广泛使用。你会经常在分类器模型的末端看到它们,其中最后一层将有 <em>n</em> 个输出,
+其中 <em>n</em> 是分类器所处理的类别数。</p>
 </div>
-<div class="section" id="convolutional-layers">
-<h3>Convolutional Layers<a class="headerlink" href="#convolutional-layers" title="Permalink to this heading">¶</a></h3>
-<p><em>Convolutional</em> layers are built to handle data with a high degree of
-spatial correlation. They are very commonly used in computer vision,
-where they detect close groupings of features which the compose into
-higher-level features. They pop up in other contexts too - for example,
-in NLP applications, where a word’s immediate context (that is, the
-other words nearby in the sequence) can affect the meaning of a
-sentence.</p>
-<p>We saw convolutional layers in action in LeNet5 in an earlier video:</p>
+<div class="section" id="id8">
+<h3>卷积层<a class="headerlink" href="#id8" title="Permalink to this heading">¶</a></h3>
+<p><em>卷积</em> 层被设计用于处理具有高度空间相关性的数据。它们在计算机视觉领域非常常用,
+用于检测组成更高级特征的紧密特征组。它们也出现在其他上下文中 - 例如,在 NLP 应用程序中,
+一个单词的直接上下文(即序列中附近的其他单词)可能会影响句子的含义。</p>
+<p>我们在之前的视频中看到了 LeNet5 中的卷积层:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch.functional</span> <span class="k">as</span> <span class="nn">F</span>
 
 
@@ -723,19 +700,18 @@ sentence.</p>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">LeNet</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-        <span class="c1"># 1 input image channel (black &amp; white), 6 output channels, 5x5 square convolution</span>
-        <span class="c1"># kernel</span>
+        <span class="c1"># 1 输入图像通道(黑白), 6 输出通道, 5x5 平方卷积核</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">conv1</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.nn.Conv2d.html#torch.nn.Conv2d" title="torch.nn.Conv2d" class="sphx-glr-backref-module-torch-nn sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span></a><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">conv2</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.nn.Conv2d.html#torch.nn.Conv2d" title="torch.nn.Conv2d" class="sphx-glr-backref-module-torch-nn sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span></a><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
-        <span class="c1"># an affine operation: y = Wx + b</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">fc1</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.nn.Linear.html#torch.nn.Linear" title="torch.nn.Linear" class="sphx-glr-backref-module-torch-nn sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span></a><span class="p">(</span><span class="mi">16</span> <span class="o">*</span> <span class="mi">6</span> <span class="o">*</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">120</span><span class="p">)</span>  <span class="c1"># 6*6 from image dimension</span>
+        <span class="c1"># 一个仿射操作: y = Wx + b</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fc1</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.nn.Linear.html#torch.nn.Linear" title="torch.nn.Linear" class="sphx-glr-backref-module-torch-nn sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span></a><span class="p">(</span><span class="mi">16</span> <span class="o">*</span> <span class="mi">6</span> <span class="o">*</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">120</span><span class="p">)</span>  <span class="c1"># 6*6 来自图像维度</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fc2</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.nn.Linear.html#torch.nn.Linear" title="torch.nn.Linear" class="sphx-glr-backref-module-torch-nn sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span></a><span class="p">(</span><span class="mi">120</span><span class="p">,</span> <span class="mi">84</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fc3</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.nn.Linear.html#torch.nn.Linear" title="torch.nn.Linear" class="sphx-glr-backref-module-torch-nn sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span></a><span class="p">(</span><span class="mi">84</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-        <span class="c1"># Max pooling over a (2, 2) window</span>
+        <span class="c1"># 在 (2, 2) 窗口上进行最大池化</span>
         <span class="n">x</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">max_pool2d</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conv1</span><span class="p">(</span><span class="n">x</span><span class="p">)),</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
-        <span class="c1"># If the size is a square you can only specify a single number</span>
+        <span class="c1"># 如果尺寸是正方形,你只需指定一个数字</span>
         <span class="n">x</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">max_pool2d</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conv2</span><span class="p">(</span><span class="n">x</span><span class="p">)),</span> <span class="mi">2</span><span class="p">)</span>
         <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_flat_features</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
         <span class="n">x</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fc1</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
@@ -744,72 +720,43 @@ sentence.</p>
         <span class="k">return</span> <span class="n">x</span>
 
     <span class="k">def</span> <span class="nf">num_flat_features</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-        <span class="n">size</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">size</span><span class="p">()[</span><span class="mi">1</span><span class="p">:]</span>  <span class="c1"># all dimensions except the batch dimension</span>
+        <span class="n">size</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">size</span><span class="p">()[</span><span class="mi">1</span><span class="p">:]</span>  <span class="c1"># 除批次维度外的所有维度</span>
         <span class="n">num_features</span> <span class="o">=</span> <span class="mi">1</span>
         <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">size</span><span class="p">:</span>
             <span class="n">num_features</span> <span class="o">*=</span> <span class="n">s</span>
         <span class="k">return</span> <span class="n">num_features</span>
 </pre></div>
 </div>
-<p>Let’s break down what’s happening in the convolutional layers of this
-model. Starting with <code class="docutils literal notranslate"><span class="pre">conv1</span></code>:</p>
+<p>让我们分解一下这个模型中卷积层的工作原理。从 <code class="docutils literal notranslate"><span class="pre">conv1</span></code> 开始:</p>
 <ul class="simple">
-<li><p>LeNet5 is meant to take in a 1x32x32 black &amp; white image. <strong>The first
-argument to a convolutional layer’s constructor is the number of
-input channels.</strong> Here, it is 1. If we were building this model to
-look at 3-color channels, it would be 3.</p></li>
-<li><p>A convolutional layer is like a window that scans over the image,
-looking for a pattern it recognizes. These patterns are called
-<em>features,</em> and one of the parameters of a convolutional layer is the
-number of features we would like it to learn. <strong>This is the second
-argument to the constructor is the number of output features.</strong> Here,
-we’re asking our layer to learn 6 features.</p></li>
-<li><p>Just above, I likened the convolutional layer to a window - but how
-big is the window? <strong>The third argument is the window or kernel
-size.</strong> Here, the “5” means we’ve chosen a 5x5 kernel. (If you want a
-kernel with height different from width, you can specify a tuple for
-this argument - e.g., <code class="docutils literal notranslate"><span class="pre">(3,</span> <span class="pre">5)</span></code> to get a 3x5 convolution kernel.)</p></li>
+<li><p>LeNet5 旨在接受 1x32x32 的黑白图像。<a href="#id9"><span class="problematic" id="id10">**</span></a>卷积层构造函数的第一个参数是输入通道数。<a href="#id11"><span class="problematic" id="id12">**</span></a>这里是 1。
+如果我们构建这个模型来查看 3 色彩通道,它将是 3。</p></li>
+<li><p>卷积层就像一个扫描图像的窗口,寻找它能识别的模式。这些模式被称为 <em>特征</em>,
+卷积层的一个参数是我们希望它学习的特征数量。<strong>构造函数的第二个参数是输出特征的数量。</strong>
+这里,我们要求我们的层学习 6 个特征。</p></li>
+<li><p>就在上面,我将卷积层比作一个窗口 - 但是窗口有多大? <strong>第三个参数是窗口或内核大小。</strong>
+这里,数字 “5” 意味着我们选择了一个 5x5 的内核。
+(如果你希望内核的高度与宽度不同,你可以为此参数指定一个元组 - 例如 <code class="docutils literal notranslate"><span class="pre">(3,</span> <span class="pre">5)</span></code> 来获得一个 3x5 的卷积核。)</p></li>
 </ul>
-<p>The output of a convolutional layer is an <em>activation map</em> - a spatial
-representation of the presence of features in the input tensor.
-<code class="docutils literal notranslate"><span class="pre">conv1</span></code> will give us an output tensor of 6x28x28; 6 is the number of
-features, and 28 is the height and width of our map. (The 28 comes from
-the fact that when scanning a 5-pixel window over a 32-pixel row, there
-are only 28 valid positions.)</p>
-<p>We then pass the output of the convolution through a ReLU activation
-function (more on activation functions later), then through a max
-pooling layer. The max pooling layer takes features near each other in
-the activation map and groups them together. It does this by reducing
-the tensor, merging every 2x2 group of cells in the output into a single
-cell, and assigning that cell the maximum value of the 4 cells that went
-into it. This gives us a lower-resolution version of the activation map,
-with dimensions 6x14x14.</p>
-<p>Our next convolutional layer, <code class="docutils literal notranslate"><span class="pre">conv2</span></code>, expects 6 input channels
-(corresponding to the 6 features sought by the first layer), has 16
-output channels, and a 3x3 kernel. It puts out a 16x12x12 activation
-map, which is again reduced by a max pooling layer to 16x6x6. Prior to
-passing this output to the linear layers, it is reshaped to a 16 * 6 *
-6 = 576-element vector for consumption by the next layer.</p>
-<p>There are convolutional layers for addressing 1D, 2D, and 3D tensors.
-There are also many more optional arguments for a conv layer
-constructor, including stride length(e.g., only scanning every second or
-every third position) in the input, padding (so you can scan out to the
-edges of the input), and more. See the
-<a class="reference external" href="https://pytorch.org/docs/stable/nn.html#convolution-layers">documentation</a>
-for more information.</p>
+<p>卷积层的输出是一个 <em>激活映射</em> - 输入张量中特征存在的空间表示。<code class="docutils literal notranslate"><span class="pre">conv1</span></code> 将给我们一个 6x28x28 的输出张量;
+6 是特征数,28 是映射的高度和宽度。(28 来自于当在 32 像素行上扫描 5 像素窗口时,只有 28 个有效位置的事实。)</p>
+<p>然后,我们将卷积的输出通过 ReLU 激活函数(稍后将讨论激活函数),然后通过最大池化层。
+最大池化层将激活映射中彼此靠近的特征组合在一起。它通过减小张量来实现这一点,
+将输出中每个 2x2 组的单元格合并为一个单元格,并将该单元格的值分配为组成它的 4 个单元格中的最大值。
+这给了我们一个较低分辨率的激活映射,尺寸为 6x14x14。</p>
+<p>我们的下一个卷积层 <code class="docutils literal notranslate"><span class="pre">conv2</span></code> 期望 6 个输入通道(对应于第一层寻找的 6 个特征),有 16 个输出通道,
+并且内核大小为 3x3。它输出一个 16x12x12 的激活映射,再次通过最大池化层减小到 16x6x6。
+在将此输出传递给线性层之前,它被重新整形为一个 16 * 6 * 6 = 576 元素向量,供下一层使用。</p>
+<p>有针对 1D、2D 和 3D 张量的卷积层。卷积层构造函数还有许多其他可选参数,
+包括步长长度(例如,只扫描每第二个或每第三个位置)、填充(因此你可以扫描到输入的边缘)等等。
+更多信息请参见 <a class="reference external" href="https://pytorch.org/docs/stable/nn.html#convolution-layers">文档</a>。</p>
 </div>
-<div class="section" id="recurrent-layers">
-<h3>Recurrent Layers<a class="headerlink" href="#recurrent-layers" title="Permalink to this heading">¶</a></h3>
-<p><em>Recurrent neural networks</em> (or <em>RNNs)</em> are used for sequential data -
-anything from time-series measurements from a scientific instrument to
-natural language sentences to DNA nucleotides. An RNN does this by
-maintaining a <em>hidden state</em> that acts as a sort of memory for what it
-has seen in the sequence so far.</p>
-<p>The internal structure of an RNN layer - or its variants, the LSTM (long
-short-term memory) and GRU (gated recurrent unit) - is moderately
-complex and beyond the scope of this video, but we’ll show you what one
-looks like in action with an LSTM-based part-of-speech tagger (a type of
-classifier that tells you if a word is a noun, verb, etc.):</p>
+<div class="section" id="id13">
+<h3>循环层<a class="headerlink" href="#id13" title="Permalink to this heading">¶</a></h3>
+<p><em>循环神经网络</em> (或 <em>RNN</em>)用于序列数据 - 从科学仪器的时间序列测量到自然语言句子再到 DNA 核苷酸。
+RNN 通过维护一个 <em>隐藏状态</em> 来实现这一点,该隐藏状态充当一种记忆,记录到目前为止它在序列中看到的内容。</p>
+<p>RNN 层的内部结构 - 或其变体 LSTM(长短期记忆)和 GRU(门控循环单元) - 相当复杂,超出了本视频的范围,
+但我们将向你展示基于 LSTM 的词性标注器(一种分类器,用于告诉你一个单词是名词、动词等)的样子:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">LSTMTagger</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/generated/torch.nn.Module.html#torch.nn.Module" title="torch.nn.Module" class="sphx-glr-backref-module-torch-nn sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span></a><span class="p">):</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">embedding_dim</span><span class="p">,</span> <span class="n">hidden_dim</span><span class="p">,</span> <span class="n">vocab_size</span><span class="p">,</span> <span class="n">tagset_size</span><span class="p">):</span>
@@ -818,11 +765,10 @@ classifier that tells you if a word is a noun, verb, etc.):</p>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">word_embeddings</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.nn.Embedding.html#torch.nn.Embedding" title="torch.nn.Embedding" class="sphx-glr-backref-module-torch-nn sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Embedding</span></a><span class="p">(</span><span class="n">vocab_size</span><span class="p">,</span> <span class="n">embedding_dim</span><span class="p">)</span>
 
-        <span class="c1"># The LSTM takes word embeddings as inputs, and outputs hidden states</span>
-        <span class="c1"># with dimensionality hidden_dim.</span>
+        <span class="c1"># LSTM 接受词嵌入作为输入,并输出维度为 hidden_dim 的隐藏状态</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">lstm</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.nn.LSTM.html#torch.nn.LSTM" title="torch.nn.LSTM" class="sphx-glr-backref-module-torch-nn sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">LSTM</span></a><span class="p">(</span><span class="n">embedding_dim</span><span class="p">,</span> <span class="n">hidden_dim</span><span class="p">)</span>
 
-        <span class="c1"># The linear layer that maps from hidden state space to tag space</span>
+        <span class="c1"># 将从隐藏状态空间映射到标记空间的线性层</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">hidden2tag</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.nn.Linear.html#torch.nn.Linear" title="torch.nn.Linear" class="sphx-glr-backref-module-torch-nn sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span></a><span class="p">(</span><span class="n">hidden_dim</span><span class="p">,</span> <span class="n">tagset_size</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sentence</span><span class="p">):</span>
@@ -833,59 +779,39 @@ classifier that tells you if a word is a noun, verb, etc.):</p>
         <span class="k">return</span> <span class="n">tag_scores</span>
 </pre></div>
 </div>
-<p>The constructor has four arguments:</p>
+<p>构造函数有四个参数:</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">vocab_size</span></code> is the number of words in the input vocabulary. Each
-word is a one-hot vector (or unit vector) in a
-<code class="docutils literal notranslate"><span class="pre">vocab_size</span></code>-dimensional space.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">tagset_size</span></code> is the number of tags in the output set.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">embedding_dim</span></code> is the size of the <em>embedding</em> space for the
-vocabulary. An embedding maps a vocabulary onto a low-dimensional
-space, where words with similar meanings are close together in the
-space.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">hidden_dim</span></code> is the size of the LSTM’s memory.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">vocab_size</span></code> 是输入词汇表中单词的数量。每个单词是一个 <code class="docutils literal notranslate"><span class="pre">vocab_size</span></code> 维的一热向量(或单位向量)。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">tagset_size</span></code> 是输出标签集的大小。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">embedding_dim</span></code> 是词汇的*嵌入*空间的大小。嵌入将词汇映射到一个低维空间,在该空间中,意义相似的单词彼此接近。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">hidden_dim</span></code> 是 LSTM 的记忆大小。</p></li>
 </ul>
-<p>The input will be a sentence with the words represented as indices of
-one-hot vectors. The embedding layer will then map these down to an
-<code class="docutils literal notranslate"><span class="pre">embedding_dim</span></code>-dimensional space. The LSTM takes this sequence of
-embeddings and iterates over it, fielding an output vector of length
-<code class="docutils literal notranslate"><span class="pre">hidden_dim</span></code>. The final linear layer acts as a classifier; applying
-<code class="docutils literal notranslate"><span class="pre">log_softmax()</span></code> to the output of the final layer converts the output
-into a normalized set of estimated probabilities that a given word maps
-to a given tag.</p>
-<p>If you’d like to see this network in action, check out the <a class="reference external" href="https://pytorch.org/tutorials/beginner/nlp/sequence_models_tutorial.html">Sequence
-Models and LSTM
-Networks</a>
-tutorial on pytorch.org.</p>
+<p>输入将是一个句子,单词表示为一热向量的索引。嵌入层将把这些映射到一个 <code class="docutils literal notranslate"><span class="pre">embedding_dim</span></code> 维的空间。
+LSTM 接收这个嵌入序列并对其进行迭代,产生一个长度为 <code class="docutils literal notranslate"><span class="pre">hidden_dim</span></code> 的输出向量。最后的线性层充当分类器;
+将最后一层的输出通过 <code class="docutils literal notranslate"><span class="pre">log_softmax()</span></code> 转换为一组归一化的估计概率,表示给定单词映射到给定标签的概率。</p>
+<p>如果你想看看这个网络的实际运行情况,可以查看 pytorch.org 上的 <a class="reference external" href="https://pytorch.org/tutorials/beginner/nlp/sequence_models_tutorial.html">序列模型和
+LSTM 网络</a> 教程。</p>
 </div>
-<div class="section" id="transformers">
-<h3>Transformers<a class="headerlink" href="#transformers" title="Permalink to this heading">¶</a></h3>
-<p><em>Transformers</em> are multi-purpose networks that have taken over the state
-of the art in NLP with models like BERT. A discussion of transformer
-architecture is beyond the scope of this video, but PyTorch has a
-<code class="docutils literal notranslate"><span class="pre">Transformer</span></code> class that allows you to define the overall parameters
-of a transformer model - the number of attention heads, the number of
-encoder &amp; decoder layers, dropout and activation functions, etc. (You
-can even build the BERT model from this single class, with the right
-parameters!) The <code class="docutils literal notranslate"><span class="pre">torch.nn.Transformer</span></code> class also has classes to
-encapsulate the individual components (<code class="docutils literal notranslate"><span class="pre">TransformerEncoder</span></code>,
-<code class="docutils literal notranslate"><span class="pre">TransformerDecoder</span></code>) and subcomponents (<code class="docutils literal notranslate"><span class="pre">TransformerEncoderLayer</span></code>,
-<code class="docutils literal notranslate"><span class="pre">TransformerDecoderLayer</span></code>). For details, check out the
-<a class="reference external" href="https://pytorch.org/docs/stable/nn.html#transformer-layers">documentation</a>
-on transformer classes, and the relevant
-<a class="reference external" href="https://pytorch.org/tutorials/beginner/transformer_tutorial.html">tutorial</a>
-on pytorch.org.</p>
+<div class="section" id="id14">
+<h3>转换器<a class="headerlink" href="#id14" title="Permalink to this heading">¶</a></h3>
+<p><a href="#id15"><span class="problematic" id="id16">*</span></a>转换器*是多用途网络,在 NLP 领域取得了最先进的成果,例如 BERT 模型。讨论转换器架构超出了本视频的范围,
+但是 PyTorch 有一个 <code class="docutils literal notranslate"><span class="pre">Transformer</span></code> 类,允许你定义转换器模型的整体参数 - 注意力头的数量、
+编码器和解码器层的数量、dropout 和激活函数等。(你甚至可以用正确的参数从这个单一类构建 BERT 模型!)</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">torch.nn.Transformer</span></code> 类还包含封装单个组件(<code class="docutils literal notranslate"><span class="pre">TransformerEncoder</span></code>、<code class="docutils literal notranslate"><span class="pre">TransformerDecoder</span></code>)</p>
+</div></blockquote>
+<p>和子组件(<code class="docutils literal notranslate"><span class="pre">TransformerEncoderLayer</span></code>、<code class="docutils literal notranslate"><span class="pre">TransformerDecoderLayer</span></code>)的类。
+详情请查看 <a class="reference external" href="https://pytorch.org/docs/stable/nn.html#transformer-layers">文档</a> 中关于转换器类的内容,
+以及 pytorch.org 上相关的 <a class="reference external" href="https://pytorch.org/tutorials/beginner/transformer_tutorial.html">教程</a>。</p>
 </div>
 </div>
-<div class="section" id="other-layers-and-functions">
-<h2>Other Layers and Functions<a class="headerlink" href="#other-layers-and-functions" title="Permalink to this heading">¶</a></h2>
-<div class="section" id="data-manipulation-layers">
-<h3>Data Manipulation Layers<a class="headerlink" href="#data-manipulation-layers" title="Permalink to this heading">¶</a></h3>
-<p>There are other layer types that perform important functions in models,
-but don’t participate in the learning process themselves.</p>
-<p><strong>Max pooling</strong> (and its twin, min pooling) reduce a tensor by combining
-cells, and assigning the maximum value of the input cells to the output
-cell (we saw this). For example:</p>
+<div class="section" id="id17">
+<h2>其他层和函数<a class="headerlink" href="#id17" title="Permalink to this heading">¶</a></h2>
+<div class="section" id="id18">
+<h3>数据操作层<a class="headerlink" href="#id18" title="Permalink to this heading">¶</a></h3>
+<p>还有其他类型的层执行模型中的重要功能,但它们自身不参与学习过程。</p>
+<p><a href="#id19"><span class="problematic" id="id20">**</span></a>最大池化**(及其孪生层最小池化)通过组合单元并将输入单元的最大值分配给输出单元来减小张量(我们之前看到过这一点)。
+例如:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">my_tensor</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.rand.html#torch.rand" title="torch.rand" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">rand</span></a><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">my_tensor</span><span class="p">)</span>
 
@@ -893,13 +819,9 @@ cell (we saw this). For example:</p>
 <span class="nb">print</span><span class="p">(</span><span class="n">maxpool_layer</span><span class="p">(</span><span class="n">my_tensor</span><span class="p">))</span>
 </pre></div>
 </div>
-<p>If you look closely at the values above, you’ll see that each of the
-values in the maxpooled output is the maximum value of each quadrant of
-the 6x6 input.</p>
-<p><strong>Normalization layers</strong> re-center and normalize the output of one layer
-before feeding it to another. Centering and scaling the intermediate
-tensors has a number of beneficial effects, such as letting you use
-higher learning rates without exploding/vanishing gradients.</p>
+<p>如果你仔细观察上面的值,你会发现最大池化输出中的每个值都是 6x6 输入的每个象限的最大值。</p>
+<p><a href="#id21"><span class="problematic" id="id22">**</span></a>归一化层**在将一层的输出馈送到另一层之前,重新居中并归一化输出。居中和缩放中间张量有许多有益的效果,
+例如让你可以使用更高的学习率而不会出现梯度爆炸/消失。</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">my_tensor</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.rand.html#torch.rand" title="torch.rand" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">rand</span></a><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span> <span class="o">*</span> <span class="mi">20</span> <span class="o">+</span> <span class="mi">5</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">my_tensor</span><span class="p">)</span>
 
@@ -912,23 +834,13 @@ higher learning rates without exploding/vanishing gradients.</p>
 <span class="nb">print</span><span class="p">(</span><span class="n">normed_tensor</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span>
 </pre></div>
 </div>
-<p>Running the cell above, we’ve added a large scaling factor and offset to
-an input tensor; you should see the input tensor’s <code class="docutils literal notranslate"><span class="pre">mean()</span></code> somewhere
-in the neighborhood of 15. After running it through the normalization
-layer, you can see that the values are smaller, and grouped around zero
-- in fact, the mean should be very small (&gt; 1e-8).</p>
-<p>This is beneficial because many activation functions (discussed below)
-have their strongest gradients near 0, but sometimes suffer from
-vanishing or exploding gradients for inputs that drive them far away
-from zero. Keeping the data centered around the area of steepest
-gradient will tend to mean faster, better learning and higher feasible
-learning rates.</p>
-<p><strong>Dropout layers</strong> are a tool for encouraging <em>sparse representations</em>
-in your model - that is, pushing it to do inference with less data.</p>
-<p>Dropout layers work by randomly setting parts of the input tensor
-<em>during training</em> - dropout layers are always turned off for inference.
-This forces the model to learn against this masked or reduced dataset.
-For example:</p>
+<p>运行上面的单元格,我们为输入张量添加了一个大的缩放因子和偏移量;你应该会看到输入张量的 <code class="docutils literal notranslate"><span class="pre">mean()</span></code> 在 15 左右。
+经过归一化层处理后,你可以看到值变小了,并且围绕着 0 分布 - 事实上,平均值应该非常小(&gt; 1e-8)。</p>
+<p>这是有益的,因为许多激活函数(下面将讨论)在 0 附近具有最强梯度,但有时对于将它们推离 0 很远的输入会遇到梯度消失或爆炸的问题。
+将数据保持在最陡梯度区域周围将倾向于意味着更快、更好的学习和更高的可行学习率。</p>
+<p><a href="#id23"><span class="problematic" id="id24">**</span></a>Dropout 层**是一种鼓励模型*稀疏表示*的工具 - 也就是说,推动它在推理时使用较少的数据。</p>
+<p>Dropout 层的工作原理是在*训练期间*随机设置输入张量的一部分 - dropout 层在推理时总是关闭的。
+这迫使模型针对这种掩码或减少的数据集进行学习。例如:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">my_tensor</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.rand.html#torch.rand" title="torch.rand" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">rand</span></a><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
 
 <span class="n">dropout</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.nn.Dropout.html#torch.nn.Dropout" title="torch.nn.Dropout" class="sphx-glr-backref-module-torch-nn sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Dropout</span></a><span class="p">(</span><span class="n">p</span><span class="o">=</span><span class="mf">0.4</span><span class="p">)</span>
@@ -936,31 +848,22 @@ For example:</p>
 <span class="nb">print</span><span class="p">(</span><span class="n">dropout</span><span class="p">(</span><span class="n">my_tensor</span><span class="p">))</span>
 </pre></div>
 </div>
-<p>Above, you can see the effect of dropout on a sample tensor. You can use
-the optional <code class="docutils literal notranslate"><span class="pre">p</span></code> argument to set the probability of an individual
-weight dropping out; if you don’t it defaults to 0.5.</p>
+<p>上面,你可以看到 dropout 对示例张量的影响。你可以使用可选的 <code class="docutils literal notranslate"><span class="pre">p</span></code> 参数设置单个权重丢弃的概率;
+如果不设置,默认为 0.5。</p>
 </div>
-<div class="section" id="activation-functions">
-<h3>Activation Functions<a class="headerlink" href="#activation-functions" title="Permalink to this heading">¶</a></h3>
-<p>Activation functions make deep learning possible. A neural network is
-really a program - with many parameters - that <em>simulates a mathematical
-function</em>. If all we did was multiple tensors by layer weights
-repeatedly, we could only simulate <em>linear functions;</em> further, there
-would be no point to having many layers, as the whole network would
-reduce could be reduced to a single matrix multiplication. Inserting
-<em>non-linear</em> activation functions between layers is what allows a deep
-learning model to simulate any function, rather than just linear ones.</p>
-<p><code class="docutils literal notranslate"><span class="pre">torch.nn.Module</span></code> has objects encapsulating all of the major
-activation functions including ReLU and its many variants, Tanh,
-Hardtanh, sigmoid, and more. It also includes other functions, such as
-Softmax, that are most useful at the output stage of a model.</p>
+<div class="section" id="id25">
+<h3>激活函数<a class="headerlink" href="#id25" title="Permalink to this heading">¶</a></h3>
+<p>激活函数使深度学习成为可能。神经网络实际上是一个程序 - 有许多参数 - 用于*模拟一个数学函数*。
+如果我们只是重复地将张量与层权重相乘,我们只能模拟*线性函数*;此外,有多层也没有意义,
+因为整个网络可以简化为单个矩阵乘法。在层之间插入*非线性*激活函数使得深度学习模型能够模拟任何函数,
+而不仅仅是线性函数。</p>
+<p><code class="docutils literal notranslate"><span class="pre">torch.nn.Module</span></code> 有封装所有主要激活函数的对象,包括 ReLU 及其许多变体、Tanh、Hardtanh、sigmoid 等。
+它还包括其他函数,如 Softmax,这些函数在模型的输出阶段最有用。</p>
 </div>
-<div class="section" id="loss-functions">
-<h3>Loss Functions<a class="headerlink" href="#loss-functions" title="Permalink to this heading">¶</a></h3>
-<p>Loss functions tell us how far a model’s prediction is from the correct
-answer. PyTorch contains a variety of loss functions, including common
-MSE (mean squared error = L2 norm), Cross Entropy Loss and Negative
-Likelihood Loss (useful for classifiers), and others.</p>
+<div class="section" id="id26">
+<h3>损失函数<a class="headerlink" href="#id26" title="Permalink to this heading">¶</a></h3>
+<p>损失函数告诉我们模型的预测与正确答案相差多远。PyTorch 包含各种损失函数,包括常见的 MSE(均方误差 = L2 范数)、
+交叉熵损失和负对数似然损失(对于分类器很有用)等。</p>
 <p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.000 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-beginner-introyt-modelsyt-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
@@ -1037,18 +940,18 @@ if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.i
             <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
               <ul>
 <li><a class="reference internal" href="#">使用 PyTorch 构建模型</a><ul>
-<li><a class="reference internal" href="#torch-nn-module-and-torch-nn-parameter"><code class="docutils literal notranslate"><span class="pre">torch.nn.Module</span></code> and <code class="docutils literal notranslate"><span class="pre">torch.nn.Parameter</span></code></a></li>
-<li><a class="reference internal" href="#common-layer-types">Common Layer Types</a><ul>
-<li><a class="reference internal" href="#linear-layers">Linear Layers</a></li>
-<li><a class="reference internal" href="#convolutional-layers">Convolutional Layers</a></li>
-<li><a class="reference internal" href="#recurrent-layers">Recurrent Layers</a></li>
-<li><a class="reference internal" href="#transformers">Transformers</a></li>
+<li><a class="reference internal" href="#torch-nn-module-torch-nn-parameter"><code class="docutils literal notranslate"><span class="pre">torch.nn.Module</span></code> 和 <code class="docutils literal notranslate"><span class="pre">torch.nn.Parameter</span></code></a></li>
+<li><a class="reference internal" href="#id6">常见层类型</a><ul>
+<li><a class="reference internal" href="#id7">线性层</a></li>
+<li><a class="reference internal" href="#id8">卷积层</a></li>
+<li><a class="reference internal" href="#id13">循环层</a></li>
+<li><a class="reference internal" href="#id14">转换器</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#other-layers-and-functions">Other Layers and Functions</a><ul>
-<li><a class="reference internal" href="#data-manipulation-layers">Data Manipulation Layers</a></li>
-<li><a class="reference internal" href="#activation-functions">Activation Functions</a></li>
-<li><a class="reference internal" href="#loss-functions">Loss Functions</a></li>
+<li><a class="reference internal" href="#id17">其他层和函数</a><ul>
+<li><a class="reference internal" href="#id18">数据操作层</a></li>
+<li><a class="reference internal" href="#id25">激活函数</a></li>
+<li><a class="reference internal" href="#id26">损失函数</a></li>
 </ul>
 </li>
 </ul>
