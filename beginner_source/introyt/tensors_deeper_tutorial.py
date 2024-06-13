@@ -261,11 +261,11 @@ print(dozens)
 ##########################################################################
 # 一般情况下，你不能以这种方式对不同形状的张量进行操作，即使在上面的单元格中，张量具有相同数量的元素。
 # 
-# 简要介绍:张量广播
+# 简介: 张量广播
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # 
 # .. note::
-#      如果你熟悉NumPy ndarrays中的广播语义,你会发现这里应用的是相同的规则。
+#      如果你熟悉NumPy ndarrays中的广播语义，你会发现这里应用的是相同的规则。
 # 
 # 同形规则的例外是 *张量广播*。这里有一个例子:
 # 
@@ -564,17 +564,12 @@ else:
 
 
 ##########################################################################
-# Once we’ve determined that one or more GPUs is available, we need to put
-# our data someplace where the GPU can see it. Your CPU does computation
-# on data in your computer’s RAM. Your GPU has dedicated memory attached
-# to it. Whenever you want to perform a computation on a device, you must
-# move *all* the data needed for that computation to memory accessible by
-# that device. (Colloquially, “moving the data to memory accessible by the
-# GPU” is shorted to, “moving the data to the GPU”.)
-# 
-# There are multiple ways to get your data onto your target device. You
-# may do it at creation time:
-# 
+# 一旦我们确定有一个或多个GPU可用，我们需要将数据放在GPU可以访问的地方。你的CPU在计算机的RAM上对数据进行计算。
+# 你的GPU有专用的内存连接到它。每当你想在一个设备上执行计算时，你必须将该计算所需的 *所有* 数据移动到该设备可访问的内存中。
+# (俗称,"将数据移动到GPU可访问的内存"被简称为"将数据移动到GPU")。
+#
+# 有多种方式可以将数据移动到目标设备。你可以在创建时这样做:
+#
 
 if torch.cuda.is_available():
     gpu_rand = torch.rand(2, 2, device='cuda')
@@ -584,21 +579,15 @@ else:
 
 
 ##########################################################################
-# By default, new tensors are created on the CPU, so we have to specify
-# when we want to create our tensor on the GPU with the optional
-# ``device`` argument. You can see when we print the new tensor, PyTorch
-# informs us which device it’s on (if it’s not on CPU).
-# 
-# You can query the number of GPUs with ``torch.cuda.device_count()``. If
-# you have more than one GPU, you can specify them by index:
-# ``device='cuda:0'``, ``device='cuda:1'``, etc.
-# 
-# As a coding practice, specifying our devices everywhere with string
-# constants is pretty fragile. In an ideal world, your code would perform
-# robustly whether you’re on CPU or GPU hardware. You can do this by
-# creating a device handle that can be passed to your tensors instead of a
-# string:
-# 
+# 默认情况下,新的张量是在CPU上创建的，所以我们必须使用可选的``device``参数来指定我们想在GPU上创建张量。
+# 当我们打印新的张量时，你可以看到PyTorch会告诉我们它在哪个设备上(如果不在CPU上)。
+#
+# 你可以使用``torch.cuda.device_count()``查询GPU的数量。如果你有多个GPU,你可以通过索引指定它们:
+# ``device='cuda:0'``、``device='cuda:1'``等。
+#
+# 作为编码实践,在任何地方都使用字符串常量来指定设备是相当脆弱的。在理想情况下，无论你在CPU还是GPU硬件上，
+# 你的代码都应该稳健地执行。你可以通过创建一个设备句柄来实现这一点，而不是使用字符串传递给你的张量:
+#
 
 if torch.cuda.is_available():
     my_device = torch.device('cuda')
@@ -611,21 +600,18 @@ print(x)
 
 
 #########################################################################
-# If you have an existing tensor living on one device, you can move it to
-# another with the ``to()`` method. The following line of code creates a
-# tensor on CPU, and moves it to whichever device handle you acquired in
-# the previous cell.
-# 
+# 如果你有一个已经存在于一个设备上的张量，你可以使用``to()``方法将它移动到另一个设备。
+# 下面一行代码在CPU上创建一个张量，并将它移动到你在上一个单元格中获取的任何设备句柄上。
+#
 
 y = torch.rand(2, 2)
 y = y.to(my_device)
 
 
 ##########################################################################
-# It is important to know that in order to do computation involving two or
-# more tensors, *all of the tensors must be on the same device*. The
-# following code will throw a runtime error, regardless of whether you
-# have a GPU device available:
+# 重要的是要知道，为了进行涉及两个或多个张量的计算，*所有张量必须在同一设备上*。
+# 无论你是否有GPU设备可用，以下代码都会抛出运行时错误:
+#
 # 
 # .. code-block:: python
 # 
@@ -636,25 +622,23 @@ y = y.to(my_device)
 
 
 ###########################################################################
-# Manipulating Tensor Shapes
+# 操作张量形状
 # --------------------------
-# 
-# Sometimes, you’ll need to change the shape of your tensor. Below, we’ll
-# look at a few common cases, and how to handle them.
-# 
-# Changing the Number of Dimensions
+#
+# 有时,你需要改变张量的形状。下面,我们将看一些常见的情况,以及如何处理它们。
+#
+# 改变维度数量
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# 
-# One case where you might need to change the number of dimensions is
-# passing a single instance of input to your model. PyTorch models
-# generally expect *batches* of input.
-# 
-# For example, imagine having a model that works on 3 x 226 x 226 images -
-# a 226-pixel square with 3 color channels. When you load and transform
-# it, you’ll get a tensor of shape ``(3, 226, 226)``. Your model, though,
-# is expecting input of shape ``(N, 3, 226, 226)``, where ``N`` is the
-# number of images in the batch. So how do you make a batch of one?
-# 
+#
+# 你可能需要改变维度数量的一种情况是将单个实例输入到你的模型中。PyTorch模型
+# 通常期望输入 *批次* 数据。
+#
+# 例如,假设有一个模型可以处理3x226x226的图像 -
+# 一个226像素的正方形,有3个颜色通道。当你加载和转换它时,
+# 你会得到一个形状为 ``(3, 226, 226)`` 的张量。但是你的模型
+# 期望输入形状为 ``(N, 3, 226, 226)``，其中 ``N`` 是批次中图像的数量。
+# 那么如何创建一个批次大小为1的输入呢?
+#
 
 a = torch.rand(3, 226, 226)
 b = a.unsqueeze(0)
@@ -664,29 +648,25 @@ print(b.shape)
 
 
 ##########################################################################
-# The ``unsqueeze()`` method adds a dimension of extent 1.
-# ``unsqueeze(0)`` adds it as a new zeroth dimension - now you have a
-# batch of one!
-# 
-# So if that’s *un*\ squeezing? What do we mean by squeezing? We’re taking
-# advantage of the fact that any dimension of extent 1 *does not* change
-# the number of elements in the tensor.
-# 
+# ``unsqueeze()`` 方法添加了一个大小为1的维度。
+# ``unsqueeze(0)`` 在最前面添加了一个新的0维度 - 现在你有了一个批次大小为1的输入!
+#
+# 那么如果是 *去除* 多余的1维度呢?我们所说的挤压(squeeze)就是利用了
+# 任何大小为1的维度 *不会* 改变张量中元素的数量这一事实。
+#
 
 c = torch.rand(1, 1, 1, 1, 1)
 print(c)
 
 
 ##########################################################################
-# Continuing the example above, let’s say the model’s output is a
-# 20-element vector for each input. You would then expect the output to
-# have shape ``(N, 20)``, where ``N`` is the number of instances in the
-# input batch. That means that for our single-input batch, we’ll get an
-# output of shape ``(1, 20)``.
-# 
-# What if you want to do some *non-batched* computation with that output -
-# something that’s just expecting a 20-element vector?
-# 
+# 继续上面的例子,假设模型的输出是一个20元素的向量,对于每个输入。
+# 那么你会期望输出的形状为 ``(N, 20)``，其中 ``N`` 是输入批次中的实例数量。
+# 这意味着对于我们的单输入批次,我们会得到形状为 ``(1, 20)`` 的输出。
+#
+# 如果你想对该输出进行一些*非批次*计算 - 
+# 一些只期望20元素向量的计算,该怎么办?
+#
 
 a = torch.rand(1, 20)
 print(a.shape)
@@ -704,48 +684,39 @@ print(d.shape)
 
 
 #########################################################################
-# You can see from the shapes that our 2-dimensional tensor is now
-# 1-dimensional, and if you look closely at the output of the cell above
-# you’ll see that printing ``a`` shows an “extra” set of square brackets
-# ``[]`` due to having an extra dimension.
-# 
-# You may only ``squeeze()`` dimensions of extent 1. See above where we
-# try to squeeze a dimension of size 2 in ``c``, and get back the same
-# shape we started with. Calls to ``squeeze()`` and ``unsqueeze()`` can
-# only act on dimensions of extent 1 because to do otherwise would change
-# the number of elements in the tensor.
-# 
-# Another place you might use ``unsqueeze()`` is to ease broadcasting.
-# Recall the example above where we had the following code:
-# 
+# 你可以从形状看出,我们的二维张量现在变成了一维的,如果你仔细观察上面单元格的输出,
+# 你会发现打印 `a` 时会显示一组"额外"的方括号 `[]`,这是因为多了一个维度。
+#
+# 你只能对大小为1的维度执行 `squeeze()`。看上面我们尝试对大小为2的维度 `c` 进行挤压,
+# 得到的形状与开始时相同。`squeeze()` 和 `unsqueeze()` 的调用只能作用于大小为1的维度,
+# 因为对其他维度操作会改变张量中元素的数量。
+#
+# 你可能会使用 `unsqueeze()` 的另一个场景是为了方便广播操作。
+# 回想一下上面的例子,我们有以下代码:
+#
 # .. code-block:: python
-# 
+#
 #    a = torch.ones(4, 3, 2)
-# 
-#    c = a * torch.rand(   3, 1) # 3rd dim = 1, 2nd dim identical to a
+#
+#    c = a * torch.rand(3, 1) # 第3维为1,第2维与a相同
 #    print(c)
-# 
-# The net effect of that was to broadcast the operation over dimensions 0
-# and 2, causing the random, 3 x 1 tensor to be multiplied element-wise by
-# every 3-element column in ``a``.
-# 
-# What if the random vector had just been 3-element vector? We’d lose the
-# ability to do the broadcast, because the final dimensions would not
-# match up according to the broadcasting rules. ``unsqueeze()`` comes to
-# the rescue:
-# 
+#
+# 其净效果是在维度0和2上进行广播操作,导致形状为3x1的随机张量与 `a` 中的每一列3元素逐元素相乘。
+#
+# 如果随机向量只是一个3元素向量呢?我们就失去了广播的能力,因为最后的维度不会根据广播规则匹配。
+# `unsqueeze()` 可以解救我们:
+#
 
 a = torch.ones(4, 3, 2)
-b = torch.rand(   3)     # trying to multiply a * b will give a runtime error
-c = b.unsqueeze(1)       # change to a 2-dimensional tensor, adding new dim at the end
+b = torch.rand(   3)     # 试图将 a * b 会导致运行时错误
+c = b.unsqueeze(1)       # 变成二维张量,在末尾添加新维度
 print(c.shape)
-print(a * c)             # broadcasting works again!
+print(a * c)             # 广播再次生效!
 
 
 ######################################################################
-# The ``squeeze()`` and ``unsqueeze()`` methods also have in-place
-# versions, ``squeeze_()`` and ``unsqueeze_()``:
-# 
+# `squeeze()` 和 `unsqueeze()` 方法也有本地版本 `squeeze_()` 和 `unsqueeze_()`：
+#
 
 batch_me = torch.rand(3, 226, 226)
 print(batch_me.shape)
@@ -754,16 +725,12 @@ print(batch_me.shape)
 
 
 ##########################################################################
-# Sometimes you’ll want to change the shape of a tensor more radically,
-# while still preserving the number of elements and their contents. One
-# case where this happens is at the interface between a convolutional
-# layer of a model and a linear layer of the model - this is common in
-# image classification models. A convolution kernel will yield an output
-# tensor of shape *features x width x height,* but the following linear
-# layer expects a 1-dimensional input. ``reshape()`` will do this for you,
-# provided that the dimensions you request yield the same number of
-# elements as the input tensor has:
-# 
+# 有时你需要更彻底地改变张量的形状,同时保留元素数量和内容不变。
+# 一种情况是在模型的卷积层和线性层之间的接口 - 这在图像分类模型中很常见。
+# 卷积核会产生形状为 *features x width x height* 的输出张量,
+# 但接下来的线性层期望一维输入。`reshape()` 可以为你做这件事,
+# 只要你请求的维度与输入张量具有相同数量的元素即可:
+#
 
 output3d = torch.rand(6, 20, 20)
 print(output3d.shape)
@@ -777,24 +744,19 @@ print(torch.reshape(output3d, (6 * 20 * 20,)).shape)
 
 ###############################################################################
 # .. note::
-#      The ``(6 * 20 * 20,)`` argument in the final line of the cell
-#      above is because PyTorch expects a **tuple** when specifying a
-#      tensor shape - but when the shape is the first argument of a method, it
-#      lets us cheat and just use a series of integers. Here, we had to add the
-#      parentheses and comma to convince the method that this is really a
-#      one-element tuple.
-# 
-# When it can, ``reshape()`` will return a *view* on the tensor to be
-# changed - that is, a separate tensor object looking at the same
-# underlying region of memory. *This is important:* That means any change
-# made to the source tensor will be reflected in the view on that tensor,
-# unless you ``clone()`` it.
-# 
-# There *are* conditions, beyond the scope of this introduction, where
-# ``reshape()`` has to return a tensor carrying a copy of the data. For
-# more information, see the
-# `docs <https://pytorch.org/docs/stable/torch.html#torch.reshape>`__.
-# 
+#      上面最后一行单元格中的 `(6 * 20 * 20,)` 参数是因为PyTorch在指定张量形状时
+#      期望一个 **元组** - 但当形状是方法的第一个参数时,它允许我们只使用一系列整数。
+#      这里,我们必须添加括号和逗号来说服该方法这确实是一个单元素元组。
+#
+# 当可能时,`reshape()` 会返回该张量的*视图* - 
+# 也就是一个单独的张量对象,查看相同的底层内存区域。
+# *这一点很重要:* 这意味着对源张量所做的任何更改都会反映在该张量的视图上,
+# 除非你 `clone()` 它。
+#
+# 确实有一些条件(超出了本介绍的范围),`reshape()` 必须返回数据的副本。
+# 有关更多信息,请参阅
+# `文档 <https://pytorch.org/docs/stable/torch.html#torch.reshape>`__。
+#
 
 
 #######################################################################
