@@ -142,18 +142,18 @@ PyTorch Recipes
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="Introduction ------------ At the heart of PyTorch data loading utility is the `torch.utils.data...">
+    <div class="sphx-glr-thumbcontainer" tooltip=" 简介 ---- PyTorch 数据加载工具的核心类为 `torch.utils.data.DataLoader &lt;https://pytorch.org/docs/stable/data...">
 
 .. only:: html
 
   .. image:: /recipes/recipes/images/thumb/sphx_glr_loading_data_recipe_thumb.png
-    :alt: Loading data in PyTorch
+    :alt: PyTorch 加载数据
 
   :ref:`sphx_glr_recipes_recipes_loading_data_recipe.py`
 
 .. raw:: html
 
-      <div class="sphx-glr-thumbnail-title">Loading data in PyTorch</div>
+      <div class="sphx-glr-thumbnail-title">PyTorch 加载数据</div>
     </div>
 
 

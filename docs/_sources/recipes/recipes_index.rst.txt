@@ -1,6 +1,12 @@
-PyTorch Recipes
+PyTorch 示例
 ---------------------------------------------
 Recipes are bite-sized, actionable examples of how to use specific PyTorch features, different from our full-length tutorials.
+
+与入门教程不同，此系列通过简洁实用的示例，展示了如何使用PyTorch的特性。
+
+
+
+
 
 .. raw:: html
 

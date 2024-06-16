@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Loading data in PyTorch &mdash; PyTorch Tutorials 2.3.0 documentation</title>
+  <title>PyTorch 加载数据 &mdash; PyTorch Tutorials 2.3.0 documentation</title>
   
 
   
@@ -43,7 +43,7 @@
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="Defining a Neural Network in PyTorch" href="defining_a_neural_network.html" />
-    <link rel="prev" title="PyTorch Recipes" href="../recipes_index.html" />
+    <link rel="prev" title="PyTorch 示例" href="../recipes_index.html" />
   <!-- Google Tag Manager -->
     <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
     new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
@@ -533,9 +533,9 @@
       </li>
 
         
-          <li><a href="../recipes_index.html">PyTorch Recipes</a> &gt;</li>
+          <li><a href="../recipes_index.html">PyTorch 示例</a> &gt;</li>
         
-      <li>Loading data in PyTorch</li>
+      <li>PyTorch 加载数据</li>
     
     
       <li class="pytorch-breadcrumbs-aside">
@@ -599,67 +599,57 @@
 <p>Click <a class="reference internal" href="#sphx-glr-download-recipes-recipes-loading-data-recipe-py"><span class="std std-ref">here</span></a>
 to download the full example code</p>
 </div>
-<div class="sphx-glr-example-title section" id="loading-data-in-pytorch">
-<span id="sphx-glr-recipes-recipes-loading-data-recipe-py"></span><h1>Loading data in PyTorch<a class="headerlink" href="#loading-data-in-pytorch" title="Permalink to this heading">¶</a></h1>
-<p>PyTorch features extensive neural network building blocks with a simple,
-intuitive, and stable API. PyTorch includes packages to prepare and load
-common datasets for your model.</p>
-<div class="section" id="introduction">
-<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this heading">¶</a></h2>
-<p>At the heart of PyTorch data loading utility is the
-<a class="reference external" href="https://pytorch.org/docs/stable/data.html#torch.utils.data.DataLoader">torch.utils.data.DataLoader</a>
-class. It represents a Python iterable over a dataset. Libraries in
-PyTorch offer built-in high-quality datasets for you to use in
-<a class="reference external" href="https://pytorch.org/docs/stable/data.html#torch.utils.data.Dataset">torch.utils.data.Dataset</a>.
-These datasets are currently available in:</p>
+<div class="sphx-glr-example-title section" id="pytorch">
+<span id="sphx-glr-recipes-recipes-loading-data-recipe-py"></span><h1>PyTorch 加载数据<a class="headerlink" href="#pytorch" title="Permalink to this heading">¶</a></h1>
+<p>PyTorch 提供了广泛的神经网络构建模块,并拥有简单、直观且稳定的 API。PyTorch包含用于准备和加载常见数据集的工具包,为训练模型提供数据。</p>
+<div class="section" id="id1">
+<h2>简介<a class="headerlink" href="#id1" title="Permalink to this heading">¶</a></h2>
+<p>PyTorch 数据加载工具的核心类为 <a class="reference external" href="https://pytorch.org/docs/stable/data.html#torch.utils.data.DataLoader">torch.utils.data.DataLoader</a> 。
+它表示数据集上的一个 Python 可迭代对象。PyTorch 提供了内置的高质量数据集，
+可通过 <a class="reference external" href="https://pytorch.org/docs/stable/data.html#torch.utils.data.Dataset">torch.utils.data.Dataset</a> 使用。使用这些数据集可通过：</p>
 <ul class="simple">
 <li><p><a class="reference external" href="https://pytorch.org/vision/stable/datasets.html">torchvision</a></p></li>
 <li><p><a class="reference external" href="https://pytorch.org/audio/stable/datasets.html">torchaudio</a></p></li>
 <li><p><a class="reference external" href="https://pytorch.org/text/stable/datasets.html">torchtext</a></p></li>
 </ul>
-<p>with more to come.
-Using the <code class="docutils literal notranslate"><span class="pre">yesno</span></code> dataset from <code class="docutils literal notranslate"><span class="pre">torchaudio.datasets.YESNO</span></code>, we will
-demonstrate how to effectively and efficiently load data from a PyTorch
-<code class="docutils literal notranslate"><span class="pre">Dataset</span></code> into a PyTorch <code class="docutils literal notranslate"><span class="pre">DataLoader</span></code>.</p>
-</div>
-<div class="section" id="setup">
-<h2>Setup<a class="headerlink" href="#setup" title="Permalink to this heading">¶</a></h2>
-<p>Before we begin, we need to install <code class="docutils literal notranslate"><span class="pre">torchaudio</span></code> to have access to the
-dataset.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># pip install torchaudio</span>
+<p>未来会持续新增。
+通过使用 <code class="docutils literal notranslate"><span class="pre">torchaudio.datasets.YESNO</span></code> 中的 <code class="docutils literal notranslate"><span class="pre">yesno</span></code> 数据集，我们将演示如何有效地将数据从 PyTorch <code class="docutils literal notranslate"><span class="pre">Dataset</span></code> 加载到 PyTorch <code class="docutils literal notranslate"><span class="pre">DataLoader</span></code> 中。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># 安装</span>
+<span class="c1"># -----</span>
+<span class="c1"># 在开始之前,我们需要安装 ``torchaudio`` 以访问该数据集。</span>
+
+<span class="c1"># pip install torchaudio</span>
 </pre></div>
 </div>
-<p>To run in Google Colab, uncomment the following line:</p>
+<p>如果在Google Colab中运行,请取消注释以下行:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># !pip install torchaudio</span>
 </pre></div>
 </div>
 </div>
-<div class="section" id="steps">
-<h2>Steps<a class="headerlink" href="#steps" title="Permalink to this heading">¶</a></h2>
+<div class="section" id="id2">
+<h2>使用步骤<a class="headerlink" href="#id2" title="Permalink to this heading">¶</a></h2>
 <ol class="arabic simple">
-<li><p>Import all necessary libraries for loading our data</p></li>
-<li><p>Access the data in the dataset</p></li>
-<li><p>Loading the data</p></li>
-<li><p>Iterate over the data</p></li>
-<li><p>[Optional] Visualize the data</p></li>
+<li><p>导入加载数据所需的所有必要库</p></li>
+<li><p>访问数据集中的数据</p></li>
+<li><p>加载数据</p></li>
+<li><p>遍历数据</p></li>
+<li><p>[可选] 可视化数据</p></li>
 </ol>
 </div>
-<div class="section" id="import-necessary-libraries-for-loading-our-data">
-<h2>1. Import necessary libraries for loading our data<a class="headerlink" href="#import-necessary-libraries-for-loading-our-data" title="Permalink to this heading">¶</a></h2>
-<p>For this recipe, we will use <code class="docutils literal notranslate"><span class="pre">torch</span></code> and <code class="docutils literal notranslate"><span class="pre">torchaudio</span></code>. Depending on
-what built-in datasets you use, you can also install and import
-<code class="docutils literal notranslate"><span class="pre">torchvision</span></code> or <code class="docutils literal notranslate"><span class="pre">torchtext</span></code>.</p>
+<div class="section" id="id3">
+<h2>1. 导入加载数据所需的必要库<a class="headerlink" href="#id3" title="Permalink to this heading">¶</a></h2>
+<p>对于本例,我们将使用 <code class="docutils literal notranslate"><span class="pre">torch</span></code> 和 <code class="docutils literal notranslate"><span class="pre">torchaudio</span></code>。根据使用的内置数据集,您还可以安装并导入
+<code class="docutils literal notranslate"><span class="pre">torchvision</span></code> 或 <code class="docutils literal notranslate"><span class="pre">torchtext</span></code>。</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">import</span> <span class="nn">torchaudio</span>
 </pre></div>
 </div>
 </div>
-<div class="section" id="access-the-data-in-the-dataset">
-<h2>2. Access the data in the dataset<a class="headerlink" href="#access-the-data-in-the-dataset" title="Permalink to this heading">¶</a></h2>
-<p>The <code class="docutils literal notranslate"><span class="pre">yesno</span></code> dataset in <code class="docutils literal notranslate"><span class="pre">torchaudio</span></code> features sixty recordings of one
-individual saying yes or no in Hebrew; with each recording being eight
-words long (<a class="reference external" href="https://www.openslr.org/1/">read more here</a>).</p>
-<p><code class="docutils literal notranslate"><span class="pre">torchaudio.datasets.YESNO</span></code> creates a dataset for <code class="docutils literal notranslate"><span class="pre">yesno</span></code>.</p>
+<div class="section" id="id4">
+<h2>2. 访问数据集中的数据<a class="headerlink" href="#id4" title="Permalink to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">torchaudio</span></code> 中的 <code class="docutils literal notranslate"><span class="pre">yesno</span></code> 数据集包含一个人说希伯来语”是”或”否”的60个录音,
+每个录音长度为8个单词(<a class="reference external" href="https://www.openslr.org/1/">更多信息</a>)。</p>
+<p><code class="docutils literal notranslate"><span class="pre">torchaudio.datasets.YESNO</span></code> 创建了一个 <code class="docutils literal notranslate"><span class="pre">yesno</span></code> 数据集。</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://pytorch.org/audio/stable/generated/torchaudio.datasets.YESNO.html#torchaudio.datasets.YESNO" title="torchaudio.datasets.YESNO" class="sphx-glr-backref-module-torchaudio-datasets sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">torchaudio</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">YESNO</span></a><span class="p">(</span>
      <span class="n">root</span><span class="o">=</span><span class="s1">&#39;./&#39;</span><span class="p">,</span>
      <span class="n">url</span><span class="o">=</span><span class="s1">&#39;http://www.openslr.org/resources/1/waves_yesno.tar.gz&#39;</span><span class="p">,</span>
@@ -667,48 +657,39 @@ words long (<a class="reference external" href="https://www.openslr.org/1/">read
      <span class="n">download</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Each item in the dataset is a tuple of the form: (waveform, sample_rate,
-labels).</p>
-<p>You must set a <code class="docutils literal notranslate"><span class="pre">root</span></code> for the <code class="docutils literal notranslate"><span class="pre">yesno</span></code> dataset, which is where the
-training and testing dataset will exist. The other parameters are
-optional, with their default values shown. Here is some additional
-useful info on the other parameters:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># * ``download``: If true, downloads the dataset from the internet and puts it in root directory. If dataset is already downloaded, it is not downloaded again.</span>
+<p>数据集中的每个条目都是一个元组,形式为:(波形,采样率,标签)。</p>
+<p>您必须为 <code class="docutils literal notranslate"><span class="pre">yesno</span></code> 数据集设置一个 <a href="#id5"><span class="problematic" id="id6">``</span></a>root``目录,用于存放训练和测试数据集。其他参数是可选的,显示了它们的默认值。
+以下是其他参数的一些有用信息:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># * ``download``: 如果为True,则从互联网下载数据集并将其放在root目录中。如果数据集已下载,则不会重新下载。</span>
 <span class="c1">#</span>
-<span class="c1"># Let’s access our ``yesno`` data:</span>
+<span class="c1"># 让我们访问 ``yesno`` 数据:</span>
 <span class="c1">#</span>
 
-<span class="c1"># A data point in ``yesno`` is a tuple (waveform, sample_rate, labels) where labels</span>
-<span class="c1"># is a list of integers with 1 for yes and 0 for no.</span>
+<span class="c1"># ``yesno`` 中的一个数据点是一个元组(波形,采样率,标签),其中标签是一个整数列表,1表示yes,0表示no。</span>
 <span class="n">yesno_data</span> <span class="o">=</span> <a href="https://pytorch.org/audio/stable/generated/torchaudio.datasets.YESNO.html#torchaudio.datasets.YESNO" title="torchaudio.datasets.YESNO" class="sphx-glr-backref-module-torchaudio-datasets sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">torchaudio</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">YESNO</span></a><span class="p">(</span><span class="s1">&#39;./&#39;</span><span class="p">,</span> <span class="n">download</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-<span class="c1"># Pick data point number 3 to see an example of the the ``yesno_data``:</span>
+<span class="c1"># 选择数据点编号3,查看 ``yesno_data`` 的示例:</span>
 <span class="n">n</span> <span class="o">=</span> <span class="mi">3</span>
 <span class="n">waveform</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="n">yesno_data</span><span class="p">[</span><span class="n">n</span><span class="p">]</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Waveform: </span><span class="si">{}</span><span class="se">\n</span><span class="s2">Sample rate: </span><span class="si">{}</span><span class="se">\n</span><span class="s2">Labels: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">labels</span><span class="p">))</span>
 </pre></div>
 </div>
-<p>When using this data in practice, it is best practice to provision the
-data into a “training” dataset and a “testing” dataset. This ensures
-that you have out-of-sample data to test the performance of your model.</p>
+<p>在实践中使用这些数据时,最好将数据划分为”训练”数据集和”测试”数据集。这可确保您有未使用的数据来测试模型的性能。</p>
 </div>
-<div class="section" id="loading-the-data">
-<h2>3. Loading the data<a class="headerlink" href="#loading-the-data" title="Permalink to this heading">¶</a></h2>
-<p>Now that we have access to the dataset, we must pass it through
-<code class="docutils literal notranslate"><span class="pre">torch.utils.data.DataLoader</span></code>. The <code class="docutils literal notranslate"><span class="pre">DataLoader</span></code> combines the dataset
-and a sampler, returning an iterable over the dataset.</p>
+<div class="section" id="id7">
+<h2>3. 加载数据<a class="headerlink" href="#id7" title="Permalink to this heading">¶</a></h2>
+<p>现在我们可以访问数据集,我们必须通过 <code class="docutils literal notranslate"><span class="pre">torch.utils.data.DataLoader</span></code> 传递它。
+<code class="docutils literal notranslate"><span class="pre">DataLoader</span></code> 将数据集和采样器组合在一起,返回数据集上的一个可迭代对象。</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">data_loader</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/data.html#torch.utils.data.DataLoader" title="torch.utils.data.DataLoader" class="sphx-glr-backref-module-torch-utils-data sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span></a><span class="p">(</span><span class="n">yesno_data</span><span class="p">,</span>
                                           <span class="n">batch_size</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
                                           <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
-<div class="section" id="iterate-over-the-data">
-<h2>4. Iterate over the data<a class="headerlink" href="#iterate-over-the-data" title="Permalink to this heading">¶</a></h2>
-<p>Our data is now iterable using the <code class="docutils literal notranslate"><span class="pre">data_loader</span></code>. This will be
-necessary when we begin training our model! You will notice that now
-each data entry in the <code class="docutils literal notranslate"><span class="pre">data_loader</span></code> object is converted to a tensor
-containing tensors representing our waveform, sample rate, and labels.</p>
+<div class="section" id="id8">
+<h2>4. 遍历数据<a class="headerlink" href="#id8" title="Permalink to this heading">¶</a></h2>
+<p>我们的数据现在可以使用 <code class="docutils literal notranslate"><span class="pre">data_loader</span></code> 进行迭代。在开始训练模型时,这将是必需的!
+您会注意到,现在 <code class="docutils literal notranslate"><span class="pre">data_loader</span></code> 对象中的每个数据条目都转换为一个张量,其中包含表示波形、采样率和标签的张量。</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">data_loader</span><span class="p">:</span>
   <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Data: &quot;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
   <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Waveform: </span><span class="si">{}</span><span class="se">\n</span><span class="s2">Sample rate: </span><span class="si">{}</span><span class="se">\n</span><span class="s2">Labels: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">data</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">data</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span>
@@ -716,10 +697,9 @@ containing tensors representing our waveform, sample rate, and labels.</p>
 </pre></div>
 </div>
 </div>
-<div class="section" id="optional-visualize-the-data">
-<h2>5. [Optional] Visualize the data<a class="headerlink" href="#optional-visualize-the-data" title="Permalink to this heading">¶</a></h2>
-<p>You can optionally visualize your data to further understand the output
-from your <code class="docutils literal notranslate"><span class="pre">DataLoader</span></code>.</p>
+<div class="section" id="id9">
+<h2>5. [可选] 可视化数据<a class="headerlink" href="#id9" title="Permalink to this heading">¶</a></h2>
+<p>您可以选择可视化数据,以进一步了解 <code class="docutils literal notranslate"><span class="pre">DataLoader</span></code> 的输出。</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">numpy</span><span class="p">())</span>
@@ -728,14 +708,14 @@ from your <code class="docutils literal notranslate"><span class="pre">DataLoade
 <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">waveform</span><span class="o">.</span><span class="n">t</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">())</span>
 </pre></div>
 </div>
-<p>Congratulations! You have successfully loaded data in PyTorch.</p>
+<p>祝贺您!您已成功在PyTorch中加载数据。</p>
 </div>
-<div class="section" id="learn-more">
-<h2>Learn More<a class="headerlink" href="#learn-more" title="Permalink to this heading">¶</a></h2>
-<p>Take a look at these other recipes to continue your learning:</p>
+<div class="section" id="id10">
+<h2>学习更多<a class="headerlink" href="#id10" title="Permalink to this heading">¶</a></h2>
+<p>查看这些其他教程,继续您的学习:</p>
 <ul class="simple">
-<li><p><a class="reference external" href="https://pytorch.org/tutorials/recipes/recipes/defining_a_neural_network.html">Defining a Neural Network</a></p></li>
-<li><p><a class="reference external" href="https://pytorch.org/tutorials/recipes/recipes/what_is_state_dict.html">What is a state_dict in PyTorch</a></p></li>
+<li><p><a class="reference external" href="https://pytorch.org/tutorials/recipes/recipes/defining_a_neural_network.html">定义神经网络</a></p></li>
+<li><p><a class="reference external" href="https://pytorch.org/tutorials/recipes/recipes/what_is_state_dict.html">PyTorch中的state_dict 是什么</a></p></li>
 </ul>
 <p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.000 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-recipes-recipes-loading-data-recipe-py">
@@ -761,7 +741,7 @@ from your <code class="docutils literal notranslate"><span class="pre">DataLoade
         <a href="defining_a_neural_network.html" class="btn btn-neutral float-right" title="Defining a Neural Network in PyTorch" accesskey="n" rel="next">Next <img src="../../_static/images/chevron-right-orange.svg" class="next-page"></a>
       
       
-        <a href="../recipes_index.html" class="btn btn-neutral" title="PyTorch Recipes" accesskey="p" rel="prev"><img src="../../_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
+        <a href="../recipes_index.html" class="btn btn-neutral" title="PyTorch 示例" accesskey="p" rel="prev"><img src="../../_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
       
     </div>
   
@@ -811,16 +791,15 @@ if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.i
           <div class="pytorch-right-menu" id="pytorch-right-menu">
             <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
               <ul>
-<li><a class="reference internal" href="#">Loading data in PyTorch</a><ul>
-<li><a class="reference internal" href="#introduction">Introduction</a></li>
-<li><a class="reference internal" href="#setup">Setup</a></li>
-<li><a class="reference internal" href="#steps">Steps</a></li>
-<li><a class="reference internal" href="#import-necessary-libraries-for-loading-our-data">1. Import necessary libraries for loading our data</a></li>
-<li><a class="reference internal" href="#access-the-data-in-the-dataset">2. Access the data in the dataset</a></li>
-<li><a class="reference internal" href="#loading-the-data">3. Loading the data</a></li>
-<li><a class="reference internal" href="#iterate-over-the-data">4. Iterate over the data</a></li>
-<li><a class="reference internal" href="#optional-visualize-the-data">5. [Optional] Visualize the data</a></li>
-<li><a class="reference internal" href="#learn-more">Learn More</a></li>
+<li><a class="reference internal" href="#">PyTorch 加载数据</a><ul>
+<li><a class="reference internal" href="#id1">简介</a></li>
+<li><a class="reference internal" href="#id2">使用步骤</a></li>
+<li><a class="reference internal" href="#id3">1. 导入加载数据所需的必要库</a></li>
+<li><a class="reference internal" href="#id4">2. 访问数据集中的数据</a></li>
+<li><a class="reference internal" href="#id7">3. 加载数据</a></li>
+<li><a class="reference internal" href="#id8">4. 遍历数据</a></li>
+<li><a class="reference internal" href="#id9">5. [可选] 可视化数据</a></li>
+<li><a class="reference internal" href="#id10">学习更多</a></li>
 </ul>
 </li>
 </ul>
