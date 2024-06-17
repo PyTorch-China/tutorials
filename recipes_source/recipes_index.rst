@@ -37,23 +37,23 @@ Recipes are bite-sized, actionable examples of how to use specific PyTorch featu
 .. Basics
 
 .. customcarditem::
-   :header: Loading data in PyTorch
-   :card_description: Learn how to use PyTorch packages to prepare and load common datasets for your model.
+   :header: PyTorch 加载数据
+   :card_description: 学习如何使用 PyTorch 来准备和加载常见的数据集。
    :image: ../_static/img/thumbnails/cropped/loading-data.PNG
    :link: ../recipes/recipes/loading_data_recipe.html
    :tags: Basics
 
 
 .. customcarditem::
-   :header: Defining a Neural Network
-   :card_description: Learn how to use PyTorch's torch.nn package to create and define a neural network for the MNIST dataset.
+   :header: PyTorch 创建神经网络
+   :card_description: 学习如何使用torch.nn，为MNIST数据集创建一个神经网络。
    :image: ../_static/img/thumbnails/cropped/defining-a-network.PNG
    :link: ../recipes/recipes/defining_a_neural_network.html
    :tags: Basics
 
 .. customcarditem::
-   :header: What is a state_dict in PyTorch
-   :card_description: Learn how state_dict objects and Python dictionaries are used in saving or loading models from PyTorch.
+   :header: PyTorch 中 state_dict 是什么
+   :card_description: 学习如何使用 `state_dict` 对象和 Python 字典在 PyTorch 中保存或加载模型。
    :image: ../_static/img/thumbnails/cropped/what-is-a-state-dict.PNG
    :link: ../recipes/recipes/what_is_state_dict.html
    :tags: Basics
