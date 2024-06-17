@@ -1,30 +1,20 @@
 """
-What is a state_dict in PyTorch
+PyTorch 中 state_dict 是什么
 ===============================
-In PyTorch, the learnable parameters (i.e. weights and biases) of a
-``torch.nn.Module`` model are contained in the model’s parameters
-(accessed with ``model.parameters()``). A ``state_dict`` is simply a
-Python dictionary object that maps each layer to its parameter tensor.
+在 PyTorch 中,一个 ``torch.nn.Module`` 模型的可学习参数(即权重和偏置)包含在模型的参数中
+(通过 ``model.parameters()`` 访问)。``state_dict`` 只是一个 Python 字典对象,它将每一层映射到其参数张量。
 
-Introduction
+介绍
 ------------
-A ``state_dict`` is an integral entity if you are interested in saving
-or loading models from PyTorch.
-Because ``state_dict`` objects are Python dictionaries, they can be
-easily saved, updated, altered, and restored, adding a great deal of
-modularity to PyTorch models and optimizers.
-Note that only layers with learnable parameters (convolutional layers,
-linear layers, etc.) and registered buffers (batchnorm’s running_mean)
-have entries in the model’s ``state_dict``. Optimizer objects
-(``torch.optim``) also have a ``state_dict``, which contains information
-about the optimizer’s state, as well as the hyperparameters used.
-In this recipe, we will see how ``state_dict`` is used with a simple
-model.
+如果使用 PyTorch 保存或加载模型,``state_dict`` 就是一个不可或缺的实体。
+由于 ``state_dict`` 对象是 Python 字典,它们可以很容易地被保存、更新、修改和恢复,使 PyTorch 模型和优化器更好的做到了模块化。
+请注意,只有具有可学习参数的层(卷积层、线性层等)和已注册的缓冲区(BatchNorm running_mean)在模型的 ``state_dict`` 中有条目。
+优化器对象(``torch.optim``)也有一个 ``state_dict``,它包含了优化器状态的信息,以及使用的超参数。
+在本教程中,我们将看到如何在一个简单的模型中 ``state_dict`` 是如何使用的。
 
-Setup
+环境设置
 -----
-Before we begin, we need to install ``torch`` if it isn’t already
-available.
+在开始之前,如果还没有安装 ``torch``,我们需要先安装它。
 
 .. code-block:: sh
 
@@ -35,20 +25,20 @@ available.
 
 
 ######################################################################
-# Steps
+# 具体步骤
 # -----
-# 
-# 1. Import all necessary libraries for loading our data
-# 2. Define and initialize the neural network
-# 3. Initialize the optimizer
-# 4. Access the model and optimizer ``state_dict``
+#
+# 1. 导入加载数据所需的所有必要库
+# 2. 定义和初始化神经网络
+# 3. 初始化优化器
+# 4. 访问模型和优化器的 ``state_dict``
 # 
 # 1. Import necessary libraries for loading our data
+# 1. 导入加载数据所需的必要库
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # 
-# For this recipe, we will use ``torch`` and its subsidiaries ``torch.nn``
-# and ``torch.optim``.
-# 
+# 对于本教程,我们将使用 ``torch`` 及其子模块 ``torch.nn`` 和 ``torch.optim``。
+#
 
 import torch
 import torch.nn as nn
@@ -57,12 +47,10 @@ import torch.optim as optim
 
 
 ######################################################################
-# 2. Define and initialize the neural network
+# 2. 定义并初始化神经网络
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# 
-# For sake of example, we will create a neural network for training
-# images. To learn more see the Defining a Neural Network recipe.
-# 
+# 为了演示，我们将创建一个用于训练图像的神经网络。要了解更多信息，请参阅定义神经网络的教程。
+#
 
 class Net(nn.Module):
     def __init__(self):
@@ -88,46 +76,45 @@ print(net)
 
 
 ######################################################################
-# 3. Initialize the optimizer
+# 3. 初始化优化器
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # 
-# We will use SGD with momentum.
+# 我们使用 SGD 优化器
 # 
 
 optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
 
 
 ######################################################################
-# 4. Access the model and optimizer ``state_dict``
+# 4. 访问模型和优化器的 ``state_dict``
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # 
 # Now that we have constructed our model and optimizer, we can understand
 # what is preserved in their respective ``state_dict`` properties.
 # 
+# 现在我们已经构建了模型和优化器,我们可以了解它们各自的 ``state_dict`` 属性中保存了什么。
+#
 
-# Print model's state_dict
 print("Model's state_dict:")
 for param_tensor in net.state_dict():
     print(param_tensor, "\t", net.state_dict()[param_tensor].size())
 
 print()
 
-# Print optimizer's state_dict
 print("Optimizer's state_dict:")
 for var_name in optimizer.state_dict():
     print(var_name, "\t", optimizer.state_dict()[var_name])
 
 
 ######################################################################
-# This information is relevant for saving and loading the model and
-# optimizers for future use.
-# 
-# Congratulations! You have successfully used ``state_dict`` in PyTorch.
-# 
-# Learn More
+# 这些信息对于将来保存和加载模型和优化器很有用。
+#
+# 祝贺你!你已经成功使用了 PyTorch 中的 ``state_dict``。
+#
+# 学习更多
 # ----------
-# 
-# Take a look at these other recipes to continue your learning:
-# 
-# - `Saving and loading models for inference in PyTorch <https://pytorch.org/tutorials/recipes/recipes/saving_and_loading_models_for_inference.html>`__
-# - `Saving and loading a general checkpoint in PyTorch <https://pytorch.org/tutorials/recipes/recipes/saving_and_loading_a_general_checkpoint.html>`__
+#
+# 查看这些其他教程,继续你的学习:
+#
+# - `在 PyTorch 中保存和加载模型用于推理 <https://pytorch.org/tutorials/recipes/recipes/saving_and_loading_models_for_inference.html>`__
+# - `在 PyTorch 中保存和加载通用检查点 <https://pytorch.org/tutorials/recipes/recipes/saving_and_loading_a_general_checkpoint.html>`__

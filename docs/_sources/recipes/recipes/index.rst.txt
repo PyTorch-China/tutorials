@@ -108,35 +108,35 @@ PyTorch Recipes
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="Introduction ------------ Saving the model’s state_dict with the torch.save() function will giv...">
+    <div class="sphx-glr-thumbcontainer" tooltip="简介 ------------ 使用 torch.save() 函数保存模型的 state_dict 为后续恢复模型提供较大的灵活性。 保存模型的推荐使用此方法，因为只需要保存训练好的模型的...">
 
 .. only:: html
 
   .. image:: /recipes/recipes/images/thumb/sphx_glr_saving_and_loading_models_for_inference_thumb.png
-    :alt: Saving and loading models for inference in PyTorch
+    :alt: PyTorch 保存和加载模型
 
   :ref:`sphx_glr_recipes_recipes_saving_and_loading_models_for_inference.py`
 
 .. raw:: html
 
-      <div class="sphx-glr-thumbnail-title">Saving and loading models for inference in PyTorch</div>
+      <div class="sphx-glr-thumbnail-title">PyTorch 保存和加载模型</div>
     </div>
 
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="Introduction ------------ A state_dict is an integral entity if you are interested in saving or...">
+    <div class="sphx-glr-thumbcontainer" tooltip="介绍 ------------ 如果使用 PyTorch 保存或加载模型,``state_dict`` 就是一个不可或缺的实体。 由于 state_dict 对象是 Python 字典,它们...">
 
 .. only:: html
 
   .. image:: /recipes/recipes/images/thumb/sphx_glr_what_is_state_dict_thumb.png
-    :alt: What is a state_dict in PyTorch
+    :alt: PyTorch 中 state_dict 是什么
 
   :ref:`sphx_glr_recipes_recipes_what_is_state_dict.py`
 
 .. raw:: html
 
-      <div class="sphx-glr-thumbnail-title">What is a state_dict in PyTorch</div>
+      <div class="sphx-glr-thumbnail-title">PyTorch 中 state_dict 是什么</div>
     </div>
 
 
@@ -227,6 +227,23 @@ PyTorch Recipes
 
 .. raw:: html
 
+    <div class="sphx-glr-thumbcontainer" tooltip="介绍 ------------ PyTorch 提供了优雅设计的模块和类来帮助您创建和训练神经网络,包括 torch.nn。 一个 nn.Module 中有层(layers)、以及一个返回 ...">
+
+.. only:: html
+
+  .. image:: /recipes/recipes/images/thumb/sphx_glr_defining_a_neural_network_thumb.png
+    :alt: PyTorch 创建神经网络
+
+  :ref:`sphx_glr_recipes_recipes_defining_a_neural_network.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">PyTorch 创建神经网络</div>
+    </div>
+
+
+.. raw:: html
+
     <div class="sphx-glr-thumbcontainer" tooltip="Introduction ------------ When saving a model comprised of multiple torch.nn.Modules, such as a...">
 
 .. only:: html
@@ -273,23 +290,6 @@ PyTorch Recipes
 .. raw:: html
 
       <div class="sphx-glr-thumbnail-title">Tips for Loading an ``nn.Module`` from a Checkpoint</div>
-    </div>
-
-
-.. raw:: html
-
-    <div class="sphx-glr-thumbcontainer" tooltip="Introduction ------------ PyTorch provides the elegantly designed modules and classes, includin...">
-
-.. only:: html
-
-  .. image:: /recipes/recipes/images/thumb/sphx_glr_defining_a_neural_network_thumb.png
-    :alt: Defining a Neural Network in PyTorch
-
-  :ref:`sphx_glr_recipes_recipes_defining_a_neural_network.py`
-
-.. raw:: html
-
-      <div class="sphx-glr-thumbnail-title">Defining a Neural Network in PyTorch</div>
     </div>
 
 
@@ -446,10 +446,10 @@ PyTorch Recipes
    /recipes/recipes/warmstarting_model_using_parameters_from_a_different_model
    /recipes/recipes/save_load_across_devices
    /recipes/recipes/reasoning_about_shapes
+   /recipes/recipes/defining_a_neural_network
    /recipes/recipes/saving_multiple_models_in_one_file
    /recipes/recipes/tuning_guide
    /recipes/recipes/module_load_state_dict_tips
-   /recipes/recipes/defining_a_neural_network
    /recipes/recipes/zeroing_out_gradients
    /recipes/recipes/timer_quick_start
    /recipes/recipes/dynamic_quantization

@@ -1,35 +1,24 @@
 """
-Saving and loading models for inference in PyTorch
+PyTorch 保存和加载模型
 ==================================================
-There are two approaches for saving and loading models for inference in
-PyTorch. The first is saving and loading the ``state_dict``, and the
-second is saving and loading the entire model.
+在PyTorch中保存和加载模型有两种方法。
+第一种是保存和加载 ``state_dict``，第二种是保存和加载整个模型。
 
-Introduction
+简介
 ------------
-Saving the model’s ``state_dict`` with the ``torch.save()`` function
-will give you the most flexibility for restoring the model later. This
-is the recommended method for saving models, because it is only really
-necessary to save the trained model’s learned parameters.
-When saving and loading an entire model, you save the entire module
-using Python’s
-`pickle <https://docs.python.org/3/library/pickle.html>`__ module. Using
-this approach yields the most intuitive syntax and involves the least
-amount of code. The disadvantage of this approach is that the serialized
-data is bound to the specific classes and the exact directory structure
-used when the model is saved. The reason for this is because pickle does
-not save the model class itself. Rather, it saves a path to the file
-containing the class, which is used during load time. Because of this,
-your code can break in various ways when used in other projects or after
-refactors.
-In this recipe, we will explore both ways on how to save and load models
-for inference.
+使用 ``torch.save()`` 函数保存模型的 ``state_dict`` 为后续恢复模型提供较大的灵活性。
+保存模型的推荐使用此方法，因为只需要保存训练好的模型的学习参数。
 
-Setup
+当保存和加载整个模型时，你使用Python  `pickle <https://docs.python.org/3/library/pickle.html>`__ 模块保存整个模块。
+使用这种方法语法最直观，代码量最少。但这种方法的缺点是序列化的数据与保存模型时使用的特定类和目录结构绑定在一起。
+原因是pickle不保存模型类本身，而是保存包含该类的文件的路径，该路径在加载时使用。
+因此，当在其他项目中使用或重构后，代码可能会出现各种异常导致程序中断。
+
+在本教程中，我们将展示两种方式如何在PyTorch中保存和加载模型。
+
+执行设置
 -----
-Before we begin, we need to install ``torch`` if it isn’t already
-available.
-
+在开始之前，如果还没有安装 ``torch``，我们需要先安装它。
 
 ::
 
@@ -40,20 +29,19 @@ available.
 
 
 ######################################################################
-# Steps
+# 具体步骤
 # -----
 # 
-# 1. Import all necessary libraries for loading our data
-# 2. Define and initialize the neural network
-# 3. Initialize the optimizer
-# 4. Save and load the model via ``state_dict``
-# 5. Save and load the entire model
+# 1. 导入加载数据所需的所有必要库
+# 2. 定义和初始化神经网络
+# 3. 初始化优化器
+# 4. 通过 ``state_dict`` 保存和加载模型
+# 5. 保存和加载整个模型
 # 
-# 1. Import necessary libraries for loading our data
+# 1. 导入加载数据所需的必要库
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # 
-# For this recipe, we will use ``torch`` and its subsidiaries ``torch.nn``
-# and ``torch.optim``.
+# 对于本教程，我们将使用 ``torch`` 及其子模块 ``torch.nn`` 和 ``torch.optim``。
 # 
 
 import torch
@@ -62,11 +50,10 @@ import torch.optim as optim
 
 
 ######################################################################
-# 2. Define and initialize the neural network
+# 2. 定义和初始化神经网络
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # 
-# For sake of example, we will create a neural network for training
-# images. To learn more see the Defining a Neural Network recipe.
+# 为了演示，我们将创建一个用于训练图像的神经网络。要了解更多信息，请参阅定义神经网络的教程。
 # 
 
 class Net(nn.Module):
@@ -93,52 +80,48 @@ print(net)
 
 
 ######################################################################
-# 3. Initialize the optimizer
+# 3. 初始化优化器
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # 
-# We will use SGD with momentum.
+# 我们将使用 SGD 优化器。
 # 
 
 optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
 
 
 ######################################################################
-# 4. Save and load the model via ``state_dict``
+# 4. 通过 ``state_dict`` 保存和加载模型
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # 
-# Let’s save and load our model using just ``state_dict``.
+# 让我们只使用 ``state_dict`` 来保存和加载我们的模型。
 # 
 
-# Specify a path
+# 路径
 PATH = "state_dict_model.pt"
 
-# Save
+# 保存
 torch.save(net.state_dict(), PATH)
 
-# Load
+# 加载
 model = Net()
 model.load_state_dict(torch.load(PATH))
 model.eval()
 
 
 ######################################################################
-# A common PyTorch convention is to save models using either a ``.pt`` or
-# ``.pth`` file extension.
+# 在PyTorch中，通常使用 ``.pt`` 或 ``.pth`` 文件扩展名来保存模型。
 # 
-# Notice that the ``load_state_dict()`` function takes a dictionary
-# object, NOT a path to a saved object. This means that you must
-# deserialize the saved state_dict before you pass it to the
-# ``load_state_dict()`` function. For example, you CANNOT load using
-# ``model.load_state_dict(PATH)``.
+# 注意 ``load_state_dict()`` 函数接受一个字典对象，而不是保存对象的路径。
+# 这意味着你必须先反序列化保存的state_dict，然后再传递给 ``load_state_dict()`` 函数。
+# 不能使用 ``model.load_state_dict(PATH)`` 来加载。
 # 
-# Remember too, that you must call ``model.eval()`` to set dropout and
-# batch normalization layers to evaluation mode before running inference.
-# Failing to do this will yield inconsistent inference results.
+# 还要记住，在运行推理之前，你必须调用 ``model.eval()`` 将dropout和batch normalization layers设置为评估模式。
+# 否则将导致推理结果不一致。
 # 
-# 5. Save and load entire model
+# 5. 保存和加载整个模型
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # 
-# Now let’s try the same thing with the entire model.
+# 现在让我们尝试将整个模型进行保存和加载。
 # 
 
 # Specify a path
@@ -153,16 +136,14 @@ model.eval()
 
 
 ######################################################################
-# Again here, remember that you must call ``model.eval()`` to set dropout and
-# batch normalization layers to evaluation mode before running inference.
+# 在这里，同样要记住在运行推理之前调用 ``model.eval()`` 将 dropout 和 batch normalization layers 设置为评估模式。
 # 
-# Congratulations! You have successfully saved and load models for
-# inference in PyTorch.
+# 祝贺你！你已经成功地在PyTorch中保存和加载了用于推理的模型。
 # 
-# Learn More
+# 继续学习
 # ----------
 # 
-# Take a look at these other recipes to continue your learning:
+# 查看这些其他教程以继续学习：
 # 
-# - `Saving and loading a general checkpoint in PyTorch <https://pytorch.org/tutorials/recipes/recipes/saving_and_loading_a_general_checkpoint.html>`__
-# - `Saving and loading multiple models in one file using PyTorch <https://pytorch.org/tutorials/recipes/recipes/saving_multiple_models_in_one_file.html>`__
+# - `PyTorch中保存和加载通用检查点 <https://pytorch.org/tutorials/recipes/recipes/saving_and_loading_a_general_checkpoint.html>`__
+# - `PyTorch中将多个模型保存在一个文件中 <https://pytorch.org/tutorials/recipes/recipes/saving_multiple_models_in_one_file.html>`__

@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Defining a Neural Network in PyTorch &mdash; PyTorch Tutorials 2.3.0 documentation</title>
+  <title>PyTorch 创建神经网络 &mdash; PyTorch Tutorials 2.3.0 documentation</title>
   
 
   
@@ -535,7 +535,7 @@
         
           <li><a href="../recipes_index.html">PyTorch 示例</a> &gt;</li>
         
-      <li>Defining a Neural Network in PyTorch</li>
+      <li>PyTorch 创建神经网络</li>
     
     
       <li class="pytorch-breadcrumbs-aside">
@@ -599,100 +599,81 @@
 <p>Click <a class="reference internal" href="#sphx-glr-download-recipes-recipes-defining-a-neural-network-py"><span class="std std-ref">here</span></a>
 to download the full example code</p>
 </div>
-<div class="sphx-glr-example-title section" id="defining-a-neural-network-in-pytorch">
-<span id="sphx-glr-recipes-recipes-defining-a-neural-network-py"></span><h1>Defining a Neural Network in PyTorch<a class="headerlink" href="#defining-a-neural-network-in-pytorch" title="Permalink to this heading">¶</a></h1>
-<p>Deep learning uses artificial neural networks (models), which are
-computing systems that are composed of many layers of interconnected
-units. By passing data through these interconnected units, a neural
-network is able to learn how to approximate the computations required to
-transform inputs into outputs. In PyTorch, neural networks can be
-constructed using the <code class="docutils literal notranslate"><span class="pre">torch.nn</span></code> package.</p>
-<div class="section" id="introduction">
-<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this heading">¶</a></h2>
-<p>PyTorch provides the elegantly designed modules and classes, including
-<code class="docutils literal notranslate"><span class="pre">torch.nn</span></code>, to help you create and train neural networks. An
-<code class="docutils literal notranslate"><span class="pre">nn.Module</span></code> contains layers, and a method <code class="docutils literal notranslate"><span class="pre">forward(input)</span></code> that
-returns the <code class="docutils literal notranslate"><span class="pre">output</span></code>.</p>
-<p>In this recipe, we will use <code class="docutils literal notranslate"><span class="pre">torch.nn</span></code> to define a neural network
-intended for the <a class="reference external" href="hhttps://pytorch.org/vision/stable/generated/torchvision.datasets.MNIST.html#torchvision.datasets.MNIST">MNIST
-dataset</a>.</p>
+<div class="sphx-glr-example-title section" id="pytorch">
+<span id="sphx-glr-recipes-recipes-defining-a-neural-network-py"></span><h1>PyTorch 创建神经网络<a class="headerlink" href="#pytorch" title="Permalink to this heading">¶</a></h1>
+<p>深度学习使用人工神经网络(模型),这是由许多互连单元层组成的计算系统。通过将数据传递到这些互连单元,
+神经网络能够学习如何近似将输入转换为输出所需的计算。在PyTorch中,可以使用 <code class="docutils literal notranslate"><span class="pre">torch.nn</span></code> 包构建神经网络。</p>
+<div class="section" id="id1">
+<h2>介绍<a class="headerlink" href="#id1" title="Permalink to this heading">¶</a></h2>
+<p>PyTorch 提供了优雅设计的模块和类来帮助您创建和训练神经网络,包括 <code class="docutils literal notranslate"><span class="pre">torch.nn</span></code>。
+一个 <code class="docutils literal notranslate"><span class="pre">nn.Module</span></code> 中有层(layers)、以及一个返回 <code class="docutils literal notranslate"><span class="pre">output</span></code> 的 <code class="docutils literal notranslate"><span class="pre">forward(input)</span></code> 方法。</p>
+<p>在本教程中,我们将使用 <code class="docutils literal notranslate"><span class="pre">torch.nn</span></code> 来定义一个用于
+<cite>MNIST 数据集 &lt;hhttps://pytorch.org/vision/stable/generated/torchvision.datasets.MNIST.html#torchvision.datasets.MNIST&gt;</cite> 的神经网络。</p>
 </div>
-<div class="section" id="setup">
-<h2>Setup<a class="headerlink" href="#setup" title="Permalink to this heading">¶</a></h2>
-<p>Before we begin, we need to install <code class="docutils literal notranslate"><span class="pre">torch</span></code> if it isn’t already
-available.</p>
+<div class="section" id="id2">
+<h2>环境设置<a class="headerlink" href="#id2" title="Permalink to this heading">¶</a></h2>
+<p>在开始之前,如果还没有安装 <a href="#id3"><span class="problematic" id="id4">``</span></a>torch``的话,我们需要先安装它。</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">torch</span>
 </pre></div>
 </div>
 </div>
-<div class="section" id="steps">
-<h2>Steps<a class="headerlink" href="#steps" title="Permalink to this heading">¶</a></h2>
+<div class="section" id="id5">
+<h2>具体步骤<a class="headerlink" href="#id5" title="Permalink to this heading">¶</a></h2>
 <ol class="arabic simple">
-<li><p>Import all necessary libraries for loading our data</p></li>
-<li><p>Define and initialize the neural network</p></li>
-<li><p>Specify how data will pass through your model</p></li>
-<li><p>[Optional] Pass data through your model to test</p></li>
+<li><p>导入加载数据所需的所有必要库</p></li>
+<li><p>定义和初始化神经网络</p></li>
+<li><p>指定数据如何通过你的模型</p></li>
+<li><p>[可选] 通过你的模型传递数据进行测试</p></li>
 </ol>
-<div class="section" id="import-necessary-libraries-for-loading-our-data">
-<h3>1. Import necessary libraries for loading our data<a class="headerlink" href="#import-necessary-libraries-for-loading-our-data" title="Permalink to this heading">¶</a></h3>
-<p>For this recipe, we will use <code class="docutils literal notranslate"><span class="pre">torch</span></code> and its subsidiaries <code class="docutils literal notranslate"><span class="pre">torch.nn</span></code>
-and <code class="docutils literal notranslate"><span class="pre">torch.nn.functional</span></code>.</p>
+<div class="section" id="id6">
+<h3>1. 导入加载数据所需的必要库<a class="headerlink" href="#id6" title="Permalink to this heading">¶</a></h3>
+<p>对于本教程,我们将使用 <code class="docutils literal notranslate"><span class="pre">torch</span></code> 及其子模块 <code class="docutils literal notranslate"><span class="pre">torch.nn</span></code> 和 <code class="docutils literal notranslate"><span class="pre">torch.nn.functional</span></code>。</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
 <span class="kn">import</span> <span class="nn">torch.nn.functional</span> <span class="k">as</span> <span class="nn">F</span>
 </pre></div>
 </div>
 </div>
-<div class="section" id="define-and-initialize-the-neural-network">
-<h3>2. Define and initialize the neural network<a class="headerlink" href="#define-and-initialize-the-neural-network" title="Permalink to this heading">¶</a></h3>
-<p>Our network will recognize images. We will use a process built into
-PyTorch called convolution. Convolution adds each element of an image to
-its local neighbors, weighted by a kernel, or a small matrix, that
-helps us extract certain features (like edge detection, sharpness,
-blurriness, etc.) from the input image.</p>
-<p>There are two requirements for defining the <code class="docutils literal notranslate"><span class="pre">Net</span></code> class of your model.
-The first is writing an __init__ function that references
-<code class="docutils literal notranslate"><span class="pre">nn.Module</span></code>. This function is where you define the fully connected
-layers in your neural network.</p>
-<p>Using convolution, we will define our model to take 1 input image
-channel, and output match our target of 10 labels representing numbers 0
-through 9. This algorithm is yours to create, we will follow a standard
-MNIST algorithm.</p>
+<div class="section" id="id7">
+<h3>2. 定义和初始化神经网络<a class="headerlink" href="#id7" title="Permalink to this heading">¶</a></h3>
+<p>我们的网络将识别图像。我们将使用PyTorch内置的卷积过程。卷积将每个图像元素与其局部邻居相加,
+并由一个小矩阵(内核)加权,该内核可帮助我们从输入图像中提取某些特征(如边缘检测、锐利度、模糊度等)。</p>
+<p>定义模型的 <code class="docutils literal notranslate"><span class="pre">Net</span></code> 类有两个要求。第一是编写一个引用 <code class="docutils literal notranslate"><span class="pre">nn.Module</span></code> 的 __init__ 函数。
+在这个函数中,你定义神经网络中的全连接层。</p>
+<p>使用卷积,我们将定义我们的模型以接受1个输入图像通道,并输出与我们的目标相匹配的10个标签,表示0到9的数字。
+这个算法由你自己创建,我们将遵循标准的MNIST算法。</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Net</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/generated/torch.nn.Module.html#torch.nn.Module" title="torch.nn.Module" class="sphx-glr-backref-module-torch-nn sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">nn</span><span class="o">.</span><span class="n">Module</span></a><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
       <span class="nb">super</span><span class="p">(</span><span class="n">Net</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
 
-      <span class="c1"># First 2D convolutional layer, taking in 1 input channel (image),</span>
-      <span class="c1"># outputting 32 convolutional features, with a square kernel size of 3</span>
+      <span class="c1"># 第一个2D卷积层,接受1个输入通道(图像),</span>
+      <span class="c1"># 输出32个卷积特征,使用3x3的方形核</span>
       <span class="bp">self</span><span class="o">.</span><span class="n">conv1</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.nn.Conv2d.html#torch.nn.Conv2d" title="torch.nn.Conv2d" class="sphx-glr-backref-module-torch-nn sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span></a><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">32</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-      <span class="c1"># Second 2D convolutional layer, taking in the 32 input layers,</span>
-      <span class="c1"># outputting 64 convolutional features, with a square kernel size of 3</span>
+      <span class="c1"># 第二个2D卷积层,接受32个输入层,</span>
+      <span class="c1"># 输出64个卷积特征,使用3x3的方形核</span>
       <span class="bp">self</span><span class="o">.</span><span class="n">conv2</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.nn.Conv2d.html#torch.nn.Conv2d" title="torch.nn.Conv2d" class="sphx-glr-backref-module-torch-nn sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span></a><span class="p">(</span><span class="mi">32</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 
-      <span class="c1"># Designed to ensure that adjacent pixels are either all 0s or all active</span>
-      <span class="c1"># with an input probability</span>
+      <span class="c1"># 设计为确保相邻像素要么全为0,要么全为激活</span>
+      <span class="c1"># 具有一定输入概率</span>
       <span class="bp">self</span><span class="o">.</span><span class="n">dropout1</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.nn.Dropout2d.html#torch.nn.Dropout2d" title="torch.nn.Dropout2d" class="sphx-glr-backref-module-torch-nn sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">nn</span><span class="o">.</span><span class="n">Dropout2d</span></a><span class="p">(</span><span class="mf">0.25</span><span class="p">)</span>
       <span class="bp">self</span><span class="o">.</span><span class="n">dropout2</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.nn.Dropout2d.html#torch.nn.Dropout2d" title="torch.nn.Dropout2d" class="sphx-glr-backref-module-torch-nn sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">nn</span><span class="o">.</span><span class="n">Dropout2d</span></a><span class="p">(</span><span class="mf">0.5</span><span class="p">)</span>
 
-      <span class="c1"># First fully connected layer</span>
+      <span class="c1"># 第一个全连接层</span>
       <span class="bp">self</span><span class="o">.</span><span class="n">fc1</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.nn.Linear.html#torch.nn.Linear" title="torch.nn.Linear" class="sphx-glr-backref-module-torch-nn sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span></a><span class="p">(</span><span class="mi">9216</span><span class="p">,</span> <span class="mi">128</span><span class="p">)</span>
-      <span class="c1"># Second fully connected layer that outputs our 10 labels</span>
+      <span class="c1"># 第二个全连接层,输出我们的10个标签</span>
       <span class="bp">self</span><span class="o">.</span><span class="n">fc2</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.nn.Linear.html#torch.nn.Linear" title="torch.nn.Linear" class="sphx-glr-backref-module-torch-nn sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span></a><span class="p">(</span><span class="mi">128</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
 
 <span class="n">my_nn</span> <span class="o">=</span> <span class="n">Net</span><span class="p">()</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">my_nn</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>We have finished defining our neural network, now we have to define how
-our data will pass through it.</p>
+<p>我们已经完成了神经网络的定义,现在我们必须定义数据如何通过它。</p>
 </div>
-<div class="section" id="specify-how-data-will-pass-through-your-model">
-<h3>3. Specify how data will pass through your model<a class="headerlink" href="#specify-how-data-will-pass-through-your-model" title="Permalink to this heading">¶</a></h3>
-<p>When you use PyTorch to build a model, you just have to define the
-<code class="docutils literal notranslate"><span class="pre">forward</span></code> function, that will pass the data into the computation graph
-(i.e. our neural network). This will represent our feed-forward
-algorithm.</p>
-<p>You can use any of the Tensor operations in the <code class="docutils literal notranslate"><span class="pre">forward</span></code> function.</p>
+<div class="section" id="id8">
+<h3>3. 指定数据如何通过你的模型<a class="headerlink" href="#id8" title="Permalink to this heading">¶</a></h3>
+<p>当你使用PyTorch构建模型时,你只需要定义 <code class="docutils literal notranslate"><span class="pre">forward</span></code> 函数,它将数据传递到计算图(即我们的神经网络)中。
+这将代表我们的前向算法。</p>
+<p>你可以在 <code class="docutils literal notranslate"><span class="pre">forward</span></code> 函数中使用任何张量操作。</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Net</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/generated/torch.nn.Module.html#torch.nn.Module" title="torch.nn.Module" class="sphx-glr-backref-module-torch-nn sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">nn</span><span class="o">.</span><span class="n">Module</span></a><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
       <span class="nb">super</span><span class="p">(</span><span class="n">Net</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
@@ -703,39 +684,38 @@ algorithm.</p>
       <span class="bp">self</span><span class="o">.</span><span class="n">fc1</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.nn.Linear.html#torch.nn.Linear" title="torch.nn.Linear" class="sphx-glr-backref-module-torch-nn sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span></a><span class="p">(</span><span class="mi">9216</span><span class="p">,</span> <span class="mi">128</span><span class="p">)</span>
       <span class="bp">self</span><span class="o">.</span><span class="n">fc2</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.nn.Linear.html#torch.nn.Linear" title="torch.nn.Linear" class="sphx-glr-backref-module-torch-nn sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span></a><span class="p">(</span><span class="mi">128</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
 
-    <span class="c1"># x represents our data</span>
+    <span class="c1"># x表示我们的数据</span>
     <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-      <span class="c1"># Pass data through conv1</span>
+      <span class="c1"># 将数据传递给conv1</span>
       <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conv1</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-      <span class="c1"># Use the rectified-linear activation function over x</span>
+      <span class="c1"># 对x使用整流线性激活函数</span>
       <span class="n">x</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.nn.functional.relu.html#torch.nn.functional.relu" title="torch.nn.functional.relu" class="sphx-glr-backref-module-torch-nn-functional sphx-glr-backref-type-py-function"><span class="n">F</span><span class="o">.</span><span class="n">relu</span></a><span class="p">(</span><span class="n">x</span><span class="p">)</span>
 
       <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conv2</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
       <span class="n">x</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.nn.functional.relu.html#torch.nn.functional.relu" title="torch.nn.functional.relu" class="sphx-glr-backref-module-torch-nn-functional sphx-glr-backref-type-py-function"><span class="n">F</span><span class="o">.</span><span class="n">relu</span></a><span class="p">(</span><span class="n">x</span><span class="p">)</span>
 
-      <span class="c1"># Run max pooling over x</span>
+      <span class="c1"># 对x运行最大池化</span>
       <span class="n">x</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.nn.functional.max_pool2d.html#torch.nn.functional.max_pool2d" title="torch.nn.functional.max_pool2d" class="sphx-glr-backref-module-torch-nn-functional sphx-glr-backref-type-py-function"><span class="n">F</span><span class="o">.</span><span class="n">max_pool2d</span></a><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
-      <span class="c1"># Pass data through dropout1</span>
+      <span class="c1"># 将数据传递给dropout1</span>
       <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dropout1</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-      <span class="c1"># Flatten x with start_dim=1</span>
+      <span class="c1"># 展平x,start_dim=1</span>
       <span class="n">x</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.flatten.html#torch.flatten" title="torch.flatten" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">flatten</span></a><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-      <span class="c1"># Pass data through ``fc1``</span>
+      <span class="c1"># 将数据传递给 ``fc1``</span>
       <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fc1</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
       <span class="n">x</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.nn.functional.relu.html#torch.nn.functional.relu" title="torch.nn.functional.relu" class="sphx-glr-backref-module-torch-nn-functional sphx-glr-backref-type-py-function"><span class="n">F</span><span class="o">.</span><span class="n">relu</span></a><span class="p">(</span><span class="n">x</span><span class="p">)</span>
       <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dropout2</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
       <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fc2</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
 
-      <span class="c1"># Apply softmax to x</span>
+      <span class="c1"># 对x应用softmax</span>
       <span class="n">output</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.nn.functional.log_softmax.html#torch.nn.functional.log_softmax" title="torch.nn.functional.log_softmax" class="sphx-glr-backref-module-torch-nn-functional sphx-glr-backref-type-py-function"><span class="n">F</span><span class="o">.</span><span class="n">log_softmax</span></a><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
       <span class="k">return</span> <span class="n">output</span>
 </pre></div>
 </div>
 </div>
-<div class="section" id="optional-pass-data-through-your-model-to-test">
-<h3>4. [Optional] Pass data through your model to test<a class="headerlink" href="#optional-pass-data-through-your-model-to-test" title="Permalink to this heading">¶</a></h3>
-<p>To ensure we receive our desired output, let’s test our model by passing
-some random data through it.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Equates to one random 28x28 image</span>
+<div class="section" id="id9">
+<h3>4. [可选] 通过你的模型传递数据进行测试<a class="headerlink" href="#id9" title="Permalink to this heading">¶</a></h3>
+<p>为了确保我们得到期望的输出,让我们通过一些随机数据测试我们的模型。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># 等同于一个随机的28x28图像</span>
 <span class="n">random_data</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.rand.html#torch.rand" title="torch.rand" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">rand</span></a><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">28</span><span class="p">,</span> <span class="mi">28</span><span class="p">))</span>
 
 <span class="n">my_nn</span> <span class="o">=</span> <span class="n">Net</span><span class="p">()</span>
@@ -743,18 +723,16 @@ some random data through it.</p>
 <span class="nb">print</span> <span class="p">(</span><span class="n">result</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Each number in this resulting tensor equates to the prediction of the
-label the random tensor is associated to.</p>
-<p>Congratulations! You have successfully defined a neural network in
-PyTorch.</p>
+<p>这个结果张量中的每个数字都等同于随机张量所关联的标签的预测。</p>
+<p>祝贺你!你已经成功地在PyTorch中定义了一个神经网络。</p>
 </div>
 </div>
-<div class="section" id="learn-more">
-<h2>Learn More<a class="headerlink" href="#learn-more" title="Permalink to this heading">¶</a></h2>
-<p>Take a look at these other recipes to continue your learning:</p>
+<div class="section" id="id10">
+<h2>学习更多<a class="headerlink" href="#id10" title="Permalink to this heading">¶</a></h2>
+<p>查看这些其他教程以继续学习:</p>
 <ul class="simple">
-<li><p><a class="reference external" href="https://pytorch.org/tutorials/recipes/recipes/what_is_state_dict.html">What is a state_dict in PyTorch</a></p></li>
-<li><p><a class="reference external" href="https://pytorch.org/tutorials/recipes/recipes/saving_and_loading_models_for_inference.html">Saving and loading models for inference in PyTorch</a></p></li>
+<li><p><a class="reference external" href="https://pytorch.org/tutorials/recipes/recipes/what_is_state_dict.html">PyTorch 中 state_dict 是什么</a></p></li>
+<li><p><a class="reference external" href="https://pytorch.org/tutorials/recipes/recipes/saving_and_loading_models_for_inference.html">PyTorch 保存和加载模型用于推理</a></p></li>
 </ul>
 <p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.000 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-recipes-recipes-defining-a-neural-network-py">
@@ -830,17 +808,17 @@ if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.i
           <div class="pytorch-right-menu" id="pytorch-right-menu">
             <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
               <ul>
-<li><a class="reference internal" href="#">Defining a Neural Network in PyTorch</a><ul>
-<li><a class="reference internal" href="#introduction">Introduction</a></li>
-<li><a class="reference internal" href="#setup">Setup</a></li>
-<li><a class="reference internal" href="#steps">Steps</a><ul>
-<li><a class="reference internal" href="#import-necessary-libraries-for-loading-our-data">1. Import necessary libraries for loading our data</a></li>
-<li><a class="reference internal" href="#define-and-initialize-the-neural-network">2. Define and initialize the neural network</a></li>
-<li><a class="reference internal" href="#specify-how-data-will-pass-through-your-model">3. Specify how data will pass through your model</a></li>
-<li><a class="reference internal" href="#optional-pass-data-through-your-model-to-test">4. [Optional] Pass data through your model to test</a></li>
+<li><a class="reference internal" href="#">PyTorch 创建神经网络</a><ul>
+<li><a class="reference internal" href="#id1">介绍</a></li>
+<li><a class="reference internal" href="#id2">环境设置</a></li>
+<li><a class="reference internal" href="#id5">具体步骤</a><ul>
+<li><a class="reference internal" href="#id6">1. 导入加载数据所需的必要库</a></li>
+<li><a class="reference internal" href="#id7">2. 定义和初始化神经网络</a></li>
+<li><a class="reference internal" href="#id8">3. 指定数据如何通过你的模型</a></li>
+<li><a class="reference internal" href="#id9">4. [可选] 通过你的模型传递数据进行测试</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#learn-more">Learn More</a></li>
+<li><a class="reference internal" href="#id10">学习更多</a></li>
 </ul>
 </li>
 </ul>
