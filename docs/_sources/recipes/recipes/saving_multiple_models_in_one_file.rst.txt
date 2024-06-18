@@ -18,53 +18,44 @@
 .. _sphx_glr_recipes_recipes_saving_multiple_models_in_one_file.py:
 
 
-Saving and loading multiple models in one file using PyTorch
+PyTorch 在一个文件中保存和加载多个模型
 ============================================================
-Saving and loading multiple models can be helpful for reusing models
-that you have previously trained.
+保存和加载多个模型，可以帮助您重用之前训练过的模型。
 
-Introduction
+简介
 ------------
-When saving a model comprised of multiple ``torch.nn.Modules``, such as
-a GAN, a sequence-to-sequence model, or an ensemble of models, you must
-save a dictionary of each model’s state_dict and corresponding
-optimizer. You can also save any other items that may aid you in
-resuming training by simply appending them to the dictionary.
-To load the models, first initialize the models and optimizers, then
-load the dictionary locally using ``torch.load()``. From here, you can
-easily access the saved items by simply querying the dictionary as you
-would expect.
-In this recipe, we will demonstrate how to save multiple models to one
-file using PyTorch.
+当保存由多个 ``torch.nn.Modules`` 组成的模型时，例如生成对抗网络(GAN)、序列到序列模型或模型集合时，
+您必须保存每个模型的state_dict和相应的优化器。
+您还可以通过简单地将其附加到字典中来保存任何可能有助于恢复训练的其他项目。
+要加载模型，首先初始化模型和优化器，然后使用 ``torch.load()`` 在本地加载字典。
+从这里开始，您可以像期望的那样简单地查询字典来轻松访问保存的项目。
+在本教程中，我们将演示如何使用PyTorch在一个文件中保存多个模型。
 
-Setup
+环境设置
 -----
-Before we begin, we need to install ``torch`` if it isn’t already
-available.
+在开始之前，如果尚未安装 ``torch``，我们需要先安装它。
 
 .. code-block:: sh
 
    pip install torch
 
-.. GENERATED FROM PYTHON SOURCE LINES 35-50
+.. GENERATED FROM PYTHON SOURCE LINES 28-41
 
-Steps
+具体步骤
 -----
+1. 导入加载数据所需的所有必要库
+2. 定义和初始化神经网络
+3. 初始化优化器
+4. 保存多个模型
+5. 加载多个模型
 
-1. Import all necessary libraries for loading our data
-2. Define and initialize the neural network
-3. Initialize the optimizer
-4. Save multiple models
-5. Load multiple models
-
-1. Import necessary libraries for loading our data
+1. 导入加载数据所需的必要库
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-For this recipe, we will use ``torch`` and its subsidiaries ``torch.nn``
-and ``torch.optim``.
+对于本教程，我们将使用 ``torch`` 及其子模块 ``torch.nn`` 和 ``torch.optim``。
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 50-56
+.. GENERATED FROM PYTHON SOURCE LINES 41-47
 
 .. code-block:: default
 
@@ -75,19 +66,19 @@ and ``torch.optim``.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 57-64
+.. GENERATED FROM PYTHON SOURCE LINES 48-54
 
-2. Define and initialize the neural network
+2. 定义和初始化神经网络
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-For sake of example, we will create a neural network for training
-images. To learn more see the Defining a Neural Network recipe. Build
-two variables for the models to eventually save.
+为了演示，我们将创建一个用于训练图像的神经网络。要了解更多信息，请参阅定义神经网络的教程。
+构建两个变量用于最终保存模型。
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 64-88
+.. GENERATED FROM PYTHON SOURCE LINES 54-79
 
 .. code-block:: default
+
 
 
     class Net(nn.Module):
@@ -114,16 +105,15 @@ two variables for the models to eventually save.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 89-95
+.. GENERATED FROM PYTHON SOURCE LINES 80-85
 
-3. Initialize the optimizer
+3. 初始化优化器
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-We will use SGD with momentum to build an optimizer for each model we
-created.
+我们将使用 SGD 为我们创建的每个模型构建优化器。
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 95-100
+.. GENERATED FROM PYTHON SOURCE LINES 85-90
 
 .. code-block:: default
 
@@ -133,20 +123,20 @@ created.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 101-106
+.. GENERATED FROM PYTHON SOURCE LINES 91-96
 
-4. Save multiple models
+4. 保存多个模型
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Collect all relevant information and build your dictionary.
+收集所有相关信息并构建字典。
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 106-118
+.. GENERATED FROM PYTHON SOURCE LINES 96-108
 
 .. code-block:: default
 
 
-    # Specify a path to save to
+    # 指定保存路径
     PATH = "model.pt"
 
     torch.save({
@@ -158,16 +148,15 @@ Collect all relevant information and build your dictionary.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 119-125
+.. GENERATED FROM PYTHON SOURCE LINES 109-114
 
-4. Load multiple models
+4. 加载多个模型
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Remember to first initialize the models and optimizers, then load the
-dictionary locally.
+记住首先初始化模型和优化器，然后在本地加载字典。
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 125-144
+.. GENERATED FROM PYTHON SOURCE LINES 114-133
 
 .. code-block:: default
 
@@ -191,18 +180,14 @@ dictionary locally.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 145-155
+.. GENERATED FROM PYTHON SOURCE LINES 134-140
 
-You must call ``model.eval()`` to set dropout and batch normalization
-layers to evaluation mode before running inference. Failing to do this
-will yield inconsistent inference results.
+在运行推理之前，您必须调用 ``model.eval()`` 将 dropout 和 batch normalization 层设置为评估模式。
+否则将导致推理结果不一致。
 
-If you wish to resuming training, call ``model.train()`` to ensure these
-layers are in training mode.
+如果您希望恢复训练，请调用 ``model.train()`` 以确保这些层处于训练模式。
 
-Congratulations! You have successfully saved and loaded multiple models
-in PyTorch.
-
+祝贺您！您已经成功地在PyTorch中保存和加载了多个模型。
 
 
 .. rst-class:: sphx-glr-timing

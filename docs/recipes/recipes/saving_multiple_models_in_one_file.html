@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Saving and loading multiple models in one file using PyTorch &mdash; PyTorch Tutorials 2.3.0 documentation</title>
+  <title>PyTorch 在一个文件中保存和加载多个模型 &mdash; PyTorch Tutorials 2.3.0 documentation</title>
   
 
   
@@ -43,7 +43,7 @@
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="Warmstarting model using parameters from a different model in PyTorch" href="warmstarting_model_using_parameters_from_a_different_model.html" />
-    <link rel="prev" title="Saving and loading a general checkpoint in PyTorch" href="saving_and_loading_a_general_checkpoint.html" />
+    <link rel="prev" title="PyTorch 保存和加载通用检查点" href="saving_and_loading_a_general_checkpoint.html" />
   <!-- Google Tag Manager -->
     <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
     new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
@@ -535,7 +535,7 @@
         
           <li><a href="../recipes_index.html">PyTorch 示例</a> &gt;</li>
         
-      <li>Saving and loading multiple models in one file using PyTorch</li>
+      <li>PyTorch 在一个文件中保存和加载多个模型</li>
     
     
       <li class="pytorch-breadcrumbs-aside">
@@ -599,56 +599,47 @@
 <p>Click <a class="reference internal" href="#sphx-glr-download-recipes-recipes-saving-multiple-models-in-one-file-py"><span class="std std-ref">here</span></a>
 to download the full example code</p>
 </div>
-<div class="sphx-glr-example-title section" id="saving-and-loading-multiple-models-in-one-file-using-pytorch">
-<span id="sphx-glr-recipes-recipes-saving-multiple-models-in-one-file-py"></span><h1>Saving and loading multiple models in one file using PyTorch<a class="headerlink" href="#saving-and-loading-multiple-models-in-one-file-using-pytorch" title="Permalink to this heading">¶</a></h1>
-<p>Saving and loading multiple models can be helpful for reusing models
-that you have previously trained.</p>
-<div class="section" id="introduction">
-<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this heading">¶</a></h2>
-<p>When saving a model comprised of multiple <code class="docutils literal notranslate"><span class="pre">torch.nn.Modules</span></code>, such as
-a GAN, a sequence-to-sequence model, or an ensemble of models, you must
-save a dictionary of each model’s state_dict and corresponding
-optimizer. You can also save any other items that may aid you in
-resuming training by simply appending them to the dictionary.
-To load the models, first initialize the models and optimizers, then
-load the dictionary locally using <code class="docutils literal notranslate"><span class="pre">torch.load()</span></code>. From here, you can
-easily access the saved items by simply querying the dictionary as you
-would expect.
-In this recipe, we will demonstrate how to save multiple models to one
-file using PyTorch.</p>
+<div class="sphx-glr-example-title section" id="pytorch">
+<span id="sphx-glr-recipes-recipes-saving-multiple-models-in-one-file-py"></span><h1>PyTorch 在一个文件中保存和加载多个模型<a class="headerlink" href="#pytorch" title="Permalink to this heading">¶</a></h1>
+<p>保存和加载多个模型，可以帮助您重用之前训练过的模型。</p>
+<div class="section" id="id1">
+<h2>简介<a class="headerlink" href="#id1" title="Permalink to this heading">¶</a></h2>
+<p>当保存由多个 <code class="docutils literal notranslate"><span class="pre">torch.nn.Modules</span></code> 组成的模型时，例如生成对抗网络(GAN)、序列到序列模型或模型集合时，
+您必须保存每个模型的state_dict和相应的优化器。
+您还可以通过简单地将其附加到字典中来保存任何可能有助于恢复训练的其他项目。
+要加载模型，首先初始化模型和优化器，然后使用 <code class="docutils literal notranslate"><span class="pre">torch.load()</span></code> 在本地加载字典。
+从这里开始，您可以像期望的那样简单地查询字典来轻松访问保存的项目。
+在本教程中，我们将演示如何使用PyTorch在一个文件中保存多个模型。</p>
 </div>
-<div class="section" id="setup">
-<h2>Setup<a class="headerlink" href="#setup" title="Permalink to this heading">¶</a></h2>
-<p>Before we begin, we need to install <code class="docutils literal notranslate"><span class="pre">torch</span></code> if it isn’t already
-available.</p>
+<div class="section" id="id2">
+<h2>环境设置<a class="headerlink" href="#id2" title="Permalink to this heading">¶</a></h2>
+<p>在开始之前，如果尚未安装 <code class="docutils literal notranslate"><span class="pre">torch</span></code>，我们需要先安装它。</p>
 <div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>torch
 </pre></div>
 </div>
 </div>
-<div class="section" id="steps">
-<h2>Steps<a class="headerlink" href="#steps" title="Permalink to this heading">¶</a></h2>
+<div class="section" id="id3">
+<h2>具体步骤<a class="headerlink" href="#id3" title="Permalink to this heading">¶</a></h2>
 <ol class="arabic simple">
-<li><p>Import all necessary libraries for loading our data</p></li>
-<li><p>Define and initialize the neural network</p></li>
-<li><p>Initialize the optimizer</p></li>
-<li><p>Save multiple models</p></li>
-<li><p>Load multiple models</p></li>
+<li><p>导入加载数据所需的所有必要库</p></li>
+<li><p>定义和初始化神经网络</p></li>
+<li><p>初始化优化器</p></li>
+<li><p>保存多个模型</p></li>
+<li><p>加载多个模型</p></li>
 </ol>
-<div class="section" id="import-necessary-libraries-for-loading-our-data">
-<h3>1. Import necessary libraries for loading our data<a class="headerlink" href="#import-necessary-libraries-for-loading-our-data" title="Permalink to this heading">¶</a></h3>
-<p>For this recipe, we will use <code class="docutils literal notranslate"><span class="pre">torch</span></code> and its subsidiaries <code class="docutils literal notranslate"><span class="pre">torch.nn</span></code>
-and <code class="docutils literal notranslate"><span class="pre">torch.optim</span></code>.</p>
+<div class="section" id="id4">
+<h3>1. 导入加载数据所需的必要库<a class="headerlink" href="#id4" title="Permalink to this heading">¶</a></h3>
+<p>对于本教程，我们将使用 <code class="docutils literal notranslate"><span class="pre">torch</span></code> 及其子模块 <code class="docutils literal notranslate"><span class="pre">torch.nn</span></code> 和 <code class="docutils literal notranslate"><span class="pre">torch.optim</span></code>。</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
 <span class="kn">import</span> <span class="nn">torch.optim</span> <span class="k">as</span> <span class="nn">optim</span>
 </pre></div>
 </div>
 </div>
-<div class="section" id="define-and-initialize-the-neural-network">
-<h3>2. Define and initialize the neural network<a class="headerlink" href="#define-and-initialize-the-neural-network" title="Permalink to this heading">¶</a></h3>
-<p>For sake of example, we will create a neural network for training
-images. To learn more see the Defining a Neural Network recipe. Build
-two variables for the models to eventually save.</p>
+<div class="section" id="id5">
+<h3>2. 定义和初始化神经网络<a class="headerlink" href="#id5" title="Permalink to this heading">¶</a></h3>
+<p>为了演示，我们将创建一个用于训练图像的神经网络。要了解更多信息，请参阅定义神经网络的教程。
+构建两个变量用于最终保存模型。</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Net</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/generated/torch.nn.Module.html#torch.nn.Module" title="torch.nn.Module" class="sphx-glr-backref-module-torch-nn sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">nn</span><span class="o">.</span><span class="n">Module</span></a><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">Net</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
@@ -673,19 +664,18 @@ two variables for the models to eventually save.</p>
 </pre></div>
 </div>
 </div>
-<div class="section" id="initialize-the-optimizer">
-<h3>3. Initialize the optimizer<a class="headerlink" href="#initialize-the-optimizer" title="Permalink to this heading">¶</a></h3>
-<p>We will use SGD with momentum to build an optimizer for each model we
-created.</p>
+<div class="section" id="id6">
+<h3>3. 初始化优化器<a class="headerlink" href="#id6" title="Permalink to this heading">¶</a></h3>
+<p>我们将使用 SGD 为我们创建的每个模型构建优化器。</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">optimizerA</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.optim.SGD.html#torch.optim.SGD" title="torch.optim.SGD" class="sphx-glr-backref-module-torch-optim sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">optim</span><span class="o">.</span><span class="n">SGD</span></a><span class="p">(</span><span class="n">netA</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span> <span class="n">momentum</span><span class="o">=</span><span class="mf">0.9</span><span class="p">)</span>
 <span class="n">optimizerB</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.optim.SGD.html#torch.optim.SGD" title="torch.optim.SGD" class="sphx-glr-backref-module-torch-optim sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">optim</span><span class="o">.</span><span class="n">SGD</span></a><span class="p">(</span><span class="n">netB</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span> <span class="n">momentum</span><span class="o">=</span><span class="mf">0.9</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
-<div class="section" id="save-multiple-models">
-<h3>4. Save multiple models<a class="headerlink" href="#save-multiple-models" title="Permalink to this heading">¶</a></h3>
-<p>Collect all relevant information and build your dictionary.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Specify a path to save to</span>
+<div class="section" id="id7">
+<h3>4. 保存多个模型<a class="headerlink" href="#id7" title="Permalink to this heading">¶</a></h3>
+<p>收集所有相关信息并构建字典。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># 指定保存路径</span>
 <span class="n">PATH</span> <span class="o">=</span> <span class="s2">&quot;model.pt&quot;</span>
 
 <a href="https://pytorch.org/docs/stable/generated/torch.save.html#torch.save" title="torch.save" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">save</span></a><span class="p">({</span>
@@ -697,10 +687,9 @@ created.</p>
 </pre></div>
 </div>
 </div>
-<div class="section" id="load-multiple-models">
-<h3>4. Load multiple models<a class="headerlink" href="#load-multiple-models" title="Permalink to this heading">¶</a></h3>
-<p>Remember to first initialize the models and optimizers, then load the
-dictionary locally.</p>
+<div class="section" id="id8">
+<h3>4. 加载多个模型<a class="headerlink" href="#id8" title="Permalink to this heading">¶</a></h3>
+<p>记住首先初始化模型和优化器，然后在本地加载字典。</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">modelA</span> <span class="o">=</span> <span class="n">Net</span><span class="p">()</span>
 <span class="n">modelB</span> <span class="o">=</span> <span class="n">Net</span><span class="p">()</span>
 <span class="n">optimModelA</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.optim.SGD.html#torch.optim.SGD" title="torch.optim.SGD" class="sphx-glr-backref-module-torch-optim sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">optim</span><span class="o">.</span><span class="n">SGD</span></a><span class="p">(</span><span class="n">modelA</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span> <span class="n">momentum</span><span class="o">=</span><span class="mf">0.9</span><span class="p">)</span>
@@ -719,13 +708,10 @@ dictionary locally.</p>
 <span class="n">modelB</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
 </pre></div>
 </div>
-<p>You must call <code class="docutils literal notranslate"><span class="pre">model.eval()</span></code> to set dropout and batch normalization
-layers to evaluation mode before running inference. Failing to do this
-will yield inconsistent inference results.</p>
-<p>If you wish to resuming training, call <code class="docutils literal notranslate"><span class="pre">model.train()</span></code> to ensure these
-layers are in training mode.</p>
-<p>Congratulations! You have successfully saved and loaded multiple models
-in PyTorch.</p>
+<p>在运行推理之前，您必须调用 <code class="docutils literal notranslate"><span class="pre">model.eval()</span></code> 将 dropout 和 batch normalization 层设置为评估模式。
+否则将导致推理结果不一致。</p>
+<p>如果您希望恢复训练，请调用 <code class="docutils literal notranslate"><span class="pre">model.train()</span></code> 以确保这些层处于训练模式。</p>
+<p>祝贺您！您已经成功地在PyTorch中保存和加载了多个模型。</p>
 <p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.000 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-recipes-recipes-saving-multiple-models-in-one-file-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
@@ -751,7 +737,7 @@ in PyTorch.</p>
         <a href="warmstarting_model_using_parameters_from_a_different_model.html" class="btn btn-neutral float-right" title="Warmstarting model using parameters from a different model in PyTorch" accesskey="n" rel="next">Next <img src="../../_static/images/chevron-right-orange.svg" class="next-page"></a>
       
       
-        <a href="saving_and_loading_a_general_checkpoint.html" class="btn btn-neutral" title="Saving and loading a general checkpoint in PyTorch" accesskey="p" rel="prev"><img src="../../_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
+        <a href="saving_and_loading_a_general_checkpoint.html" class="btn btn-neutral" title="PyTorch 保存和加载通用检查点" accesskey="p" rel="prev"><img src="../../_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
       
     </div>
   
@@ -801,15 +787,15 @@ if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.i
           <div class="pytorch-right-menu" id="pytorch-right-menu">
             <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
               <ul>
-<li><a class="reference internal" href="#">Saving and loading multiple models in one file using PyTorch</a><ul>
-<li><a class="reference internal" href="#introduction">Introduction</a></li>
-<li><a class="reference internal" href="#setup">Setup</a></li>
-<li><a class="reference internal" href="#steps">Steps</a><ul>
-<li><a class="reference internal" href="#import-necessary-libraries-for-loading-our-data">1. Import necessary libraries for loading our data</a></li>
-<li><a class="reference internal" href="#define-and-initialize-the-neural-network">2. Define and initialize the neural network</a></li>
-<li><a class="reference internal" href="#initialize-the-optimizer">3. Initialize the optimizer</a></li>
-<li><a class="reference internal" href="#save-multiple-models">4. Save multiple models</a></li>
-<li><a class="reference internal" href="#load-multiple-models">4. Load multiple models</a></li>
+<li><a class="reference internal" href="#">PyTorch 在一个文件中保存和加载多个模型</a><ul>
+<li><a class="reference internal" href="#id1">简介</a></li>
+<li><a class="reference internal" href="#id2">环境设置</a></li>
+<li><a class="reference internal" href="#id3">具体步骤</a><ul>
+<li><a class="reference internal" href="#id4">1. 导入加载数据所需的必要库</a></li>
+<li><a class="reference internal" href="#id5">2. 定义和初始化神经网络</a></li>
+<li><a class="reference internal" href="#id6">3. 初始化优化器</a></li>
+<li><a class="reference internal" href="#id7">4. 保存多个模型</a></li>
+<li><a class="reference internal" href="#id8">4. 加载多个模型</a></li>
 </ul>
 </li>
 </ul>
