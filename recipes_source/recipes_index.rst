@@ -59,23 +59,23 @@ Recipes are bite-sized, actionable examples of how to use specific PyTorch featu
    :tags: Basics
 
 .. customcarditem::
-   :header: Saving and loading models for inference in PyTorch
-   :card_description: Learn about the two approaches for saving and loading models for inference in PyTorch - via the state_dict and via the entire model.
+   :header: PyTorch 保存和加载模型
+   :card_description: 在PyTorch中保存和加载模型用于推理的两种方式 - state_dict和完整模型。
    :image: ../_static/img/thumbnails/cropped/saving-and-loading-models-for-inference.PNG
    :link: ../recipes/recipes/saving_and_loading_models_for_inference.html
    :tags: Basics
 
 
 .. customcarditem::
-   :header: Saving and loading a general checkpoint in PyTorch
-   :card_description: Saving and loading a general checkpoint model for inference or resuming training can be helpful for picking up where you last left off. In this recipe, explore how to save and load multiple checkpoints.
+   :header: PyTorch 保存和加载通用检查点
+   :card_description: 保存和加载一个通用的检查点模型,可以帮助您从上次停止的地方继续推理或训练。在这个示例中,探索如何保存和加载多个检查点。
    :image: ../_static/img/thumbnails/cropped/saving-and-loading-general-checkpoint.PNG
    :link: ../recipes/recipes/saving_and_loading_a_general_checkpoint.html
    :tags: Basics
 
 .. customcarditem::
-   :header: Saving and loading multiple models in one file using PyTorch
-   :card_description: In this recipe, learn how saving and loading multiple models can be helpful for reusing models that you have previously trained.
+   :header: PyTorch 在一个文件中保存和加载多个模型
+   :card_description: 在这个示例中,学习保存和加载多个模型,有助于重用您之前训练过的模型。
    :image: ../_static/img/thumbnails/cropped/saving-multiple-models.PNG
    :link: ../recipes/recipes/saving_multiple_models_in_one_file.html
    :tags: Basics
