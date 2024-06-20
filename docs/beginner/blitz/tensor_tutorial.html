@@ -618,30 +618,30 @@ API walkthrough.</p>
 <p><strong>Directly from data</strong></p>
 <p>Tensors can be created directly from data. The data type is automatically inferred.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">data</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">]]</span>
-<span class="n">x_data</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.tensor.html#torch.tensor" title="torch.tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span></a><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="n">x_data</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 </pre></div>
 </div>
 <p><strong>From a NumPy array</strong></p>
 <p>Tensors can be created from NumPy arrays (and vice versa - see <a class="reference internal" href="#bridge-to-np-label"><span class="std std-ref">Bridge with NumPy</span></a>).</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">np_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-<span class="n">x_np</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.from_numpy.html#torch.from_numpy" title="torch.from_numpy" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span></a><span class="p">(</span><span class="n">np_array</span><span class="p">)</span>
+<span class="n">x_np</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">np_array</span><span class="p">)</span>
 </pre></div>
 </div>
 <p><strong>From another tensor:</strong></p>
 <p>The new tensor retains the properties (shape, datatype) of the argument tensor, unless explicitly overridden.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">x_ones</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.ones_like.html#torch.ones_like" title="torch.ones_like" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">ones_like</span></a><span class="p">(</span><span class="n">x_data</span><span class="p">)</span> <span class="c1"># retains the properties of x_data</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">x_ones</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">x_data</span><span class="p">)</span> <span class="c1"># retains the properties of x_data</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Ones Tensor: </span><span class="se">\n</span><span class="s2"> </span><span class="si">{</span><span class="n">x_ones</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
 
-<span class="n">x_rand</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.rand_like.html#torch.rand_like" title="torch.rand_like" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">rand_like</span></a><span class="p">(</span><span class="n">x_data</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">float</span><span class="p">)</span> <span class="c1"># overrides the datatype of x_data</span>
+<span class="n">x_rand</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">rand_like</span><span class="p">(</span><span class="n">x_data</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">float</span><span class="p">)</span> <span class="c1"># overrides the datatype of x_data</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Random Tensor: </span><span class="se">\n</span><span class="s2"> </span><span class="si">{</span><span class="n">x_rand</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p><strong>With random or constant values:</strong></p>
 <p><code class="docutils literal notranslate"><span class="pre">shape</span></code> is a tuple of tensor dimensions. In the functions below, it determines the dimensionality of the output tensor.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">shape</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,)</span>
-<span class="n">rand_tensor</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.rand.html#torch.rand" title="torch.rand" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">rand</span></a><span class="p">(</span><span class="n">shape</span><span class="p">)</span>
-<span class="n">ones_tensor</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.ones.html#torch.ones" title="torch.ones" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">ones</span></a><span class="p">(</span><span class="n">shape</span><span class="p">)</span>
-<span class="n">zeros_tensor</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.zeros.html#torch.zeros" title="torch.zeros" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">zeros</span></a><span class="p">(</span><span class="n">shape</span><span class="p">)</span>
+<span class="n">rand_tensor</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span>
+<span class="n">ones_tensor</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span>
+<span class="n">zeros_tensor</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Random Tensor: </span><span class="se">\n</span><span class="s2"> </span><span class="si">{</span><span class="n">rand_tensor</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Ones Tensor: </span><span class="se">\n</span><span class="s2"> </span><span class="si">{</span><span class="n">ones_tensor</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -653,7 +653,7 @@ API walkthrough.</p>
 <div class="section" id="tensor-attributes">
 <h2>Tensor Attributes<a class="headerlink" href="#tensor-attributes" title="Permalink to this heading">¶</a></h2>
 <p>Tensor attributes describe their shape, datatype, and the device on which they are stored.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">tensor</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.rand.html#torch.rand" title="torch.rand" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">rand</span></a><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">tensor</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Shape of tensor: </span><span class="si">{</span><span class="n">tensor</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Datatype of tensor: </span><span class="si">{</span><span class="n">tensor</span><span class="o">.</span><span class="n">dtype</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -672,7 +672,7 @@ comprehensively described
 CPU). If you’re using Colab, allocate a GPU by going to Edit &gt; Notebook
 Settings.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># We move our tensor to the GPU if available</span>
-<span class="k">if</span> <a href="https://pytorch.org/docs/stable/generated/torch.cuda.is_available.html#torch.cuda.is_available" title="torch.cuda.is_available" class="sphx-glr-backref-module-torch-cuda sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span></a><span class="p">():</span>
+<span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">():</span>
   <span class="n">tensor</span> <span class="o">=</span> <span class="n">tensor</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="s1">&#39;cuda&#39;</span><span class="p">)</span>
   <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Device tensor is stored on: </span><span class="si">{</span><span class="n">tensor</span><span class="o">.</span><span class="n">device</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
@@ -680,7 +680,7 @@ Settings.</p>
 <p>Try out some of the operations from the list.
 If you’re familiar with the NumPy API, you’ll find the Tensor API a breeze to use.</p>
 <p><strong>Standard numpy-like indexing and slicing:</strong></p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">tensor</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.ones.html#torch.ones" title="torch.ones" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">ones</span></a><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">tensor</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
 <span class="n">tensor</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">tensor</span><span class="p">)</span>
 </pre></div>
@@ -688,7 +688,7 @@ If you’re familiar with the NumPy API, you’ll find the Tensor API a breeze t
 <p><strong>Joining tensors</strong> You can use <code class="docutils literal notranslate"><span class="pre">torch.cat</span></code> to concatenate a sequence of tensors along a given dimension.
 See also <a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.stack.html">torch.stack</a>,
 another tensor joining op that is subtly different from <code class="docutils literal notranslate"><span class="pre">torch.cat</span></code>.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">t1</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.cat.html#torch.cat" title="torch.cat" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">cat</span></a><span class="p">([</span><span class="n">tensor</span><span class="p">,</span> <span class="n">tensor</span><span class="p">,</span> <span class="n">tensor</span><span class="p">],</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">t1</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">tensor</span><span class="p">,</span> <span class="n">tensor</span><span class="p">,</span> <span class="n">tensor</span><span class="p">],</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">t1</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -725,7 +725,7 @@ of history. Hence, their use is discouraged.</p>
 locations, and changing one will change the other.</p>
 <div class="section" id="tensor-to-numpy-array">
 <h3>Tensor to NumPy array<a class="headerlink" href="#tensor-to-numpy-array" title="Permalink to this heading">¶</a></h3>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">t</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.ones.html#torch.ones" title="torch.ones" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">ones</span></a><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">t</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;t: </span><span class="si">{</span><span class="n">t</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 <span class="n">n</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;n: </span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -741,7 +741,7 @@ locations, and changing one will change the other.</p>
 <div class="section" id="numpy-array-to-tensor">
 <h3>NumPy array to Tensor<a class="headerlink" href="#numpy-array-to-tensor" title="Permalink to this heading">¶</a></h3>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">n</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
-<span class="n">t</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.from_numpy.html#torch.from_numpy" title="torch.from_numpy" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span></a><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+<span class="n">t</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Changes in the NumPy array reflects in the tensor.</p>

@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Warmstarting model using parameters from a different model in PyTorch &mdash; PyTorch Tutorials 2.3.0 documentation</title>
+  <title>PyTorch 使用不同模型的参数对模型进行热启动 &mdash; PyTorch Tutorials 2.3.0 documentation</title>
   
 
   
@@ -535,7 +535,7 @@
         
           <li><a href="../recipes_index.html">PyTorch 示例</a> &gt;</li>
         
-      <li>Warmstarting model using parameters from a different model in PyTorch</li>
+      <li>PyTorch 使用不同模型的参数对模型进行热启动</li>
     
     
       <li class="pytorch-breadcrumbs-aside">
@@ -599,63 +599,54 @@
 <p>Click <a class="reference internal" href="#sphx-glr-download-recipes-recipes-warmstarting-model-using-parameters-from-a-different-model-py"><span class="std std-ref">here</span></a>
 to download the full example code</p>
 </div>
-<div class="sphx-glr-example-title section" id="warmstarting-model-using-parameters-from-a-different-model-in-pytorch">
-<span id="sphx-glr-recipes-recipes-warmstarting-model-using-parameters-from-a-different-model-py"></span><h1>Warmstarting model using parameters from a different model in PyTorch<a class="headerlink" href="#warmstarting-model-using-parameters-from-a-different-model-in-pytorch" title="Permalink to this heading">¶</a></h1>
-<p>Partially loading a model or loading a partial model are common
-scenarios when transfer learning or training a new complex model.
-Leveraging trained parameters, even if only a few are usable, will help
-to warmstart the training process and hopefully help your model converge
-much faster than training from scratch.</p>
-<div class="section" id="introduction">
-<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this heading">¶</a></h2>
-<p>Whether you are loading from a partial <code class="docutils literal notranslate"><span class="pre">state_dict</span></code>, which is missing
-some keys, or loading a <code class="docutils literal notranslate"><span class="pre">state_dict</span></code> with more keys than the model
-that you are loading into, you can set the strict argument to <code class="docutils literal notranslate"><span class="pre">False</span></code>
-in the <code class="docutils literal notranslate"><span class="pre">load_state_dict()</span></code> function to ignore non-matching keys.
-In this recipe, we will experiment with warmstarting a model using
-parameters of a different model.</p>
+<div class="sphx-glr-example-title section" id="pytorch">
+<span id="sphx-glr-recipes-recipes-warmstarting-model-using-parameters-from-a-different-model-py"></span><h1>PyTorch 使用不同模型的参数对模型进行热启动<a class="headerlink" href="#pytorch" title="Permalink to this heading">¶</a></h1>
+<p>在转移学习或训练新的复杂模型时,加载部分模型是很常见的场景。
+利用已经训练好的参数,即使只有少数可用,也将有助于加快训练过程的启动,
+并有望使您的模型比从头开始训练收敛得更快。</p>
+<div class="section" id="id1">
+<h2>简介<a class="headerlink" href="#id1" title="Permalink to this heading">¶</a></h2>
+<p>无论您是加载缺少某些键的部分 <code class="docutils literal notranslate"><span class="pre">state_dict</span></code> ,还是加载比预期的模型更多键的 <code class="docutils literal notranslate"><span class="pre">state_dict</span></code>,
+您都可以通过 <code class="docutils literal notranslate"><span class="pre">load_state_dict()</span></code> 函数中将 strict 参数设置为 <code class="docutils literal notranslate"><span class="pre">False</span></code> 以忽略不匹配的键。
+在本教程中,我们将尝试使用不同模型的参数对模型进行热启动。</p>
 </div>
-<div class="section" id="setup">
-<h2>Setup<a class="headerlink" href="#setup" title="Permalink to this heading">¶</a></h2>
-<p>Before we begin, we need to install <code class="docutils literal notranslate"><span class="pre">torch</span></code> if it isn’t already
-available.</p>
+<div class="section" id="id2">
+<h2>环境设置<a class="headerlink" href="#id2" title="Permalink to this heading">¶</a></h2>
+<p>在开始之前,如果尚未安装 <code class="docutils literal notranslate"><span class="pre">torch</span></code>,我们需要先安装它。</p>
 <div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>torch
 </pre></div>
 </div>
 </div>
-<div class="section" id="steps">
-<h2>Steps<a class="headerlink" href="#steps" title="Permalink to this heading">¶</a></h2>
+<div class="section" id="id3">
+<h2>具体步骤<a class="headerlink" href="#id3" title="Permalink to this heading">¶</a></h2>
 <ol class="arabic simple">
-<li><p>Import all necessary libraries for loading our data</p></li>
-<li><p>Define and initialize the neural network A and B</p></li>
-<li><p>Save model A</p></li>
-<li><p>Load into model B</p></li>
+<li><p>导入加载数据所需的所有必要库</p></li>
+<li><p>定义并初始化神经网络 A 和 B</p></li>
+<li><p>保存模型 A</p></li>
+<li><p>加载到模型 B</p></li>
 </ol>
-<div class="section" id="import-necessary-libraries-for-loading-our-data">
-<h3>1. Import necessary libraries for loading our data<a class="headerlink" href="#import-necessary-libraries-for-loading-our-data" title="Permalink to this heading">¶</a></h3>
-<p>For this recipe, we will use <code class="docutils literal notranslate"><span class="pre">torch</span></code> and its subsidiaries <code class="docutils literal notranslate"><span class="pre">torch.nn</span></code>
-and <code class="docutils literal notranslate"><span class="pre">torch.optim</span></code>.</p>
+<div class="section" id="id4">
+<h3>1. 导入加载数据所需的必要库<a class="headerlink" href="#id4" title="Permalink to this heading">¶</a></h3>
+<p>对于本教程,我们将使用 <code class="docutils literal notranslate"><span class="pre">torch</span></code> 及其子模块 <code class="docutils literal notranslate"><span class="pre">torch.nn</span></code> 和 <code class="docutils literal notranslate"><span class="pre">torch.optim</span></code>。</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
 <span class="kn">import</span> <span class="nn">torch.optim</span> <span class="k">as</span> <span class="nn">optim</span>
 </pre></div>
 </div>
 </div>
-<div class="section" id="define-and-initialize-the-neural-network-a-and-b">
-<h3>2. Define and initialize the neural network A and B<a class="headerlink" href="#define-and-initialize-the-neural-network-a-and-b" title="Permalink to this heading">¶</a></h3>
-<p>For sake of example, we will create a neural network for training
-images. To learn more see the Defining a Neural Network recipe. We will
-create two neural networks for sake of loading one parameter of type A
-into type B.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">NetA</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/generated/torch.nn.Module.html#torch.nn.Module" title="torch.nn.Module" class="sphx-glr-backref-module-torch-nn sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">nn</span><span class="o">.</span><span class="n">Module</span></a><span class="p">):</span>
+<div class="section" id="a-b">
+<h3>2. 定义并初始化神经网络 A 和 B<a class="headerlink" href="#a-b" title="Permalink to this heading">¶</a></h3>
+<p>我们将创建一个用于训练图像的神经网络。要了解更多信息,请参阅定义神经网络的教程。
+我们将创建两个神经网络,将类型 A 的一个参数加载到类型 B 中。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">NetA</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">NetA</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">conv1</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.nn.Conv2d.html#torch.nn.Conv2d" title="torch.nn.Conv2d" class="sphx-glr-backref-module-torch-nn sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span></a><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">pool</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.nn.MaxPool2d.html#torch.nn.MaxPool2d" title="torch.nn.MaxPool2d" class="sphx-glr-backref-module-torch-nn sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">nn</span><span class="o">.</span><span class="n">MaxPool2d</span></a><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">conv2</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.nn.Conv2d.html#torch.nn.Conv2d" title="torch.nn.Conv2d" class="sphx-glr-backref-module-torch-nn sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span></a><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">fc1</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.nn.Linear.html#torch.nn.Linear" title="torch.nn.Linear" class="sphx-glr-backref-module-torch-nn sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span></a><span class="p">(</span><span class="mi">16</span> <span class="o">*</span> <span class="mi">5</span> <span class="o">*</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">120</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">fc2</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.nn.Linear.html#torch.nn.Linear" title="torch.nn.Linear" class="sphx-glr-backref-module-torch-nn sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span></a><span class="p">(</span><span class="mi">120</span><span class="p">,</span> <span class="mi">84</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">fc3</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.nn.Linear.html#torch.nn.Linear" title="torch.nn.Linear" class="sphx-glr-backref-module-torch-nn sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span></a><span class="p">(</span><span class="mi">84</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conv1</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pool</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">MaxPool2d</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conv2</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fc1</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">16</span> <span class="o">*</span> <span class="mi">5</span> <span class="o">*</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">120</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fc2</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">120</span><span class="p">,</span> <span class="mi">84</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fc3</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">84</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
         <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pool</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conv1</span><span class="p">(</span><span class="n">x</span><span class="p">)))</span>
@@ -668,15 +659,15 @@ into type B.</p>
 
 <span class="n">netA</span> <span class="o">=</span> <span class="n">NetA</span><span class="p">()</span>
 
-<span class="k">class</span> <span class="nc">NetB</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/generated/torch.nn.Module.html#torch.nn.Module" title="torch.nn.Module" class="sphx-glr-backref-module-torch-nn sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">nn</span><span class="o">.</span><span class="n">Module</span></a><span class="p">):</span>
+<span class="k">class</span> <span class="nc">NetB</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">NetB</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">conv1</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.nn.Conv2d.html#torch.nn.Conv2d" title="torch.nn.Conv2d" class="sphx-glr-backref-module-torch-nn sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span></a><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">pool</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.nn.MaxPool2d.html#torch.nn.MaxPool2d" title="torch.nn.MaxPool2d" class="sphx-glr-backref-module-torch-nn sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">nn</span><span class="o">.</span><span class="n">MaxPool2d</span></a><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">conv2</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.nn.Conv2d.html#torch.nn.Conv2d" title="torch.nn.Conv2d" class="sphx-glr-backref-module-torch-nn sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span></a><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">fc1</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.nn.Linear.html#torch.nn.Linear" title="torch.nn.Linear" class="sphx-glr-backref-module-torch-nn sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span></a><span class="p">(</span><span class="mi">16</span> <span class="o">*</span> <span class="mi">5</span> <span class="o">*</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">120</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">fc2</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.nn.Linear.html#torch.nn.Linear" title="torch.nn.Linear" class="sphx-glr-backref-module-torch-nn sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span></a><span class="p">(</span><span class="mi">120</span><span class="p">,</span> <span class="mi">84</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">fc3</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.nn.Linear.html#torch.nn.Linear" title="torch.nn.Linear" class="sphx-glr-backref-module-torch-nn sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span></a><span class="p">(</span><span class="mi">84</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conv1</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pool</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">MaxPool2d</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conv2</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fc1</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">16</span> <span class="o">*</span> <span class="mi">5</span> <span class="o">*</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">120</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fc2</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">120</span><span class="p">,</span> <span class="mi">84</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fc3</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">84</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
         <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pool</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conv1</span><span class="p">(</span><span class="n">x</span><span class="p">)))</span>
@@ -691,35 +682,32 @@ into type B.</p>
 </pre></div>
 </div>
 </div>
-<div class="section" id="save-model-a">
-<h3>3. Save model A<a class="headerlink" href="#save-model-a" title="Permalink to this heading">¶</a></h3>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Specify a path to save to</span>
+<div class="section" id="a">
+<h3>3. 保存模型 A<a class="headerlink" href="#a" title="Permalink to this heading">¶</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># 指定保存路径</span>
 <span class="n">PATH</span> <span class="o">=</span> <span class="s2">&quot;model.pt&quot;</span>
 
-<a href="https://pytorch.org/docs/stable/generated/torch.save.html#torch.save" title="torch.save" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">save</span></a><span class="p">(</span><span class="n">netA</span><span class="o">.</span><span class="n">state_dict</span><span class="p">(),</span> <span class="n">PATH</span><span class="p">)</span>
+<span class="n">torch</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">netA</span><span class="o">.</span><span class="n">state_dict</span><span class="p">(),</span> <span class="n">PATH</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
-<div class="section" id="load-into-model-b">
-<h3>4. Load into model B<a class="headerlink" href="#load-into-model-b" title="Permalink to this heading">¶</a></h3>
-<p>If you want to load parameters from one layer to another, but some keys
-do not match, simply change the name of the parameter keys in the
-state_dict that you are loading to match the keys in the model that you
-are loading into.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">netB</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/generated/torch.load.html#torch.load" title="torch.load" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">load</span></a><span class="p">(</span><span class="n">PATH</span><span class="p">),</span> <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<div class="section" id="b">
+<h3>4. 加载到模型 B<a class="headerlink" href="#b" title="Permalink to this heading">¶</a></h3>
+<p>如果您想将一个层的参数加载到另一个层,但是某些键不匹配,
+只需将要加载的 state_dict 中的参数键名称更改为与要加载到的模型中的键名称相匹配即可。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">netB</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">PATH</span><span class="p">),</span> <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>You can see that all keys matched successfully!</p>
-<p>Congratulations! You have successfully warmstarted a model using
-parameters from a different model in PyTorch.</p>
+<p>您可以看到所有键都匹配成功!</p>
+<p>祝贺您!您已成功使用不同模型的参数对模型进行了热启动。</p>
 </div>
 </div>
-<div class="section" id="learn-more">
-<h2>Learn More<a class="headerlink" href="#learn-more" title="Permalink to this heading">¶</a></h2>
-<p>Take a look at these other recipes to continue your learning:</p>
+<div class="section" id="id5">
+<h2>学习更多<a class="headerlink" href="#id5" title="Permalink to this heading">¶</a></h2>
+<p>查看这些其他教程,继续您的学习:</p>
 <ul class="simple">
-<li><p><a class="reference external" href="https://pytorch.org/tutorials/recipes/recipes/saving_multiple_models_in_one_file.html">Saving and loading multiple models in one file using PyTorch</a></p></li>
-<li><p><a class="reference external" href="https://pytorch.org/tutorials/recipes/recipes/save_load_across_devices.html">Saving and loading models across devices in PyTorch</a></p></li>
+<li><p><a class="reference external" href="https://pytorch.org/tutorials/recipes/recipes/saving_multiple_models_in_one_file.html">使用PyTorch在一个文件中保存和加载多个模型</a></p></li>
+<li><p><a class="reference external" href="https://pytorch.org/tutorials/recipes/recipes/save_load_across_devices.html">在PyTorch中跨设备保存和加载模型</a></p></li>
 </ul>
 <p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.000 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-recipes-recipes-warmstarting-model-using-parameters-from-a-different-model-py">
@@ -795,17 +783,17 @@ if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.i
           <div class="pytorch-right-menu" id="pytorch-right-menu">
             <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
               <ul>
-<li><a class="reference internal" href="#">Warmstarting model using parameters from a different model in PyTorch</a><ul>
-<li><a class="reference internal" href="#introduction">Introduction</a></li>
-<li><a class="reference internal" href="#setup">Setup</a></li>
-<li><a class="reference internal" href="#steps">Steps</a><ul>
-<li><a class="reference internal" href="#import-necessary-libraries-for-loading-our-data">1. Import necessary libraries for loading our data</a></li>
-<li><a class="reference internal" href="#define-and-initialize-the-neural-network-a-and-b">2. Define and initialize the neural network A and B</a></li>
-<li><a class="reference internal" href="#save-model-a">3. Save model A</a></li>
-<li><a class="reference internal" href="#load-into-model-b">4. Load into model B</a></li>
+<li><a class="reference internal" href="#">PyTorch 使用不同模型的参数对模型进行热启动</a><ul>
+<li><a class="reference internal" href="#id1">简介</a></li>
+<li><a class="reference internal" href="#id2">环境设置</a></li>
+<li><a class="reference internal" href="#id3">具体步骤</a><ul>
+<li><a class="reference internal" href="#id4">1. 导入加载数据所需的必要库</a></li>
+<li><a class="reference internal" href="#a-b">2. 定义并初始化神经网络 A 和 B</a></li>
+<li><a class="reference internal" href="#a">3. 保存模型 A</a></li>
+<li><a class="reference internal" href="#b">4. 加载到模型 B</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#learn-more">Learn More</a></li>
+<li><a class="reference internal" href="#id5">学习更多</a></li>
 </ul>
 </li>
 </ul>

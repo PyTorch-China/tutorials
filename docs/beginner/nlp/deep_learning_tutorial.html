@@ -626,12 +626,12 @@ output below is the mapping of the <span class="math">\(i\)</span>’th row of t
 <span class="kn">import</span> <span class="nn">torch.nn.functional</span> <span class="k">as</span> <span class="nn">F</span>
 <span class="kn">import</span> <span class="nn">torch.optim</span> <span class="k">as</span> <span class="nn">optim</span>
 
-<a href="https://pytorch.org/docs/stable/generated/torch.manual_seed.html#torch.manual_seed" title="torch.manual_seed" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">manual_seed</span></a><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">torch</span><span class="o">.</span><span class="n">manual_seed</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">lin</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.nn.Linear.html#torch.nn.Linear" title="torch.nn.Linear" class="sphx-glr-backref-module-torch-nn sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span></a><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>  <span class="c1"># maps from R^5 to R^3, parameters A, b</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">lin</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>  <span class="c1"># maps from R^5 to R^3, parameters A, b</span>
 <span class="c1"># data is 2x5.  A maps from 5 to 3... can we map &quot;data&quot; under A?</span>
-<span class="n">data</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.randn.html#torch.randn" title="torch.randn" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">randn</span></a><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">lin</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>  <span class="c1"># yes</span>
 </pre></div>
 </div>
@@ -672,9 +672,9 @@ tanh or ReLU.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># In pytorch, most non-linearities are in torch.functional (we have it imported as F)</span>
 <span class="c1"># Note that non-linearites typically don&#39;t have parameters like affine maps do.</span>
 <span class="c1"># That is, they don&#39;t have weights that are updated during training.</span>
-<span class="n">data</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.randn.html#torch.randn" title="torch.randn" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">randn</span></a><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/generated/torch.nn.functional.relu.html#torch.nn.functional.relu" title="torch.nn.functional.relu" class="sphx-glr-backref-module-torch-nn-functional sphx-glr-backref-type-py-function"><span class="n">F</span><span class="o">.</span><span class="n">relu</span></a><span class="p">(</span><span class="n">data</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
 </pre></div>
 </div>
 </div>
@@ -697,11 +697,11 @@ element is non-negative and the sum over all components is 1.</p>
 exponentiation operator to the input to make everything non-negative and
 then dividing by the normalization constant.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Softmax is also in torch.nn.functional</span>
-<span class="n">data</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.randn.html#torch.randn" title="torch.randn" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">randn</span></a><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/generated/torch.nn.functional.softmax.html#torch.nn.functional.softmax" title="torch.nn.functional.softmax" class="sphx-glr-backref-module-torch-nn-functional sphx-glr-backref-type-py-function"><span class="n">F</span><span class="o">.</span><span class="n">softmax</span></a><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
-<span class="nb">print</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/generated/torch.nn.functional.softmax.html#torch.nn.functional.softmax" title="torch.nn.functional.softmax" class="sphx-glr-backref-module-torch-nn-functional sphx-glr-backref-type-py-function"><span class="n">F</span><span class="o">.</span><span class="n">softmax</span></a><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span>  <span class="c1"># Sums to 1 because it is a distribution!</span>
-<span class="nb">print</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/generated/torch.nn.functional.log_softmax.html#torch.nn.functional.log_softmax" title="torch.nn.functional.log_softmax" class="sphx-glr-backref-module-torch-nn-functional sphx-glr-backref-type-py-function"><span class="n">F</span><span class="o">.</span><span class="n">log_softmax</span></a><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>  <span class="c1"># theres also log_softmax</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span>  <span class="c1"># Sums to 1 because it is a distribution!</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">log_softmax</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>  <span class="c1"># theres also log_softmax</span>
 </pre></div>
 </div>
 </div>
@@ -820,7 +820,7 @@ softmax.</p>
 <span class="n">NUM_LABELS</span> <span class="o">=</span> <span class="mi">2</span>
 
 
-<span class="k">class</span> <span class="nc">BoWClassifier</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/generated/torch.nn.Module.html#torch.nn.Module" title="torch.nn.Module" class="sphx-glr-backref-module-torch-nn sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">nn</span><span class="o">.</span><span class="n">Module</span></a><span class="p">):</span>  <span class="c1"># inheriting from nn.Module!</span>
+<span class="k">class</span> <span class="nc">BoWClassifier</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>  <span class="c1"># inheriting from nn.Module!</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_labels</span><span class="p">,</span> <span class="n">vocab_size</span><span class="p">):</span>
         <span class="c1"># calls the init function of nn.Module.  Dont get confused by syntax,</span>
@@ -832,7 +832,7 @@ softmax.</p>
         <span class="c1"># Torch defines nn.Linear(), which provides the affine map.</span>
         <span class="c1"># Make sure you understand why the input dimension is vocab_size</span>
         <span class="c1"># and the output is num_labels!</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">linear</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.nn.Linear.html#torch.nn.Linear" title="torch.nn.Linear" class="sphx-glr-backref-module-torch-nn sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span></a><span class="p">(</span><span class="n">vocab_size</span><span class="p">,</span> <span class="n">num_labels</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">linear</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">vocab_size</span><span class="p">,</span> <span class="n">num_labels</span><span class="p">)</span>
 
         <span class="c1"># NOTE! The non-linearity log softmax does not have parameters! So we don&#39;t need</span>
         <span class="c1"># to worry about that here</span>
@@ -841,11 +841,11 @@ softmax.</p>
         <span class="c1"># Pass the input through the linear layer,</span>
         <span class="c1"># then pass that through log_softmax.</span>
         <span class="c1"># Many non-linearities and other functions are in torch.nn.functional</span>
-        <span class="k">return</span> <a href="https://pytorch.org/docs/stable/generated/torch.nn.functional.log_softmax.html#torch.nn.functional.log_softmax" title="torch.nn.functional.log_softmax" class="sphx-glr-backref-module-torch-nn-functional sphx-glr-backref-type-py-function"><span class="n">F</span><span class="o">.</span><span class="n">log_softmax</span></a><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">linear</span><span class="p">(</span><span class="n">bow_vec</span><span class="p">),</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">F</span><span class="o">.</span><span class="n">log_softmax</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">linear</span><span class="p">(</span><span class="n">bow_vec</span><span class="p">),</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">make_bow_vector</span><span class="p">(</span><span class="n">sentence</span><span class="p">,</span> <span class="n">word_to_ix</span><span class="p">):</span>
-    <span class="n">vec</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.zeros.html#torch.zeros" title="torch.zeros" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">zeros</span></a><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">word_to_ix</span><span class="p">))</span>
+    <span class="n">vec</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">word_to_ix</span><span class="p">))</span>
     <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">sentence</span><span class="p">:</span>
         <span class="n">vec</span><span class="p">[</span><span class="n">word_to_ix</span><span class="p">[</span><span class="n">word</span><span class="p">]]</span> <span class="o">+=</span> <span class="mi">1</span>
     <span class="k">return</span> <span class="n">vec</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
@@ -868,7 +868,7 @@ softmax.</p>
 
 <span class="c1"># To run the model, pass in a BoW vector</span>
 <span class="c1"># Here we don&#39;t need to train, so the code is wrapped in torch.no_grad()</span>
-<span class="k">with</span> <a href="https://pytorch.org/docs/stable/generated/torch.no_grad.html#torch.no_grad" title="torch.no_grad" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span></a><span class="p">():</span>
+<span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
     <span class="n">sample</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="n">bow_vector</span> <span class="o">=</span> <span class="n">make_bow_vector</span><span class="p">(</span><span class="n">sample</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">word_to_ix</span><span class="p">)</span>
     <span class="n">log_probs</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">bow_vector</span><span class="p">)</span>
@@ -893,7 +893,7 @@ why the last layer of our network is log softmax. The loss function
 nn.CrossEntropyLoss() is the same as NLLLoss(), except it does the log
 softmax for you.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Run on test data before we train, just to see a before-and-after</span>
-<span class="k">with</span> <a href="https://pytorch.org/docs/stable/generated/torch.no_grad.html#torch.no_grad" title="torch.no_grad" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span></a><span class="p">():</span>
+<span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
     <span class="k">for</span> <span class="n">instance</span><span class="p">,</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">test_data</span><span class="p">:</span>
         <span class="n">bow_vec</span> <span class="o">=</span> <span class="n">make_bow_vector</span><span class="p">(</span><span class="n">instance</span><span class="p">,</span> <span class="n">word_to_ix</span><span class="p">)</span>
         <span class="n">log_probs</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">bow_vec</span><span class="p">)</span>
@@ -902,8 +902,8 @@ softmax for you.</p>
 <span class="c1"># Print the matrix column corresponding to &quot;creo&quot;</span>
 <span class="nb">print</span><span class="p">(</span><span class="nb">next</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">())[:,</span> <span class="n">word_to_ix</span><span class="p">[</span><span class="s2">&quot;creo&quot;</span><span class="p">]])</span>
 
-<span class="n">loss_function</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.nn.NLLLoss.html#torch.nn.NLLLoss" title="torch.nn.NLLLoss" class="sphx-glr-backref-module-torch-nn sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">nn</span><span class="o">.</span><span class="n">NLLLoss</span></a><span class="p">()</span>
-<span class="n">optimizer</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.optim.SGD.html#torch.optim.SGD" title="torch.optim.SGD" class="sphx-glr-backref-module-torch-optim sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">optim</span><span class="o">.</span><span class="n">SGD</span></a><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+<span class="n">loss_function</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">NLLLoss</span><span class="p">()</span>
+<span class="n">optimizer</span> <span class="o">=</span> <span class="n">optim</span><span class="o">.</span><span class="n">SGD</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
 
 <span class="c1"># Usually you want to pass over the training data several times.</span>
 <span class="c1"># 100 is much bigger than on a real data set, but real datasets have more than</span>
@@ -931,7 +931,7 @@ softmax for you.</p>
         <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
         <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
 
-<span class="k">with</span> <a href="https://pytorch.org/docs/stable/generated/torch.no_grad.html#torch.no_grad" title="torch.no_grad" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span></a><span class="p">():</span>
+<span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
     <span class="k">for</span> <span class="n">instance</span><span class="p">,</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">test_data</span><span class="p">:</span>
         <span class="n">bow_vec</span> <span class="o">=</span> <span class="n">make_bow_vector</span><span class="p">(</span><span class="n">instance</span><span class="p">,</span> <span class="n">word_to_ix</span><span class="p">)</span>
         <span class="n">log_probs</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">bow_vec</span><span class="p">)</span>

@@ -159,18 +159,18 @@ PyTorch Recipes
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="Introduction ------------ Whether you are loading from a partial state_dict, which is missing s...">
+    <div class="sphx-glr-thumbcontainer" tooltip="简介 ------------ 无论您是加载缺少某些键的部分 state_dict ,还是加载比预期的模型更多键的 state_dict, 您都可以通过 load_state_dict() ...">
 
 .. only:: html
 
   .. image:: /recipes/recipes/images/thumb/sphx_glr_warmstarting_model_using_parameters_from_a_different_model_thumb.png
-    :alt: Warmstarting model using parameters from a different model in PyTorch
+    :alt: PyTorch 使用不同模型的参数对模型进行热启动
 
   :ref:`sphx_glr_recipes_recipes_warmstarting_model_using_parameters_from_a_different_model.py`
 
 .. raw:: html
 
-      <div class="sphx-glr-thumbnail-title">Warmstarting model using parameters from a different model in PyTorch</div>
+      <div class="sphx-glr-thumbnail-title">PyTorch 使用不同模型的参数对模型进行热启动</div>
     </div>
 
 

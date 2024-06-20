@@ -16,6 +16,23 @@ PyTorch 中 state_dict 是什么
 -----
 在开始之前,如果还没有安装 ``torch``,我们需要先安装它。
 
+PyTorch 中的 state_dict 是什么
+===============================
+在 PyTorch 中,一个 ``torch.nn.Module`` 模型的可学习参数(即权重和偏置)包含在模型的参数中
+(通过 ``model.parameters()`` 访问)。``state_dict`` 只是一个 Python 字典对象,它将每一层映射到其参数张量。
+
+介绍
+------------
+如果使用 PyTorch 保存或加载模型,``state_dict`` 就是一个不可或缺的实体。
+由于 ``state_dict`` 对象是 Python 字典,它们可以很容易地被保存、更新、修改和恢复,使 PyTorch 模型和优化器更好的做到了模块化。
+请注意,只有具有可学习参数的层(卷积层、线性层等)和已注册的缓冲区(BatchNorm running_mean)在模型的 ``state_dict`` 中有条目。
+优化器对象(``torch.optim``)也有一个 ``state_dict``,它包含了优化器状态的信息,以及使用的超参数。
+在本教程中,我们将看到如何在一个简单的模型中 ``state_dict`` 是如何使用的。
+
+环境设置
+-----
+在开始之前,如果还没有安装 ``torch``,我们需要先安装它。
+
 .. code-block:: sh
 
    pip install torch
