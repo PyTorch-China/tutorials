@@ -1,37 +1,24 @@
 """
-Zeroing out gradients in PyTorch
+ PyTorch 中清零梯度
 ================================
-It is beneficial to zero out gradients when building a neural network.
-This is because by default, gradients are accumulated in buffers (i.e,
-not overwritten) whenever ``.backward()`` is called.
+在构建神经网络时，清零梯度是有益的。
+因为默认情况下,每次调用 ``.backward()`` 时,梯度会累积在缓冲区中(即不会被覆盖)。
 
-Introduction
+介绍
 ------------
-When training your neural network, models are able to increase their
-accuracy through gradient descent. In short, gradient descent is the
-process of minimizing our loss (or error) by tweaking the weights and
-biases in our model.
+在训练神经网络时,模型能够通过使用梯度下降来提高它们的精度。简而言之,梯度下降是通过调整模型中的权重和偏置来最小化损失(或误差)的过程。
 
-``torch.Tensor`` is the central class of PyTorch. When you create a
-tensor, if you set its attribute ``.requires_grad`` as ``True``, the
-package tracks all operations on it. This happens on subsequent backward
-passes. The gradient for this tensor will be accumulated into ``.grad``
-attribute. The accumulation (or sum) of all the gradients is calculated
-when .backward() is called on the loss tensor.
+``torch.Tensor`` 是PyTorch的中心类。当你创建一个张量时,如果将其属性 ``.requires_grad`` 设置为 ``True``,
+该对象会跟踪对它的所有操作。这发生在后续的反向传播过程中。该张量的梯度将累积到 ``.grad`` 属性中。
+所有梯度的累积(或求和)是在对损失张量调用 .backward() 时计算的。
 
-There are cases where it may be necessary to zero-out the gradients of a
-tensor. For example: when you start your training loop, you should zero
-out the gradients so that you can perform this tracking correctly.
-In this recipe, we will learn how to zero out gradients using the
-PyTorch library. We will demonstrate how to do this by training a neural
-network on the ``CIFAR10`` dataset built into PyTorch.
+在某些情况下,可能需要清零张量的梯度。例如:当你开始训练循环时,你应该清零梯度,以便正确执行此跟踪。
+在本教程中,我们将学习如何使用PyTorch库清零梯度。我们将通过在PyTorch内置的 ``CIFAR10`` 数据集上训练神经网络来演示如何做到这一点。
 
-Setup
+环境设置
 -----
-Since we will be training data in this recipe, if you are in a runnable
-notebook, it is best to switch the runtime to GPU or TPU.
-Before we begin, we need to install ``torch`` and ``torchvision`` if
-they aren’t already available.
+由于我们将在本教程中训练数据,如果你在可运行的笔记本中,最好将运行时切换到GPU或TPU。
+在开始之前,如果尚未安装 ``torch`` 和 ``torchvision``,我们需要安装它们。
 
 .. code-block:: sh
 
@@ -42,25 +29,22 @@ they aren’t already available.
 
 
 ######################################################################
-# Steps
+# 具体步骤
 # -----
-# 
-# Steps 1 through 4 set up our data and neural network for training. The
-# process of zeroing out the gradients happens in step 5. If you already
-# have your data and neural network built, skip to 5.
-# 
-# 1. Import all necessary libraries for loading our data
-# 2. Load and normalize the dataset
-# 3. Build the neural network
-# 4. Define the loss function
-# 5. Zero the gradients while training the network
-# 
-# 1. Import necessary libraries for loading our data
+#
+# 步骤1到4设置了我们用于训练的数据和神经网络。清零梯度的过程发生在步骤5。如果你已经构建了数据和神经网络,可以跳过前四步,直接进入第5步。
+#
+# 1. 导入加载数据所需的所有必要库
+# 2. 加载和标准化数据集
+# 3. 构建神经网络
+# 4. 定义损失函数
+# 5. 在训练网络时清零梯度
+#
+# 1. 导入加载数据所需的必要库
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# 
-# For this recipe, we will just be using ``torch`` and ``torchvision`` to
-# access the dataset.
-# 
+#
+# 对于本教程,我们只使用 ``torch`` 和 ``torchvision`` 来访问数据集。
+#
 
 import torch
 
@@ -74,12 +58,11 @@ import torchvision.transforms as transforms
 
 
 ######################################################################
-# 2. Load and normalize the dataset
+# 2. 加载和标准化数据集
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# 
-# PyTorch features various built-in datasets (see the Loading Data recipe
-# for more information).
-# 
+#
+# PyTorch提供了各种内置数据集(有关更多信息,请参阅加载数据教程)。
+#
 
 transform = transforms.Compose(
     [transforms.ToTensor(),
@@ -100,12 +83,11 @@ classes = ('plane', 'car', 'bird', 'cat',
 
 
 ######################################################################
-# 3. Build the neural network
+# 3. 构建神经网络
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# 
-# We will use a convolutional neural network. To learn more see the
-# Defining a Neural Network recipe.
-# 
+#
+# 我们将使用卷积神经网络。要了解更多信息,请参阅定义神经网络教程。
+#
 
 class Net(nn.Module):
     def __init__(self):
@@ -128,11 +110,11 @@ class Net(nn.Module):
 
 
 ######################################################################
-# 4. Define a Loss function and optimizer
+# 4. 定义损失函数和优化器
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# 
-# Let’s use a Classification Cross-Entropy loss and SGD with momentum.
-# 
+#
+# 让我们使用分类交叉熵损失和带动量的SGD。
+#
 
 net = Net()
 criterion = nn.CrossEntropyLoss()
@@ -140,36 +122,33 @@ optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
 
 
 ######################################################################
-# 5. Zero the gradients while training the network
+# 5. 在训练网络时清零梯度
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# 
-# This is when things start to get interesting. We simply have to loop
-# over our data iterator, and feed the inputs to the network and optimize.
-# 
-# Notice that for each entity of data, we zero out the gradients. This is
-# to ensure that we aren’t tracking any unnecessary information when we
-# train our neural network.
-# 
+#
+# 我们只需要遍历数据迭代器,并将输入馈送到网络中并优化。
+#
+# 注意,对于每个数据实体,我们都会清零梯度。这是为了确保在训练神经网络时,我们不会跟踪任何不必要的信息。
+#
 
 for epoch in range(2):  # loop over the dataset multiple times
 
     running_loss = 0.0
     for i, data in enumerate(trainloader, 0):
-        # get the inputs; data is a list of [inputs, labels]
+        # 获取输入,data是一个包含[输入,标签]的列表
         inputs, labels = data
 
-        # zero the parameter gradients
+        # 清零参数梯度
         optimizer.zero_grad()
 
-        # forward + backward + optimize
+        # 前向 + 反向 + 优化
         outputs = net(inputs)
         loss = criterion(outputs, labels)
         loss.backward()
         optimizer.step()
 
-        # print statistics
+        # 打印统计信息
         running_loss += loss.item()
-        if i % 2000 == 1999:    # print every 2000 mini-batches
+        if i % 2000 == 1999:    # 每2000个小批次打印一次
             print('[%d, %5d] loss: %.3f' %
                   (epoch + 1, i + 1, running_loss / 2000))
             running_loss = 0.0
@@ -178,16 +157,15 @@ print('Finished Training')
 
 
 ######################################################################
-# You can also use ``model.zero_grad()``. This is the same as using
-# ``optimizer.zero_grad()`` as long as all your model parameters are in
-# that optimizer. Use your best judgment to decide which one to use.
-# 
-# Congratulations! You have successfully zeroed out gradients PyTorch.
-# 
-# Learn More
+# 你也可以使用 ``model.zero_grad()``。只要你的所有模型参数都在该优化器中,
+# 使用 ``model.zero_grad()`` 和使用 ``optimizer.zero_grad()`` 是一样的。请根据具体情况决定使用哪一种方式。
+#
+# 祝贺你!你已经成功地在PyTorch中清零了梯度。
+#
+# 继续学习
 # ----------
-# 
-# Take a look at these other recipes to continue your learning:
-# 
-# - `Loading data in PyTorch <https://pytorch.org/tutorials/recipes/recipes/loading_data_recipe.html>`__
-# - `Saving and loading models across devices in PyTorch <https://pytorch.org/tutorials/recipes/recipes/save_load_across_devices.html>`__
+#
+# 查看这些其他教程,继续你的学习之旅:
+#
+# - `在PyTorch中加载数据 <https://pytorch.org/tutorials/recipes/recipes/loading_data_recipe.html>`__
+# - `在PyTorch中跨设备保存和加载模型 <https://pytorch.org/tutorials/recipes/recipes/save_load_across_devices.html>`__
