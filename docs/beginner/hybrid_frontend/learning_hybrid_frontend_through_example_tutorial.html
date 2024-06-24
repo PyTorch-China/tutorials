@@ -679,11 +679,11 @@ single valued torch tensor.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
 
 <span class="k">def</span> <span class="nf">fn</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">x</span><span class="p">)</span>
+    <span class="k">return</span> <a href="https://pytorch.org/docs/stable/generated/torch.abs.html#torch.abs" title="torch.abs" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">abs</span></a><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">x</span><span class="p">)</span>
 
 <span class="c1"># This is how you define a traced function</span>
 <span class="c1"># Pass in both the function to be traced and an example input to ``torch.jit.trace``</span>
-<span class="n">traced_fn</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="n">fn</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">rand</span><span class="p">(()))</span>
+<span class="n">traced_fn</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.jit.trace.html#torch.jit.trace" title="torch.jit.trace" class="sphx-glr-backref-module-torch-jit sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">trace</span></a><span class="p">(</span><span class="n">fn</span><span class="p">,</span> <a href="https://pytorch.org/docs/stable/generated/torch.rand.html#torch.rand" title="torch.rand" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">rand</span></a><span class="p">(()))</span>
 </pre></div>
 </div>
 </div>
@@ -698,7 +698,7 @@ the <code class="docutils literal notranslate"><span class="pre">&#64;torch.jit.
 <span class="c1"># Apply this decorator directly to the function</span>
 <span class="nd">@torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">script</span>
 <span class="k">def</span> <span class="nf">script_fn</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
-    <span class="n">z</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">([</span><span class="mi">1</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+    <span class="n">z</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.ones.html#torch.ones" title="torch.ones" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">ones</span></a><span class="p">([</span><span class="mi">1</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="p">)):</span>
         <span class="n">z</span> <span class="o">=</span> <span class="n">z</span> <span class="o">*</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">z</span>
@@ -712,10 +712,10 @@ function of a <code class="docutils literal notranslate"><span class="pre">torch
 than adding a decorator here, we will handle the tracing where the
 Module is constructed. Thus, the class definition is not changed at all.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># This is a normal module that can be traced.</span>
-<span class="k">class</span> <span class="nc">TracedModule</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">TracedModule</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/generated/torch.nn.Module.html#torch.nn.Module" title="torch.nn.Module" class="sphx-glr-backref-module-torch-nn sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span></a><span class="p">):</span>
     <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
         <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">type</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">/</span> <span class="mf">5.</span><span class="p">)</span>
+        <span class="k">return</span> <a href="https://pytorch.org/docs/stable/generated/torch.floor.html#torch.floor" title="torch.floor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">floor</span></a><span class="p">(</span><a href="https://pytorch.org/docs/stable/generated/torch.sqrt.html#torch.sqrt" title="torch.sqrt" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">sqrt</span></a><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">/</span> <span class="mf">5.</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -728,11 +728,11 @@ decorator to the forward function.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># This is how you define a scripted module.</span>
 <span class="c1"># The module should inherit from ScriptModule and the forward should have the</span>
 <span class="c1">#   script_method decorator applied to it.</span>
-<span class="k">class</span> <span class="nc">ScriptModule</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">ScriptModule</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">ScriptModule</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/generated/torch.jit.ScriptModule.html#torch.jit.ScriptModule" title="torch.jit.ScriptModule" class="sphx-glr-backref-module-torch-jit sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">ScriptModule</span></a><span class="p">):</span>
     <span class="nd">@torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">script_method</span>
     <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
         <span class="n">r</span> <span class="o">=</span> <span class="o">-</span><span class="n">x</span>
-        <span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">fmod</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">))</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">int</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/generated/torch.fmod.html#torch.fmod" title="torch.fmod" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">fmod</span></a><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">))</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">:</span>
             <span class="n">r</span> <span class="o">=</span> <span class="n">x</span> <span class="o">/</span> <span class="mf">2.0</span>
         <span class="k">return</span> <span class="n">r</span>
 </pre></div>
@@ -759,13 +759,13 @@ There is no strange syntax here and we call the traced and scripted
 modules and functions as expected.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># This is a demonstration net that calls all of the different types of</span>
 <span class="c1"># methods and functions</span>
-<span class="k">class</span> <span class="nc">Net</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">Net</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/generated/torch.nn.Module.html#torch.nn.Module" title="torch.nn.Module" class="sphx-glr-backref-module-torch-nn sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span></a><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">Net</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="c1"># Modules must be attributes on the Module because if you want to trace</span>
         <span class="c1"># or script this Module, we must be able to inherit the submodules&#39;</span>
         <span class="c1"># params.</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">traced_module</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="n">TracedModule</span><span class="p">(),</span> <span class="n">torch</span><span class="o">.</span><span class="n">rand</span><span class="p">(()))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">traced_module</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.jit.trace.html#torch.jit.trace" title="torch.jit.trace" class="sphx-glr-backref-module-torch-jit sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">trace</span></a><span class="p">(</span><span class="n">TracedModule</span><span class="p">(),</span> <a href="https://pytorch.org/docs/stable/generated/torch.rand.html#torch.rand" title="torch.rand" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">rand</span></a><span class="p">(()))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">script_module</span> <span class="o">=</span> <span class="n">ScriptModule</span><span class="p">()</span>
 
         <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;traced_fn graph&#39;</span><span class="p">,</span> <span class="n">traced_fn</span><span class="o">.</span><span class="n">graph</span><span class="p">)</span>
@@ -798,7 +798,7 @@ value and expect <span class="math">\(Y(x)=190.\)</span> Also, check out the gra
 printed during the construction of the Net.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Instantiate this net and run it</span>
 <span class="n">n</span> <span class="o">=</span> <span class="n">Net</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">n</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="mi">5</span><span class="p">])))</span> <span class="c1"># 190.</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">n</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/generated/torch.tensor.html#torch.tensor" title="torch.tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span></a><span class="p">([</span><span class="mi">5</span><span class="p">])))</span> <span class="c1"># 190.</span>
 </pre></div>
 </div>
 </div>
@@ -810,8 +810,8 @@ attributes of Net, we are able to trace <code class="docutils literal notranslat
 parameters of the traced/scripted submodules. Note, the syntax for
 tracing Net is identical to the syntax for tracing <code class="docutils literal notranslate"><span class="pre">TracedModule</span></code>.
 Also, check out the graph that is created.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">n_traced</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="mi">5</span><span class="p">]))</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">n_traced</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="mi">5</span><span class="p">])))</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">n_traced</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.jit.trace.html#torch.jit.trace" title="torch.jit.trace" class="sphx-glr-backref-module-torch-jit sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">trace</span></a><span class="p">(</span><span class="n">n</span><span class="p">,</span> <a href="https://pytorch.org/docs/stable/generated/torch.tensor.html#torch.tensor" title="torch.tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span></a><span class="p">([</span><span class="mi">5</span><span class="p">]))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">n_traced</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/generated/torch.tensor.html#torch.tensor" title="torch.tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span></a><span class="p">([</span><span class="mi">5</span><span class="p">])))</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;n_traced graph&#39;</span><span class="p">,</span> <span class="n">n_traced</span><span class="o">.</span><span class="n">graph</span><span class="p">)</span>
 </pre></div>
 </div>

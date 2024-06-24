@@ -88,15 +88,15 @@ Recipes are bite-sized, actionable examples of how to use specific PyTorch featu
    :tags: Basics
 
 .. customcarditem::
-   :header: Saving and loading models across devices in PyTorch
-   :card_description: Learn how saving and loading models across devices (CPUs and GPUs) is relatively straightforward using PyTorch.
+   :header: PyTorch 跨设备保存和加载模型
+   :card_description: 了解如何使用PyTorch在不同设备(CPU和GPU)之间保存和加载模型。
    :image: ../_static/img/thumbnails/cropped/saving-and-loading-models-across-devices.PNG
    :link: ../recipes/recipes/save_load_across_devices.html
    :tags: Basics
 
 .. customcarditem::
-   :header: Zeroing out gradients in PyTorch
-   :card_description: Learn when you should zero out gradients and how doing so can help increase the accuracy of your model.
+   :header:  PyTorch 清零梯度
+   :card_description: 了解何时应该清零梯度,以及这样做如何有助于提高模型的精度。
    :image: ../_static/img/thumbnails/cropped/zeroing-out-gradients.PNG
    :link: ../recipes/recipes/zeroing_out_gradients.html
    :tags: Basics

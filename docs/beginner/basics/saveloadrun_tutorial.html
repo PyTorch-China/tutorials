@@ -618,12 +618,12 @@ to download the full example code</p>
 <p>PyTorch模型将学习到的参数存储在一个内部状态字典中，称为``state_dict``。这些参数可以通过``torch.save``进行持久化。
 方法:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">model</span> <span class="o">=</span> <a href="https://pytorch.org/vision/stable/models/generated/torchvision.models.vgg16.html#torchvision.models.vgg16" title="torchvision.models.vgg16" class="sphx-glr-backref-module-torchvision-models sphx-glr-backref-type-py-function"><span class="n">models</span><span class="o">.</span><span class="n">vgg16</span></a><span class="p">(</span><span class="n">weights</span><span class="o">=</span><span class="s1">&#39;IMAGENET1K_V1&#39;</span><span class="p">)</span>
-<span class="n">torch</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">state_dict</span><span class="p">(),</span> <span class="s1">&#39;model_weights.pth&#39;</span><span class="p">)</span>
+<a href="https://pytorch.org/docs/stable/generated/torch.save.html#torch.save" title="torch.save" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">save</span></a><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">state_dict</span><span class="p">(),</span> <span class="s1">&#39;model_weights.pth&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>要加载模型权重，您需要先创建一个相同模型的实例，然后使用``load_state_dict()``方法加载参数。</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">model</span> <span class="o">=</span> <a href="https://pytorch.org/vision/stable/models/generated/torchvision.models.vgg16.html#torchvision.models.vgg16" title="torchvision.models.vgg16" class="sphx-glr-backref-module-torchvision-models sphx-glr-backref-type-py-function"><span class="n">models</span><span class="o">.</span><span class="n">vgg16</span></a><span class="p">()</span> <span class="c1"># we do not specify ``weights``, i.e. create untrained model</span>
-<span class="n">model</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;model_weights.pth&#39;</span><span class="p">))</span>
+<span class="n">model</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/generated/torch.load.html#torch.load" title="torch.load" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">load</span></a><span class="p">(</span><span class="s1">&#39;model_weights.pth&#39;</span><span class="p">))</span>
 <span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -633,11 +633,11 @@ to download the full example code</p>
 <h2>保存和加载带有结构的模型<a class="headerlink" href="#id10" title="Permalink to this heading">¶</a></h2>
 <p>在加载模型权重时，我们需要先实例化模型类，因为类定义了网络的结构。我们可能希望将这个类的结构与模型一起保存，
 在这种情况下，我们可以将``model``（而不是``model.state_dict()``）传递给 save 函数：</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">torch</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="s1">&#39;model.pth&#39;</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://pytorch.org/docs/stable/generated/torch.save.html#torch.save" title="torch.save" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">save</span></a><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="s1">&#39;model.pth&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>我们可以使用如下方式加载模型:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">model</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;model.pth&#39;</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">model</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.load.html#torch.load" title="torch.load" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">load</span></a><span class="p">(</span><span class="s1">&#39;model.pth&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>

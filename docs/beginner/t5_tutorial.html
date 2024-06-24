@@ -688,12 +688,12 @@ prefixes, please visit Appendix D of the <a class="reference external" href="htt
 <p class="admonition-title">Note</p>
 <p>Using datapipes is still currently subject to a few caveats. If you wish
 to extend this example to include shuffling, multi-processing, or
-distributed learning, please see <span class="xref std std-ref">this note</span>
+distributed learning, please see <a class="reference external" href="https://pytorch.org/text/stable/datasets.html#datapipes-warnings" title="(in Torchtext v0.18.0)"><span class="xref std std-ref">this note</span></a>
 for further instructions.</p>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
 
-<span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="kn">import</span> <span class="n">DataLoader</span>
+<span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="kn">import</span> <a href="https://pytorch.org/docs/stable/data.html#torch.utils.data.DataLoader" title="torch.utils.data.DataLoader" class="sphx-glr-backref-module-torch-utils-data sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">DataLoader</span></a>
 <span class="kn">from</span> <span class="nn">torchtext.datasets</span> <span class="kn">import</span> <span class="n">CNNDM</span>
 
 <span class="n">cnndm_batch_size</span> <span class="o">=</span> <span class="mi">5</span>
@@ -708,7 +708,7 @@ for further instructions.</p>
 <span class="n">cnndm_datapipe</span> <span class="o">=</span> <span class="n">cnndm_datapipe</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">partial</span><span class="p">(</span><span class="n">apply_prefix</span><span class="p">,</span> <span class="n">task</span><span class="p">))</span>
 <span class="n">cnndm_datapipe</span> <span class="o">=</span> <span class="n">cnndm_datapipe</span><span class="o">.</span><span class="n">batch</span><span class="p">(</span><span class="n">cnndm_batch_size</span><span class="p">)</span>
 <span class="n">cnndm_datapipe</span> <span class="o">=</span> <span class="n">cnndm_datapipe</span><span class="o">.</span><span class="n">rows2columnar</span><span class="p">([</span><span class="s2">&quot;article&quot;</span><span class="p">,</span> <span class="s2">&quot;abstract&quot;</span><span class="p">])</span>
-<span class="n">cnndm_dataloader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">cnndm_datapipe</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="n">cnndm_dataloader</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/data.html#torch.utils.data.DataLoader" title="torch.utils.data.DataLoader" class="sphx-glr-backref-module-torch-utils-data sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">DataLoader</span></a><span class="p">(</span><span class="n">cnndm_datapipe</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Alternately, we can also use batched API, for example, apply the prefix on the whole batch:</p>
@@ -724,17 +724,17 @@ for further instructions.</p>
 
 <span class="n">cnndm_datapipe</span> <span class="o">=</span> <span class="n">cnndm_datapipe</span><span class="o">.</span><span class="n">batch</span><span class="p">(</span><span class="n">cnndm_batch_size</span><span class="p">)</span><span class="o">.</span><span class="n">rows2columnar</span><span class="p">([</span><span class="s2">&quot;article&quot;</span><span class="p">,</span> <span class="s2">&quot;abstract&quot;</span><span class="p">])</span>
 <span class="n">cnndm_datapipe</span> <span class="o">=</span> <span class="n">cnndm_datapipe</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">partial</span><span class="p">(</span><span class="n">batch_prefix</span><span class="p">,</span> <span class="n">task</span><span class="p">))</span>
-<span class="n">cnndm_dataloader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">cnndm_datapipe</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="n">cnndm_dataloader</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/data.html#torch.utils.data.DataLoader" title="torch.utils.data.DataLoader" class="sphx-glr-backref-module-torch-utils-data sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">DataLoader</span></a><span class="p">(</span><span class="n">cnndm_datapipe</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>We can also load the IMDB dataset, which will be used to demonstrate sentiment classification using the T5 model.
 This dataset has a train and test split. Below we demo on the test split.</p>
 <p>The T5 model was trained on the SST2 dataset (also available in torchtext) for sentiment classification using the
 prefix <code class="docutils literal notranslate"><span class="pre">sst2</span> <span class="pre">sentence</span></code>. Therefore, we will use this prefix to perform sentiment classification on the IMDB dataset.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torchtext.datasets</span> <span class="kn">import</span> <span class="n">IMDB</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torchtext.datasets</span> <span class="kn">import</span> <a href="https://pytorch.org/text/stable/datasets.html#torchtext.datasets.IMDB" title="torchtext.datasets.IMDB" class="sphx-glr-backref-module-torchtext-datasets sphx-glr-backref-type-py-function"><span class="n">IMDB</span></a>
 
 <span class="n">imdb_batch_size</span> <span class="o">=</span> <span class="mi">3</span>
-<span class="n">imdb_datapipe</span> <span class="o">=</span> <span class="n">IMDB</span><span class="p">(</span><span class="n">split</span><span class="o">=</span><span class="s2">&quot;test&quot;</span><span class="p">)</span>
+<span class="n">imdb_datapipe</span> <span class="o">=</span> <a href="https://pytorch.org/text/stable/datasets.html#torchtext.datasets.IMDB" title="torchtext.datasets.IMDB" class="sphx-glr-backref-module-torchtext-datasets sphx-glr-backref-type-py-function"><span class="n">IMDB</span></a><span class="p">(</span><span class="n">split</span><span class="o">=</span><span class="s2">&quot;test&quot;</span><span class="p">)</span>
 <span class="n">task</span> <span class="o">=</span> <span class="s2">&quot;sst2 sentence&quot;</span>
 <span class="n">labels</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;1&quot;</span><span class="p">:</span> <span class="s2">&quot;negative&quot;</span><span class="p">,</span> <span class="s2">&quot;2&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">}</span>
 
@@ -747,23 +747,23 @@ prefix <code class="docutils literal notranslate"><span class="pre">sst2</span> 
 <span class="n">imdb_datapipe</span> <span class="o">=</span> <span class="n">imdb_datapipe</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">partial</span><span class="p">(</span><span class="n">apply_prefix</span><span class="p">,</span> <span class="n">task</span><span class="p">))</span>
 <span class="n">imdb_datapipe</span> <span class="o">=</span> <span class="n">imdb_datapipe</span><span class="o">.</span><span class="n">batch</span><span class="p">(</span><span class="n">imdb_batch_size</span><span class="p">)</span>
 <span class="n">imdb_datapipe</span> <span class="o">=</span> <span class="n">imdb_datapipe</span><span class="o">.</span><span class="n">rows2columnar</span><span class="p">([</span><span class="s2">&quot;text&quot;</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">])</span>
-<span class="n">imdb_dataloader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">imdb_datapipe</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="n">imdb_dataloader</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/data.html#torch.utils.data.DataLoader" title="torch.utils.data.DataLoader" class="sphx-glr-backref-module-torch-utils-data sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">DataLoader</span></a><span class="p">(</span><span class="n">imdb_datapipe</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Finally, we can also load the Multi30k dataset to demonstrate English to German translation using the T5 model.
 This dataset has a train, validation, and test split. Below we demo on the test split.</p>
 <p>The T5 model uses the prefix “translate English to German” for this task.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torchtext.datasets</span> <span class="kn">import</span> <span class="n">Multi30k</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torchtext.datasets</span> <span class="kn">import</span> <a href="https://pytorch.org/text/stable/datasets.html#torchtext.datasets.Multi30k" title="torchtext.datasets.Multi30k" class="sphx-glr-backref-module-torchtext-datasets sphx-glr-backref-type-py-function"><span class="n">Multi30k</span></a>
 
 <span class="n">multi_batch_size</span> <span class="o">=</span> <span class="mi">5</span>
 <span class="n">language_pair</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;en&quot;</span><span class="p">,</span> <span class="s2">&quot;de&quot;</span><span class="p">)</span>
-<span class="n">multi_datapipe</span> <span class="o">=</span> <span class="n">Multi30k</span><span class="p">(</span><span class="n">split</span><span class="o">=</span><span class="s2">&quot;test&quot;</span><span class="p">,</span> <span class="n">language_pair</span><span class="o">=</span><span class="n">language_pair</span><span class="p">)</span>
+<span class="n">multi_datapipe</span> <span class="o">=</span> <a href="https://pytorch.org/text/stable/datasets.html#torchtext.datasets.Multi30k" title="torchtext.datasets.Multi30k" class="sphx-glr-backref-module-torchtext-datasets sphx-glr-backref-type-py-function"><span class="n">Multi30k</span></a><span class="p">(</span><span class="n">split</span><span class="o">=</span><span class="s2">&quot;test&quot;</span><span class="p">,</span> <span class="n">language_pair</span><span class="o">=</span><span class="n">language_pair</span><span class="p">)</span>
 <span class="n">task</span> <span class="o">=</span> <span class="s2">&quot;translate English to German&quot;</span>
 
 <span class="n">multi_datapipe</span> <span class="o">=</span> <span class="n">multi_datapipe</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">partial</span><span class="p">(</span><span class="n">apply_prefix</span><span class="p">,</span> <span class="n">task</span><span class="p">))</span>
 <span class="n">multi_datapipe</span> <span class="o">=</span> <span class="n">multi_datapipe</span><span class="o">.</span><span class="n">batch</span><span class="p">(</span><span class="n">multi_batch_size</span><span class="p">)</span>
 <span class="n">multi_datapipe</span> <span class="o">=</span> <span class="n">multi_datapipe</span><span class="o">.</span><span class="n">rows2columnar</span><span class="p">([</span><span class="s2">&quot;english&quot;</span><span class="p">,</span> <span class="s2">&quot;german&quot;</span><span class="p">])</span>
-<span class="n">multi_dataloader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">multi_datapipe</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="n">multi_dataloader</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/data.html#torch.utils.data.DataLoader" title="torch.utils.data.DataLoader" class="sphx-glr-backref-module-torch-utils-data sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">DataLoader</span></a><span class="p">(</span><span class="n">multi_datapipe</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>

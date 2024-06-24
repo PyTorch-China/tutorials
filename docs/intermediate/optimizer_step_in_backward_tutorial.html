@@ -625,7 +625,7 @@ but, again, feel free to substitute with your own optimizer.</p>
 <span class="kn">from</span> <span class="nn">pickle</span> <span class="kn">import</span> <span class="n">dump</span>
 
 <span class="n">model</span> <span class="o">=</span> <a href="https://pytorch.org/vision/stable/models/generated/torchvision.models.vit_l_16.html#torchvision.models.vit_l_16" title="torchvision.models.vit_l_16" class="sphx-glr-backref-module-torchvision-models sphx-glr-backref-type-py-function"><span class="n">models</span><span class="o">.</span><span class="n">vit_l_16</span></a><span class="p">(</span><span class="n">weights</span><span class="o">=</span><span class="s1">&#39;DEFAULT&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">cuda</span><span class="p">()</span>
-<span class="n">optimizer</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">())</span>
+<span class="n">optimizer</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.optim.Adam.html#torch.optim.Adam" title="torch.optim.Adam" class="sphx-glr-backref-module-torch-optim sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Adam</span></a><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">())</span>
 </pre></div>
 </div>
 <p>Now let’s define our typical training loop. You should use real images when
@@ -635,7 +635,7 @@ inputs and not worrying about loading any actual data.</p>
 
 <span class="k">def</span> <span class="nf">train</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">):</span>
   <span class="c1"># create our fake image input: tensor shape is batch_size, channels, height, width</span>
-  <span class="n">fake_image</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">IMAGE_SIZE</span><span class="p">,</span> <span class="n">IMAGE_SIZE</span><span class="p">)</span><span class="o">.</span><span class="n">cuda</span><span class="p">()</span>
+  <span class="n">fake_image</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.rand.html#torch.rand" title="torch.rand" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">rand</span></a><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">IMAGE_SIZE</span><span class="p">,</span> <span class="n">IMAGE_SIZE</span><span class="p">)</span><span class="o">.</span><span class="n">cuda</span><span class="p">()</span>
 
   <span class="c1"># call our forward and backward</span>
   <span class="n">loss</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">fake_image</span><span class="p">)</span>
@@ -667,19 +667,19 @@ not worry about them for now as they are usually small and ephemeral.</p></li>
 <p>Let’s get us a memory snapshot! As your code runs, consider what you may expect
 the CUDA memory timeline to look like.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># tell CUDA to start recording memory allocations</span>
-<span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">memory</span><span class="o">.</span><span class="n">_record_memory_history</span><span class="p">(</span><span class="n">enabled</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">)</span>
+<a href="https://pytorch.org/docs/stable/torch_cuda_memory.html#torch.cuda.memory._record_memory_history" title="torch.cuda.memory._record_memory_history" class="sphx-glr-backref-module-torch-cuda-memory sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">memory</span><span class="o">.</span><span class="n">_record_memory_history</span></a><span class="p">(</span><span class="n">enabled</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">)</span>
 
 <span class="c1"># train 3 steps</span>
 <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
   <span class="n">train</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">)</span>
 
 <span class="c1"># save a snapshot of the memory allocations</span>
-<span class="n">s</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">memory</span><span class="o">.</span><span class="n">_snapshot</span><span class="p">()</span>
+<span class="n">s</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/torch_cuda_memory.html#torch.cuda.memory._snapshot" title="torch.cuda.memory._snapshot" class="sphx-glr-backref-module-torch-cuda-memory sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">memory</span><span class="o">.</span><span class="n">_snapshot</span></a><span class="p">()</span>
 <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;snapshot.pickle&quot;</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
     <span class="n">dump</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
 
 <span class="c1"># tell CUDA to stop recording memory allocations now</span>
-<span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">memory</span><span class="o">.</span><span class="n">_record_memory_history</span><span class="p">(</span><span class="n">enabled</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<a href="https://pytorch.org/docs/stable/torch_cuda_memory.html#torch.cuda.memory._record_memory_history" title="torch.cuda.memory._record_memory_history" class="sphx-glr-backref-module-torch-cuda-memory sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">memory</span><span class="o">.</span><span class="n">_record_memory_history</span></a><span class="p">(</span><span class="n">enabled</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Now open up the snapshot in the CUDA Memory Visualizer at
@@ -748,12 +748,12 @@ accumulated. We will encapsulate the optimizer step into this hook. How?</p>
 <p>Remember our model and optimizer setup from the beginning? I’ll leave them commented
 out below so we don’t spend resources rerunning the code.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">model</span> <span class="o">=</span> <a href="https://pytorch.org/vision/stable/models/generated/torchvision.models.vit_l_16.html#torchvision.models.vit_l_16" title="torchvision.models.vit_l_16" class="sphx-glr-backref-module-torchvision-models sphx-glr-backref-type-py-function"><span class="n">models</span><span class="o">.</span><span class="n">vit_l_16</span></a><span class="p">(</span><span class="n">weights</span><span class="o">=</span><span class="s1">&#39;DEFAULT&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">cuda</span><span class="p">()</span>
-<span class="n">optimizer</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">())</span>
+<span class="n">optimizer</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.optim.Adam.html#torch.optim.Adam" title="torch.optim.Adam" class="sphx-glr-backref-module-torch-optim sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Adam</span></a><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">())</span>
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Instead of having just *one* optimizer, we will have a ``dict`` of optimizers</span>
 <span class="c1"># for every parameter so we could reference them in our hook.</span>
-<span class="n">optimizer_dict</span> <span class="o">=</span> <span class="p">{</span><span class="n">p</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">([</span><span class="n">p</span><span class="p">],</span> <span class="n">foreach</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">()}</span>
+<span class="n">optimizer_dict</span> <span class="o">=</span> <span class="p">{</span><span class="n">p</span><span class="p">:</span> <a href="https://pytorch.org/docs/stable/generated/torch.optim.Adam.html#torch.optim.Adam" title="torch.optim.Adam" class="sphx-glr-backref-module-torch-optim sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Adam</span></a><span class="p">([</span><span class="n">p</span><span class="p">],</span> <span class="n">foreach</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">()}</span>
 
 <span class="c1"># Define our hook, which will call the optimizer ``step()`` and ``zero_grad()``</span>
 <span class="k">def</span> <span class="nf">optimizer_hook</span><span class="p">(</span><span class="n">parameter</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -768,7 +768,7 @@ out below so we don’t spend resources rerunning the code.</p>
 <span class="c1"># fused into the backward, we can remove the optimizer step and zero_grad calls.</span>
 <span class="k">def</span> <span class="nf">train</span><span class="p">(</span><span class="n">model</span><span class="p">):</span>
   <span class="c1"># create our fake image input: tensor shape is batch_size, channels, height, width</span>
-  <span class="n">fake_image</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">IMAGE_SIZE</span><span class="p">,</span> <span class="n">IMAGE_SIZE</span><span class="p">)</span><span class="o">.</span><span class="n">cuda</span><span class="p">()</span>
+  <span class="n">fake_image</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.rand.html#torch.rand" title="torch.rand" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">rand</span></a><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">IMAGE_SIZE</span><span class="p">,</span> <span class="n">IMAGE_SIZE</span><span class="p">)</span><span class="o">.</span><span class="n">cuda</span><span class="p">()</span>
 
   <span class="c1"># call our forward and backward</span>
   <span class="n">loss</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">fake_image</span><span class="p">)</span>
@@ -795,19 +795,19 @@ We will consult our friend, the memory snapshot.</p>
 <span class="k">del</span> <span class="n">optimizer</span>
 
 <span class="c1"># tell CUDA to start recording memory allocations</span>
-<span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">memory</span><span class="o">.</span><span class="n">_record_memory_history</span><span class="p">(</span><span class="n">enabled</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">)</span>
+<a href="https://pytorch.org/docs/stable/torch_cuda_memory.html#torch.cuda.memory._record_memory_history" title="torch.cuda.memory._record_memory_history" class="sphx-glr-backref-module-torch-cuda-memory sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">memory</span><span class="o">.</span><span class="n">_record_memory_history</span></a><span class="p">(</span><span class="n">enabled</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">)</span>
 
 <span class="c1"># train 3 steps. note that we no longer pass the optimizer into train()</span>
 <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
   <span class="n">train</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
 
 <span class="c1"># save a snapshot of the memory allocations</span>
-<span class="n">s</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">memory</span><span class="o">.</span><span class="n">_snapshot</span><span class="p">()</span>
+<span class="n">s</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/torch_cuda_memory.html#torch.cuda.memory._snapshot" title="torch.cuda.memory._snapshot" class="sphx-glr-backref-module-torch-cuda-memory sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">memory</span><span class="o">.</span><span class="n">_snapshot</span></a><span class="p">()</span>
 <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;snapshot-opt-in-bwd.pickle&quot;</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
     <span class="n">dump</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
 
 <span class="c1"># tell CUDA to stop recording memory allocations now</span>
-<span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">memory</span><span class="o">.</span><span class="n">_record_memory_history</span><span class="p">(</span><span class="n">enabled</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<a href="https://pytorch.org/docs/stable/torch_cuda_memory.html#torch.cuda.memory._record_memory_history" title="torch.cuda.memory._record_memory_history" class="sphx-glr-backref-module-torch-cuda-memory sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">memory</span><span class="o">.</span><span class="n">_record_memory_history</span></a><span class="p">(</span><span class="n">enabled</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Yes, take some time to drag your snapshot into the CUDA Memory Visualizer.</p>

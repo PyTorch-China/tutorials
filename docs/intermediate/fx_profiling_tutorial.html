@@ -621,7 +621,7 @@ for demonstration purposes.</p>
 <p>Now that we have our model, we want to inspect deeper into its
 performance. That is, for the following invocation, which parts
 of the model are taking the longest?</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">input</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">224</span><span class="p">,</span> <span class="mi">224</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">input</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.randn.html#torch.randn" title="torch.randn" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">randn</span></a><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">224</span><span class="p">,</span> <span class="mi">224</span><span class="p">)</span>
 <span class="n">output</span> <span class="o">=</span> <span class="n">rn18</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -638,7 +638,7 @@ process without needing to modify any source.</p>
 of these later in the code).</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">statistics</span><span class="o">,</span> <span class="nn">tabulate</span><span class="o">,</span> <span class="nn">time</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span>
-<span class="kn">from</span> <span class="nn">torch.fx</span> <span class="kn">import</span> <span class="n">Interpreter</span>
+<span class="kn">from</span> <span class="nn">torch.fx</span> <span class="kn">import</span> <a href="https://pytorch.org/docs/stable/fx.html#torch.fx.Interpreter" title="torch.fx.Interpreter" class="sphx-glr-backref-module-torch-fx sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">Interpreter</span></a>
 </pre></div>
 </div>
 <div class="admonition note">
@@ -652,7 +652,7 @@ make sure you’ve installed it from your favorite Python package source.</p>
 <p>Next, we are going to use FX’s symbolic tracing mechanism to capture
 the definition of our model in a data structure we can manipulate
 and examine.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">traced_rn18</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">fx</span><span class="o">.</span><span class="n">symbolic_trace</span><span class="p">(</span><span class="n">rn18</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">traced_rn18</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/fx.html#torch.fx.symbolic_trace" title="torch.fx.symbolic_trace" class="sphx-glr-backref-module-torch-fx sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">fx</span><span class="o">.</span><span class="n">symbolic_trace</span></a><span class="p">(</span><span class="n">rn18</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">traced_rn18</span><span class="o">.</span><span class="n">graph</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -677,13 +677,13 @@ install the profiling behavior we want. The goal is to have an object to which
 we can pass a model, invoke the model 1 or more times, then get statistics about
 how long the model and each part of the model took during those runs.</p>
 <p>Let’s define our <code class="docutils literal notranslate"><span class="pre">ProfilingInterpreter</span></code> class:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">ProfilingInterpreter</span><span class="p">(</span><span class="n">Interpreter</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mod</span> <span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">ProfilingInterpreter</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/fx.html#torch.fx.Interpreter" title="torch.fx.Interpreter" class="sphx-glr-backref-module-torch-fx sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">Interpreter</span></a><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mod</span> <span class="p">:</span> <a href="https://pytorch.org/docs/stable/generated/torch.nn.Module.html#torch.nn.Module" title="torch.nn.Module" class="sphx-glr-backref-module-torch-nn sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span></a><span class="p">):</span>
         <span class="c1"># Rather than have the user symbolically trace their model,</span>
         <span class="c1"># we&#39;re going to do it in the constructor. As a result, the</span>
         <span class="c1"># user can pass in any ``Module`` without having to worry about</span>
         <span class="c1"># symbolic tracing APIs</span>
-        <span class="n">gm</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">fx</span><span class="o">.</span><span class="n">symbolic_trace</span><span class="p">(</span><span class="n">mod</span><span class="p">)</span>
+        <span class="n">gm</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/fx.html#torch.fx.symbolic_trace" title="torch.fx.symbolic_trace" class="sphx-glr-backref-module-torch-fx sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">fx</span><span class="o">.</span><span class="n">symbolic_trace</span></a><span class="p">(</span><span class="n">mod</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">gm</span><span class="p">)</span>
 
         <span class="c1"># We are going to store away two things here:</span>
@@ -695,7 +695,7 @@ how long the model and each part of the model took during those runs.</p>
         <span class="c1"># 2. A map from ``Node`` to a list of times (in seconds) that</span>
         <span class="c1">#    node took to run. This can be seen as similar to (1) but</span>
         <span class="c1">#    for specific sub-parts of the model.</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">runtimes_sec</span> <span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">fx</span><span class="o">.</span><span class="n">Node</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">runtimes_sec</span> <span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><a href="https://pytorch.org/docs/stable/fx.html#torch.fx.Node" title="torch.fx.Node" class="sphx-glr-backref-module-torch-fx sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">torch</span><span class="o">.</span><span class="n">fx</span><span class="o">.</span><span class="n">Node</span></a><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
 
     <span class="c1">######################################################################</span>
     <span class="c1"># Next, let&#39;s override our first method: ``run()``. ``Interpreter``&#39;s ``run``</span>
@@ -721,7 +721,7 @@ how long the model and each part of the model took during those runs.</p>
     <span class="c1"># can measure and record the time taken for each individual call in</span>
     <span class="c1"># the model.</span>
 
-    <span class="k">def</span> <span class="nf">run_node</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span> <span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">fx</span><span class="o">.</span><span class="n">Node</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">run_node</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span> <span class="p">:</span> <a href="https://pytorch.org/docs/stable/fx.html#torch.fx.Node" title="torch.fx.Node" class="sphx-glr-backref-module-torch-fx sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">torch</span><span class="o">.</span><span class="n">fx</span><span class="o">.</span><span class="n">Node</span></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
         <span class="c1"># Record the time we started running the op</span>
         <span class="n">t_start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
         <span class="c1"># Run the op by delegating back into Interpreter.run_node()</span>

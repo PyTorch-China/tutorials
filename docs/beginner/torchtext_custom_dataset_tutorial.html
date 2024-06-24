@@ -638,7 +638,7 @@ python<span class="w"> </span>-m<span class="w"> </span>spacy<span class="w"> </
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torchdata.datapipes</span> <span class="k">as</span> <span class="nn">dp</span>
 <span class="kn">import</span> <span class="nn">torchtext.transforms</span> <span class="k">as</span> <span class="nn">T</span>
 <span class="kn">import</span> <span class="nn">spacy</span>
-<span class="kn">from</span> <span class="nn">torchtext.vocab</span> <span class="kn">import</span> <span class="n">build_vocab_from_iterator</span>
+<span class="kn">from</span> <span class="nn">torchtext.vocab</span> <span class="kn">import</span> <a href="https://pytorch.org/text/stable/vocab.html#torchtext.vocab.build_vocab_from_iterator" title="torchtext.vocab.build_vocab_from_iterator" class="sphx-glr-backref-module-torchtext-vocab sphx-glr-backref-type-py-function"><span class="n">build_vocab_from_iterator</span></a>
 <span class="n">eng</span> <span class="o">=</span> <span class="n">spacy</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;en_core_web_sm&quot;</span><span class="p">)</span> <span class="c1"># Load the English model to tokenize English text</span>
 <span class="n">de</span> <span class="o">=</span> <span class="n">spacy</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;de_core_news_sm&quot;</span><span class="p">)</span> <span class="c1"># Load the German model to tokenize German text</span>
 </pre></div>
@@ -729,7 +729,7 @@ We will build vocabulary for both our source and target now.</p>
 </pre></div>
 </div>
 <p>Now, we will build vocabulary for source:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">source_vocab</span> <span class="o">=</span> <span class="n">build_vocab_from_iterator</span><span class="p">(</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">source_vocab</span> <span class="o">=</span> <a href="https://pytorch.org/text/stable/vocab.html#torchtext.vocab.build_vocab_from_iterator" title="torchtext.vocab.build_vocab_from_iterator" class="sphx-glr-backref-module-torchtext-vocab sphx-glr-backref-type-py-function"><span class="n">build_vocab_from_iterator</span></a><span class="p">(</span>
     <span class="n">getTokens</span><span class="p">(</span><span class="n">data_pipe</span><span class="p">,</span><span class="mi">0</span><span class="p">),</span>
     <span class="n">min_freq</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
     <span class="n">specials</span><span class="o">=</span> <span class="p">[</span><span class="s1">&#39;&lt;pad&gt;&#39;</span><span class="p">,</span> <span class="s1">&#39;&lt;sos&gt;&#39;</span><span class="p">,</span> <span class="s1">&#39;&lt;eos&gt;&#39;</span><span class="p">,</span> <span class="s1">&#39;&lt;unk&gt;&#39;</span><span class="p">],</span>
@@ -761,7 +761,7 @@ batch, there can be sentences of different length. So, we pad the shorter senten
 vocabulary, we will use <cite>&lt;unk&gt;</cite> instead of that unknown word.</p></li>
 </ul>
 <p>Similarly, we will build vocabulary for target sentences:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">target_vocab</span> <span class="o">=</span> <span class="n">build_vocab_from_iterator</span><span class="p">(</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">target_vocab</span> <span class="o">=</span> <a href="https://pytorch.org/text/stable/vocab.html#torchtext.vocab.build_vocab_from_iterator" title="torchtext.vocab.build_vocab_from_iterator" class="sphx-glr-backref-module-torchtext-vocab sphx-glr-backref-type-py-function"><span class="n">build_vocab_from_iterator</span></a><span class="p">(</span>
     <span class="n">getTokens</span><span class="p">(</span><span class="n">data_pipe</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span>
     <span class="n">min_freq</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
     <span class="n">specials</span><span class="o">=</span> <span class="p">[</span><span class="s1">&#39;&lt;pad&gt;&#39;</span><span class="p">,</span> <span class="s1">&#39;&lt;sos&gt;&#39;</span><span class="p">,</span> <span class="s1">&#39;&lt;eos&gt;&#39;</span><span class="p">,</span> <span class="s1">&#39;&lt;unk&gt;&#39;</span><span class="p">],</span>
@@ -788,15 +788,15 @@ Let us define some functions for this:</p>
 <span class="sd">    Create transforms based on given vocabulary. The returned transform is applied to sequence</span>
 <span class="sd">    of tokens.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">text_tranform</span> <span class="o">=</span> <span class="n">T</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
+    <span class="n">text_tranform</span> <span class="o">=</span> <a href="https://pytorch.org/text/stable/transforms.html#torchtext.transforms.Sequential" title="torchtext.transforms.Sequential" class="sphx-glr-backref-module-torchtext-transforms sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">T</span><span class="o">.</span><span class="n">Sequential</span></a><span class="p">(</span>
         <span class="c1">## converts the sentences to indices based on given vocabulary</span>
-        <span class="n">T</span><span class="o">.</span><span class="n">VocabTransform</span><span class="p">(</span><span class="n">vocab</span><span class="o">=</span><span class="n">vocab</span><span class="p">),</span>
+        <a href="https://pytorch.org/text/stable/transforms.html#torchtext.transforms.VocabTransform" title="torchtext.transforms.VocabTransform" class="sphx-glr-backref-module-torchtext-transforms sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">T</span><span class="o">.</span><span class="n">VocabTransform</span></a><span class="p">(</span><span class="n">vocab</span><span class="o">=</span><span class="n">vocab</span><span class="p">),</span>
         <span class="c1">## Add &lt;sos&gt; at beginning of each sentence. 1 because the index for &lt;sos&gt; in vocabulary is</span>
         <span class="c1"># 1 as seen in previous section</span>
-        <span class="n">T</span><span class="o">.</span><span class="n">AddToken</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">begin</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+        <a href="https://pytorch.org/text/stable/transforms.html#torchtext.transforms.AddToken" title="torchtext.transforms.AddToken" class="sphx-glr-backref-module-torchtext-transforms sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">T</span><span class="o">.</span><span class="n">AddToken</span></a><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">begin</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
         <span class="c1">## Add &lt;eos&gt; at beginning of each sentence. 2 because the index for &lt;eos&gt; in vocabulary is</span>
         <span class="c1"># 2 as seen in previous section</span>
-        <span class="n">T</span><span class="o">.</span><span class="n">AddToken</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">begin</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <a href="https://pytorch.org/text/stable/transforms.html#torchtext.transforms.AddToken" title="torchtext.transforms.AddToken" class="sphx-glr-backref-module-torchtext-transforms sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">T</span><span class="o">.</span><span class="n">AddToken</span></a><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">begin</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="p">)</span>
     <span class="k">return</span> <span class="n">text_tranform</span>
 </pre></div>
@@ -902,7 +902,7 @@ make all the sequences in a batch of equal length. We can perform padding as fol
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Convert sequences to tensors and apply padding</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="p">(</span><span class="n">T</span><span class="o">.</span><span class="n">ToTensor</span><span class="p">(</span><span class="mi">0</span><span class="p">)(</span><span class="nb">list</span><span class="p">(</span><span class="n">pair_of_sequences</span><span class="p">[</span><span class="mi">0</span><span class="p">])),</span> <span class="n">T</span><span class="o">.</span><span class="n">ToTensor</span><span class="p">(</span><span class="mi">0</span><span class="p">)(</span><span class="nb">list</span><span class="p">(</span><span class="n">pair_of_sequences</span><span class="p">[</span><span class="mi">1</span><span class="p">])))</span>
+    <span class="k">return</span> <span class="p">(</span><a href="https://pytorch.org/text/stable/transforms.html#torchtext.transforms.ToTensor" title="torchtext.transforms.ToTensor" class="sphx-glr-backref-module-torchtext-transforms sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">T</span><span class="o">.</span><span class="n">ToTensor</span></a><span class="p">(</span><span class="mi">0</span><span class="p">)(</span><span class="nb">list</span><span class="p">(</span><span class="n">pair_of_sequences</span><span class="p">[</span><span class="mi">0</span><span class="p">])),</span> <a href="https://pytorch.org/text/stable/transforms.html#torchtext.transforms.ToTensor" title="torchtext.transforms.ToTensor" class="sphx-glr-backref-module-torchtext-transforms sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">T</span><span class="o">.</span><span class="n">ToTensor</span></a><span class="p">(</span><span class="mi">0</span><span class="p">)(</span><span class="nb">list</span><span class="p">(</span><span class="n">pair_of_sequences</span><span class="p">[</span><span class="mi">1</span><span class="p">])))</span>
 <span class="c1">## `T.ToTensor(0)` returns a transform that converts the sequence to `torch.tensor` and also applies</span>
 <span class="c1"># padding. Here, `0` is passed to the constructor to specify the index of the `&lt;pad&gt;` token in the</span>
 <span class="c1"># vocabulary.</span>

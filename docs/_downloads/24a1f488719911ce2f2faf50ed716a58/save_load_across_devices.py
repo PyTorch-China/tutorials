@@ -1,23 +1,20 @@
 """
-Saving and loading models across devices in PyTorch
+PyTorch 中跨设备保存和加载模型
 ===================================================
 
-There may be instances where you want to save and load your neural
-networks across different devices.
+在某些情况下,您可能需要在不同的设备之间保存和加载神经网络模型。
 
-Introduction
+简介
 ------------
 
-Saving and loading models across devices is relatively straightforward
-using PyTorch. In this recipe, we will experiment with saving and
-loading models across CPUs and GPUs.
+使用PyTorch在不同设备之间保存和加载模型是相对直接的。在本教程中,我们将尝试在CPU和GPU之间保存和加载模型。
 
-Setup
+环境设置
 -----
 
-In order for every code block to run properly in this recipe, you must
-first change the runtime to “GPU” or higher. Once you do, we need to
-install ``torch`` if it isn’t already available.
+为了让本教程中的每个代码块都能正确运行,您必须先将运行环境切换到"GPU"或更高。
+完成后,如果还没有安装`torch`,我们需要安装它。
+
 
 .. code-block:: sh
 
@@ -26,22 +23,21 @@ install ``torch`` if it isn’t already available.
 """
 
 ######################################################################
-# Steps
+# 具体步骤
 # -----
-# 
-# 1. Import all necessary libraries for loading our data
-# 2. Define and initialize the neural network
-# 3. Save on a GPU, load on a CPU
-# 4. Save on a GPU, load on a GPU
-# 5. Save on a CPU, load on a GPU
-# 6. Saving and loading ``DataParallel`` models
-# 
-# 1. Import necessary libraries for loading our data
+#
+# 1. 导入加载数据所需的所有必要库
+# 2. 定义并初始化神经网络
+# 3. 在GPU上保存,CPU上加载
+# 4. 在GPU上保存,GPU上加载
+# 5. 在CPU上保存,GPU上加载
+# 6. 保存和加载`DataParallel`模型
+#
+# 1. 导入加载数据所需的必要库
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# 
-# For this recipe, we will use ``torch`` and its subsidiaries ``torch.nn``
-# and ``torch.optim``.
-# 
+#
+# 在本教程中,我们将使用`torch`及其子模块`torch.nn`和`torch.optim`。
+#
 
 import torch
 import torch.nn as nn
@@ -49,12 +45,12 @@ import torch.optim as optim
 
 
 ######################################################################
-# 2. Define and initialize the neural network
+# 2. 定义并初始化神经网络
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# 
-# For sake of example, we will create a neural network for training
-# images. To learn more see the Defining a Neural Network recipe.
-# 
+#
+# 为了演示,我们将创建一个用于训练图像的神经网络。
+# 要了解更多信息,请参阅定义神经网络的教程。
+#
 
 class Net(nn.Module):
     def __init__(self):
@@ -80,45 +76,39 @@ print(net)
 
 
 ######################################################################
-# 3. Save on GPU, Load on CPU
+# 3. 在GPU上保存,CPU上加载
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# 
-# When loading a model on a CPU that was trained with a GPU, pass
-# ``torch.device('cpu')`` to the ``map_location`` argument in the
-# ``torch.load()`` function.
-# 
+#
+# 当在CPU上加载使用GPU训练的模型时,请将`torch.device('cpu')`传递给`torch.load()`函数的`map_location`参数。
+#
 
-# Specify a path to save to
+# 指定保存路径
 PATH = "model.pt"
 
-# Save
+# 保存
 torch.save(net.state_dict(), PATH)
 
-# Load
+# 加载
 device = torch.device('cpu')
 model = Net()
 model.load_state_dict(torch.load(PATH, map_location=device))
 
 
 ######################################################################
-# In this case, the storages underlying the tensors are dynamically
-# remapped to the CPU device using the ``map_location`` argument.
-# 
-# 4. Save on GPU, Load on GPU
+# 在这种情况下,张量底层的存储将使用`map_location`参数动态重新映射到CPU设备。
+#
+# 4. 在GPU上保存,GPU上加载
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# 
-# When loading a model on a GPU that was trained and saved on GPU, simply
-# convert the initialized model to a CUDA optimized model using
-# ``model.to(torch.device('cuda'))``.
-# 
-# Be sure to use the ``.to(torch.device('cuda'))`` function on all model
-# inputs to prepare the data for the model.
-# 
+#
+# 当在GPU上加载使用GPU训练和保存的模型时,只需使用`model.to(torch.device('cuda'))`将初始化的模型转换为CUDA优化模型。
+#
+# 请确保对所有模型输入使用`.to(torch.device('cuda'))`函数,为模型准备数据。
+#
 
-# Save
+# 保存
 torch.save(net.state_dict(), PATH)
 
-# Load
+# 加载
 device = torch.device("cuda")
 model = Net()
 model.load_state_dict(torch.load(PATH))
@@ -126,34 +116,29 @@ model.to(device)
 
 
 ######################################################################
-# Note that calling ``my_tensor.to(device)`` returns a new copy of
-# ``my_tensor`` on GPU. It does NOT overwrite ``my_tensor``. Therefore,
-# remember to manually overwrite tensors:
-# ``my_tensor = my_tensor.to(torch.device('cuda'))``.
-# 
-# 5. Save on CPU, Load on GPU
+# 注意,调用`my_tensor.to(device)`会返回`my_tensor`在GPU上的新副本。它不会覆盖`my_tensor`。
+# 因此,请记住手动覆盖张量:
+# `my_tensor = my_tensor.to(torch.device('cuda'))`。
+#
+# 5. 在CPU上保存,在GPU上加载
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# 
-# When loading a model on a GPU that was trained and saved on CPU, set the
-# ``map_location`` argument in the ``torch.load()`` function to
-# ``cuda:device_id``. This loads the model to a given GPU device.
-# 
-# Be sure to call ``model.to(torch.device('cuda'))`` to convert the
-# model’s parameter tensors to CUDA tensors.
-# 
-# Finally, also be sure to use the ``.to(torch.device('cuda'))`` function
-# on all model inputs to prepare the data for the CUDA optimized model.
-# 
+#
+# 当在GPU上加载使用CPU训练和保存的模型时,请在`torch.load()`函数中将`map_location`参数设置为`cuda:device_id`,
+# 将模型加载到给定的GPU设备。
+#
+# 请确保调用`model.to(torch.device('cuda'))`将模型的参数张量转换为CUDA张量。
+#
+# 最后,还要确保对所有模型输入使用`.to(torch.device('cuda'))`函数,为CUDA优化的模型准备数据。
+#
 
-# Save
+# 保存
 torch.save(net.state_dict(), PATH)
 
-# Load
+# 加载
 device = torch.device("cuda")
 model = Net()
-# Choose whatever GPU device number you want
+# 选择您想用的GPU设备编号
 model.load_state_dict(torch.load(PATH, map_location="cuda:0"))
-# Make sure to call input = input.to(device) on any input tensors that you feed to the model
 model.to(device)
 
 
@@ -170,12 +155,21 @@ model.to(device)
 # 
 
 # Save
+# 6. 保存`torch.nn.DataParallel`模型
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#
+# `torch.nn.DataParallel`是一个模型包装器,可以启用并行GPU利用。
+#
+# 要通用地保存`DataParallel`模型,请保存`model.module.state_dict()`。
+# 这样,您就可以灵活地将模型加载到任何设备。
+#
+
+# 保存
 torch.save(net.module.state_dict(), PATH)
 
-# Load to whatever device you want
+# 加载到任何您想要的设备
 
 
 ######################################################################
-# Congratulations! You have successfully saved and loaded models across
-# devices in PyTorch.
-# 
+# 祝贺您!您已成功在PyTorch中跨设备保存和加载模型。
+#
