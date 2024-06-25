@@ -109,8 +109,8 @@ Recipes are bite-sized, actionable examples of how to use specific PyTorch featu
    :tags: Basics
 
 .. customcarditem::
-   :header: PyTorch Benchmark (quick start)
-   :card_description: Learn how to measure snippet run times and collect instructions.
+   :header: PyTorch Benchmark Timer 快速入门
+   :card_description: 学习如何测量代码片段的运行时间和收集指令。
    :image: ../_static/img/thumbnails/cropped/profiler.png
    :link: ../recipes/recipes/timer_quick_start.html
    :tags: Basics

@@ -148,23 +148,6 @@ print(stats)
 #
 
 ###############################################################################
-# 5. Instruction counts: Delving deeper
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-#
-# The string representation of ``CallgrindStats`` is similar to that of
-# Measurement. `Noisy symbols` are a Python concept (removing calls in the
-# CPython interpreter which are known to be noisy).
-#
-# For more detailed analysis, however, we will want to look at specific calls.
-# ``CallgrindStats.stats()`` returns a ``FunctionCounts`` object to make this easier.
-# Conceptually, ``FunctionCounts`` can be thought of as a tuple of pairs with some
-# utility methods, where each pair is `(number of instructions, file path and
-# function name)`.
-#
-# A note on paths:
-#   One generally doesn't care about absolute path. For instance, the full path
-#   and function name for a multiply call is something like:
-#
 # 5. 指令计数: 深入探讨
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
@@ -355,6 +338,7 @@ print(delta.transform(extract_fn_name).filter(lambda fn: "TensorIterator" in fn)
 ###############################################################################
 # 7. 总结
 # ~~~~~~~~~~~~~~
+#
 # 总之,使用 Timer.blocked_autorange 来收集墙上时间。如果计时变化过高,
 # 请增加 min_run_time,或者如果方便的话,转移到 C++ 代码片段。
 # 对于细粒度分析,使用 Timer.collect_callgrind 来测量指令计数,
@@ -364,10 +348,12 @@ print(delta.transform(extract_fn_name).filter(lambda fn: "TensorIterator" in fn)
 ###############################################################################
 # 8. 脚注
 # ~~~~~~~~~~~~
+#
 # - 隐含的 import torch
 # 如果 globals 不包含 "torch",Timer 将自动填充它。这意味着 Timer("torch.empty(())") 将正常工作。
 # (不过其他导入应该放在 setup 中,
 # 例如 Timer("np.zeros(())", "import numpy as np"))
+#
 # - REL_WITH_DEB_INFO
 # 为了提供有关执行的 PyTorch 内部信息的完整信息,Callgrind 需要访问 C++ 调试符号。
 # 这是通过在构建 PyTorch 时设置 REL_WITH_DEB_INFO=1 来实现的。

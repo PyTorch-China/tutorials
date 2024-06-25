@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Timer quick start &mdash; PyTorch Tutorials 2.3.0 documentation</title>
+  <title>Timer快速入门 &mdash; PyTorch Tutorials 2.3.0 documentation</title>
   
 
   
@@ -531,7 +531,7 @@
       </li>
 
         
-      <li>Timer quick start</li>
+      <li>Timer快速入门</li>
     
     
       <li class="pytorch-breadcrumbs-aside">
@@ -595,73 +595,65 @@
 <p>Click <a class="reference internal" href="#sphx-glr-download-recipes-recipes-timer-quick-start-py"><span class="std std-ref">here</span></a>
 to download the full example code</p>
 </div>
-<div class="sphx-glr-example-title section" id="timer-quick-start">
-<span id="sphx-glr-recipes-recipes-timer-quick-start-py"></span><h1>Timer quick start<a class="headerlink" href="#timer-quick-start" title="Permalink to this heading">¶</a></h1>
-<p>In this tutorial, we’re going to cover the primary APIs of
-<cite>torch.utils.benchmark.Timer</cite>. The PyTorch Timer is based on the
-<a class="reference external" href="https://docs.python.org/3/library/timeit.html#timeit.Timer">timeit.Timer</a>
-API, with several PyTorch specific modifications. Familiarity with the
-builtin <cite>Timer</cite> class is not required for this tutorial, however we assume
-that the reader is familiar with the fundamentals of performance work.</p>
-<p>For a more comprehensive performance tuning tutorial, see
-<a class="reference external" href="https://pytorch.org/tutorials/recipes/recipes/benchmark.html">PyTorch Benchmark</a>.</p>
+<div class="sphx-glr-example-title section" id="timer">
+<span id="sphx-glr-recipes-recipes-timer-quick-start-py"></span><h1>Timer快速入门<a class="headerlink" href="#timer" title="Permalink to this heading">¶</a></h1>
+<p>在本教程中,我们将介绍 <cite>torch.utils.benchmark.Timer</cite> 的主要API。
+PyTorch Timer基于 <a class="reference external" href="https://docs.python.org/3/library/timeit.html#timeit.Timer">timeit.Timer</a> API,
+并做了一些PyTorch特定的修改。本教程不要求读者熟悉内置的 <cite>Timer</cite> 类,但假设读者熟悉性能工作的基础知识。</p>
+<p>有关更全面的性能调优教程,请参阅 <a class="reference external" href="https://pytorch.org/tutorials/recipes/recipes/benchmark.html">PyTorch Benchmark</a>。</p>
 <dl class="simple">
-<dt><strong>Contents:</strong></dt><dd><ol class="arabic simple">
-<li><p><a class="reference external" href="#defining-a-timer">Defining a Timer</a></p></li>
-<li><p><a class="reference external" href="#wall-time-timer-blocked-autorange">Wall time: Timer.blocked_autorange(…)</a></p></li>
-<li><p><a class="reference external" href="#c-snippets">C++ snippets</a></p></li>
-<li><p><a class="reference external" href="#instruction-counts-timer-collect-callgrind">Instruction counts: Timer.collect_callgrind(…)</a></p></li>
-<li><p><a class="reference external" href="#instruction-counts-delving-deeper">Instruction counts: Delving deeper</a></p></li>
-<li><p><a class="reference external" href="#a-b-testing-with-callgrind">A/B testing with Callgrind</a></p></li>
-<li><p><a class="reference external" href="#wrapping-up">Wrapping up</a></p></li>
-<li><p><a class="reference external" href="#footnotes">Footnotes</a></p></li>
+<dt><strong>内容:</strong></dt><dd><ol class="arabic simple">
+<li><p><a class="reference external" href="#defining-a-timer">定义Timer</a></p></li>
+<li><p><a class="reference external" href="#wall-time-timer-blocked-autorange">Wall时间: Timer.blocked_autorange(…)</a></p></li>
+<li><p><a class="reference external" href="#c-snippets">C++代码片段</a></p></li>
+<li><p><a class="reference external" href="#instruction-counts-timer-collect-callgrind">指令计数: Timer.collect_callgrind(…)</a></p></li>
+<li><p><a class="reference external" href="#instruction-counts-delving-deeper">指令计数: 深入探讨</a></p></li>
+<li><p><a class="reference external" href="#a-b-testing-with-callgrind">使用Callgrind进行A/B测试</a></p></li>
+<li><p><a class="reference external" href="#wrapping-up">总结</a></p></li>
+<li><p><a class="reference external" href="#footnotes">脚注</a></p></li>
 </ol>
 </dd>
 </dl>
-<div class="section" id="defining-a-timer">
-<h2>1. Defining a Timer<a class="headerlink" href="#defining-a-timer" title="Permalink to this heading">¶</a></h2>
-<p>A <cite>Timer</cite> serves as a task definition.</p>
+<div class="section" id="id1">
+<h2>1. 定义Timer<a class="headerlink" href="#id1" title="Permalink to this heading">¶</a></h2>
+<p><cite>Timer</cite> 用于定义任务。</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torch.utils.benchmark</span> <span class="kn">import</span> <a href="https://pytorch.org/docs/stable/benchmark_utils.html#torch.utils.benchmark.Timer" title="torch.utils.benchmark.Timer" class="sphx-glr-backref-module-torch-utils-benchmark sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">Timer</span></a>
 
 <span class="n">timer</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/benchmark_utils.html#torch.utils.benchmark.Timer" title="torch.utils.benchmark.Timer" class="sphx-glr-backref-module-torch-utils-benchmark sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">Timer</span></a><span class="p">(</span>
-    <span class="c1"># The computation which will be run in a loop and timed.</span>
+    <span class="c1"># 将在循环中运行并计时的计算。</span>
     <span class="n">stmt</span><span class="o">=</span><span class="s2">&quot;x * y&quot;</span><span class="p">,</span>
 
-    <span class="c1"># `setup` will be run before calling the measurement loop, and is used to</span>
-    <span class="c1"># populate any state which is needed by `stmt`</span>
+    <span class="c1"># `setup` 将在调用测量循环之前运行,用于填充 `stmt` 所需的任何状态</span>
     <span class="n">setup</span><span class="o">=</span><span class="s2">&quot;&quot;&quot;</span>
 <span class="s2">        x = torch.ones((128,))</span>
 <span class="s2">        y = torch.ones((128,))</span>
 <span class="s2">    &quot;&quot;&quot;</span><span class="p">,</span>
 
-    <span class="c1"># Alternatively, ``globals`` can be used to pass variables from the outer scope.</span>
+    <span class="c1"># 或者,可以使用 ``globals`` 从外部作用域传递变量。</span>
     <span class="c1">#</span>
     <span class="c1">#    globals={</span>
     <span class="c1">#        &quot;x&quot;: torch.ones((128,)),</span>
     <span class="c1">#        &quot;y&quot;: torch.ones((128,)),</span>
     <span class="c1">#    },</span>
 
-    <span class="c1"># Control the number of threads that PyTorch uses. (Default: 1)</span>
+    <span class="c1"># 控制PyTorch使用的线程数。(默认值: 1)</span>
     <span class="n">num_threads</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
 <span class="p">)</span>
 </pre></div>
 </div>
 </div>
-<div class="section" id="wall-time-timer-blocked-autorange">
-<h2>2. Wall time: <code class="docutils literal notranslate"><span class="pre">Timer.blocked_autorange(...)</span></code><a class="headerlink" href="#wall-time-timer-blocked-autorange" title="Permalink to this heading">¶</a></h2>
-<p>This method will handle details such as picking a suitable number if repeats,
-fixing the number of threads, and providing a convenient representation of
-the results.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Measurement objects store the results of multiple repeats, and provide</span>
-<span class="c1"># various utility features.</span>
+<div class="section" id="wall-timer-blocked-autorange">
+<h2>2. Wall时间: <code class="docutils literal notranslate"><span class="pre">Timer.blocked_autorange(...)</span></code><a class="headerlink" href="#wall-timer-blocked-autorange" title="Permalink to this heading">¶</a></h2>
+<p>此方法将处理诸如选择合适的重复次数、固定线程数以及提供结果的方便表示等细节。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Measurement对象存储多次重复的结果,并提供各种实用功能。</span>
 <span class="kn">from</span> <span class="nn">torch.utils.benchmark</span> <span class="kn">import</span> <a href="https://pytorch.org/docs/stable/benchmark_utils.html#torch.utils.benchmark.Measurement" title="torch.utils.benchmark.Measurement" class="sphx-glr-backref-module-torch-utils-benchmark sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">Measurement</span></a>
 
 <span class="n">m</span><span class="p">:</span> <a href="https://pytorch.org/docs/stable/benchmark_utils.html#torch.utils.benchmark.Measurement" title="torch.utils.benchmark.Measurement" class="sphx-glr-backref-module-torch-utils-benchmark sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">Measurement</span></a> <span class="o">=</span> <span class="n">timer</span><span class="o">.</span><span class="n">blocked_autorange</span><span class="p">(</span><span class="n">min_run_time</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="literal-block-wrapper docutils container" id="id1">
-<div class="code-block-caption"><span class="caption-text"><strong>Snippet wall time.</strong></span><a class="headerlink" href="#id1" title="Permalink to this code">¶</a></div>
+<div class="literal-block-wrapper docutils container" id="id5">
+<div class="code-block-caption"><span class="caption-text"><strong>Snippet wall time.</strong></span><a class="headerlink" href="#id5" title="Permalink to this code">¶</a></div>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>     &lt;torch.utils.benchmark.utils.common.Measurement object at 0x7f1929a38ed0&gt;
      x * y
      setup:
@@ -675,8 +667,8 @@ the results.</p>
 </div>
 </div>
 </div>
-<div class="section" id="c-snippets">
-<h2>3. C++ snippets<a class="headerlink" href="#c-snippets" title="Permalink to this heading">¶</a></h2>
+<div class="section" id="c">
+<h2>3. C++ 代码片段<a class="headerlink" href="#c" title="Permalink to this heading">¶</a></h2>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torch.utils.benchmark</span> <span class="kn">import</span> <span class="n">Language</span>
 
 <span class="n">cpp_timer</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/benchmark_utils.html#torch.utils.benchmark.Timer" title="torch.utils.benchmark.Timer" class="sphx-glr-backref-module-torch-utils-benchmark sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">Timer</span></a><span class="p">(</span>
@@ -691,8 +683,8 @@ the results.</p>
 <span class="nb">print</span><span class="p">(</span><span class="n">cpp_timer</span><span class="o">.</span><span class="n">blocked_autorange</span><span class="p">(</span><span class="n">min_run_time</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
 </pre></div>
 </div>
-<div class="literal-block-wrapper docutils container" id="id2">
-<div class="code-block-caption"><span class="caption-text"><strong>C++ snippet wall time.</strong></span><a class="headerlink" href="#id2" title="Permalink to this code">¶</a></div>
+<div class="literal-block-wrapper docutils container" id="id6">
+<div class="code-block-caption"><span class="caption-text"><strong>C++ snippet wall time.</strong></span><a class="headerlink" href="#id6" title="Permalink to this code">¶</a></div>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>     &lt;torch.utils.benchmark.utils.common.Measurement object at 0x7f192b019ed0&gt;
      x * y;
      setup:
@@ -705,23 +697,22 @@ the results.</p>
 </pre></div>
 </div>
 </div>
-<p>Unsurprisingly, the C++ snippet is both faster and has lower variation.</p>
+<p>不出所料,C++代码片段的速度更快,变化也更小。</p>
 </div>
-<div class="section" id="instruction-counts-timer-collect-callgrind">
-<h2>4. Instruction counts: <code class="docutils literal notranslate"><span class="pre">Timer.collect_callgrind(...)</span></code><a class="headerlink" href="#instruction-counts-timer-collect-callgrind" title="Permalink to this heading">¶</a></h2>
-<p>For deep dive investigations, <code class="docutils literal notranslate"><span class="pre">Timer.collect_callgrind</span></code> wraps
-<a class="reference external" href="https://valgrind.org/docs/manual/cl-manual.html">Callgrind</a> in order to
-collect instruction counts. These are useful as they offer fine grained and
-deterministic (or very low noise in the case of Python) insights into how a
-snippet is run.</p>
+<div class="section" id="timer-collect-callgrind">
+<h2>4. 指令计数: <code class="docutils literal notranslate"><span class="pre">Timer.collect_callgrind(...)</span></code><a class="headerlink" href="#timer-collect-callgrind" title="Permalink to this heading">¶</a></h2>
+<p>为了深入调查,`Timer.collect_callgrind` 封装了
+<a class="reference external" href="https://valgrind.org/docs/manual/cl-manual.html">Callgrind</a> 以收集指令计数。
+这些指令计数非常有用,因为它们提供了细粒度和确定性的(或在Python的情况下噪声很低的)见解,
+说明了代码片段是如何运行的。</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torch.utils.benchmark</span> <span class="kn">import</span> <a href="https://pytorch.org/docs/stable/benchmark_utils.html#torch.utils.benchmark.CallgrindStats" title="torch.utils.benchmark.CallgrindStats" class="sphx-glr-backref-module-torch-utils-benchmark sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">CallgrindStats</span></a><span class="p">,</span> <span class="n">FunctionCounts</span>
 
 <span class="n">stats</span><span class="p">:</span> <a href="https://pytorch.org/docs/stable/benchmark_utils.html#torch.utils.benchmark.CallgrindStats" title="torch.utils.benchmark.CallgrindStats" class="sphx-glr-backref-module-torch-utils-benchmark sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">CallgrindStats</span></a> <span class="o">=</span> <span class="n">cpp_timer</span><span class="o">.</span><span class="n">collect_callgrind</span><span class="p">()</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">stats</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="literal-block-wrapper docutils container" id="id3">
-<div class="code-block-caption"><span class="caption-text"><strong>C++ Callgrind stats (summary)</strong></span><a class="headerlink" href="#id3" title="Permalink to this code">¶</a></div>
+<div class="literal-block-wrapper docutils container" id="id7">
+<div class="code-block-caption"><span class="caption-text"><strong>C++ Callgrind stats (summary)</strong></span><a class="headerlink" href="#id7" title="Permalink to this code">¶</a></div>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>     &lt;torch.utils.benchmark.utils.valgrind_wrapper.timer_interface.CallgrindStats object at 0x7f1929a35850&gt;
      x * y;
      setup:
@@ -736,40 +727,30 @@ snippet is run.</p>
 </div>
 </div>
 </div>
-<div class="section" id="instruction-counts-delving-deeper">
-<h2>5. Instruction counts: Delving deeper<a class="headerlink" href="#instruction-counts-delving-deeper" title="Permalink to this heading">¶</a></h2>
-<p>The string representation of <code class="docutils literal notranslate"><span class="pre">CallgrindStats</span></code> is similar to that of
-Measurement. <cite>Noisy symbols</cite> are a Python concept (removing calls in the
-CPython interpreter which are known to be noisy).</p>
-<p>For more detailed analysis, however, we will want to look at specific calls.
-<code class="docutils literal notranslate"><span class="pre">CallgrindStats.stats()</span></code> returns a <code class="docutils literal notranslate"><span class="pre">FunctionCounts</span></code> object to make this easier.
-Conceptually, <code class="docutils literal notranslate"><span class="pre">FunctionCounts</span></code> can be thought of as a tuple of pairs with some
-utility methods, where each pair is <cite>(number of instructions, file path and
-function name)</cite>.</p>
+<div class="section" id="id2">
+<h2>5. 指令计数: 深入探讨<a class="headerlink" href="#id2" title="Permalink to this heading">¶</a></h2>
+<p><cite>CallgrindStats</cite> 的字符串表示形式类似于 Measurement。<cite>Noisy symbols</cite> 是一个Python概念(移除了在CPython解释器中已知的噪声调用)。</p>
+<p>然而,为了进行更详细的分析,我们需要查看特定的调用。<cite>CallgrindStats.stats()</cite> 返回一个 <cite>FunctionCounts</cite> 对象,以便于此操作。从概念上讲,`FunctionCounts` 可以被视为一个带有一些实用方法的成对元组,其中每一对都是 <cite>(指令数量,文件路径和函数名称)</cite>。</p>
 <dl class="simple">
-<dt>A note on paths:</dt><dd><p>One generally doesn’t care about absolute path. For instance, the full path
-and function name for a multiply call is something like:</p>
+<dt>关于路径的说明:</dt><dd><p>通常我们不关心绝对路径。例如,一个乘法调用的完整路径和函数名是这样的:</p>
 </dd>
 </dl>
-<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span> /the/prefix/to/your/pytorch/install/dir/pytorch/build/aten/src/ATen/core/TensorMethods.cpp:at::Tensor::mul(at::Tensor const&amp;) const [/the/path/to/your/conda/install/miniconda3/envs/ab_ref/lib/python3.7/site-packages/torch/lib/libtorch_cpu.so]
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><span class="w"> </span>/the/prefix/to/your/pytorch/install/dir/pytorch/build/aten/src/ATen/core/TensorMethods.cpp:at::Tensor::mul<span class="o">(</span>at::Tensor<span class="w"> </span>const<span class="p">&amp;</span><span class="o">)</span><span class="w"> </span>const<span class="w"> </span><span class="o">[</span>/the/path/to/your/conda/install/miniconda3/envs/ab_ref/lib/python3.7/site-packages/torch/lib/libtorch_cpu.so<span class="o">]</span>
 
-when in reality, all of the information that we&#39;re interested in can be
-represented in:
+而实际上,我们感兴趣的所有信息都可以表示为:
 </pre></div>
 </div>
 <div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><span class="w"> </span>build/aten/src/ATen/core/TensorMethods.cpp:at::Tensor::mul<span class="o">(</span>at::Tensor<span class="w"> </span>const<span class="p">&amp;</span><span class="o">)</span><span class="w"> </span>const
 
-<span class="sb">``</span>CallgrindStats.as_standardized<span class="o">()</span><span class="sb">``</span><span class="w"> </span>makes<span class="w"> </span>a<span class="w"> </span>best<span class="w"> </span>effort<span class="w"> </span>to<span class="w"> </span>strip<span class="w"> </span>low<span class="w"> </span>signal
-portions<span class="w"> </span>of<span class="w"> </span>the<span class="w"> </span>file<span class="w"> </span>path,<span class="w"> </span>as<span class="w"> </span>well<span class="w"> </span>as<span class="w"> </span>the<span class="w"> </span>shared<span class="w"> </span>object<span class="w"> </span>and<span class="w"> </span>is<span class="w"> </span>generally
-recommended.
+<span class="sb">``</span>CallgrindStats.as_standardized<span class="o">()</span><span class="sb">``</span><span class="w"> </span>会尽最大努力去除文件路径中低信号部分,以及共享对象,通常建议使用。
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">inclusive_stats</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">as_standardized</span><span class="p">()</span><span class="o">.</span><span class="n">stats</span><span class="p">(</span><span class="n">inclusive</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">inclusive_stats</span><span class="p">[:</span><span class="mi">10</span><span class="p">])</span>
 </pre></div>
 </div>
-<div class="literal-block-wrapper docutils container" id="id4">
-<div class="code-block-caption"><span class="caption-text"><strong>C++ Callgrind stats (detailed)</strong></span><a class="headerlink" href="#id4" title="Permalink to this code">¶</a></div>
+<div class="literal-block-wrapper docutils container" id="id8">
+<div class="code-block-caption"><span class="caption-text"><strong>C++ Callgrind stats (detailed)</strong></span><a class="headerlink" href="#id8" title="Permalink to this code">¶</a></div>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>     torch.utils.benchmark.utils.valgrind_wrapper.timer_interface.FunctionCounts object at 0x7f192a6dfd90&gt;
        47264  ???:_int_free
        25963  ???:_int_malloc
@@ -786,10 +767,8 @@ recommended.
 </pre></div>
 </div>
 </div>
-<p>That’s still quite a lot to digest. Let’s use the <cite>FunctionCounts.transform</cite>
-method to trim some of the function path, and discard the function called.
-When we do, the counts of any collisions (e.g. <cite>foo.h:a()</cite> and <cite>foo.h:b()</cite>
-will both map to <cite>foo.h</cite>) will be added together.</p>
+<p>这仍然有很多内容需要消化。让我们使用 <cite>FunctionCounts.transform</cite> 方法来去除一些函数路径,并丢弃函数调用。
+这样做时,任何冲突(例如 <cite>foo.h:a()</cite> 和 <cite>foo.h:b()</cite> 都将映射到 <cite>foo.h</cite>)的计数将被累加。</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">re</span>
 
@@ -806,8 +785,8 @@ will both map to <cite>foo.h</cite>) will be added together.</p>
 <span class="nb">print</span><span class="p">(</span><span class="n">inclusive_stats</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">group_by_file</span><span class="p">)[:</span><span class="mi">10</span><span class="p">])</span>
 </pre></div>
 </div>
-<div class="literal-block-wrapper docutils container" id="id5">
-<div class="code-block-caption"><span class="caption-text"><strong>Callgrind stats (condensed)</strong></span><a class="headerlink" href="#id5" title="Permalink to this code">¶</a></div>
+<div class="literal-block-wrapper docutils container" id="id9">
+<div class="code-block-caption"><span class="caption-text"><strong>Callgrind stats (condensed)</strong></span><a class="headerlink" href="#id9" title="Permalink to this code">¶</a></div>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>     &lt;torch.utils.benchmark.utils.valgrind_wrapper.timer_interface.FunctionCounts object at 0x7f192995d750&gt;
        118200  aten/src/ATen   TensorIterator.cpp
         65000  c10/util        SmallVector.h
@@ -825,17 +804,13 @@ will both map to <cite>foo.h</cite>) will be added together.</p>
 </div>
 </div>
 </div>
-<div class="section" id="a-b-testing-with-callgrind">
-<h2>6. A/B testing with <code class="docutils literal notranslate"><span class="pre">Callgrind</span></code><a class="headerlink" href="#a-b-testing-with-callgrind" title="Permalink to this heading">¶</a></h2>
-<p>One of the most useful features of instruction counts is they allow fine
-grained comparison of computation, which is critical when analyzing
-performance.</p>
-<p>To see this in action, lets compare our multiplication of two size 128
-Tensors with a {128} x {1} multiplication, which will broadcast the second
-Tensor:</p>
-<blockquote>
-<div><p>result = {a0 * b0, a1 * b0, …, a127 * b0}</p>
-</div></blockquote>
+<div class="section" id="callgrind-a-b">
+<h2>6. 使用 <code class="docutils literal notranslate"><span class="pre">Callgrind</span></code> 进行A/B测试<a class="headerlink" href="#callgrind-a-b" title="Permalink to this heading">¶</a></h2>
+<p>指令计数最有用的特性之一是允许对计算进行细粒度比较,这在分析性能时至关重要。</p>
+<dl class="simple">
+<dt>为了看到这一点,让我们将两个大小为128的张量相乘与一个{128} x {1}的乘法进行比较,后者将对第二个张量进行广播:</dt><dd><p>result = {a0 * b0, a1 * b0, …, a127 * b0}</p>
+</dd>
+</dl>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">broadcasting_stats</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/benchmark_utils.html#torch.utils.benchmark.Timer" title="torch.utils.benchmark.Timer" class="sphx-glr-backref-module-torch-utils-benchmark sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">Timer</span></a><span class="p">(</span>
     <span class="s2">&quot;x * y;&quot;</span><span class="p">,</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -846,17 +821,14 @@ Tensor:</p>
 <span class="p">)</span><span class="o">.</span><span class="n">collect_callgrind</span><span class="p">()</span><span class="o">.</span><span class="n">as_standardized</span><span class="p">()</span><span class="o">.</span><span class="n">stats</span><span class="p">(</span><span class="n">inclusive</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Often we want to A/B test two different environments. (e.g. testing a PR, or
-experimenting with compile flags.) This is quite simple, as <code class="docutils literal notranslate"><span class="pre">CallgrindStats</span></code>,
-<code class="docutils literal notranslate"><span class="pre">FunctionCounts</span></code>, and Measurement are all pickleable. Simply save measurements
-from each environment, and load them in a single process for analysis.</p>
+<p>我们经常需要对两种不同的环境进行A/B测试。(例如测试一个PR,或尝试不同的编译标志。)这很简单,
+因为 <cite>CallgrindStats</cite>、<cite>FunctionCounts</cite> 和 Measurement 都是可pickle化的。
+只需在每个环境中保存测量结果,然后在单个进程中加载它们进行分析。</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pickle</span>
 
-<span class="c1"># Let&#39;s round trip `broadcasting_stats` just to show that we can.</span>
 <span class="n">broadcasting_stats</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">pickle</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">broadcasting_stats</span><span class="p">))</span>
 
 
-<span class="c1"># And now to diff the two tasks:</span>
 <span class="n">delta</span> <span class="o">=</span> <span class="n">broadcasting_stats</span> <span class="o">-</span> <span class="n">inclusive_stats</span>
 
 <span class="k">def</span> <span class="nf">extract_fn_name</span><span class="p">(</span><span class="n">fn</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
@@ -864,12 +836,11 @@ from each environment, and load them in a single process for analysis.</p>
     <span class="n">fn</span> <span class="o">=</span> <span class="s2">&quot;:&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">fn</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">:])</span>
     <span class="k">return</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\(.+\)&quot;</span><span class="p">,</span> <span class="s2">&quot;(...)&quot;</span><span class="p">,</span> <span class="n">fn</span><span class="p">)</span>
 
-<span class="c1"># We use `.transform` to make the diff readable:</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">delta</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">extract_fn_name</span><span class="p">))</span>
 </pre></div>
 </div>
-<div class="literal-block-wrapper docutils container" id="id6">
-<div class="code-block-caption"><span class="caption-text"><strong>Instruction count delta</strong></span><a class="headerlink" href="#id6" title="Permalink to this code">¶</a></div>
+<div class="literal-block-wrapper docutils container" id="id10">
+<div class="code-block-caption"><span class="caption-text"><strong>Instruction count delta</strong></span><a class="headerlink" href="#id10" title="Permalink to this code">¶</a></div>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>     &lt;torch.utils.benchmark.utils.valgrind_wrapper.timer_interface.FunctionCounts object at 0x7f192995d750&gt;
          17600  at::TensorIteratorBase::compute_strides(...)
          12700  at::TensorIteratorBase::allocate_or_resize_outputs()
@@ -895,15 +866,14 @@ from each environment, and load them in a single process for analysis.</p>
 </pre></div>
 </div>
 </div>
-<p>So the broadcasting version takes an extra 580 instructions per call (recall
-that we’re collecting 100 runs per sample), or about 10%. There are quite a
-few <code class="docutils literal notranslate"><span class="pre">TensorIterator</span></code> calls, so lets drill down to those. <code class="docutils literal notranslate"><span class="pre">FunctionCounts.filter</span></code>
-makes this easy.</p>
+<p>所以广播版本每次调用需要额外580条指令(回想一下我们收集了100次运行的样本),约占10%。
+有相当多的 <cite>TensorIterator</cite> 调用,所以让我们深入研究这些调用。
+<cite>FunctionCounts.filter</cite> 可以很容易地做到这一点。</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">delta</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">extract_fn_name</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">fn</span><span class="p">:</span> <span class="s2">&quot;TensorIterator&quot;</span> <span class="ow">in</span> <span class="n">fn</span><span class="p">))</span>
 </pre></div>
 </div>
-<div class="literal-block-wrapper docutils container" id="id7">
-<div class="code-block-caption"><span class="caption-text"><strong>Instruction count delta (filter)</strong></span><a class="headerlink" href="#id7" title="Permalink to this code">¶</a></div>
+<div class="literal-block-wrapper docutils container" id="id11">
+<div class="code-block-caption"><span class="caption-text"><strong>Instruction count delta (filter)</strong></span><a class="headerlink" href="#id11" title="Permalink to this code">¶</a></div>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>     &lt;torch.utils.benchmark.utils.valgrind_wrapper.timer_interface.FunctionCounts object at 0x7f19299544d0&gt;
          17600  at::TensorIteratorBase::compute_strides(...)
          12700  at::TensorIteratorBase::allocate_or_resize_outputs()
@@ -921,44 +891,33 @@ makes this easy.</p>
 </pre></div>
 </div>
 </div>
-<p>This makes plain what is going on: there is a fast path in <code class="docutils literal notranslate"><span class="pre">TensorIterator</span></code>
-setup, but in the {128} x {1} case we miss it and have to do a more general
-analysis which is more expensive. The most prominent call omitted by the
-filter is <cite>c10::SmallVectorImpl&lt;long&gt;::operator=(…)</cite>, which is also part
-of the more general setup.</p>
+<p>这说明了正在发生的情况:在 TensorIterator 设置中有一条快速路径,
+但在 {128} x {1} 的情况下,我们错过了它,不得不进行更通用的分析,这更加昂贵。
+被过滤器省略的最显著的调用是 c10::SmallVectorImpl&lt;long&gt;::operator=(…),
+这也是更通用设置的一部分。</p>
 </div>
-<div class="section" id="wrapping-up">
-<h2>7. Wrapping up<a class="headerlink" href="#wrapping-up" title="Permalink to this heading">¶</a></h2>
-<p>In summary, use <cite>Timer.blocked_autorange</cite> to collect wall times. If timing
-variation is too high, increase <cite>min_run_time</cite>, or move to C++ snippets if
-convenient.</p>
-<p>For fine grained analysis, use <cite>Timer.collect_callgrind</cite> to measure
-instruction counts and <cite>FunctionCounts.(__add__ / __sub__ / transform / filter)</cite>
-to slice-and-dice them.</p>
+<div class="section" id="id3">
+<h2>7. 总结<a class="headerlink" href="#id3" title="Permalink to this heading">¶</a></h2>
+<p>总之,使用 Timer.blocked_autorange 来收集墙上时间。如果计时变化过高,
+请增加 min_run_time,或者如果方便的话,转移到 C++ 代码片段。
+对于细粒度分析,使用 Timer.collect_callgrind 来测量指令计数,
+并使用 FunctionCounts.(__add__ / __sub__ / transform / filter)
+来切分和处理它们。</p>
 </div>
-<div class="section" id="footnotes">
-<h2>8. Footnotes<a class="headerlink" href="#footnotes" title="Permalink to this heading">¶</a></h2>
-<blockquote>
-<div><ul class="simple">
-<li><dl class="simple">
-<dt>Implied <code class="docutils literal notranslate"><span class="pre">import</span> <span class="pre">torch</span></code></dt><dd><p>If <cite>globals</cite> does not contain “torch”, Timer will automatically
-populate it. This means that <code class="docutils literal notranslate"><span class="pre">Timer(&quot;torch.empty(())&quot;)</span></code> will work.
-(Though other imports should be placed in <cite>setup</cite>,
-e.g. <code class="docutils literal notranslate"><span class="pre">Timer(&quot;np.zeros(())&quot;,</span> <span class="pre">&quot;import</span> <span class="pre">numpy</span> <span class="pre">as</span> <span class="pre">np&quot;)</span></code>)</p>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt><code class="docutils literal notranslate"><span class="pre">REL_WITH_DEB_INFO</span></code></dt><dd><p>In order to provide full information about the PyTorch internals which
-are executed, <code class="docutils literal notranslate"><span class="pre">Callgrind</span></code> needs access to C++ debug symbols. This is
-accomplished by setting <code class="docutils literal notranslate"><span class="pre">REL_WITH_DEB_INFO=1</span></code> when building PyTorch.
-Otherwise function calls will be opaque. (The resultant <code class="docutils literal notranslate"><span class="pre">CallgrindStats</span></code>
-will warn if debug symbols are missing.)</p>
-</dd>
-</dl>
-</li>
+<div class="section" id="id4">
+<h2>8. 脚注<a class="headerlink" href="#id4" title="Permalink to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>隐含的 import torch</p></li>
 </ul>
-</div></blockquote>
+<p>如果 globals 不包含 “torch”,Timer 将自动填充它。这意味着 Timer(“torch.empty(())”) 将正常工作。
+(不过其他导入应该放在 setup 中,
+例如 Timer(“np.zeros(())”, “import numpy as np”))</p>
+<ul class="simple">
+<li><p>REL_WITH_DEB_INFO</p></li>
+</ul>
+<p>为了提供有关执行的 PyTorch 内部信息的完整信息,Callgrind 需要访问 C++ 调试符号。
+这是通过在构建 PyTorch 时设置 REL_WITH_DEB_INFO=1 来实现的。
+否则函数调用将是不透明的。(生成的 CallgrindStats 将在缺少调试符号时发出警告。)</p>
 <p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.000 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-recipes-recipes-timer-quick-start-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
@@ -1024,15 +983,15 @@ if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.i
           <div class="pytorch-right-menu" id="pytorch-right-menu">
             <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
               <ul>
-<li><a class="reference internal" href="#">Timer quick start</a><ul>
-<li><a class="reference internal" href="#defining-a-timer">1. Defining a Timer</a></li>
-<li><a class="reference internal" href="#wall-time-timer-blocked-autorange">2. Wall time: <code class="docutils literal notranslate"><span class="pre">Timer.blocked_autorange(...)</span></code></a></li>
-<li><a class="reference internal" href="#c-snippets">3. C++ snippets</a></li>
-<li><a class="reference internal" href="#instruction-counts-timer-collect-callgrind">4. Instruction counts: <code class="docutils literal notranslate"><span class="pre">Timer.collect_callgrind(...)</span></code></a></li>
-<li><a class="reference internal" href="#instruction-counts-delving-deeper">5. Instruction counts: Delving deeper</a></li>
-<li><a class="reference internal" href="#a-b-testing-with-callgrind">6. A/B testing with <code class="docutils literal notranslate"><span class="pre">Callgrind</span></code></a></li>
-<li><a class="reference internal" href="#wrapping-up">7. Wrapping up</a></li>
-<li><a class="reference internal" href="#footnotes">8. Footnotes</a></li>
+<li><a class="reference internal" href="#">Timer快速入门</a><ul>
+<li><a class="reference internal" href="#id1">1. 定义Timer</a></li>
+<li><a class="reference internal" href="#wall-timer-blocked-autorange">2. Wall时间: <code class="docutils literal notranslate"><span class="pre">Timer.blocked_autorange(...)</span></code></a></li>
+<li><a class="reference internal" href="#c">3. C++ 代码片段</a></li>
+<li><a class="reference internal" href="#timer-collect-callgrind">4. 指令计数: <code class="docutils literal notranslate"><span class="pre">Timer.collect_callgrind(...)</span></code></a></li>
+<li><a class="reference internal" href="#id2">5. 指令计数: 深入探讨</a></li>
+<li><a class="reference internal" href="#callgrind-a-b">6. 使用 <code class="docutils literal notranslate"><span class="pre">Callgrind</span></code> 进行A/B测试</a></li>
+<li><a class="reference internal" href="#id3">7. 总结</a></li>
+<li><a class="reference internal" href="#id4">8. 脚注</a></li>
 </ul>
 </li>
 </ul>

@@ -295,6 +295,23 @@ PyTorch Recipes
 
 .. raw:: html
 
+    <div class="sphx-glr-thumbcontainer" tooltip="在本教程中,我们将介绍 torch.utils.benchmark.Timer 的主要API。 PyTorch Timer基于 `timeit.Timer &lt;https://docs.pyt...">
+
+.. only:: html
+
+  .. image:: /recipes/recipes/images/thumb/sphx_glr_timer_quick_start_thumb.png
+    :alt: Timer快速入门
+
+  :ref:`sphx_glr_recipes_recipes_timer_quick_start.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Timer快速入门</div>
+    </div>
+
+
+.. raw:: html
+
     <div class="sphx-glr-thumbcontainer" tooltip="介绍 ------------ 在训练神经网络时,模型能够通过使用梯度下降来提高它们的精度。简而言之,梯度下降是通过调整模型中的权重和偏置来最小化损失(或误差)的过程。">
 
 .. only:: html
@@ -307,23 +324,6 @@ PyTorch Recipes
 .. raw:: html
 
       <div class="sphx-glr-thumbnail-title">PyTorch 中清零梯度</div>
-    </div>
-
-
-.. raw:: html
-
-    <div class="sphx-glr-thumbcontainer" tooltip="In this tutorial, we&#x27;re going to cover the primary APIs of torch.utils.benchmark.Timer. The PyT...">
-
-.. only:: html
-
-  .. image:: /recipes/recipes/images/thumb/sphx_glr_timer_quick_start_thumb.png
-    :alt: Timer quick start
-
-  :ref:`sphx_glr_recipes_recipes_timer_quick_start.py`
-
-.. raw:: html
-
-      <div class="sphx-glr-thumbnail-title">Timer quick start</div>
     </div>
 
 
@@ -450,8 +450,8 @@ PyTorch Recipes
    /recipes/recipes/saving_multiple_models_in_one_file
    /recipes/recipes/tuning_guide
    /recipes/recipes/module_load_state_dict_tips
-   /recipes/recipes/zeroing_out_gradients
    /recipes/recipes/timer_quick_start
+   /recipes/recipes/zeroing_out_gradients
    /recipes/recipes/dynamic_quantization
    /recipes/recipes/Captum_Recipe
    /recipes/recipes/swap_tensors
