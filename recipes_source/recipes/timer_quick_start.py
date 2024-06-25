@@ -1,72 +1,64 @@
 """
-Timer quick start
+Timer快速入门
 =================
 
-In this tutorial, we're going to cover the primary APIs of
-`torch.utils.benchmark.Timer`. The PyTorch Timer is based on the
-`timeit.Timer <https://docs.python.org/3/library/timeit.html#timeit.Timer>`__
-API, with several PyTorch specific modifications. Familiarity with the
-builtin `Timer` class is not required for this tutorial, however we assume
-that the reader is familiar with the fundamentals of performance work.
+在本教程中,我们将介绍 `torch.utils.benchmark.Timer` 的主要API。
+PyTorch Timer基于 `timeit.Timer <https://docs.python.org/3/library/timeit.html#timeit.Timer>`__ API,
+并做了一些PyTorch特定的修改。本教程不要求读者熟悉内置的 `Timer` 类,但假设读者熟悉性能工作的基础知识。
 
-For a more comprehensive performance tuning tutorial, see
-`PyTorch Benchmark <https://pytorch.org/tutorials/recipes/recipes/benchmark.html>`__.
+有关更全面的性能调优教程,请参阅 `PyTorch Benchmark <https://pytorch.org/tutorials/recipes/recipes/benchmark.html>`__。
 
 
-**Contents:**
-    1. `Defining a Timer <#defining-a-timer>`__
-    2. `Wall time: Timer.blocked_autorange(...) <#wall-time-timer-blocked-autorange>`__
-    3. `C++ snippets <#c-snippets>`__
-    4. `Instruction counts: Timer.collect_callgrind(...) <#instruction-counts-timer-collect-callgrind>`__
-    5. `Instruction counts: Delving deeper <#instruction-counts-delving-deeper>`__
-    6. `A/B testing with Callgrind <#a-b-testing-with-callgrind>`__
-    7. `Wrapping up <#wrapping-up>`__
-    8. `Footnotes <#footnotes>`__
+**内容:**
+    1. `定义Timer <#defining-a-timer>`__
+    2. `Wall时间: Timer.blocked_autorange(...) <#wall-time-timer-blocked-autorange>`__
+    3. `C++代码片段 <#c-snippets>`__
+    4. `指令计数: Timer.collect_callgrind(...) <#instruction-counts-timer-collect-callgrind>`__
+    5. `指令计数: 深入探讨 <#instruction-counts-delving-deeper>`__
+    6. `使用Callgrind进行A/B测试 <#a-b-testing-with-callgrind>`__
+    7. `总结 <#wrapping-up>`__
+    8. `脚注 <#footnotes>`__
 """
 
 
 ###############################################################################
-# 1. Defining a Timer
+# 1. 定义Timer
 # ~~~~~~~~~~~~~~~~~~~
 #
-# A `Timer` serves as a task definition.
+# `Timer` 用于定义任务。
 #
 
 from torch.utils.benchmark import Timer
 
 timer = Timer(
-    # The computation which will be run in a loop and timed.
+    # 将在循环中运行并计时的计算。
     stmt="x * y",
 
-    # `setup` will be run before calling the measurement loop, and is used to
-    # populate any state which is needed by `stmt`
+    # `setup` 将在调用测量循环之前运行,用于填充 `stmt` 所需的任何状态
     setup="""
         x = torch.ones((128,))
         y = torch.ones((128,))
     """,
 
-    # Alternatively, ``globals`` can be used to pass variables from the outer scope.
+    # 或者,可以使用 ``globals`` 从外部作用域传递变量。
     # 
     #    globals={
     #        "x": torch.ones((128,)),
     #        "y": torch.ones((128,)),
     #    },
 
-    # Control the number of threads that PyTorch uses. (Default: 1)
+    # 控制PyTorch使用的线程数。(默认值: 1)
     num_threads=1,
 )
 
 ###############################################################################
-# 2. Wall time: ``Timer.blocked_autorange(...)``
+# 2. Wall时间: ``Timer.blocked_autorange(...)``
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-# This method will handle details such as picking a suitable number if repeats,
-# fixing the number of threads, and providing a convenient representation of
-# the results.
+# 此方法将处理诸如选择合适的重复次数、固定线程数以及提供结果的方便表示等细节。
 #
 
-# Measurement objects store the results of multiple repeats, and provide
-# various utility features.
+# Measurement对象存储多次重复的结果,并提供各种实用功能。
 from torch.utils.benchmark import Measurement
 
 m: Measurement = timer.blocked_autorange(min_run_time=1)
@@ -88,7 +80,7 @@ print(m)
 #
 
 ###############################################################################
-# 3. C++ snippets
+# 3. C++ 代码片段
 # ~~~~~~~~~~~~~~~
 #
 
@@ -121,18 +113,17 @@ print(cpp_timer.blocked_autorange(min_run_time=1))
 #
 
 ###############################################################################
-# Unsurprisingly, the C++ snippet is both faster and has lower variation.
+# 不出所料,C++代码片段的速度更快,变化也更小。
 #
 
 ###############################################################################
-# 4. Instruction counts: ``Timer.collect_callgrind(...)``
+# 4. 指令计数: ``Timer.collect_callgrind(...)``
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-# For deep dive investigations, ``Timer.collect_callgrind`` wraps
-# `Callgrind <https://valgrind.org/docs/manual/cl-manual.html>`__ in order to
-# collect instruction counts. These are useful as they offer fine grained and
-# deterministic (or very low noise in the case of Python) insights into how a
-# snippet is run.
+# 为了深入调查,`Timer.collect_callgrind` 封装了 
+# `Callgrind <https://valgrind.org/docs/manual/cl-manual.html>`__ 以收集指令计数。
+# 这些指令计数非常有用,因为它们提供了细粒度和确定性的(或在Python的情况下噪声很低的)见解,
+# 说明了代码片段是如何运行的。
 #
 
 from torch.utils.benchmark import CallgrindStats, FunctionCounts
@@ -174,20 +165,27 @@ print(stats)
 #   One generally doesn't care about absolute path. For instance, the full path
 #   and function name for a multiply call is something like:
 #
+# 5. 指令计数: 深入探讨
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#
+# `CallgrindStats` 的字符串表示形式类似于 Measurement。`Noisy symbols` 是一个Python概念(移除了在CPython解释器中已知的噪声调用)。
+#
+# 然而,为了进行更详细的分析,我们需要查看特定的调用。`CallgrindStats.stats()` 返回一个 `FunctionCounts` 对象,以便于此操作。从概念上讲,`FunctionCounts` 可以被视为一个带有一些实用方法的成对元组,其中每一对都是 `(指令数量,文件路径和函数名称)`。
+#
+# 关于路径的说明:
+#   通常我们不关心绝对路径。例如,一个乘法调用的完整路径和函数名是这样的:
+#
 # .. code-block:: sh
 #
 #    /the/prefix/to/your/pytorch/install/dir/pytorch/build/aten/src/ATen/core/TensorMethods.cpp:at::Tensor::mul(at::Tensor const&) const [/the/path/to/your/conda/install/miniconda3/envs/ab_ref/lib/python3.7/site-packages/torch/lib/libtorch_cpu.so]
 #
-#   when in reality, all of the information that we're interested in can be
-#   represented in:
+#   而实际上,我们感兴趣的所有信息都可以表示为:
 #
 # .. code-block:: sh
 #
 #    build/aten/src/ATen/core/TensorMethods.cpp:at::Tensor::mul(at::Tensor const&) const
 #
-#   ``CallgrindStats.as_standardized()`` makes a best effort to strip low signal
-#   portions of the file path, as well as the shared object and is generally
-#   recommended.
+#   ``CallgrindStats.as_standardized()`` 会尽最大努力去除文件路径中低信号部分,以及共享对象,通常建议使用。
 #
 
 inclusive_stats = stats.as_standardized().stats(inclusive=False)
@@ -213,10 +211,8 @@ print(inclusive_stats[:10])
 #
 
 ###############################################################################
-# That's still quite a lot to digest. Let's use the `FunctionCounts.transform`
-# method to trim some of the function path, and discard the function called.
-# When we do, the counts of any collisions (e.g. `foo.h:a()` and `foo.h:b()`
-# will both map to `foo.h`) will be added together.
+# 这仍然有很多内容需要消化。让我们使用 `FunctionCounts.transform` 方法来去除一些函数路径,并丢弃函数调用。
+# 这样做时,任何冲突(例如 `foo.h:a()` 和 `foo.h:b()` 都将映射到 `foo.h`)的计数将被累加。
 #
 
 import os
@@ -254,16 +250,12 @@ print(inclusive_stats.transform(group_by_file)[:10])
 #
 
 ###############################################################################
-# 6. A/B testing with ``Callgrind``
+# 6. 使用 ``Callgrind`` 进行A/B测试
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-# One of the most useful features of instruction counts is they allow fine
-# grained comparison of computation, which is critical when analyzing
-# performance.
+# 指令计数最有用的特性之一是允许对计算进行细粒度比较,这在分析性能时至关重要。
 #
-# To see this in action, lets compare our multiplication of two size 128
-# Tensors with a {128} x {1} multiplication, which will broadcast the second
-# Tensor:
+# 为了看到这一点,让我们将两个大小为128的张量相乘与一个{128} x {1}的乘法进行比较,后者将对第二个张量进行广播:
 #   result = {a0 * b0, a1 * b0, ..., a127 * b0}
 #
 
@@ -277,19 +269,17 @@ broadcasting_stats = Timer(
 ).collect_callgrind().as_standardized().stats(inclusive=False)
 
 ###############################################################################
-# Often we want to A/B test two different environments. (e.g. testing a PR, or
-# experimenting with compile flags.) This is quite simple, as ``CallgrindStats``,
-# ``FunctionCounts``, and Measurement are all pickleable. Simply save measurements
-# from each environment, and load them in a single process for analysis.
+# 我们经常需要对两种不同的环境进行A/B测试。(例如测试一个PR,或尝试不同的编译标志。)这很简单,
+# 因为 `CallgrindStats`、`FunctionCounts` 和 Measurement 都是可pickle化的。
+# 只需在每个环境中保存测量结果,然后在单个进程中加载它们进行分析。
 #
+
 
 import pickle
 
-# Let's round trip `broadcasting_stats` just to show that we can.
 broadcasting_stats = pickle.loads(pickle.dumps(broadcasting_stats))
 
 
-# And now to diff the two tasks:
 delta = broadcasting_stats - inclusive_stats
 
 def extract_fn_name(fn: str):
@@ -297,7 +287,6 @@ def extract_fn_name(fn: str):
     fn = ":".join(fn.split(":")[1:])
     return re.sub(r"\(.+\)", "(...)", fn)
 
-# We use `.transform` to make the diff readable:
 print(delta.transform(extract_fn_name))
 
 
@@ -330,11 +319,10 @@ print(delta.transform(extract_fn_name))
 #
 
 ###############################################################################
-# So the broadcasting version takes an extra 580 instructions per call (recall
-# that we're collecting 100 runs per sample), or about 10%. There are quite a
-# few ``TensorIterator`` calls, so lets drill down to those. ``FunctionCounts.filter``
-# makes this easy.
-#
+# 所以广播版本每次调用需要额外580条指令(回想一下我们收集了100次运行的样本),约占10%。
+# 有相当多的 `TensorIterator` 调用,所以让我们深入研究这些调用。
+# `FunctionCounts.filter` 可以很容易地做到这一点。
+
 
 print(delta.transform(extract_fn_name).filter(lambda fn: "TensorIterator" in fn))
 
@@ -359,39 +347,28 @@ print(delta.transform(extract_fn_name).filter(lambda fn: "TensorIterator" in fn)
 #
 
 ###############################################################################
-# This makes plain what is going on: there is a fast path in ``TensorIterator``
-# setup, but in the {128} x {1} case we miss it and have to do a more general
-# analysis which is more expensive. The most prominent call omitted by the
-# filter is `c10::SmallVectorImpl<long>::operator=(...)`, which is also part
-# of the more general setup.
-#
+# 这说明了正在发生的情况:在 TensorIterator 设置中有一条快速路径,
+# 但在 {128} x {1} 的情况下,我们错过了它,不得不进行更通用的分析,这更加昂贵。
+# 被过滤器省略的最显著的调用是 c10::SmallVectorImpl<long>::operator=(...),
+# 这也是更通用设置的一部分。
 
 ###############################################################################
-# 7. Wrapping up
+# 7. 总结
 # ~~~~~~~~~~~~~~
-#
-# In summary, use `Timer.blocked_autorange` to collect wall times. If timing
-# variation is too high, increase `min_run_time`, or move to C++ snippets if
-# convenient.
-#
-# For fine grained analysis, use `Timer.collect_callgrind` to measure
-# instruction counts and `FunctionCounts.(__add__ / __sub__ / transform / filter)`
-# to slice-and-dice them.
-#
+# 总之,使用 Timer.blocked_autorange 来收集墙上时间。如果计时变化过高,
+# 请增加 min_run_time,或者如果方便的话,转移到 C++ 代码片段。
+# 对于细粒度分析,使用 Timer.collect_callgrind 来测量指令计数,
+# 并使用 FunctionCounts.(__add__ / __sub__ / transform / filter)
+# 来切分和处理它们。
 
 ###############################################################################
-# 8. Footnotes
+# 8. 脚注
 # ~~~~~~~~~~~~
-#
-#   - Implied ``import torch``
-#       If `globals` does not contain "torch", Timer will automatically
-#       populate it. This means that ``Timer("torch.empty(())")`` will work.
-#       (Though other imports should be placed in `setup`,
-#       e.g. ``Timer("np.zeros(())", "import numpy as np")``)
-#
-#   - ``REL_WITH_DEB_INFO``
-#       In order to provide full information about the PyTorch internals which
-#       are executed, ``Callgrind`` needs access to C++ debug symbols. This is
-#       accomplished by setting ``REL_WITH_DEB_INFO=1`` when building PyTorch.
-#       Otherwise function calls will be opaque. (The resultant ``CallgrindStats``
-#       will warn if debug symbols are missing.)
+# - 隐含的 import torch
+# 如果 globals 不包含 "torch",Timer 将自动填充它。这意味着 Timer("torch.empty(())") 将正常工作。
+# (不过其他导入应该放在 setup 中,
+# 例如 Timer("np.zeros(())", "import numpy as np"))
+# - REL_WITH_DEB_INFO
+# 为了提供有关执行的 PyTorch 内部信息的完整信息,Callgrind 需要访问 C++ 调试符号。
+# 这是通过在构建 PyTorch 时设置 REL_WITH_DEB_INFO=1 来实现的。
+# 否则函数调用将是不透明的。(生成的 CallgrindStats 将在缺少调试符号时发出警告。)
