@@ -380,7 +380,7 @@ PyTorch Recipes
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="Introduction ------------ PyTorch includes a simple profiler API that is useful when user needs...">
+    <div class="sphx-glr-thumbcontainer" tooltip="简介 ------------ 当用户需要确定模型中最耗费资源的算子时,PyTorch包含一个简单的profiler API非常有用。">
 
 .. only:: html
 
