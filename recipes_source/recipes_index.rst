@@ -117,7 +117,7 @@ Recipes are bite-sized, actionable examples of how to use specific PyTorch featu
 
 .. customcarditem::
    :header: PyTorch Profiler
-   :card_description: Learn how to use PyTorch's profiler to measure operators time and memory consumption
+   :card_description: 学习如何使用 PyTorch Profiler 来测量算子的时间和内存消耗。
    :image: ../_static/img/thumbnails/cropped/profiler.png
    :link: ../recipes/recipes/profiler_recipe.html
    :tags: Basics
