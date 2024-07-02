@@ -1,29 +1,21 @@
 """
 PyTorch Benchmark
 ====================================
-This recipe provides a quick-start guide to using PyTorch
-``benchmark`` module to measure and compare code performance.
+本教程提供了使用 PyTorch ``benchmark`` 模块来测量和比较代码性能的快速入门指南。
 
-Introduction
+介绍
 ------------
-Benchmarking is an important step in writing code. It helps
-us validate that our code meets performance expectations,
-compare different approaches to solving the same problem and
-prevent performance regressions.
+基准测试是编写代码时的一个重要步骤。它帮助我们验证代码是否满足性能预期,比较解决同一问题的不同方法,并防止性能裂化。
 
-There are many options when it comes to benchmarking PyTorch code
-including the Python builtin ``timeit`` module. However, benchmarking
-PyTorch code has many caveats that can be easily overlooked such as
-managing the number of threads and synchronizing CUDA devices. Moreover,
-generating Tensor inputs for benchmarking can be quite tedious.
+对于基准测试 PyTorch 代码有许多选择,包括 Python 内置的 ``timeit`` 模块。
+然而,基准测试 PyTorch 代码有许多容易被忽视的注意事项,例如管理线程数量和同步 CUDA 设备。
+此外,为基准测试生成张量输入可能相当繁琐。
 
-This recipe demonstrates how to use PyTorch ``benchmark`` module to avoid
-common mistakes while making it easier to compare performance of
-different code, generate input for benchmarking and more.
+本教程演示了如何使用 PyTorch ``benchmark`` 模块来避免常见错误,同时更容易比较不同代码的性能、为基准测试生成输入等。
 
-Setup
+设置
 -----
-Before we begin, install ``torch`` if it isn’t already available.
+在开始之前,如果尚未安装 ``torch``,请先安装。
 
 ::
 
@@ -31,39 +23,36 @@ Before we begin, install ``torch`` if it isn’t already available.
 
 """
 
-
 ######################################################################
-# Steps
+# 具体步骤
 # -----
 #
-# 1. Defining functions to benchmark
-# 2. Benchmarking with ``timeit.Timer``
-# 3. Benchmarking with ``torch.utils.benchmark.Timer``
-# 4. Benchmarking with ``Blocked Autorange``
-# 5. Comparing benchmark results
-# 6. Saving/Loading benchmark results
-# 7. Generating inputs with ``Fuzzed Parameters``
-# 8. Collecting instruction counts with ``Callgrind``
+# 1. 定义要基准测试的函数
+# 2. 使用 ``timeit.Timer`` 进行基准测试
+# 3. 使用 ``torch.utils.benchmark.Timer`` 进行基准测试
+# 4. 使用 ``Blocked Autorange`` 进行基准测试
+# 5. 比较基准测试结果
+# 6. 保存/加载基准测试结果
+# 7. 使用 ``Fuzzed Parameters`` 生成输入
+# 8. 使用 ``Callgrind`` 收集指令计数
 #
-# 1. Defining functions to benchmark
+# 1. 定义要基准测试的函数
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-# As of the time of this writing, `torch.dot <https://pytorch.org/docs/stable/generated/torch.dot.html?highlight=dot#torch.dot>`__
-# does not support batched mode, so we will compare two approaches to
-# implementing it using existing ``torch`` operators: one approach uses a
-# combination of ``mul`` and ``sum`` while the other reduces the problem to ``bmm``.
+# 在撰写本文时, `torch.dot <https://pytorch.org/docs/stable/generated/torch.dot.html?highlight=dot#torch.dot>`__
+# 不支持批量模式,因此我们将比较使用现有 ``torch`` 运算符实现它的两种方法:一种方法使用 ``mul`` 和 ``sum`` 的组合,另一种方法使用 ``bmm``。
 #
 
 import torch
 
 
 def batched_dot_mul_sum(a, b):
-    '''Computes batched dot by multiplying and summing'''
+    """Computes batched dot by multiplying and summing"""
     return a.mul(b).sum(-1)
 
 
 def batched_dot_bmm(a, b):
-    '''Computes batched dot by reducing to ``bmm``'''
+    """Computes batched dot by reducing to ``bmm``"""
     a = a.reshape(-1, 1, a.shape[-1])
     b = b.reshape(-1, b.shape[-1], 1)
     return torch.bmm(a, b).flatten(-3)
@@ -77,28 +66,28 @@ assert batched_dot_mul_sum(x, x).allclose(batched_dot_bmm(x, x))
 
 
 ######################################################################
-# 2. Benchmarking with ``timeit.Timer``
+# 2. 使用 ``timeit.Timer`` 进行基准测试
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-#
-# First, let's benchmark the code using Python's builtin ``timeit`` module.
-# We keep the benchmark code simple here so we can compare the defaults
-# of ``timeit`` and ``torch.utils.benchmark``.
+# 首先,让我们使用 Python 内置的 ``timeit`` 模块对代码进行基准测试。
+# 我们在这里保持基准测试代码简单,以便我们可以比较 ``timeit`` 和 ``torch.utils.benchmark`` 的默认设置。
 #
 
 import timeit
 
 t0 = timeit.Timer(
-    stmt='batched_dot_mul_sum(x, x)', 
-    setup='from __main__ import batched_dot_mul_sum',
-    globals={'x': x})
+    stmt="batched_dot_mul_sum(x, x)",
+    setup="from __main__ import batched_dot_mul_sum",
+    globals={"x": x},
+)
 
 t1 = timeit.Timer(
-    stmt='batched_dot_bmm(x, x)',
-    setup='from __main__ import batched_dot_bmm',
-    globals={'x': x})
+    stmt="batched_dot_bmm(x, x)",
+    setup="from __main__ import batched_dot_bmm",
+    globals={"x": x},
+)
 
-print(f'mul_sum(x, x):  {t0.timeit(100) / 100 * 1e6:>5.1f} us')
-print(f'bmm(x, x):      {t1.timeit(100) / 100 * 1e6:>5.1f} us')
+print(f"mul_sum(x, x):  {t0.timeit(100) / 100 * 1e6:>5.1f} us")
+print(f"bmm(x, x):      {t1.timeit(100) / 100 * 1e6:>5.1f} us")
 
 ######################################################################
 # .. code-block:: none
@@ -110,26 +99,25 @@ print(f'bmm(x, x):      {t1.timeit(100) / 100 * 1e6:>5.1f} us')
 
 
 ######################################################################
-# 3. Benchmarking with ``torch.utils.benchmark.Timer``
+# 3. 使用 ``torch.utils.benchmark.Timer`` 进行基准测试
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-#
-# PyTorch ``benchmark`` module was designed to be familiar to those who
-# have used the ``timeit`` module before. However, its defaults make it
-# easier and safer to use for benchmarking PyTorch code. Let's first
-# compare the same basic API as above.
-#
+# PyTorch ``benchmark``模块的设计使得对于那些曾经使用过 ``timeit`` 模块的人来说,它看起来很熟悉。
+# 然而,它的默认设置使得它更容易且更安全地用于对 PyTorch 代码进行基准测试。
+# 首先让我们对比一下基本API的使用。
 
 import torch.utils.benchmark as benchmark
 
 t0 = benchmark.Timer(
-    stmt='batched_dot_mul_sum(x, x)', 
-    setup='from __main__ import batched_dot_mul_sum',
-    globals={'x': x})
+    stmt="batched_dot_mul_sum(x, x)",
+    setup="from __main__ import batched_dot_mul_sum",
+    globals={"x": x},
+)
 
 t1 = benchmark.Timer(
-    stmt='batched_dot_bmm(x, x)',
-    setup='from __main__ import batched_dot_bmm',
-    globals={'x': x})
+    stmt="batched_dot_bmm(x, x)",
+    setup="from __main__ import batched_dot_bmm",
+    globals={"x": x},
+)
 
 print(t0.timeit(100))
 print(t1.timeit(100))
@@ -151,40 +139,37 @@ print(t1.timeit(100))
 #
 
 ######################################################################
-# Even though the APIs are the same for the basic functionality, there
-# are some important differences. ``benchmark.Timer.timeit()`` returns the
-# time per run as opposed to the total runtime like ``timeit.Timer.timeit()``
-# does. PyTorch ``benchmark`` module also provides formatted string
-# representations for printing the results.
+# 虽然基本功能的API是相同的,但是还是有一些重要的区别。
+# ``benchmark.Timer.timeit()``返回的是每次运行的时间,而不是 ``timeit.Timer.timeit()`` 返回的总运行时间。
+# PyTorch ``benchmark``模块还提供了格式化的字符串表示,用于打印结果。
 #
-# Another important difference, and the reason why the results diverge
-# is that PyTorch benchmark module runs in a single thread by default.
-# We can change the number of threads with the ``num_threads`` argument.
+# 另一个重要的区别,也是结果不同的原因,是PyTorch基准测试模块默认在单线程中运行。
+# 我们可以使用``num_threads``参数来更改线程数量。
 #
-# ``torch.utils.benchmark.Timer`` takes several additional arguments
-# including: ``label``, ``sub_label``, ``description`` and ``env`` which change
-# the __repr__ of the measurement object returned and are used for
-# grouping the results (more on this later).
+# ``torch.utils.benchmark.Timer``接受几个额外的参数,包括: ``label``、``sub_label``、``description``和``env``,
+# 这些参数会改变返回的测量对象的__repr__,并用于对结果进行分组(稍后会详细介绍)。
 #
 
 num_threads = torch.get_num_threads()
-print(f'Benchmarking on {num_threads} threads')
+print(f"Benchmarking on {num_threads} threads")
 
 t0 = benchmark.Timer(
-    stmt='batched_dot_mul_sum(x, x)', 
-    setup='from __main__ import batched_dot_mul_sum',
-    globals={'x': x},
+    stmt="batched_dot_mul_sum(x, x)",
+    setup="from __main__ import batched_dot_mul_sum",
+    globals={"x": x},
     num_threads=num_threads,
-    label='Multithreaded batch dot',
-    sub_label='Implemented using mul and sum')
+    label="Multithreaded batch dot",
+    sub_label="Implemented using mul and sum",
+)
 
 t1 = benchmark.Timer(
-    stmt='batched_dot_bmm(x, x)',
-    setup='from __main__ import batched_dot_bmm',
-    globals={'x': x},
+    stmt="batched_dot_bmm(x, x)",
+    setup="from __main__ import batched_dot_bmm",
+    globals={"x": x},
     num_threads=num_threads,
-    label='Multithreaded batch dot',
-    sub_label='Implemented using bmm')
+    label="Multithreaded batch dot",
+    sub_label="Implemented using bmm",
+)
 
 print(t0.timeit(100))
 print(t1.timeit(100))
@@ -206,32 +191,32 @@ print(t1.timeit(100))
 #       1 measurement, 100 runs , 40 threads
 
 ######################################################################
-# Running ``benchmark`` with all threads available gives similar results
-# as the ``timeit`` module. More importantly, which version is faster
-# depends on how many threads we run the code with. This is why it's
-# important to benchmark the code with thread settings that are
-# representative of real use cases. Another important thing to remember
-# is to synchronize CPU and CUDA when benchmarking on the GPU. Let's run
-# the above benchmarks again on a CUDA tensor and see what happens.
+# 使用所有可用线程运行 ``benchmark`` 会得到与 ``timeit`` 模块类似的结果。
+# 更重要的是,哪个版本更快取决于我们使用多少线程运行代码。
+# 这就是为什么在基准测试时,使用与实际用例相符的线程设置非常重要。
+# 另一个需要记住的重要事情是,在 GPU 上进行基准测试时,要同步CPU和CUDA。
+# 让我们再次在CUDA张量上运行上面的基准测试,看看会发生什么。
 #
 
-x = torch.randn(10000, 1024, device='cuda')
+x = torch.randn(10000, 1024, device="cuda")
 
 t0 = timeit.Timer(
-    stmt='batched_dot_mul_sum(x, x)', 
-    setup='from __main__ import batched_dot_mul_sum',
-    globals={'x': x})
+    stmt="batched_dot_mul_sum(x, x)",
+    setup="from __main__ import batched_dot_mul_sum",
+    globals={"x": x},
+)
 
 t1 = timeit.Timer(
-    stmt='batched_dot_bmm(x, x)',
-    setup='from __main__ import batched_dot_bmm',
-    globals={'x': x})
+    stmt="batched_dot_bmm(x, x)",
+    setup="from __main__ import batched_dot_bmm",
+    globals={"x": x},
+)
 
 # Ran each twice to show difference before/after warm-up
-print(f'mul_sum(x, x):  {t0.timeit(100) / 100 * 1e6:>5.1f} us')
-print(f'mul_sum(x, x):  {t0.timeit(100) / 100 * 1e6:>5.1f} us')
-print(f'bmm(x, x):      {t1.timeit(100) / 100 * 1e6:>5.1f} us')
-print(f'bmm(x, x):      {t1.timeit(100) / 100 * 1e6:>5.1f} us')
+print(f"mul_sum(x, x):  {t0.timeit(100) / 100 * 1e6:>5.1f} us")
+print(f"mul_sum(x, x):  {t0.timeit(100) / 100 * 1e6:>5.1f} us")
+print(f"bmm(x, x):      {t1.timeit(100) / 100 * 1e6:>5.1f} us")
+print(f"bmm(x, x):      {t1.timeit(100) / 100 * 1e6:>5.1f} us")
 
 ######################################################################
 # .. code-block:: none
@@ -244,14 +229,16 @@ print(f'bmm(x, x):      {t1.timeit(100) / 100 * 1e6:>5.1f} us')
 #
 
 t0 = benchmark.Timer(
-    stmt='batched_dot_mul_sum(x, x)', 
-    setup='from __main__ import batched_dot_mul_sum',
-    globals={'x': x})
+    stmt="batched_dot_mul_sum(x, x)",
+    setup="from __main__ import batched_dot_mul_sum",
+    globals={"x": x},
+)
 
 t1 = benchmark.Timer(
-    stmt='batched_dot_bmm(x, x)',
-    setup='from __main__ import batched_dot_bmm',
-    globals={'x': x})
+    stmt="batched_dot_bmm(x, x)",
+    setup="from __main__ import batched_dot_bmm",
+    globals={"x": x},
+)
 
 # Run only once since benchmark module does warm-up for us
 print(t0.timeit(100))
@@ -274,34 +261,23 @@ print(t1.timeit(100))
 #
 
 ######################################################################
-# The results reveal something interesting. The first run of the ``bmm``
-# version using the ``timeit`` module takes much longer than the second
-# run. This is because ``bmm`` calls into `cuBLAS` which needs to be
-# loaded the first time it's called which takes some time. This is why
-# it's important to do a warm-up run before benchmarking, luckily for
-# us, PyTorch's ``benchmark`` module takes care of that.
+# 结果揭示了一些有趣的事情。使用 `timeit` 模块运行 `bmm` 版本的第一次运行比第二次运行慢很多。
+# 这是因为 `bmm` 需要调用 `cuBLAS`,第一次调用时需要加载它,这需要一些时间。
+# 这就是为什么在基准测试之前做一次预热运行很重要,幸运的是, PyTorch 的 `benchmark` 模块为我们处理了这个问题。
 #
-# The difference in the results between ``timeit`` and ``benchmark`` modules
-# is because the `timeit` module is not synchronizing CUDA and is thus only
-# timing the time to launch the kernel. PyTorch's ``benchmark`` module does
-# the synchronization for us.
+# `timeit` 模块和 `benchmark` 模块之间结果的差异是因为 `timeit` 模块没有同步 CUDA,因此只计时了启动内核的时间。
+# PyTorch 的 `benchmark` 模块为我们做了同步。
 
 
 ######################################################################
-# 4. Benchmarking with `Blocked Autorange`
+# 4. 使用 `Blocked Autorange` 进行基准测试
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-# While ``timeit.Timer.autorange`` takes a single continuous measurement
-# of at least 0.2 seconds, `torch.utils.benchmark.blocked_autorange`
-# takes many measurements whose times total at least 0.2 seconds (which
-# can be changed by the `min_run_time` parameter) subject to the constraint
-# that timing overhead is a small fraction of the overall measurement.
-# This is accomplished by first running with an increasing number of runs
-# per loop until the runtime is much larger than measurement overhead
-# (which also serves as a warm up), and then taking measurements until
-# the target time is reached. This has the useful properties that it wastes
-# less data and allows us to compute statistics to estimate the reliability
-# of the measurements.
+# 虽然 `timeit.Timer.autorange` 采取至少 0.2 秒的单次连续测量,
+# 但 `torch.utils.benchmark.blocked_autorange` 采取多次测量,其总时间至少为 0.2 秒(可通过 `min_run_time` 参数更改),
+# 并且测量开销只占总体测量的一小部分。
+# 这是通过首先以递增的循环次数运行,直到运行时间远大于测量开销(这也起到了热身的作用),
+# 然后进行测量直到达到目标时间。这有一个有用的特性,即它浪费的数据更少,并且允许我们计算统计数据来估计测量的可靠性。
 #
 
 m0 = t0.blocked_autorange()
@@ -327,8 +303,7 @@ print(m1)
 #
 
 ######################################################################
-# We can also inspect the individual statistics from the returned
-# measurements object.
+# 我们还可以查看返回的测量对象中获得的各个统计数据。
 
 print(f"Mean:   {m0.mean * 1e6:6.2f} us")
 print(f"Median: {m0.median * 1e6:6.2f} us")
@@ -342,17 +317,14 @@ print(f"Median: {m0.median * 1e6:6.2f} us")
 #
 
 ######################################################################
-# 5. Comparing benchmark results
+# 5. 比较基准测试结果
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-# So far we've been comparing our two versions of batched dot against a
-# single input. In practice, we want to try a combination of inputs as
-# well as different number of threads. The ``Compare`` class helps display
-# the results of many measurements in a formatted table. It uses the
-# annotations described above (`label`, `sub_label`, `num_threads`, etc.) as
-# well as `description` to group and organize the table. Let's use
-# ``Compare`` to see how our functions perform for different input sizes
-# and number of threads.
+# 到目前为止,我们一直在比较我们的两个批量点积版本对同一输入的表现。
+# 在实践中,我们希望尝试不同的输入组合以及不同的线程数量。
+# `Compare` 类帮助我们以格式化表格的形式显示多个测量结果。
+# 它使用上面描述的注释( `label`、 `sub_label`、 `num_threads` 等)以及 `description` 来对表格进行分组和组织。
+# 让我们使用 `Compare` 来看看我们的函数在不同的输入大小和线程数量下的表现如何。
 #
 
 from itertools import product
@@ -364,28 +336,32 @@ sizes = [1, 64, 1024, 10000]
 for b, n in product(sizes, sizes):
     # label and sub_label are the rows
     # description is the column
-    label = 'Batched dot'
-    sub_label = f'[{b}, {n}]'
+    label = "Batched dot"
+    sub_label = f"[{b}, {n}]"
     x = torch.ones((b, n))
     for num_threads in [1, 4, 16, 32]:
-        results.append(benchmark.Timer(
-            stmt='batched_dot_mul_sum(x, x)',
-            setup='from __main__ import batched_dot_mul_sum',
-            globals={'x': x},
-            num_threads=num_threads,
-            label=label,
-            sub_label=sub_label,
-            description='mul/sum',
-        ).blocked_autorange(min_run_time=1))
-        results.append(benchmark.Timer(
-            stmt='batched_dot_bmm(x, x)',
-            setup='from __main__ import batched_dot_bmm',
-            globals={'x': x},
-            num_threads=num_threads,
-            label=label,
-            sub_label=sub_label,
-            description='bmm',
-        ).blocked_autorange(min_run_time=1))
+        results.append(
+            benchmark.Timer(
+                stmt="batched_dot_mul_sum(x, x)",
+                setup="from __main__ import batched_dot_mul_sum",
+                globals={"x": x},
+                num_threads=num_threads,
+                label=label,
+                sub_label=sub_label,
+                description="mul/sum",
+            ).blocked_autorange(min_run_time=1)
+        )
+        results.append(
+            benchmark.Timer(
+                stmt="batched_dot_bmm(x, x)",
+                setup="from __main__ import batched_dot_bmm",
+                globals={"x": x},
+                num_threads=num_threads,
+                label=label,
+                sub_label=sub_label,
+                description="bmm",
+            ).blocked_autorange(min_run_time=1)
+        )
 
 compare = benchmark.Compare(results)
 compare.print()
@@ -395,7 +371,7 @@ compare.print()
 #    :caption: Output
 #
 #     [--------------- Batched dot ----------------]
-#                           |  mul/sum   |    bmm   
+#                           |  mul/sum   |    bmm
 #     1 threads: -----------------------------------
 #           [1, 1]          |       5.9  |      11.2
 #           [1, 64]         |       6.4  |      11.4
@@ -469,12 +445,10 @@ compare.print()
 #
 
 ######################################################################
-# The results above indicate that the version which reduces to ``bmm``
-# is better for larger tensors running on multiple threads, while for
-# smaller and/or single thread code, the other version is better.
+# 上面的结果表明,对于在多线程上运行的较大张量, `bmm` 的版本效果更好,
+# 而对于较小和/或单线程代码,另一个版本效果更好。
 #
-# ``Compare`` also provides functions for changing the table format
-#
+# `Compare` 还提供了用于更改表格格式的函数
 
 compare.trim_significant_figures()
 compare.colorize()
@@ -482,36 +456,34 @@ compare.print()
 
 
 ######################################################################
-# 6. Saving/Loading benchmark results
+# 6. 保存/加载基准测试结果
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-# `Measurements` (and ``CallgrindStats`` which are described in section 8)
-# can be serialized by the ``pickle`` module. This makes A/B testing easy, as you can collect
-# measurements from two separate environments, pickle them, and then
-# load both in a single environment. Timer even takes an `env`
-# constructor argument so that such A/B testing works seamlessly.
+# `Measurements` (和第8节中描述的 `CallgrindStats` )可以通过 `pickle` 模块序列化。
+# 这使得A/B测试变得很容易,因为您可以从两个独立的环境中收集测量结果,
+# 将它们序列化,然后在单个环境中加载两者。Timer甚至接受一个 `env`
+# 构造函数参数,以便这种A/B测试可以无缝衔接。
 #
-# Let's imagine that rather than two Python functions, the add/sum
-# and ``bmm`` approaches were in two different builds of PyTorch.
-# The example below demonstrates how one might A/B test them. For
-# simplicity, we only use a subset of shapes, and simply round trip
-# results through pickle rather than actually using multiple environments
-# and writing results to disk.
+# 假设 add/sum 和 `bmm` 方法不是两个Python函数,而是 PyTorch 的两个不同版本。
+# 下面的示例演示了如何进行A/B测试。为了简单起见,我们只使用了一部分数据,
+# 并简单地通过pickle来回传结果,而不是实际使用多个环境并将结果写入磁盘。
 #
 
 import pickle
 
 ab_test_results = []
-for env in ('environment A: mul/sum', 'environment B: bmm'):
+for env in ("environment A: mul/sum", "environment B: bmm"):
     for b, n in ((1, 1), (1024, 10000), (10000, 1)):
         x = torch.ones((b, n))
-        dot_fn = (batched_dot_mul_sum if env == 'environment A: mul/sum' else batched_dot_bmm)
+        dot_fn = (
+            batched_dot_mul_sum if env == "environment A: mul/sum" else batched_dot_bmm
+        )
         m = benchmark.Timer(
-            stmt='batched_dot(x, x)',
-            globals={'x': x, 'batched_dot': dot_fn},
+            stmt="batched_dot(x, x)",
+            globals={"x": x, "batched_dot": dot_fn},
             num_threads=1,
-            label='Batched dot',
-            description=f'[{b}, {n}]',
+            label="Batched dot",
+            description=f"[{b}, {n}]",
             env=env,
         ).blocked_autorange(min_run_time=1)
         ab_test_results.append(pickle.dumps(m))
@@ -535,35 +507,38 @@ compare.print()
 #     Times are in microseconds (us).
 #
 
-# And just to show that we can round trip all of the results from earlier:
+# 仅为展示可以将之前所有的结果通过 pickle 进行回传:
 round_tripped_results = pickle.loads(pickle.dumps(results))
-assert(str(benchmark.Compare(results)) == str(benchmark.Compare(round_tripped_results)))
+assert str(benchmark.Compare(results)) == str(benchmark.Compare(round_tripped_results))
 
 
 ######################################################################
-# 7. Generating inputs with `Fuzzed Parameters`
+# 7. 使用 `Fuzzed Parameters` 生成输入
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-# As we've seen in the previous section, there can be some stark
-# performance differences depending on the input tensors. Hence, it
-# is a good idea to run benchmarks on a number of different inputs.
-# However, creating all these input tensors can be tedious which is
-# where ``torch.utils.benchmark.Fuzzer`` and related classes come in.
-# Let's take a look at how we can use the ``Fuzzer`` to create some test
-# cases for the benchmark.
+# 正如我们在上一节中看到的,根据输入张量的不同,性能差异可能会很大。
+# 因此,在多个不同的输入上运行基准测试是一个好主意。
+# 但是,创建所有这些输入张量可能会很麻烦,这就是 `torch.utils.benchmark.Fuzzer`
+# 和相关类的用武之地。让我们看看如何使用 `Fuzzer` 来创建一些用于基准测试的测试用例。
 #
 
-from torch.utils.benchmark import Fuzzer, FuzzedParameter, FuzzedTensor, ParameterAlias
+from torch.utils.benchmark import FuzzedParameter, FuzzedTensor, Fuzzer, ParameterAlias
 
-# Generates random tensors with 128 to 10000000 elements and sizes k0 and k1 chosen from a
-# ``loguniform`` distribution in [1, 10000], 40% of which will be discontiguous on average.
+# 生成随机张量,元素数量在 128 到 10000000 之间,大小 k0 和 k1 从 [1, 10000] 的 `loguniform` 分布中选择,
+# 其中平均 40% 将是不连续的。
 example_fuzzer = Fuzzer(
-    parameters = [
-        FuzzedParameter('k0', minval=1, maxval=10000, distribution='loguniform'),
-        FuzzedParameter('k1', minval=1, maxval=10000, distribution='loguniform'),
+    parameters=[
+        FuzzedParameter("k0", minval=1, maxval=10000, distribution="loguniform"),
+        FuzzedParameter("k1", minval=1, maxval=10000, distribution="loguniform"),
     ],
-    tensors = [
-        FuzzedTensor('x', size=('k0', 'k1'), min_elements=128, max_elements=10000000, probability_contiguous=0.6)
+    tensors=[
+        FuzzedTensor(
+            "x",
+            size=("k0", "k1"),
+            min_elements=128,
+            max_elements=10000000,
+            probability_contiguous=0.6,
+        )
     ],
     seed=0,
 )
@@ -571,23 +546,27 @@ example_fuzzer = Fuzzer(
 results = []
 for tensors, tensor_params, params in example_fuzzer.take(10):
     # description is the column label
-    sub_label=f"{params['k0']:<6} x {params['k1']:<4} {'' if tensor_params['x']['is_contiguous'] else '(discontiguous)'}"
-    results.append(benchmark.Timer(
-        stmt='batched_dot_mul_sum(x, x)',
-        setup='from __main__ import batched_dot_mul_sum',
-        globals=tensors,
-        label='Batched dot',
-        sub_label=sub_label,
-        description='mul/sum',
-    ).blocked_autorange(min_run_time=1))
-    results.append(benchmark.Timer(
-        stmt='batched_dot_bmm(x, x)',
-        setup='from __main__ import batched_dot_bmm',
-        globals=tensors,
-        label='Batched dot',
-        sub_label=sub_label,
-        description='bmm',
-    ).blocked_autorange(min_run_time=1))
+    sub_label = f"{params['k0']:<6} x {params['k1']:<4} {'' if tensor_params['x']['is_contiguous'] else '(discontiguous)'}"
+    results.append(
+        benchmark.Timer(
+            stmt="batched_dot_mul_sum(x, x)",
+            setup="from __main__ import batched_dot_mul_sum",
+            globals=tensors,
+            label="Batched dot",
+            sub_label=sub_label,
+            description="mul/sum",
+        ).blocked_autorange(min_run_time=1)
+    )
+    results.append(
+        benchmark.Timer(
+            stmt="batched_dot_bmm(x, x)",
+            setup="from __main__ import batched_dot_bmm",
+            globals=tensors,
+            label="Batched dot",
+            sub_label=sub_label,
+            description="bmm",
+        ).blocked_autorange(min_run_time=1)
+    )
 
 compare = benchmark.Compare(results)
 compare.trim_significant_figures()
@@ -598,7 +577,7 @@ compare.print()
 #    :caption: Output
 #
 #     [--------------------- Batched dot ---------------------]
-#                                          |  mul/sum  |   bmm 
+#                                          |  mul/sum  |   bmm
 #     1 threads: ----------------------------------------------
 #           725    x 257                   |      87   |    180
 #           49     x 383                   |      15   |     30
@@ -611,38 +590,40 @@ compare.print()
 #           78     x 5    (discontiguous)  |       9   |     20
 #           187    x 1                     |      12   |     10
 #
-#     Times are in microseconds (us). 
+#     Times are in microseconds (us).
 #
 
 ######################################################################
-# There is a lot of flexibility for defining your own ``fuzzers`` which
-# is great for creating a powerful set of inputs to benchmark. But to
-# make things even simpler, PyTorch benchmark module comes with some
-# built-in ``fuzzers`` for common benchmarking needs. Let's take a look at
-# how we can use one of these built-in ``fuzzers``.
+# 定义自己的 `fuzzers` 有很大的灵活性,这对于创建强大的输入集进行基准测试非常有用。
+# 但为了让事情变得更简单, PyTorch 基准测试模块为常见的基准测试需求提供了一些内置的 `fuzzers`。
+# 让我们看看如何使用其中一个内置的 `fuzzers` 。
 #
 
 from torch.utils.benchmark.op_fuzzers import binary
 
 results = []
 for tensors, tensor_params, params in binary.BinaryOpFuzzer(seed=0).take(10):
-    sub_label=f"{params['k0']:<6} x {params['k1']:<4} {'' if tensor_params['x']['is_contiguous'] else '(discontiguous)'}"
-    results.append(benchmark.Timer(
-        stmt='batched_dot_mul_sum(x, x)',
-        setup='from __main__ import batched_dot_mul_sum',
-        globals=tensors,
-        label='Batched dot',
-        sub_label=sub_label,
-        description='mul/sum',
-    ).blocked_autorange(min_run_time=1))
-    results.append(benchmark.Timer(
-        stmt='batched_dot_bmm(x, x)',
-        setup='from __main__ import batched_dot_bmm',
-        globals=tensors,
-        label='Batched dot',
-        sub_label=sub_label,
-        description='bmm',
-    ).blocked_autorange(min_run_time=1))
+    sub_label = f"{params['k0']:<6} x {params['k1']:<4} {'' if tensor_params['x']['is_contiguous'] else '(discontiguous)'}"
+    results.append(
+        benchmark.Timer(
+            stmt="batched_dot_mul_sum(x, x)",
+            setup="from __main__ import batched_dot_mul_sum",
+            globals=tensors,
+            label="Batched dot",
+            sub_label=sub_label,
+            description="mul/sum",
+        ).blocked_autorange(min_run_time=1)
+    )
+    results.append(
+        benchmark.Timer(
+            stmt="batched_dot_bmm(x, x)",
+            setup="from __main__ import batched_dot_bmm",
+            globals=tensors,
+            label="Batched dot",
+            sub_label=sub_label,
+            description="bmm",
+        ).blocked_autorange(min_run_time=1)
+    )
 
 compare = benchmark.Compare(results)
 compare.trim_significant_figures()
@@ -654,7 +635,7 @@ compare.print()
 #    :caption: Output
 #
 #     [----------------------- Batched dot ------------------------]
-#                                              |  mul/sum  |   bmm  
+#                                              |  mul/sum  |   bmm
 #     1 threads: ---------------------------------------------------
 #           64     x 473  (discontiguous)      |    10000  |   40000
 #           16384  x 12642115 (discontiguous)  |       31  |      78
@@ -666,33 +647,27 @@ compare.print()
 #           488    x 62374                     |    90000  |  100000
 #           240372 x 69                        |    40000  |   16000
 #           40156  x 32   (discontiguous)      |     2670  |    5000
-#    
+#
 #     Times are in microseconds (us).
 #
 
 ######################################################################
-# 8. Collecting instruction counts with ``Callgrind``
+# 8. 使用 `Callgrind` 收集指令计数
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-# One of the challenges of optimizing code is the variation and opacity of
-# wall time. There are many sources of non-determinism, from adaptive clock
-# speeds to resource contention with other processes. Furthermore, end-to-end
-# time gives no insight into where time is being spent, which is really what
-# we're interested in when optimizing code.
+# 优化代码的一个挑战是时间的变化和不透明性。有许多不确定性的来源,
+# 从自适应时钟速度到与其他进程的资源争用。此外,端到端时间并不能揭示时间花费在哪里,
+# 而这正是我们在优化代码时感兴趣的。
 #
-# A complementary approach is to also collect instruction counts. These counts
-# are a proxy metric and do not capture all aspects of performance
-# (e.g. memory or I/O bound tasks), however they do have several useful
-# properties. Instruction counts are reproducible, insensitive to environmental
-# variation, and offer fine grained insight into where a program is spending
-# cycles.
+# 一种补充方法是也收集指令计数。这些计数是一种代理指标,并不能捕获性能的所有方面
+# (例如内存或I/O绑定任务),但它们确实具有一些有用的特性。指令计数是可重复的,
+# 不受环境变化的影响,并且可以提供对程序在哪里花费周期的细粒度洞察。
 #
-# To see the utility of instruction counts, let us look at how we might
-# reduce the overhead of `batched_dot_mul_sum`. The obvious solution is to
-# move it to C++, so we avoid going between Python and C++ multiple times.
+# 为了看到指令计数的实用性,让我们看看如何减少 `batched_dot_mul_sum` 的开销。
+# 显而易见的解决方案是将其移至 C++ ,这样我们就可以避免在 Python 和 C++ 之间多次来回切换。
 #
-# Fortunately, the source is nearly identical. One question that we have to ask
-# in C++ is whether we should take arguments by value or reference.
+# 幸运的是,源代码几乎是相同的。在 C++ 中我们必须问的一个问题是,
+# 我们是通过值还是引用来传递参数。
 #
 
 batched_dot_src = """\
@@ -714,25 +689,26 @@ torch::Tensor batched_dot_mul_sum_v1(
 """
 
 
-# PyTorch makes it easy to test our C++ implementations by providing a utility
-# to JIT compile C++ source into Python extensions:
+# PyTorch 提供一个实用程序来 JIT 编译 C++ 源代码为 Python 扩展,
+# 使得测试我们的 C++ 实现变得很容易:
 import os
+
 from torch.utils import cpp_extension
+
 cpp_lib = cpp_extension.load_inline(
-    name='cpp_lib',
+    name="cpp_lib",
     cpp_sources=batched_dot_src,
-    extra_cflags=['-O3'],
+    extra_cflags=["-O3"],
     extra_include_paths=[
-        # `load_inline` needs to know where to find ``pybind11`` headers.
-        os.path.join(os.getenv('CONDA_PREFIX'), 'include')
+        # `load_inline`需要知道`pybind11`头文件的位置。
+        os.path.join(os.getenv("CONDA_PREFIX"), "include")
     ],
-    functions=['batched_dot_mul_sum_v0', 'batched_dot_mul_sum_v1']
+    functions=["batched_dot_mul_sum_v0", "batched_dot_mul_sum_v1"],
 )
 
-# `load_inline` will create a shared object that is loaded into Python. When we collect
-# instruction counts Timer will create a subprocess, so we need to re-import it. The
-# import process is slightly more complicated for C extensions, but that's all we're
-# doing here.
+# `load_inline` 将创建一个共享对象,并加载到Python中。当我们收集指令计数时,
+# Timer将创建一个子进程,因此我们需要重新导入它。对于C扩展,导入过程略有不同,
+# 但这就是我们在这里所做的。
 module_import_str = f"""\
 # https://stackoverflow.com/questions/67631/how-to-import-a-module-given-the-full-path
 import importlib.util
@@ -741,32 +717,39 @@ cpp_lib = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(cpp_lib)"""
 
 import textwrap
+
+
 def pretty_print(result):
     """Import machinery for ``cpp_lib.so`` can get repetitive to look at."""
-    print(repr(result).replace(textwrap.indent(module_import_str, "  "), "  import cpp_lib"))
+    print(
+        repr(result).replace(
+            textwrap.indent(module_import_str, "  "), "  import cpp_lib"
+        )
+    )
 
 
 t_baseline = benchmark.Timer(
-    stmt='batched_dot_mul_sum(x, x)',
-    setup='''\
+    stmt="batched_dot_mul_sum(x, x)",
+    setup="""\
 from __main__ import batched_dot_mul_sum
-x = torch.randn(2, 2)''')
+x = torch.randn(2, 2)""",
+)
 
 t0 = benchmark.Timer(
-    stmt='cpp_lib.batched_dot_mul_sum_v0(x, x)',
-    setup=f'''\
+    stmt="cpp_lib.batched_dot_mul_sum_v0(x, x)",
+    setup=f"""\
 {module_import_str}
-x = torch.randn(2, 2)''')
+x = torch.randn(2, 2)""",
+)
 
 t1 = benchmark.Timer(
-    stmt='cpp_lib.batched_dot_mul_sum_v1(x, x)',
-    setup=f'''\
+    stmt="cpp_lib.batched_dot_mul_sum_v1(x, x)",
+    setup=f"""\
 {module_import_str}
-x = torch.randn(2, 2)''')
+x = torch.randn(2, 2)""",
+)
 
-# Moving to C++ did indeed reduce overhead, but it's hard to tell which
-# calling convention is more efficient. v1 (call with references) seems to
-# be a bit faster, but it's within measurement error.
+# 转移到 C++ 确实减少了开销,但很难判断哪种调用约定更有效。v1(使用引用调用)似乎稍快一些,但在测量误差范围内。
 pretty_print(t_baseline.blocked_autorange())
 pretty_print(t0.blocked_autorange())
 pretty_print(t1.blocked_autorange())
@@ -780,7 +763,7 @@ pretty_print(t1.blocked_autorange())
 #     setup:
 #       from __main__ import batched_dot_mul_sum
 #       x = torch.randn(2, 2)
-#    
+#
 #       6.92 us
 #       1 measurement, 100000 runs , 1 thread
 #     <torch.utils.benchmark.utils.common.Measurement object at 0x7fb16935d2e8>
@@ -788,7 +771,7 @@ pretty_print(t1.blocked_autorange())
 #     setup:
 #       import cpp_lib
 #       x = torch.randn(2, 2)
-#    
+#
 #       5.29 us
 #       1 measurement, 100000 runs , 1 thread
 #     <torch.utils.benchmark.utils.common.Measurement object at 0x7fb16935d2e8>
@@ -796,31 +779,26 @@ pretty_print(t1.blocked_autorange())
 #     setup:
 #       import cpp_lib
 #       x = torch.randn(2, 2)
-#    
+#
 #       5.22 us
 #       1 measurement, 100000 runs , 1 thread
 #
 
-# Let's use ``Callgrind`` to determine which is better.
+# 让我们使用 ``Callgrind`` 来确定哪种方式更好。
 stats_v0 = t0.collect_callgrind()
 stats_v1 = t1.collect_callgrind()
 
 pretty_print(stats_v0)
 pretty_print(stats_v1)
 
-# `.as_standardized` removes file names and some path prefixes, and makes
-# it easier to read the function symbols.
+# `.as_standardized` 移除了文件名和某些路径前缀,使函数符号更易读。
 stats_v0 = stats_v0.as_standardized()
 stats_v1 = stats_v1.as_standardized()
 
-# `.delta` diffs the instruction counts, and `.denoise` removes several
-# functions in the Python interpreter that are known to have significant
-# jitter.
+# `.delta` 对指令计数进行差分, `.denoise` 则移除了 Python 解释器中已知存在显著抖动的几个函数。
 delta = stats_v1.delta(stats_v0).denoise()
 
-# `.transform` is a convenience API for transforming function names. It is
-# useful for increasing cancelation when ``diff-ing`` instructions, as well as
-# just generally improving readability.
+# `.transform` 是一个转换函数名的便利 API。它在进行 ``diff-ing`` 时很有用,因为可以增加抵消,同时也能提高可读性。
 replacements = (
     ("???:void pybind11", "pybind11"),
     ("batched_dot_mul_sum_v0", "batched_dot_mul_sum_v1"),
@@ -831,13 +809,12 @@ replacements = (
 for before, after in replacements:
     delta = delta.transform(lambda l: l.replace(before, after))
 
-# We can use print options to control how much of the function to display.
+# 我们可以使用打印选项来控制显示函数的多少内容。
 torch.set_printoptions(linewidth=160)
 
-# Once parsed, the instruction counts make clear that passing `a` and `b`
-# by reference is more efficient as it skips some ``c10::TensorImpl`` bookkeeping
-# for the intermediate Tensors, and is also works better with ``pybind11``. This
-# is consistent with our noisy wall time observations.
+# 解析后,指令计数清楚地表明,通过引用传递 `a` 和 `b` 更有效,
+# 因为它跳过了一些 `c10::TensorImpl` 中间张量的簿记操作,并且与 `pybind11` 也更兼容。
+# 这与我们有噪声时间观察结果一致。
 print(delta)
 
 ######################################################################
@@ -879,10 +856,10 @@ print(delta)
 
 
 ######################################################################
-# Learn More
+# 学习更多
 # ----------
 #
-# Take a look at these other recipes to continue your learning:
+# 查看其他教程继续学习:
 #
 # -  `PyTorch Profiler <https://pytorch.org/tutorials/recipes/recipes/profiler.html>`_
 #

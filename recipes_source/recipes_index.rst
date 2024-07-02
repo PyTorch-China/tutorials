@@ -103,7 +103,7 @@ Recipes are bite-sized, actionable examples of how to use specific PyTorch featu
 
 .. customcarditem::
    :header: PyTorch Benchmark
-   :card_description: Learn how to use PyTorch's benchmark module to measure and compare the performance of your code
+   :card_description: 学习如何使用 PyTorch Benchmark 模块来测量和比较代码性能
    :image: ../_static/img/thumbnails/cropped/profiler.png
    :link: ../recipes/recipes/benchmark.html
    :tags: Basics
