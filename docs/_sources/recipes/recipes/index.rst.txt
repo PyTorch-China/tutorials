@@ -414,7 +414,7 @@ PyTorch Recipes
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="Introduction ------------ Benchmarking is an important step in writing code. It helps us valida...">
+    <div class="sphx-glr-thumbcontainer" tooltip="介绍 ------------ 基准测试是编写代码时的一个重要步骤。它帮助我们验证代码是否满足性能预期,比较解决同一问题的不同方法,并防止性能裂化。">
 
 .. only:: html
 
