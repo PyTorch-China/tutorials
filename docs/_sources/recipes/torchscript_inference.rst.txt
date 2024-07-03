@@ -1,13 +1,16 @@
-TorchScript for Deployment
+TorchScript 部署
 ==========================
 
-In this recipe, you will learn:
+在本教程中,您将学习:
 
 -  What TorchScript is
 -  How to export your trained model in TorchScript format
 -  How to load your TorchScript model in C++ and do inference
+- TorchScript 是什么
+- 如何将训练好的模型导出为 TorchScript 格式
+- 如何在 C++ 中加载 TorchScript 模型并进行推理
 
-Requirements
+环境要求
 ------------
 
 -  PyTorch 1.5
@@ -15,31 +18,25 @@ Requirements
 -  libtorch 1.5
 -  C++ compiler
 
-The instructions for installing the three PyTorch components are
-available at `pytorch.org`_. The C++ compiler will depend on your
-platform.
+安装这三个 PyTorch 组件的说明可在 `pytorch.org_` 上找到。C++ 编译器则取决于您的平台。
 
-What is TorchScript?
+
+
+什么是 TorchScript?
 --------------------
 
-**TorchScript** is an intermediate representation of a PyTorch model
-(subclass of ``nn.Module``) that can then be run in a high-performance
-environment like C++. It’s a high-performance subset of Python that is
-meant to be consumed by the **PyTorch JIT Compiler,** which performs
-run-time optimization on your model’s computation. TorchScript is the
-recommended model format for doing scaled inference with PyTorch models.
-For more information, see the PyTorch `Introduction to TorchScript
-tutorial`_, the `Loading A TorchScript Model in C++ tutorial`_, and the
-`full TorchScript documentation`_, all of which are available on
-`pytorch.org`_.
+**TorchScript** 是 PyTorch 模型( ``nn.Module`` 的子类)的中间表示,可以在高性能环境(如 C++)中运行。
+它是 Python 的一个高性能子集,旨在被 **PyTorch JIT 编译器** 使用,后者会对模型的计算进行运行时优化。
+TorchScript 是使用 PyTorch 模型进行大规模推理的推荐模型格式。更多信息,
+请参阅 `pytorch.org_` 上的 `PyTorch TorchScript 入门教程`、 `在 C++ 中加载 TorchScript 模型教程`
+和 `完整的 TorchScript 文档_` 。
 
-How to Export Your Model
+如何导出模型
 ------------------------
 
-As an example, let’s take a pretrained vision model. All of the
-pretrained models in TorchVision are compatible with TorchScript.
+作为示例,让我们使用一个预训练的视觉模型。TorchVision 中的所有预训练模型都与 TorchScript 兼容。
 
-Run the following Python 3 code, either in a script or from the REPL:
+运行以下 Python 3 代码,可以在脚本中或从 REPL 中运行:
 
 .. code:: python3
 
@@ -47,9 +44,9 @@ Run the following Python 3 code, either in a script or from the REPL:
    import torch.nn.functional as F
    import torchvision.models as models
 
-   r18 = models.resnet18(pretrained=True)       # We now have an instance of the pretrained model
-   r18_scripted = torch.jit.script(r18)         # *** This is the TorchScript export
-   dummy_input = torch.rand(1, 3, 224, 224)     # We should run a quick test
+   r18 = models.resnet18(pretrained=True)       # 现在我们有一个预训练模型的实例
+   r18_scripted = torch.jit.script(r18)         # *** 这是 TorchScript 导出
+   dummy_input = torch.rand(1, 3, 224, 224)     # 快速测试一下
 
 Let’s do a sanity check on the equivalence of the two models:
 

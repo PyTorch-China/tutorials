@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Extension points in nn.Module for load_state_dict and tensor subclasses &mdash; PyTorch Tutorials 2.3.0 documentation</title>
+  <title>在 nn.Module 中为 load_state_dict 和张量子类提供扩展点 &mdash; PyTorch Tutorials 2.3.0 documentation</title>
   
 
   
@@ -531,7 +531,7 @@
       </li>
 
         
-      <li>Extension points in <code class="docutils literal notranslate"><span class="pre">nn.Module</span></code> for <code class="docutils literal notranslate"><span class="pre">load_state_dict</span></code> and tensor subclasses</li>
+      <li>在 <code class="docutils literal notranslate"><span class="pre">nn.Module</span></code> 中为 <code class="docutils literal notranslate"><span class="pre">load_state_dict</span></code> 和张量子类提供扩展点</li>
     
     
       <li class="pytorch-breadcrumbs-aside">
@@ -595,76 +595,71 @@
 <p>Click <a class="reference internal" href="#sphx-glr-download-recipes-recipes-swap-tensors-py"><span class="std std-ref">here</span></a>
 to download the full example code</p>
 </div>
-<div class="sphx-glr-example-title section" id="extension-points-in-nn-module-for-load-state-dict-and-tensor-subclasses">
-<span id="sphx-glr-recipes-recipes-swap-tensors-py"></span><h1>Extension points in <code class="docutils literal notranslate"><span class="pre">nn.Module</span></code> for <code class="docutils literal notranslate"><span class="pre">load_state_dict</span></code> and tensor subclasses<a class="headerlink" href="#extension-points-in-nn-module-for-load-state-dict-and-tensor-subclasses" title="Permalink to this heading">¶</a></h1>
-<p><strong>Author:</strong> <a class="reference external" href="https://github.com/mikaylagawarecki">Mikayla Gawarecki</a></p>
-<p>This recipe introduces a new utility function <code class="docutils literal notranslate"><span class="pre">torch.utils.swap_tensors</span></code>
-as well as two new extension points where it has been integrated in
-<code class="docutils literal notranslate"><span class="pre">nn.Module</span></code>:</p>
+<div class="sphx-glr-example-title section" id="nn-module-load-state-dict">
+<span id="sphx-glr-recipes-recipes-swap-tensors-py"></span><h1>在 <code class="docutils literal notranslate"><span class="pre">nn.Module</span></code> 中为 <code class="docutils literal notranslate"><span class="pre">load_state_dict</span></code> 和张量子类提供扩展点<a class="headerlink" href="#nn-module-load-state-dict" title="Permalink to this heading">¶</a></h1>
+<p><strong>作者:</strong> <a class="reference external" href="https://github.com/mikaylagawarecki">Mikayla Gawarecki</a></p>
+<p>本教程介绍了一个新的实用函数 <code class="docutils literal notranslate"><span class="pre">torch.utils.swap_tensors</span></code>，
+以及在 <code class="docutils literal notranslate"><span class="pre">nn.Module</span></code> 中集成它的两个新扩展点:</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">nn.Module.to()</span></code> and related methods</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">nn.Module.to()</span></code> 和相关方法</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">nn.Module.load_state_dict()</span></code></p></li>
 </ul>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>This recipe requires PyTorch 2.3.0 or later.</p>
+<p>本教程需要 PyTorch 2.3.0 或更高版本。</p>
 </div>
 <div class="section" id="torch-utils-swap-tensors">
 <h2><code class="docutils literal notranslate"><span class="pre">torch.utils.swap_tensors</span></code><a class="headerlink" href="#torch-utils-swap-tensors" title="Permalink to this heading">¶</a></h2>
-<p><code class="docutils literal notranslate"><span class="pre">torch.utils.swap_tensors</span></code> (hereafter referred to as <code class="docutils literal notranslate"><span class="pre">swap_tensors</span></code>) is a
-utility function that takes in two Python tensors and swaps them.</p>
+<p><code class="docutils literal notranslate"><span class="pre">torch.utils.swap_tensors``(以下简称为</span> <span class="pre">``swap_tensors</span></code>) 是一个
+实用函数,它接受两个 Python 张量并交换它们。</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
+
 <span class="n">t1</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.arange.html#torch.arange" title="torch.arange" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">arange</span></a><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
 <span class="n">t2</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.arange.html#torch.arange" title="torch.arange" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">arange</span></a><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Before swapping, t1: </span><span class="si">{</span><span class="n">t1</span><span class="si">}</span><span class="s2">, t2: </span><span class="si">{</span><span class="n">t2</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;交换前, t1: </span><span class="si">{</span><span class="n">t1</span><span class="si">}</span><span class="s2">, t2: </span><span class="si">{</span><span class="n">t2</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 <a href="https://pytorch.org/docs/stable/generated/torch.utils.swap_tensors.html#torch.utils.swap_tensors" title="torch.utils.swap_tensors" class="sphx-glr-backref-module-torch-utils sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">swap_tensors</span></a><span class="p">(</span><span class="n">t1</span><span class="p">,</span> <span class="n">t2</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;After swapping, t1: </span><span class="si">{</span><span class="n">t1</span><span class="si">}</span><span class="s2">, t2: </span><span class="si">{</span><span class="n">t2</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;交换后, t1: </span><span class="si">{</span><span class="n">t1</span><span class="si">}</span><span class="s2">, t2: </span><span class="si">{</span><span class="n">t2</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>More specifically, <code class="docutils literal notranslate"><span class="pre">swap_tensors</span></code> swaps the Python <code class="docutils literal notranslate"><span class="pre">__class__</span></code>, <code class="docutils literal notranslate"><span class="pre">__dict__</span></code>
-and <code class="docutils literal notranslate"><span class="pre">__slots__</span></code> of the two tensors, as well as their associated <code class="docutils literal notranslate"><span class="pre">at::Tensor</span></code>.</p>
+<p>更具体地说,``swap_tensors`` 交换了两个张量的 Python <code class="docutils literal notranslate"><span class="pre">__class__</span></code>、<code class="docutils literal notranslate"><span class="pre">__dict__</span></code>
+和 <code class="docutils literal notranslate"><span class="pre">__slots__</span></code>,以及它们相关的 <code class="docutils literal notranslate"><span class="pre">at::Tensor</span></code>。</p>
 </div>
-<div class="section" id="application-to-nn-module">
-<h2>Application to <code class="docutils literal notranslate"><span class="pre">nn.Module</span></code><a class="headerlink" href="#application-to-nn-module" title="Permalink to this heading">¶</a></h2>
-<p>This utility is pertinent to <code class="docutils literal notranslate"><span class="pre">nn.Module</span></code> when a Python object outside
-of the module holds a reference to parameters of the module. If an <code class="docutils literal notranslate"><span class="pre">nn.Module</span></code>
-modifies any of its parameters out of place, the object holding references to
-the parameters will not see the change. A classic example of this is the
-optimizer, which holds a reference to the parameters of the <code class="docutils literal notranslate"><span class="pre">nn.Module</span></code>.
-This leads to a silent correctness issue where the <code class="docutils literal notranslate"><span class="pre">optimizer.step()</span></code> will
-run without error but the weights of the <code class="docutils literal notranslate"><span class="pre">nn.Module</span></code> will not be updated.</p>
+<div class="section" id="nn-module">
+<h2>应用于 <code class="docutils literal notranslate"><span class="pre">nn.Module</span></code><a class="headerlink" href="#nn-module" title="Permalink to this heading">¶</a></h2>
+<p>当 <code class="docutils literal notranslate"><span class="pre">nn.Module</span></code> 之外的 Python 对象持有该模块参数的引用时,此实用函数就很有用。
+如果 <code class="docutils literal notranslate"><span class="pre">nn.Module</span></code> 就地修改了任何参数,持有这些参数引用的对象将无法看到更改。
+一个典型的例子是优化器,它持有 <code class="docutils literal notranslate"><span class="pre">nn.Module</span></code> 参数的引用。
+这会导致一个潜在的正确性问题,即 <code class="docutils literal notranslate"><span class="pre">optimizer.step()</span></code> 会无错误运行,
+但 <code class="docutils literal notranslate"><span class="pre">nn.Module</span></code> 的权重不会被更新。</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mod</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.nn.Linear.html#torch.nn.Linear" title="torch.nn.Linear" class="sphx-glr-backref-module-torch-nn sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span></a><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <span class="n">optimizer</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.optim.SGD.html#torch.optim.SGD" title="torch.optim.SGD" class="sphx-glr-backref-module-torch-optim sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">SGD</span></a><span class="p">(</span><span class="n">mod</span><span class="o">.</span><span class="n">parameters</span><span class="p">())</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;weight in mod: </span><span class="si">{</span><span class="n">mod</span><span class="o">.</span><span class="n">weight</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;weight in optimizer: </span><span class="si">{</span><span class="n">optimizer</span><span class="o">.</span><span class="n">param_groups</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;params&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;mod 中的权重: </span><span class="si">{</span><span class="n">mod</span><span class="o">.</span><span class="n">weight</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;优化器中的权重: </span><span class="si">{</span><span class="n">optimizer</span><span class="o">.</span><span class="n">param_groups</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;params&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 <span class="n">mod</span><span class="o">.</span><span class="n">weight</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Parameter</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">mod</span><span class="o">.</span><span class="n">weight</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;weight in mod: </span><span class="si">{</span><span class="n">mod</span><span class="o">.</span><span class="n">weight</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;weight in optimizer: </span><span class="si">{</span><span class="n">optimizer</span><span class="o">.</span><span class="n">param_groups</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;params&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;mod 中的权重: </span><span class="si">{</span><span class="n">mod</span><span class="o">.</span><span class="n">weight</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;优化器中的权重: </span><span class="si">{</span><span class="n">optimizer</span><span class="o">.</span><span class="n">param_groups</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;params&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
-<div class="section" id="nn-module-to-and-related-methods">
-<h2><code class="docutils literal notranslate"><span class="pre">nn.Module.to()</span></code> and related methods<a class="headerlink" href="#nn-module-to-and-related-methods" title="Permalink to this heading">¶</a></h2>
-<p>This includes methods that change the device of the module (such as <code class="docutils literal notranslate"><span class="pre">nn.Module.cpu()</span></code>),
-methods that change the <code class="docutils literal notranslate"><span class="pre">dtype</span></code> of the module (such as <code class="docutils literal notranslate"><span class="pre">nn.Module.float()</span></code>)
-as well as methods that allow the module to be materialized
-(such as <code class="docutils literal notranslate"><span class="pre">nn.Module.to_empty()</span></code>).</p>
-<p>At first glance, it might be non-intuitive that these methods are able to
-modify the parameters of the module in-place. The existing approach has been
-to use a nasty hack dating back from the first days of PyTorch.</p>
-<p>Notably, the existing approach does not work in these cases:</p>
+<div class="section" id="nn-module-to">
+<h2><code class="docutils literal notranslate"><span class="pre">nn.Module.to()</span></code> 和相关方法<a class="headerlink" href="#nn-module-to" title="Permalink to this heading">¶</a></h2>
+<p>这包括改变模块设备的方法(如 <code class="docutils literal notranslate"><span class="pre">nn.Module.cpu()</span></code>)、
+改变模块 <code class="docutils literal notranslate"><span class="pre">dtype</span></code> 的方法(如 <code class="docutils literal notranslate"><span class="pre">nn.Module.float()</span></code>)、
+以及允许模块实例化的方法(如 <code class="docutils literal notranslate"><span class="pre">nn.Module.to_empty()</span></code>)。</p>
+<p>乍一看,这些方法能够就地修改模块的参数可能看起来不太直观。
+现有的方法是使用一种追溯到 PyTorch 最初几天的丑陋黑客手段。</p>
+<p>值得注意的是,现有方法在以下情况下无法工作:</p>
 <ul class="simple">
-<li><p>when using <code class="docutils literal notranslate"><span class="pre">__torch_dispatch__</span></code> subclasses</p></li>
-<li><p>when <code class="docutils literal notranslate"><span class="pre">param</span></code> and <code class="docutils literal notranslate"><span class="pre">new_param</span></code> do not have the same Python <code class="docutils literal notranslate"><span class="pre">type()</span></code></p></li>
-<li><p>For tensors with special C++ representations (such as sparse tensors and <code class="docutils literal notranslate"><span class="pre">XLA</span></code> tensors)</p></li>
+<li><p>使用 <code class="docutils literal notranslate"><span class="pre">__torch_dispatch__</span></code> 子类</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">param</span></code> 和 <code class="docutils literal notranslate"><span class="pre">new_param</span></code> 的 Python <code class="docutils literal notranslate"><span class="pre">type()</span></code> 不同</p></li>
+<li><p>对于具有特殊 C++ 表示的张量(如稀疏张量和 <code class="docutils literal notranslate"><span class="pre">XLA</span></code> 张量)</p></li>
 </ul>
-<p>In the following part of this recipe, we will define a toy <code class="docutils literal notranslate"><span class="pre">__torch_dispatch__</span></code>
-subclass <code class="docutils literal notranslate"><span class="pre">MyQuantizedLinearWeight</span></code> that represents quantized linear weights.
-This subclass will be used for illustration purposes throughout the rest of
-the tutorial. For brevity, we omit most of the <code class="docutils literal notranslate"><span class="pre">__torch_dispatch__</span></code>
-implementation.</p>
+<p>在本教程的下一部分,我们将定义一个玩具 <code class="docutils literal notranslate"><span class="pre">__torch_dispatch__</span></code> 子类 <code class="docutils literal notranslate"><span class="pre">MyQuantizedLinearWeight</span></code>
+来表示量化的线性权重。在本教程的剩余部分,我们将使用这个子类进行说明。
+为简洁起见,我们省略了大部分 <code class="docutils literal notranslate"><span class="pre">__torch_dispatch__</span></code> 实现。</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">aten</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">aten</span>
+
 
 <span class="k">class</span> <span class="nc">MyQuantizedLinearWeight</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span></a><span class="p">):</span>
     <span class="nd">@staticmethod</span>
@@ -676,7 +671,8 @@ implementation.</p>
             <span class="n">layout</span><span class="o">=</span><span class="n">elem</span><span class="o">.</span><span class="n">layout</span><span class="p">,</span>
             <span class="n">device</span><span class="o">=</span><span class="n">elem</span><span class="o">.</span><span class="n">device</span><span class="p">,</span>
             <span class="n">strides</span><span class="o">=</span><span class="n">elem</span><span class="o">.</span><span class="n">stride</span><span class="p">(),</span>
-            <span class="n">storage_offset</span><span class="o">=</span><span class="n">elem</span><span class="o">.</span><span class="n">storage_offset</span><span class="p">())</span>
+            <span class="n">storage_offset</span><span class="o">=</span><span class="n">elem</span><span class="o">.</span><span class="n">storage_offset</span><span class="p">(),</span>
+        <span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">elem</span><span class="p">:</span> <a href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="torch.Tensor" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span></a><span class="p">,</span> <span class="n">scale</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">elem</span> <span class="o">=</span> <span class="n">elem</span>
@@ -690,40 +686,36 @@ implementation.</p>
         <span class="k">if</span> <span class="n">func</span> <span class="ow">in</span> <span class="p">(</span><span class="n">aten</span><span class="o">.</span><span class="n">detach</span><span class="o">.</span><span class="n">default</span><span class="p">,</span> <span class="n">aten</span><span class="o">.</span><span class="n">_to_copy</span><span class="o">.</span><span class="n">default</span><span class="p">):</span>
             <span class="n">new_elem</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">elem</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
             <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">new_elem</span><span class="p">,</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">scale</span><span class="p">)</span>
-        <span class="c1"># Implementations for certain ops would be added to ``OP_TABLE``.</span>
-        <span class="c1"># We omit this for brevity.</span>
+        <span class="c1"># 某些操作的实现将添加到 ``OP_TABLE``。</span>
+        <span class="c1"># 为简洁起见,我们在此省略。</span>
         <span class="n">OP_TABLE</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">func</span> <span class="ow">in</span> <span class="n">OP_TABLE</span><span class="p">:</span>
-          <span class="k">return</span> <span class="n">OP_TABLE</span><span class="p">[</span><span class="n">func</span><span class="p">](</span><span class="n">func</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unsupported function </span><span class="si">{</span><span class="n">func</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">OP_TABLE</span><span class="p">[</span><span class="n">func</span><span class="p">](</span><span class="n">func</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;不支持的函数 </span><span class="si">{</span><span class="n">func</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Let us create an <code class="docutils literal notranslate"><span class="pre">nn.Linear</span></code> layer of <code class="docutils literal notranslate"><span class="pre">dtype</span></code> <code class="docutils literal notranslate"><span class="pre">torch.float32</span></code> where the weight is
-a <code class="docutils literal notranslate"><span class="pre">MyQuantizedLinearWeight</span></code> and try to convert it to <code class="docutils literal notranslate"><span class="pre">torch.bfloat16</span></code>.
-Observe that the weight’s <code class="docutils literal notranslate"><span class="pre">dtype</span></code> changes as expected. However, the <code class="docutils literal notranslate"><span class="pre">dtype</span></code>
-of the subclass’ payload (<code class="docutils literal notranslate"><span class="pre">elem</span></code>) does not change.</p>
+<p>让我们创建一个 <code class="docutils literal notranslate"><span class="pre">dtype</span></code> 为 <code class="docutils literal notranslate"><span class="pre">torch.float32</span></code> 的 <code class="docutils literal notranslate"><span class="pre">nn.Linear</span></code> 层,
+其权重是 <code class="docutils literal notranslate"><span class="pre">MyQuantizedLinearWeight</span></code>。然后尝试将其转换为 <code class="docutils literal notranslate"><span class="pre">torch.bfloat16</span></code>。
+观察到权重的 <code class="docutils literal notranslate"><span class="pre">dtype</span></code> 如预期般改变了。但是子类的有效载荷(<code class="docutils literal notranslate"><span class="pre">elem</span></code>)的 <code class="docutils literal notranslate"><span class="pre">dtype</span></code> 没有改变。</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">m</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.nn.Linear.html#torch.nn.Linear" title="torch.nn.Linear" class="sphx-glr-backref-module-torch-nn sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span></a><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
 <span class="n">m</span><span class="o">.</span><span class="n">weight</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Parameter</span><span class="p">(</span><span class="n">MyQuantizedLinearWeight</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">weight</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">))</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Before: id(m.weight)=</span><span class="si">{</span><span class="nb">id</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">weight</span><span class="p">)</span><span class="si">}</span><span class="s2">, id(m.bias)=</span><span class="si">{</span><span class="nb">id</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">bias</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;之前: id(m.weight)=</span><span class="si">{</span><span class="nb">id</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">weight</span><span class="p">)</span><span class="si">}</span><span class="s2">, id(m.bias)=</span><span class="si">{</span><span class="nb">id</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">bias</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 <span class="n">m</span><span class="o">.</span><span class="n">bfloat16</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;After: id(m.weight)=</span><span class="si">{</span><span class="nb">id</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">weight</span><span class="p">)</span><span class="si">}</span><span class="s2">, id(m.bias)=</span><span class="si">{</span><span class="nb">id</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">bias</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;之后: id(m.weight)=</span><span class="si">{</span><span class="nb">id</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">weight</span><span class="p">)</span><span class="si">}</span><span class="s2">, id(m.bias)=</span><span class="si">{</span><span class="nb">id</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">bias</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;m.weight.dtype: </span><span class="si">{</span><span class="n">m</span><span class="o">.</span><span class="n">weight</span><span class="o">.</span><span class="n">dtype</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;m.weight.elem.dtype: </span><span class="si">{</span><span class="n">m</span><span class="o">.</span><span class="n">weight</span><span class="o">.</span><span class="n">elem</span><span class="o">.</span><span class="n">dtype</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;m.bias.dtype: </span><span class="si">{</span><span class="n">m</span><span class="o">.</span><span class="n">bias</span><span class="o">.</span><span class="n">dtype</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>To this end, we introduce a global config
-<code class="docutils literal notranslate"><span class="pre">torch.__future__.set_swap_module_params_on_conversion</span></code> that will use
-<code class="docutils literal notranslate"><span class="pre">swap_tensors</span></code> to swap the parameters of the module while preserving
-references in place of <code class="docutils literal notranslate"><span class="pre">.data</span></code> setting. When this config is set,
-<code class="docutils literal notranslate"><span class="pre">swap_tensors</span></code> will be used during the conversion, which ensures that
-the <code class="docutils literal notranslate"><span class="pre">dtype</span></code> of the payload is properly converted.</p>
+<p>为此,我们引入了一个全局配置 <code class="docutils literal notranslate"><span class="pre">torch.__future__.set_swap_module_params_on_conversion</span></code>
+它将使用 <code class="docutils literal notranslate"><span class="pre">swap_tensors</span></code> 交换模块的参数,同时保留 <code class="docutils literal notranslate"><span class="pre">.data</span></code> 设置中的引用。
+设置此配置后,在转换期间将使用 <code class="docutils literal notranslate"><span class="pre">swap_tensors</span></code>,从而确保有效载荷的 <code class="docutils literal notranslate"><span class="pre">dtype</span></code> 正确转换。</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://pytorch.org/docs/stable/future_mod.html#torch.__future__.set_swap_module_params_on_conversion" title="torch.__future__.set_swap_module_params_on_conversion" class="sphx-glr-backref-module-torch-__future__ sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">__future__</span><span class="o">.</span><span class="n">set_swap_module_params_on_conversion</span></a><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
 <span class="n">m</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.nn.Linear.html#torch.nn.Linear" title="torch.nn.Linear" class="sphx-glr-backref-module-torch-nn sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span></a><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
 <span class="n">m</span><span class="o">.</span><span class="n">weight</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Parameter</span><span class="p">(</span><span class="n">MyQuantizedLinearWeight</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">weight</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">))</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Before: id(m.weight)=</span><span class="si">{</span><span class="nb">id</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">weight</span><span class="p">)</span><span class="si">}</span><span class="s2">, id(m.bias)=</span><span class="si">{</span><span class="nb">id</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">bias</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;之前: id(m.weight)=</span><span class="si">{</span><span class="nb">id</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">weight</span><span class="p">)</span><span class="si">}</span><span class="s2">, id(m.bias)=</span><span class="si">{</span><span class="nb">id</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">bias</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 <span class="n">m</span><span class="o">.</span><span class="n">bfloat16</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;After: id(m.weight)=</span><span class="si">{</span><span class="nb">id</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">weight</span><span class="p">)</span><span class="si">}</span><span class="s2">, id(m.bias)=</span><span class="si">{</span><span class="nb">id</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">bias</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;之后: id(m.weight)=</span><span class="si">{</span><span class="nb">id</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">weight</span><span class="p">)</span><span class="si">}</span><span class="s2">, id(m.bias)=</span><span class="si">{</span><span class="nb">id</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">bias</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;m.weight.dtype: </span><span class="si">{</span><span class="n">m</span><span class="o">.</span><span class="n">weight</span><span class="o">.</span><span class="n">dtype</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;m.weight.elem.dtype: </span><span class="si">{</span><span class="n">m</span><span class="o">.</span><span class="n">weight</span><span class="o">.</span><span class="n">elem</span><span class="o">.</span><span class="n">dtype</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;m.bias.dtype: </span><span class="si">{</span><span class="n">m</span><span class="o">.</span><span class="n">bias</span><span class="o">.</span><span class="n">dtype</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -731,39 +723,29 @@ the <code class="docutils literal notranslate"><span class="pre">dtype</span></c
 </pre></div>
 </div>
 </div>
-<div class="section" id="nn-module-load-state-dict">
-<h2><code class="docutils literal notranslate"><span class="pre">nn.Module.load_state_dict()</span></code><a class="headerlink" href="#nn-module-load-state-dict" title="Permalink to this heading">¶</a></h2>
-<p>Depending on the value of the <code class="docutils literal notranslate"><span class="pre">assign</span></code> keyword argument passed
-to <code class="docutils literal notranslate"><span class="pre">load_state_dict()</span></code>, there are two ways to load the <code class="docutils literal notranslate"><span class="pre">state_dict</span></code>:</p>
+<div class="section" id="id1">
+<h2><code class="docutils literal notranslate"><span class="pre">nn.Module.load_state_dict()</span></code><a class="headerlink" href="#id1" title="Permalink to this heading">¶</a></h2>
+<p>根据传递给 <code class="docutils literal notranslate"><span class="pre">load_state_dict()</span></code> 的 <code class="docutils literal notranslate"><span class="pre">assign</span></code> 关键字参数的值,
+有两种方式加载 <code class="docutils literal notranslate"><span class="pre">state_dict</span></code>：</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">assign=False</span></code>: preserves the properties of <code class="docutils literal notranslate"><span class="pre">module.param</span></code> and only takes the values
-from <code class="docutils literal notranslate"><span class="pre">state_dict['param_name']</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">assign=True</span></code>: preserves the properties and values of <code class="docutils literal notranslate"><span class="pre">state_dict['param_name']</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">assign=False</span></code>: 保留 <code class="docutils literal notranslate"><span class="pre">module.param</span></code> 的属性,只从 <code class="docutils literal notranslate"><span class="pre">state_dict['param_name']</span></code> 中获取值</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">assign=True</span></code>: 保留 <code class="docutils literal notranslate"><span class="pre">state_dict['param_name']</span></code> 的属性和值。</p></li>
 </ul>
-<p>Previously, these were implemented with in-place <code class="docutils literal notranslate"><span class="pre">copy_</span></code> and <code class="docutils literal notranslate"><span class="pre">__setattr__</span></code> respectively.
-With the existing implementation, each approach had its own limitations – <code class="docutils literal notranslate"><span class="pre">assign=False</span></code>
-imposes the constraint that the type of the parameter in the <code class="docutils literal notranslate"><span class="pre">state_dict</span></code> must
-be the same as the type of the parameter in the module while <code class="docutils literal notranslate"><span class="pre">assign=True</span></code> imposes
-the constraint that anything that holds references to the module’s parameters must
-be initialized after <code class="docutils literal notranslate"><span class="pre">nn.Module.load_state_dict()</span></code>.</p>
-<p>Now, we address both constraints by adding a <code class="docutils literal notranslate"><span class="pre">swap_tensors</span></code> path to <code class="docutils literal notranslate"><span class="pre">load_state_dict()</span></code>
-and introducing a new extension point <code class="docutils literal notranslate"><span class="pre">torch.Tensor.module_load(self,</span> <span class="pre">other,</span> <span class="pre">assign=False)</span></code>.
-When the <code class="docutils literal notranslate"><span class="pre">swap_tensors</span></code> path is enabled via the <code class="docutils literal notranslate"><span class="pre">__future__</span></code> mentioned above,
-we can use a <code class="docutils literal notranslate"><span class="pre">__torch_function__</span></code> handler for <code class="docutils literal notranslate"><span class="pre">module_load</span></code> to apply a
-custom transformation to the value in the <code class="docutils literal notranslate"><span class="pre">state_dict</span></code>. The result of this
-transformation will be swapped with the parameter in the module.</p>
-<p>In the following example, we will use the <code class="docutils literal notranslate"><span class="pre">MyQuantizedLinearWeight</span></code> subclass
-defined above to illustrate how we can use these features to apply a
-custom quantization scheme to the weights of a linear layer when
-loading the <code class="docutils literal notranslate"><span class="pre">state_dict</span></code>.</p>
-<p>Recall that the <code class="docutils literal notranslate"><span class="pre">__torch_function__</span></code> handler for <code class="docutils literal notranslate"><span class="pre">module_load</span></code> will be
-invoked if either <code class="docutils literal notranslate"><span class="pre">self</span></code> or <code class="docutils literal notranslate"><span class="pre">other</span></code> (in this case <code class="docutils literal notranslate"><span class="pre">param</span></code> or
-<code class="docutils literal notranslate"><span class="pre">state_dict[param_key]</span></code>) are <code class="docutils literal notranslate"><span class="pre">MyQuantizedLinearWeight</span></code> subclasses.</p>
-<p>Assume that we expect the <code class="docutils literal notranslate"><span class="pre">state_dict</span></code> to contain plain tensors and the
-module to contain <code class="docutils literal notranslate"><span class="pre">MyQuantizedLinearWeight</span></code> parameters where we want the
-tensors in the <code class="docutils literal notranslate"><span class="pre">state_dict</span></code> to be transformed into the subclass. Then we
-can define a <code class="docutils literal notranslate"><span class="pre">__torch_function__</span></code> handler for <code class="docutils literal notranslate"><span class="pre">torch.Tensor.module_load</span></code>
-as such:</p>
+<p>之前,这些分别是通过就地 <code class="docutils literal notranslate"><span class="pre">copy_</span></code> 和 <code class="docutils literal notranslate"><span class="pre">__setattr__</span></code> 实现的。
+在现有实现中,每种方法都有自己的限制 - <code class="docutils literal notranslate"><span class="pre">assign=False</span></code> 要求 <code class="docutils literal notranslate"><span class="pre">state_dict</span></code> 中的参数类型
+必须与模块中的参数类型相同,而 <code class="docutils literal notranslate"><span class="pre">assign=True</span></code> 要求在 <code class="docutils literal notranslate"><span class="pre">nn.Module.load_state_dict()</span></code> 之后
+初始化任何持有模块参数引用的对象。</p>
+<p>现在,我们通过在 <code class="docutils literal notranslate"><span class="pre">load_state_dict()</span></code> 中添加 <code class="docutils literal notranslate"><span class="pre">swap_tensors</span></code> 路径并引入新的扩展点
+<code class="docutils literal notranslate"><span class="pre">torch.Tensor.module_load(self,</span> <span class="pre">other,</span> <span class="pre">assign=False)</span></code> 来解决这两个限制。
+当启用上述 <code class="docutils literal notranslate"><span class="pre">__future__</span></code> 时,我们可以使用 <code class="docutils literal notranslate"><span class="pre">module_load</span></code> 的 <code class="docutils literal notranslate"><span class="pre">__torch_function__</span></code> 处理程序
+对 <code class="docutils literal notranslate"><span class="pre">state_dict</span></code> 中的值应用自定义转换。转换的结果将与模块中的参数交换。</p>
+<p>在下面的示例中,我们将使用上面定义的 <code class="docutils literal notranslate"><span class="pre">MyQuantizedLinearWeight</span></code> 子类
+来说明如何使用这些功能在加载 <code class="docutils literal notranslate"><span class="pre">state_dict</span></code> 时对线性层的权重应用自定义量化方案。</p>
+<p>回顾一下,如果 <code class="docutils literal notranslate"><span class="pre">self</span></code> 或 <code class="docutils literal notranslate"><span class="pre">other``(在本例中是</span> <span class="pre">``param</span></code> 或 <code class="docutils literal notranslate"><span class="pre">state_dict[param_key]</span></code>)
+是 <code class="docutils literal notranslate"><span class="pre">MyQuantizedLinearWeight</span></code> 子类,则会调用 <code class="docutils literal notranslate"><span class="pre">module_load</span></code> 的 <code class="docutils literal notranslate"><span class="pre">__torch_function__</span></code> 处理程序。</p>
+<p>假设我们期望 <code class="docutils literal notranslate"><span class="pre">state_dict</span></code> 包含普通张量,而模块包含 <code class="docutils literal notranslate"><span class="pre">MyQuantizedLinearWeight</span></code> 参数,
+我们希望将 <code class="docutils literal notranslate"><span class="pre">state_dict</span></code> 中的张量转换为子类。那么我们可以为 <code class="docutils literal notranslate"><span class="pre">torch.Tensor.module_load</span></code> 定义
+一个 <code class="docutils literal notranslate"><span class="pre">__torch_function__</span></code> 处理程序,如下所示:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@classmethod</span>
 <span class="k">def</span> <span class="nf">custom_torch_function</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="n">types</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(),</span> <span class="n">kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{}</span> <span class="k">if</span> <span class="n">kwargs</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">kwargs</span>
@@ -774,52 +756,48 @@ as such:</p>
         <span class="k">return</span> <span class="n">MyQuantizedLinearWeight</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">dest</span><span class="o">.</span><span class="n">scale</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">_C</span><span class="o">.</span><span class="n">DisableTorchFunctionSubclass</span><span class="p">():</span>
-                <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
 
 <span class="n">MyQuantizedLinearWeight</span><span class="o">.</span><span class="n">__torch_function__</span> <span class="o">=</span> <span class="n">custom_torch_function</span>
 </pre></div>
 </div>
-<p>First, let us create a skeleton of a model on the meta device to avoid
-materializing storages. We convert all weights in the modules to
-<code class="docutils literal notranslate"><span class="pre">MyQuantizedLinearWeight</span></code> subclasses while leaving biases intact.</p>
+<p>首先,让我们在 meta 设备上创建一个模型框架,以避免实例化存储。
+我们将模块中的所有权重转换为 <code class="docutils literal notranslate"><span class="pre">MyQuantizedLinearWeight</span></code> 子类,同时保留偏置不变。</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">fn</span><span class="p">(</span><span class="n">m</span><span class="p">):</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <a href="https://pytorch.org/docs/stable/generated/torch.nn.Linear.html#torch.nn.Linear" title="torch.nn.Linear" class="sphx-glr-backref-module-torch-nn sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span></a><span class="p">):</span>
         <span class="n">requires_grad</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">weight</span><span class="o">.</span><span class="n">requires_grad</span>
         <span class="n">m</span><span class="o">.</span><span class="n">weight</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Parameter</span><span class="p">(</span>
-                    <span class="n">MyQuantizedLinearWeight</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">weight</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">),</span> <span class="n">requires_grad</span><span class="o">=</span><span class="n">requires_grad</span>
-                   <span class="p">)</span>
+            <span class="n">MyQuantizedLinearWeight</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">weight</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">),</span> <span class="n">requires_grad</span><span class="o">=</span><span class="n">requires_grad</span>
+        <span class="p">)</span>
+
 
 <span class="k">with</span> <a href="https://pytorch.org/docs/stable/tensor_attributes.html#torch.device" title="torch.device" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">torch</span><span class="o">.</span><span class="n">device</span></a><span class="p">(</span><span class="s2">&quot;meta&quot;</span><span class="p">):</span>
     <span class="n">m</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.nn.Linear.html#torch.nn.Linear" title="torch.nn.Linear" class="sphx-glr-backref-module-torch-nn sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span></a><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
     <span class="n">m</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>We can then load the <code class="docutils literal notranslate"><span class="pre">state_dict</span></code>. Observe that we use <code class="docutils literal notranslate"><span class="pre">assign=True</span></code> because
-for biases, we want to preserve the properties of the tensor in the <code class="docutils literal notranslate"><span class="pre">state_dict</span></code>
-(for example, we do not want the bias to be on the <code class="docutils literal notranslate"><span class="pre">meta</span></code> device after loading).</p>
+<p>然后我们可以加载 <code class="docutils literal notranslate"><span class="pre">state_dict</span></code>。注意我们使用 <code class="docutils literal notranslate"><span class="pre">assign=True</span></code>，因为对于偏置,
+我们希望保留 <code class="docutils literal notranslate"><span class="pre">state_dict</span></code> 中张量的属性(例如,我们不希望偏置在加载后位于 <code class="docutils literal notranslate"><span class="pre">meta</span></code> 设备上)。</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://pytorch.org/docs/stable/future_mod.html#torch.__future__.set_swap_module_params_on_conversion" title="torch.__future__.set_swap_module_params_on_conversion" class="sphx-glr-backref-module-torch-__future__ sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">__future__</span><span class="o">.</span><span class="n">set_swap_module_params_on_conversion</span></a><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Before: id(weight)=</span><span class="si">{</span><span class="nb">id</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">weight</span><span class="p">)</span><span class="si">}</span><span class="s2">, id(bias)=</span><span class="si">{</span><span class="nb">id</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">bias</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;m.state_dict() before load_state_dict():</span><span class="se">\n</span><span class="s2"> </span><span class="si">{</span><span class="n">m</span><span class="o">.</span><span class="n">state_dict</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;之前: id(weight)=</span><span class="si">{</span><span class="nb">id</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">weight</span><span class="p">)</span><span class="si">}</span><span class="s2">, id(bias)=</span><span class="si">{</span><span class="nb">id</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">bias</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;load_state_dict() 之前的 m.state_dict():</span><span class="se">\n</span><span class="s2"> </span><span class="si">{</span><span class="n">m</span><span class="o">.</span><span class="n">state_dict</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 <span class="n">state_dict</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.nn.Linear.html#torch.nn.Linear" title="torch.nn.Linear" class="sphx-glr-backref-module-torch-nn sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span></a><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">state_dict</span><span class="p">()</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;state_dict:</span><span class="se">\n</span><span class="s2"> </span><span class="si">{</span><span class="n">state_dict</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 <span class="n">m</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">state_dict</span><span class="p">,</span> <span class="n">assign</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;After: id(weight)=</span><span class="si">{</span><span class="nb">id</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">weight</span><span class="p">)</span><span class="si">}</span><span class="s2">, id(bias)=</span><span class="si">{</span><span class="nb">id</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">bias</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;m.state_dict() after load_state_dict():</span><span class="se">\n</span><span class="s2"> </span><span class="si">{</span><span class="n">m</span><span class="o">.</span><span class="n">state_dict</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;之后: id(weight)=</span><span class="si">{</span><span class="nb">id</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">weight</span><span class="p">)</span><span class="si">}</span><span class="s2">, id(bias)=</span><span class="si">{</span><span class="nb">id</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">bias</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;load_state_dict() 之后的 m.state_dict():</span><span class="se">\n</span><span class="s2"> </span><span class="si">{</span><span class="n">m</span><span class="o">.</span><span class="n">state_dict</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>The above is a toy example of how we can use the new extension point in
-<code class="docutils literal notranslate"><span class="pre">nn.Module.load_state_dict()</span></code>. One can also imagine alternate scenarios such
-as when we have tensor subclasses in the <code class="docutils literal notranslate"><span class="pre">state_dict</span></code> and plain <code class="docutils literal notranslate"><span class="pre">nn.Parameters</span></code>/
-tensors in the module or when both are tensor subclasses. Based on the use
-case, we can define the <code class="docutils literal notranslate"><span class="pre">__torch_function__</span></code> handler for <code class="docutils literal notranslate"><span class="pre">module_load</span></code>
-to apply the transforms as needed.</p>
+<p>上面是一个如何使用 <code class="docutils literal notranslate"><span class="pre">nn.Module.load_state_dict()</span></code> 中的新扩展点的玩具示例。
+我们还可以想象其他场景,例如当 <code class="docutils literal notranslate"><span class="pre">state_dict</span></code> 中有张量子类而模块中有普通 <code class="docutils literal notranslate"><span class="pre">nn.Parameters</span></code>/张量时,
+或者两者都是张量子类时。根据使用场景,我们可以定义 <code class="docutils literal notranslate"><span class="pre">module_load</span></code> 的 <code class="docutils literal notranslate"><span class="pre">__torch_function__</span></code> 处理程序
+来应用所需的转换。</p>
 </div>
-<div class="section" id="conclusion">
-<h2>Conclusion<a class="headerlink" href="#conclusion" title="Permalink to this heading">¶</a></h2>
-<p>In this recipe, we learned about <code class="docutils literal notranslate"><span class="pre">swap_tensors</span></code>, the importance
-of preserving references for parameters in <code class="docutils literal notranslate"><span class="pre">nn.Module</span></code> as well as how to
-use the two new extension points that are gated by
-<code class="docutils literal notranslate"><span class="pre">torch.__future__.set_swap_module_params_on_conversion</span></code>.</p>
+<div class="section" id="id2">
+<h2>结论<a class="headerlink" href="#id2" title="Permalink to this heading">¶</a></h2>
+<p>在本教程中,我们学习了 <code class="docutils literal notranslate"><span class="pre">swap_tensors</span></code>、在 <code class="docutils literal notranslate"><span class="pre">nn.Module</span></code> 中保留参数引用的重要性,
+以及如何使用由 <code class="docutils literal notranslate"><span class="pre">torch.__future__.set_swap_module_params_on_conversion</span></code> 控制的两个新扩展点。</p>
 <p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.000 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-recipes-recipes-swap-tensors-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
@@ -885,12 +863,12 @@ if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.i
           <div class="pytorch-right-menu" id="pytorch-right-menu">
             <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
               <ul>
-<li><a class="reference internal" href="#">Extension points in <code class="docutils literal notranslate"><span class="pre">nn.Module</span></code> for <code class="docutils literal notranslate"><span class="pre">load_state_dict</span></code> and tensor subclasses</a><ul>
+<li><a class="reference internal" href="#">在 <code class="docutils literal notranslate"><span class="pre">nn.Module</span></code> 中为 <code class="docutils literal notranslate"><span class="pre">load_state_dict</span></code> 和张量子类提供扩展点</a><ul>
 <li><a class="reference internal" href="#torch-utils-swap-tensors"><code class="docutils literal notranslate"><span class="pre">torch.utils.swap_tensors</span></code></a></li>
-<li><a class="reference internal" href="#application-to-nn-module">Application to <code class="docutils literal notranslate"><span class="pre">nn.Module</span></code></a></li>
-<li><a class="reference internal" href="#nn-module-to-and-related-methods"><code class="docutils literal notranslate"><span class="pre">nn.Module.to()</span></code> and related methods</a></li>
-<li><a class="reference internal" href="#nn-module-load-state-dict"><code class="docutils literal notranslate"><span class="pre">nn.Module.load_state_dict()</span></code></a></li>
-<li><a class="reference internal" href="#conclusion">Conclusion</a></li>
+<li><a class="reference internal" href="#nn-module">应用于 <code class="docutils literal notranslate"><span class="pre">nn.Module</span></code></a></li>
+<li><a class="reference internal" href="#nn-module-to"><code class="docutils literal notranslate"><span class="pre">nn.Module.to()</span></code> 和相关方法</a></li>
+<li><a class="reference internal" href="#id1"><code class="docutils literal notranslate"><span class="pre">nn.Module.load_state_dict()</span></code></a></li>
+<li><a class="reference internal" href="#id2">结论</a></li>
 </ul>
 </li>
 </ul>

@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>How to use TensorBoard with PyTorch &mdash; PyTorch Tutorials 2.3.0 documentation</title>
+  <title>如何在PyTorch中使用TensorBoard &mdash; PyTorch Tutorials 2.3.0 documentation</title>
   
 
   
@@ -42,8 +42,8 @@
   <link rel="stylesheet" href="../../_static/css/custom2.css" type="text/css" />
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Dynamic Quantization" href="dynamic_quantization.html" />
-    <link rel="prev" title="Model Interpretability using Captum" href="Captum_Recipe.html" />
+    <link rel="next" title="动态量化" href="dynamic_quantization.html" />
+    <link rel="prev" title="使用 Captum 进行模型可解释性" href="Captum_Recipe.html" />
   <!-- Google Tag Manager -->
     <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
     new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
@@ -535,7 +535,7 @@
         
           <li><a href="../recipes_index.html">PyTorch 示例</a> &gt;</li>
         
-      <li>How to use TensorBoard with PyTorch</li>
+      <li>如何在PyTorch中使用TensorBoard</li>
     
     
       <li class="pytorch-breadcrumbs-aside">
@@ -599,52 +599,52 @@
 <p>Click <a class="reference internal" href="#sphx-glr-download-recipes-recipes-tensorboard-with-pytorch-py"><span class="std std-ref">here</span></a>
 to download the full example code</p>
 </div>
-<div class="sphx-glr-example-title section" id="how-to-use-tensorboard-with-pytorch">
-<span id="sphx-glr-recipes-recipes-tensorboard-with-pytorch-py"></span><h1>How to use TensorBoard with PyTorch<a class="headerlink" href="#how-to-use-tensorboard-with-pytorch" title="Permalink to this heading">¶</a></h1>
-<p>TensorBoard is a visualization toolkit for machine learning experimentation.
-TensorBoard allows tracking and visualizing metrics such as loss and accuracy,
-visualizing the model graph, viewing histograms, displaying images and much more.
-In this tutorial we are going to cover TensorBoard installation,
-basic usage with PyTorch, and how to visualize data you logged in TensorBoard UI.</p>
-<div class="section" id="installation">
-<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this heading">¶</a></h2>
-<p>PyTorch should be installed to log models and metrics into TensorBoard log
-directory. The following command will install PyTorch 1.4+ via
-Anaconda (recommended):</p>
+<div class="sphx-glr-example-title section" id="pytorchtensorboard">
+<span id="sphx-glr-recipes-recipes-tensorboard-with-pytorch-py"></span><h1>如何在PyTorch中使用TensorBoard<a class="headerlink" href="#pytorchtensorboard" title="Permalink to this heading">¶</a></h1>
+<p>TensorBoard是一个用于机器学习实验的可视化工具包。
+TensorBoard允许跟踪和可视化指标,如损失和准确率,
+可视化模型图,查看直方图,显示图像等。
+在本教程中,我们将介绍TensorBoard的安装、
+在PyTorch中的基本用法,以及如何在TensorBoard UI中可视化您记录的数据。</p>
+<div class="section" id="id1">
+<h2>安装<a class="headerlink" href="#id1" title="Permalink to this heading">¶</a></h2>
+<p>应安装PyTorch以将模型和指标记录到TensorBoard日志
+目录。以下命令将通过Anaconda(推荐)安装PyTorch 1.4+:</p>
 <div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>conda<span class="w"> </span>install<span class="w"> </span>pytorch<span class="w"> </span>torchvision<span class="w"> </span>-c<span class="w"> </span>pytorch
 </pre></div>
 </div>
-<p>or pip</p>
+<p>或者使用pip:</p>
 <div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>torch<span class="w"> </span>torchvision
 </pre></div>
 </div>
 </div>
-<div class="section" id="using-tensorboard-in-pytorch">
-<h2>Using TensorBoard in PyTorch<a class="headerlink" href="#using-tensorboard-in-pytorch" title="Permalink to this heading">¶</a></h2>
-<p>Let’s now try using TensorBoard with PyTorch! Before logging anything,
-we need to create a <code class="docutils literal notranslate"><span class="pre">SummaryWriter</span></code> instance.</p>
+<div class="section" id="id2">
+<h2>在PyTorch中使用TensorBoard<a class="headerlink" href="#id2" title="Permalink to this heading">¶</a></h2>
+<p>现在让我们尝试在PyTorch中使用TensorBoard!在记录任何内容之前,
+我们需要创建一个 <code class="docutils literal notranslate"><span class="pre">SummaryWriter</span></code> 实例。</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">from</span> <span class="nn">torch.utils.tensorboard</span> <span class="kn">import</span> <span class="n">SummaryWriter</span>
+
 <span class="n">writer</span> <span class="o">=</span> <span class="n">SummaryWriter</span><span class="p">()</span>
 </pre></div>
 </div>
-<p>Writer will output to <code class="docutils literal notranslate"><span class="pre">./runs/</span></code> directory by default.</p>
+<p>写入器默认将输出到 <code class="docutils literal notranslate"><span class="pre">./runs/</span></code> 目录。</p>
 </div>
-<div class="section" id="log-scalars">
-<h2>Log scalars<a class="headerlink" href="#log-scalars" title="Permalink to this heading">¶</a></h2>
-<p>In machine learning, it’s important to understand key metrics such as
-loss and how they change during training. Scalar helps to save
-the loss value of each training step, or the accuracy after each epoch.</p>
-<p>To log a scalar value, use
-<code class="docutils literal notranslate"><span class="pre">add_scalar(tag,</span> <span class="pre">scalar_value,</span> <span class="pre">global_step=None,</span> <span class="pre">walltime=None)</span></code>.
-For example, lets create a simple linear regression training, and
-log loss value using <code class="docutils literal notranslate"><span class="pre">add_scalar</span></code></p>
+<div class="section" id="id3">
+<h2>记录标量<a class="headerlink" href="#id3" title="Permalink to this heading">¶</a></h2>
+<p>在机器学习中,了解关键指标(如损失)及其在训练期间的变化非常重要。
+标量可用于保存每个训练步骤的损失值或每个epoch的准确率。</p>
+<p>要记录标量值,请使用
+<code class="docutils literal notranslate"><span class="pre">add_scalar(tag,</span> <span class="pre">scalar_value,</span> <span class="pre">global_step=None,</span> <span class="pre">walltime=None)</span></code>。
+例如,让我们创建一个简单的线性回归训练,并
+使用 <code class="docutils literal notranslate"><span class="pre">add_scalar</span></code> 记录损失值</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">x</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.arange.html#torch.arange" title="torch.arange" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">arange</span></a><span class="p">(</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">)</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 <span class="n">y</span> <span class="o">=</span> <span class="o">-</span><span class="mi">5</span> <span class="o">*</span> <span class="n">x</span> <span class="o">+</span> <span class="mf">0.1</span> <span class="o">*</span> <a href="https://pytorch.org/docs/stable/generated/torch.randn.html#torch.randn" title="torch.randn" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">randn</span></a><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">size</span><span class="p">())</span>
 
 <span class="n">model</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.nn.Linear.html#torch.nn.Linear" title="torch.nn.Linear" class="sphx-glr-backref-module-torch-nn sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span></a><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 <span class="n">criterion</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.nn.MSELoss.html#torch.nn.MSELoss" title="torch.nn.MSELoss" class="sphx-glr-backref-module-torch-nn sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">MSELoss</span></a><span class="p">()</span>
-<span class="n">optimizer</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.optim.SGD.html#torch.optim.SGD" title="torch.optim.SGD" class="sphx-glr-backref-module-torch-optim sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">SGD</span></a><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">)</span>
+<span class="n">optimizer</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.optim.SGD.html#torch.optim.SGD" title="torch.optim.SGD" class="sphx-glr-backref-module-torch-optim sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">SGD</span></a><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+
 
 <span class="k">def</span> <span class="nf">train_model</span><span class="p">(</span><span class="nb">iter</span><span class="p">):</span>
     <span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">iter</span><span class="p">):</span>
@@ -655,44 +655,43 @@ log loss value using <code class="docutils literal notranslate"><span class="pre
         <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
         <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
 
+
 <span class="n">train_model</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
 <span class="n">writer</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
 </pre></div>
 </div>
-<p>Call <code class="docutils literal notranslate"><span class="pre">flush()</span></code> method to make sure that all pending events
-have been written to disk.</p>
-<p>See <a class="reference external" href="https://pytorch.org/docs/stable/tensorboard.html">torch.utils.tensorboard tutorials</a>
-to find more TensorBoard visualization types you can log.</p>
-<p>If you do not need the summary writer anymore, call <code class="docutils literal notranslate"><span class="pre">close()</span></code> method.</p>
+<p>调用 <code class="docutils literal notranslate"><span class="pre">flush()</span></code> 方法以确保所有待处理事件
+已写入磁盘。</p>
+<p>请参阅 <a class="reference external" href="https://pytorch.org/docs/stable/tensorboard.html">torch.utils.tensorboard 教程</a>
+以了解您可以记录的更多TensorBoard可视化类型。</p>
+<p>如果您不再需要摘要写入器,请调用 <code class="docutils literal notranslate"><span class="pre">close()</span></code> 方法。</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">writer</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
-<div class="section" id="run-tensorboard">
-<h2>Run TensorBoard<a class="headerlink" href="#run-tensorboard" title="Permalink to this heading">¶</a></h2>
-<p>Install TensorBoard through the command line to visualize data you logged</p>
+<div class="section" id="tensorboard">
+<h2>运行TensorBoard<a class="headerlink" href="#tensorboard" title="Permalink to this heading">¶</a></h2>
+<p>通过命令行安装TensorBoard以可视化您记录的数据</p>
 <div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>tensorboard
 </pre></div>
 </div>
-<p>Now, start TensorBoard, specifying the root log directory you used above.
-Argument <code class="docutils literal notranslate"><span class="pre">logdir</span></code> points to directory where TensorBoard will look to find
-event files that it can display. TensorBoard will recursively walk
-the directory structure rooted at <code class="docutils literal notranslate"><span class="pre">logdir</span></code>, looking for <code class="docutils literal notranslate"><span class="pre">.*tfevents.*</span></code> files.</p>
+<p>现在,启动TensorBoard,指定您之前使用的根日志目录。
+参数 <code class="docutils literal notranslate"><span class="pre">logdir</span></code> 指向TensorBoard将查找可显示的事件文件的目录。
+TensorBoard将递归遍历 <code class="docutils literal notranslate"><span class="pre">logdir</span></code> 根目录下的目录结构,寻找 <code class="docutils literal notranslate"><span class="pre">.*tfevents.*</span></code> 文件。</p>
 <div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>tensorboard<span class="w"> </span>--logdir<span class="o">=</span>runs
 </pre></div>
 </div>
-<p>Go to the URL it provides OR to <a class="reference external" href="http://localhost:6006/">http://localhost:6006/</a></p>
+<p>转到它提供的URL或 <a class="reference external" href="http://localhost:6006/">http://localhost:6006/</a></p>
 <a class="reference internal image-reference" href="../../_images/tensorboard_scalars.png"><img alt="../../_images/tensorboard_scalars.png" src="../../_images/tensorboard_scalars.png" style="width: 584.0px; height: 455.20000000000005px;" /></a>
-<p>This dashboard shows how the loss and accuracy change with every epoch.
-You can use it to also track training speed, learning rate, and other
-scalar values. It’s helpful to compare these metrics across different
-training runs to improve your model.</p>
+<p>此仪表板显示了损失和准确率如何随着每个epoch而变化。
+您可以使用它来跟踪训练速度、学习率和其他标量值。
+比较不同训练运行的这些指标有助于改进您的模型。</p>
 </div>
-<div class="section" id="learn-more">
-<h2>Learn More<a class="headerlink" href="#learn-more" title="Permalink to this heading">¶</a></h2>
+<div class="section" id="id4">
+<h2>了解更多<a class="headerlink" href="#id4" title="Permalink to this heading">¶</a></h2>
 <ul class="simple">
-<li><p><a class="reference external" href="https://pytorch.org/docs/stable/tensorboard.html">torch.utils.tensorboard</a> docs</p></li>
-<li><p><a class="reference external" href="https://pytorch.org/tutorials/intermediate/tensorboard_tutorial.html">Visualizing models, data, and training with TensorBoard</a> tutorial</p></li>
+<li><p><a class="reference external" href="https://pytorch.org/docs/stable/tensorboard.html">torch.utils.tensorboard</a> 文档</p></li>
+<li><p><a class="reference external" href="https://pytorch.org/tutorials/intermediate/tensorboard_tutorial.html">使用TensorBoard可视化模型、数据和训练</a> 教程</p></li>
 </ul>
 <p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.000 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-recipes-recipes-tensorboard-with-pytorch-py">
@@ -715,10 +714,10 @@ training runs to improve your model.</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="dynamic_quantization.html" class="btn btn-neutral float-right" title="Dynamic Quantization" accesskey="n" rel="next">Next <img src="../../_static/images/chevron-right-orange.svg" class="next-page"></a>
+        <a href="dynamic_quantization.html" class="btn btn-neutral float-right" title="动态量化" accesskey="n" rel="next">Next <img src="../../_static/images/chevron-right-orange.svg" class="next-page"></a>
       
       
-        <a href="Captum_Recipe.html" class="btn btn-neutral" title="Model Interpretability using Captum" accesskey="p" rel="prev"><img src="../../_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
+        <a href="Captum_Recipe.html" class="btn btn-neutral" title="使用 Captum 进行模型可解释性" accesskey="p" rel="prev"><img src="../../_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
       
     </div>
   
@@ -768,12 +767,12 @@ if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.i
           <div class="pytorch-right-menu" id="pytorch-right-menu">
             <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
               <ul>
-<li><a class="reference internal" href="#">How to use TensorBoard with PyTorch</a><ul>
-<li><a class="reference internal" href="#installation">Installation</a></li>
-<li><a class="reference internal" href="#using-tensorboard-in-pytorch">Using TensorBoard in PyTorch</a></li>
-<li><a class="reference internal" href="#log-scalars">Log scalars</a></li>
-<li><a class="reference internal" href="#run-tensorboard">Run TensorBoard</a></li>
-<li><a class="reference internal" href="#learn-more">Learn More</a></li>
+<li><a class="reference internal" href="#">如何在PyTorch中使用TensorBoard</a><ul>
+<li><a class="reference internal" href="#id1">安装</a></li>
+<li><a class="reference internal" href="#id2">在PyTorch中使用TensorBoard</a></li>
+<li><a class="reference internal" href="#id3">记录标量</a></li>
+<li><a class="reference internal" href="#tensorboard">运行TensorBoard</a></li>
+<li><a class="reference internal" href="#id4">了解更多</a></li>
 </ul>
 </li>
 </ul>

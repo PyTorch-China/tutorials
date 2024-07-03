@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Intel® Extension for PyTorch* Backend &mdash; PyTorch Tutorials 2.3.0 documentation</title>
+  <title>Intel® PyTorch* 扩展后端 &mdash; PyTorch Tutorials 2.3.0 documentation</title>
   
 
   
@@ -42,7 +42,7 @@
   <link rel="stylesheet" href="../_static/css/custom2.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="TorchScript for Deployment" href="torchscript_inference.html" />
+    <link rel="next" title="TorchScript 部署" href="torchscript_inference.html" />
     <link rel="prev" title="(beta) Compiling the optimizer with torch.compile" href="compiling_optimizer.html" />
   <!-- Google Tag Manager -->
     <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -535,7 +535,7 @@
         
           <li><a href="recipes_index.html">PyTorch 示例</a> &gt;</li>
         
-      <li>Intel® Extension for PyTorch* Backend</li>
+      <li>Intel® PyTorch* 扩展后端</li>
     
     
       <li class="pytorch-breadcrumbs-aside">
@@ -594,17 +594,16 @@
             <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
-  <div class="section" id="intel-extension-for-pytorch-backend">
-<h1>Intel® Extension for PyTorch* Backend<a class="headerlink" href="#intel-extension-for-pytorch-backend" title="Permalink to this heading">¶</a></h1>
-<p>To work better with <cite>torch.compile</cite>, Intel® Extension for PyTorch* implements a backend <code class="docutils literal notranslate"><span class="pre">ipex</span></code>.
-It targets to improve hardware resource usage efficiency on Intel platforms for better performance.
-The <cite>ipex</cite> backend is implemented with further customizations designed in Intel® Extension for
-PyTorch* for the model compilation.</p>
-<div class="section" id="usage-example">
-<h2>Usage Example<a class="headerlink" href="#usage-example" title="Permalink to this heading">¶</a></h2>
-<div class="section" id="train-fp32">
-<h3>Train FP32<a class="headerlink" href="#train-fp32" title="Permalink to this heading">¶</a></h3>
-<p>Check the example below to learn how to utilize the <cite>ipex</cite> backend with <cite>torch.compile</cite> for model training with FP32 data type.</p>
+  <div class="section" id="intel-pytorch">
+<h1>Intel® PyTorch* 扩展后端<a class="headerlink" href="#intel-pytorch" title="Permalink to this heading">¶</a></h1>
+<p>为了更好地与 <cite>torch.compile</cite> 协作，Intel® PyTorch* 扩展实现了一个名为 <cite>ipex</cite> 的后端。
+它旨在提高 Intel 平台上的硬件资源使用效率,从而获得更好的性能。
+<cite>ipex</cite> 后端是通过 Intel® PyTorch* 扩展中进一步的定制设计来实现模型编译的。</p>
+<div class="section" id="id1">
+<h2>使用示例<a class="headerlink" href="#id1" title="Permalink to this heading">¶</a></h2>
+<div class="section" id="fp32">
+<h3>FP32 训练<a class="headerlink" href="#fp32" title="Permalink to this heading">¶</a></h3>
+<p>查看下面的示例,了解如何将 <cite>ipex</cite> 后端与 <cite>torch.compile</cite> 一起使用,进行 FP32 数据类型的模型训练。</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">import</span> <span class="nn">torchvision</span>
 
@@ -633,10 +632,10 @@ PyTorch* for the model compilation.</p>
 <span class="n">optimizer</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">SGD</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span> <span class="o">=</span> <span class="n">LR</span><span class="p">,</span> <span class="n">momentum</span><span class="o">=</span><span class="mf">0.9</span><span class="p">)</span>
 <span class="n">model</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
 
-<span class="c1">#################### code changes ####################</span>
+<span class="c1">#################### 代码修改 ####################</span>
 <span class="kn">import</span> <span class="nn">intel_extension_for_pytorch</span> <span class="k">as</span> <span class="nn">ipex</span>
 
-<span class="c1"># Invoke the following API optionally, to apply frontend optimizations</span>
+<span class="c1"># 可选择调用以下 API,应用前端优化</span>
 <span class="n">model</span><span class="p">,</span> <span class="n">optimizer</span> <span class="o">=</span> <span class="n">ipex</span><span class="o">.</span><span class="n">optimize</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">optimizer</span><span class="o">=</span><span class="n">optimizer</span><span class="p">)</span>
 
 <span class="n">compile_model</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s2">&quot;ipex&quot;</span><span class="p">)</span>
@@ -651,9 +650,9 @@ PyTorch* for the model compilation.</p>
 </pre></div>
 </div>
 </div>
-<div class="section" id="train-bf16">
-<h3>Train BF16<a class="headerlink" href="#train-bf16" title="Permalink to this heading">¶</a></h3>
-<p>Check the example below to learn how to utilize the <cite>ipex</cite> backend with <cite>torch.compile</cite> for model training with BFloat16 data type.</p>
+<div class="section" id="bf16">
+<h3>BF16 训练<a class="headerlink" href="#bf16" title="Permalink to this heading">¶</a></h3>
+<p>查看下面的示例,了解如何将 <cite>ipex</cite> 后端与 <cite>torch.compile</cite> 一起使用,进行 BFloat16 数据类型的模型训练。</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">import</span> <span class="nn">torchvision</span>
 
@@ -682,10 +681,10 @@ PyTorch* for the model compilation.</p>
 <span class="n">optimizer</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">SGD</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span> <span class="o">=</span> <span class="n">LR</span><span class="p">,</span> <span class="n">momentum</span><span class="o">=</span><span class="mf">0.9</span><span class="p">)</span>
 <span class="n">model</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
 
-<span class="c1">#################### code changes ####################</span>
+<span class="c1">#################### 代码修改 ####################</span>
 <span class="kn">import</span> <span class="nn">intel_extension_for_pytorch</span> <span class="k">as</span> <span class="nn">ipex</span>
 
-<span class="c1"># Invoke the following API optionally, to apply frontend optimizations</span>
+<span class="c1"># 可选择调用以下 API,应用前端优化</span>
 <span class="n">model</span><span class="p">,</span> <span class="n">optimizer</span> <span class="o">=</span> <span class="n">ipex</span><span class="o">.</span><span class="n">optimize</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">bfloat16</span><span class="p">,</span> <span class="n">optimizer</span><span class="o">=</span><span class="n">optimizer</span><span class="p">)</span>
 
 <span class="n">compile_model</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s2">&quot;ipex&quot;</span><span class="p">)</span>
@@ -701,9 +700,9 @@ PyTorch* for the model compilation.</p>
 </pre></div>
 </div>
 </div>
-<div class="section" id="inference-fp32">
-<h3>Inference FP32<a class="headerlink" href="#inference-fp32" title="Permalink to this heading">¶</a></h3>
-<p>Check the example below to learn how to utilize the <cite>ipex</cite> backend with <cite>torch.compile</cite> for model inference with FP32 data type.</p>
+<div class="section" id="id2">
+<h3>FP32 推理<a class="headerlink" href="#id2" title="Permalink to this heading">¶</a></h3>
+<p>查看下面的示例,了解如何将 <cite>ipex</cite> 后端与 <cite>torch.compile</cite> 一起使用,进行 FP32 数据类型的模型推理。</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">import</span> <span class="nn">torchvision.models</span> <span class="k">as</span> <span class="nn">models</span>
 
@@ -711,10 +710,10 @@ PyTorch* for the model compilation.</p>
 <span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
 <span class="n">data</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">224</span><span class="p">,</span> <span class="mi">224</span><span class="p">)</span>
 
-<span class="c1">#################### code changes ####################</span>
+<span class="c1">#################### 代码修改 ####################</span>
 <span class="kn">import</span> <span class="nn">intel_extension_for_pytorch</span> <span class="k">as</span> <span class="nn">ipex</span>
 
-<span class="c1"># Invoke the following API optionally, to apply frontend optimizations</span>
+<span class="c1"># 可选择调用以下 API,应用前端优化</span>
 <span class="n">model</span> <span class="o">=</span> <span class="n">ipex</span><span class="o">.</span><span class="n">optimize</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">weights_prepack</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
 <span class="n">compile_model</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s2">&quot;ipex&quot;</span><span class="p">)</span>
@@ -725,9 +724,9 @@ PyTorch* for the model compilation.</p>
 </pre></div>
 </div>
 </div>
-<div class="section" id="inference-bf16">
-<h3>Inference BF16<a class="headerlink" href="#inference-bf16" title="Permalink to this heading">¶</a></h3>
-<p>Check the example below to learn how to utilize the <cite>ipex</cite> backend with <cite>torch.compile</cite> for model inference with BFloat16 data type.</p>
+<div class="section" id="id3">
+<h3>BF16 推理<a class="headerlink" href="#id3" title="Permalink to this heading">¶</a></h3>
+<p>查看下面的示例,了解如何将 <cite>ipex</cite> 后端与 <cite>torch.compile</cite> 一起使用,进行 BFloat16 数据类型的模型推理。</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">import</span> <span class="nn">torchvision.models</span> <span class="k">as</span> <span class="nn">models</span>
 
@@ -735,10 +734,10 @@ PyTorch* for the model compilation.</p>
 <span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
 <span class="n">data</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">224</span><span class="p">,</span> <span class="mi">224</span><span class="p">)</span>
 
-<span class="c1">#################### code changes ####################</span>
+<span class="c1">#################### 代码修改 ####################</span>
 <span class="kn">import</span> <span class="nn">intel_extension_for_pytorch</span> <span class="k">as</span> <span class="nn">ipex</span>
 
-<span class="c1"># Invoke the following API optionally, to apply frontend optimizations</span>
+<span class="c1"># 可选择调用以下 API,应用前端优化</span>
 <span class="n">model</span> <span class="o">=</span> <span class="n">ipex</span><span class="o">.</span><span class="n">optimize</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">bfloat16</span><span class="p">,</span> <span class="n">weights_prepack</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
 <span class="n">compile_model</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s2">&quot;ipex&quot;</span><span class="p">)</span>
@@ -760,7 +759,7 @@ PyTorch* for the model compilation.</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="torchscript_inference.html" class="btn btn-neutral float-right" title="TorchScript for Deployment" accesskey="n" rel="next">Next <img src="../_static/images/chevron-right-orange.svg" class="next-page"></a>
+        <a href="torchscript_inference.html" class="btn btn-neutral float-right" title="TorchScript 部署" accesskey="n" rel="next">Next <img src="../_static/images/chevron-right-orange.svg" class="next-page"></a>
       
       
         <a href="compiling_optimizer.html" class="btn btn-neutral" title="(beta) Compiling the optimizer with torch.compile" accesskey="p" rel="prev"><img src="../_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
@@ -813,12 +812,12 @@ if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.i
           <div class="pytorch-right-menu" id="pytorch-right-menu">
             <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
               <ul>
-<li><a class="reference internal" href="#">Intel® Extension for PyTorch* Backend</a><ul>
-<li><a class="reference internal" href="#usage-example">Usage Example</a><ul>
-<li><a class="reference internal" href="#train-fp32">Train FP32</a></li>
-<li><a class="reference internal" href="#train-bf16">Train BF16</a></li>
-<li><a class="reference internal" href="#inference-fp32">Inference FP32</a></li>
-<li><a class="reference internal" href="#inference-bf16">Inference BF16</a></li>
+<li><a class="reference internal" href="#">Intel® PyTorch* 扩展后端</a><ul>
+<li><a class="reference internal" href="#id1">使用示例</a><ul>
+<li><a class="reference internal" href="#fp32">FP32 训练</a></li>
+<li><a class="reference internal" href="#bf16">BF16 训练</a></li>
+<li><a class="reference internal" href="#id2">FP32 推理</a></li>
+<li><a class="reference internal" href="#id3">BF16 推理</a></li>
 </ul>
 </li>
 </ul>
