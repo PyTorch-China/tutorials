@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>(beta) Using TORCH_LOGS python API with torch.compile &mdash; PyTorch Tutorials 2.3.0 documentation</title>
+  <title>(Beta) 使用 TORCH_LOGS python API 与 torch.compile &mdash; PyTorch Tutorials 2.3.0 documentation</title>
   
 
   
@@ -535,7 +535,7 @@
         
           <li><a href="recipes_index.html">PyTorch 示例</a> &gt;</li>
         
-      <li>(beta) Using TORCH_LOGS python API with torch.compile</li>
+      <li>(Beta) 使用 TORCH_LOGS python API 与 torch.compile</li>
     
     
       <li class="pytorch-breadcrumbs-aside">
@@ -599,71 +599,64 @@
 <p>Click <a class="reference internal" href="#sphx-glr-download-recipes-torch-logs-py"><span class="std std-ref">here</span></a>
 to download the full example code</p>
 </div>
-<div class="sphx-glr-example-title section" id="beta-using-torch-logs-python-api-with-torch-compile">
-<span id="sphx-glr-recipes-torch-logs-py"></span><h1>(beta) Using TORCH_LOGS python API with torch.compile<a class="headerlink" href="#beta-using-torch-logs-python-api-with-torch-compile" title="Permalink to this heading">¶</a></h1>
-<p><strong>Author:</strong> <a class="reference external" href="https://github.com/mlazos">Michael Lazos</a></p>
+<div class="sphx-glr-example-title section" id="beta-torch-logs-python-api-torch-compile">
+<span id="sphx-glr-recipes-torch-logs-py"></span><h1>(Beta) 使用 TORCH_LOGS python API 与 torch.compile<a class="headerlink" href="#beta-torch-logs-python-api-torch-compile" title="Permalink to this heading">¶</a></h1>
+<p><strong>作者:</strong> <a class="reference external" href="https://github.com/mlazos">Michael Lazos</a></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">logging</span>
 </pre></div>
 </div>
-<p>This tutorial introduces the <code class="docutils literal notranslate"><span class="pre">TORCH_LOGS</span></code> environment variable, as well as the Python API, and
-demonstrates how to apply it to observe the phases  of <code class="docutils literal notranslate"><span class="pre">torch.compile</span></code>.</p>
+<p>本教程介绍了 <code class="docutils literal notranslate"><span class="pre">TORCH_LOGS</span></code> 环境变量以及 Python API,并演示了如何将其应用于观察 <code class="docutils literal notranslate"><span class="pre">torch.compile</span></code> 的各个阶段。</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>This tutorial requires PyTorch 2.2.0 or later.</p>
+<p>本教程需要 PyTorch 2.2.0 或更高版本。</p>
 </div>
-<div class="section" id="setup">
-<h2>Setup<a class="headerlink" href="#setup" title="Permalink to this heading">¶</a></h2>
-<p>In this example, we’ll set up a simple Python function which performs an elementwise
-add and observe the compilation process with <code class="docutils literal notranslate"><span class="pre">TORCH_LOGS</span></code> Python API.</p>
+<div class="section" id="id1">
+<h2>设置<a class="headerlink" href="#id1" title="Permalink to this heading">¶</a></h2>
+<p>在这个例子中,我们将设置一个简单的 Python 函数,执行元素级加法,并使用 <code class="docutils literal notranslate"><span class="pre">TORCH_LOGS</span></code> Python API 观察编译过程。</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>There is also an environment variable <code class="docutils literal notranslate"><span class="pre">TORCH_LOGS</span></code>, which can be used to
-change logging settings at the command line. The equivalent environment
-variable setting is shown for each example.</p>
+<p>还有一个环境变量 <code class="docutils literal notranslate"><span class="pre">TORCH_LOGS</span></code>,可用于在命令行中更改日志设置。每个示例都显示了等效的环境变量设置。</p>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
 
-<span class="c1"># exit cleanly if we are on a device that doesn&#39;t support torch.compile</span>
+<span class="c1"># 如果设备不支持 torch.compile,则干净地退出</span>
 <span class="k">if</span> <a href="https://pytorch.org/docs/stable/generated/torch.cuda.get_device_capability.html#torch.cuda.get_device_capability" title="torch.cuda.get_device_capability" class="sphx-glr-backref-module-torch-cuda sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">get_device_capability</span></a><span class="p">()</span> <span class="o">&lt;</span> <span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Skipping because torch.compile is not supported on this device.&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;跳过,因为此设备不支持 torch.compile。&quot;</span><span class="p">)</span>
 <span class="k">else</span><span class="p">:</span>
+
     <span class="nd">@torch</span><span class="o">.</span><span class="n">compile</span><span class="p">()</span>
     <span class="k">def</span> <span class="nf">fn</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
         <span class="n">z</span> <span class="o">=</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span>
         <span class="k">return</span> <span class="n">z</span> <span class="o">+</span> <span class="mi">2</span>
 
-
     <span class="n">inputs</span> <span class="o">=</span> <span class="p">(</span><a href="https://pytorch.org/docs/stable/generated/torch.ones.html#torch.ones" title="torch.ones" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">ones</span></a><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cuda&quot;</span><span class="p">),</span> <a href="https://pytorch.org/docs/stable/generated/torch.zeros.html#torch.zeros" title="torch.zeros" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">zeros</span></a><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cuda&quot;</span><span class="p">))</span>
 
-
-<span class="c1"># print separator and reset dynamo</span>
-<span class="c1"># between each example</span>
+    <span class="c1"># 在每个示例之间打印分隔符并重置 dynamo</span>
     <span class="k">def</span> <span class="nf">separator</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;===================</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">=========================&quot;</span><span class="p">)</span>
         <span class="n">torch</span><span class="o">.</span><span class="n">_dynamo</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
 
-
-    <span class="n">separator</span><span class="p">(</span><span class="s2">&quot;Dynamo Tracing&quot;</span><span class="p">)</span>
-<span class="c1"># View dynamo tracing</span>
-<span class="c1"># TORCH_LOGS=&quot;+dynamo&quot;</span>
+    <span class="n">separator</span><span class="p">(</span><span class="s2">&quot;Dynamo 跟踪&quot;</span><span class="p">)</span>
+    <span class="c1"># 查看 dynamo 跟踪</span>
+    <span class="c1"># TORCH_LOGS=&quot;+dynamo&quot;</span>
     <a href="https://pytorch.org/docs/stable/generated/torch._logging.set_logs.html#torch._logging.set_logs" title="torch._logging.set_logs" class="sphx-glr-backref-module-torch-_logging sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">_logging</span><span class="o">.</span><span class="n">set_logs</span></a><span class="p">(</span><span class="n">dynamo</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
     <span class="n">fn</span><span class="p">(</span><span class="o">*</span><span class="n">inputs</span><span class="p">)</span>
 
-    <span class="n">separator</span><span class="p">(</span><span class="s2">&quot;Traced Graph&quot;</span><span class="p">)</span>
-<span class="c1"># View traced graph</span>
-<span class="c1"># TORCH_LOGS=&quot;graph&quot;</span>
+    <span class="n">separator</span><span class="p">(</span><span class="s2">&quot;跟踪的图形&quot;</span><span class="p">)</span>
+    <span class="c1"># 查看跟踪的图形</span>
+    <span class="c1"># TORCH_LOGS=&quot;graph&quot;</span>
     <a href="https://pytorch.org/docs/stable/generated/torch._logging.set_logs.html#torch._logging.set_logs" title="torch._logging.set_logs" class="sphx-glr-backref-module-torch-_logging sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">_logging</span><span class="o">.</span><span class="n">set_logs</span></a><span class="p">(</span><span class="n">graph</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">fn</span><span class="p">(</span><span class="o">*</span><span class="n">inputs</span><span class="p">)</span>
 
-    <span class="n">separator</span><span class="p">(</span><span class="s2">&quot;Fusion Decisions&quot;</span><span class="p">)</span>
-<span class="c1"># View fusion decisions</span>
-<span class="c1"># TORCH_LOGS=&quot;fusion&quot;</span>
+    <span class="n">separator</span><span class="p">(</span><span class="s2">&quot;融合决策&quot;</span><span class="p">)</span>
+    <span class="c1"># 查看融合决策</span>
+    <span class="c1"># TORCH_LOGS=&quot;fusion&quot;</span>
     <a href="https://pytorch.org/docs/stable/generated/torch._logging.set_logs.html#torch._logging.set_logs" title="torch._logging.set_logs" class="sphx-glr-backref-module-torch-_logging sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">_logging</span><span class="o">.</span><span class="n">set_logs</span></a><span class="p">(</span><span class="n">fusion</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">fn</span><span class="p">(</span><span class="o">*</span><span class="n">inputs</span><span class="p">)</span>
 
-    <span class="n">separator</span><span class="p">(</span><span class="s2">&quot;Output Code&quot;</span><span class="p">)</span>
-<span class="c1"># View output code generated by inductor</span>
-<span class="c1"># TORCH_LOGS=&quot;output_code&quot;</span>
+    <span class="n">separator</span><span class="p">(</span><span class="s2">&quot;输出代码&quot;</span><span class="p">)</span>
+    <span class="c1"># 查看 inductor 生成的输出代码</span>
+    <span class="c1"># TORCH_LOGS=&quot;output_code&quot;</span>
     <a href="https://pytorch.org/docs/stable/generated/torch._logging.set_logs.html#torch._logging.set_logs" title="torch._logging.set_logs" class="sphx-glr-backref-module-torch-_logging sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">_logging</span><span class="o">.</span><span class="n">set_logs</span></a><span class="p">(</span><span class="n">output_code</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">fn</span><span class="p">(</span><span class="o">*</span><span class="n">inputs</span><span class="p">)</span>
 
@@ -671,15 +664,12 @@ variable setting is shown for each example.</p>
 </pre></div>
 </div>
 </div>
-<div class="section" id="conclusion">
-<h2>Conclusion<a class="headerlink" href="#conclusion" title="Permalink to this heading">¶</a></h2>
-<p>In this tutorial we introduced the TORCH_LOGS environment variable and python API
-by experimenting with a small number of the available logging options.
-To view descriptions of all available options, run any python script
-which imports torch and set TORCH_LOGS to “help”.</p>
-<p>Alternatively, you can view the <a class="reference external" href="https://pytorch.org/docs/main/logging.html">torch._logging documentation</a> to see
-descriptions of all available logging options.</p>
-<p>For more information on torch.compile, see the <a class="reference external" href="https://pytorch.org/tutorials/intermediate/torch_compile_tutorial.html">torch.compile tutorial</a>.</p>
+<div class="section" id="id2">
+<h2>结论<a class="headerlink" href="#id2" title="Permalink to this heading">¶</a></h2>
+<p>在本教程中,我们介绍了 TORCH_LOGS 环境变量和 python API,并通过实验了一小部分可用的日志选项。
+要查看所有可用选项的描述,请运行任何导入 torch 的 python 脚本,并将 TORCH_LOGS 设置为 “help”。</p>
+<p>或者,您可以查看 <a class="reference external" href="https://pytorch.org/docs/main/logging.html">torch._logging 文档</a> 以查看所有可用日志选项的描述。</p>
+<p>有关 torch.compile 的更多信息,请参阅 <a class="reference external" href="https://pytorch.org/tutorials/intermediate/torch_compile_tutorial.html">torch.compile 教程</a>。</p>
 <p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.000 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-recipes-torch-logs-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
@@ -754,9 +744,9 @@ if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.i
           <div class="pytorch-right-menu" id="pytorch-right-menu">
             <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
               <ul>
-<li><a class="reference internal" href="#">(beta) Using TORCH_LOGS python API with torch.compile</a><ul>
-<li><a class="reference internal" href="#setup">Setup</a></li>
-<li><a class="reference internal" href="#conclusion">Conclusion</a></li>
+<li><a class="reference internal" href="#">(Beta) 使用 TORCH_LOGS python API 与 torch.compile</a><ul>
+<li><a class="reference internal" href="#id1">设置</a></li>
+<li><a class="reference internal" href="#id2">结论</a></li>
 </ul>
 </li>
 </ul>

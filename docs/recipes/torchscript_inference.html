@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>TorchScript for Deployment &mdash; PyTorch Tutorials 2.3.0 documentation</title>
+  <title>TorchScript 部署 &mdash; PyTorch Tutorials 2.3.0 documentation</title>
   
 
   
@@ -43,7 +43,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Deploying with Flask" href="deployment_with_flask.html" />
-    <link rel="prev" title="Intel® Extension for PyTorch* Backend" href="torch_compile_backend_ipex.html" />
+    <link rel="prev" title="Intel® PyTorch* 扩展后端" href="torch_compile_backend_ipex.html" />
   <!-- Google Tag Manager -->
     <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
     new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
@@ -535,7 +535,7 @@
         
           <li><a href="recipes_index.html">PyTorch 示例</a> &gt;</li>
         
-      <li>TorchScript for Deployment</li>
+      <li>TorchScript 部署</li>
     
     
       <li class="pytorch-breadcrumbs-aside">
@@ -594,51 +594,46 @@
             <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
-  <div class="section" id="torchscript-for-deployment">
-<h1>TorchScript for Deployment<a class="headerlink" href="#torchscript-for-deployment" title="Permalink to this heading">¶</a></h1>
-<p>In this recipe, you will learn:</p>
+  <div class="section" id="torchscript">
+<h1>TorchScript 部署<a class="headerlink" href="#torchscript" title="Permalink to this heading">¶</a></h1>
+<p>在本教程中,您将学习:</p>
 <ul class="simple">
 <li><p>What TorchScript is</p></li>
 <li><p>How to export your trained model in TorchScript format</p></li>
 <li><p>How to load your TorchScript model in C++ and do inference</p></li>
+<li><p>TorchScript 是什么</p></li>
+<li><p>如何将训练好的模型导出为 TorchScript 格式</p></li>
+<li><p>如何在 C++ 中加载 TorchScript 模型并进行推理</p></li>
 </ul>
-<div class="section" id="requirements">
-<h2>Requirements<a class="headerlink" href="#requirements" title="Permalink to this heading">¶</a></h2>
+<div class="section" id="id1">
+<h2>环境要求<a class="headerlink" href="#id1" title="Permalink to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>PyTorch 1.5</p></li>
 <li><p>TorchVision 0.6.0</p></li>
 <li><p>libtorch 1.5</p></li>
 <li><p>C++ compiler</p></li>
 </ul>
-<p>The instructions for installing the three PyTorch components are
-available at <a class="reference external" href="https://pytorch.org/">pytorch.org</a>. The C++ compiler will depend on your
-platform.</p>
+<p>安装这三个 PyTorch 组件的说明可在 <cite>pytorch.org_</cite> 上找到。C++ 编译器则取决于您的平台。</p>
 </div>
-<div class="section" id="what-is-torchscript">
-<h2>What is TorchScript?<a class="headerlink" href="#what-is-torchscript" title="Permalink to this heading">¶</a></h2>
-<p><strong>TorchScript</strong> is an intermediate representation of a PyTorch model
-(subclass of <code class="docutils literal notranslate"><span class="pre">nn.Module</span></code>) that can then be run in a high-performance
-environment like C++. It’s a high-performance subset of Python that is
-meant to be consumed by the <strong>PyTorch JIT Compiler,</strong> which performs
-run-time optimization on your model’s computation. TorchScript is the
-recommended model format for doing scaled inference with PyTorch models.
-For more information, see the PyTorch <a class="reference external" href="https://pytorch.org/tutorials/beginner/Intro_to_TorchScript_tutorial.html">Introduction to TorchScript
-tutorial</a>, the <a href="#id2"><span class="problematic" id="id3">`Loading A TorchScript Model in C++ tutorial`_</span></a>, and the
-<a class="reference external" href="https://pytorch.org/docs/stable/jit.html">full TorchScript documentation</a>, all of which are available on
-<a class="reference external" href="https://pytorch.org/">pytorch.org</a>.</p>
+<div class="section" id="id2">
+<h2>什么是 TorchScript?<a class="headerlink" href="#id2" title="Permalink to this heading">¶</a></h2>
+<p><strong>TorchScript</strong> 是 PyTorch 模型( <code class="docutils literal notranslate"><span class="pre">nn.Module</span></code> 的子类)的中间表示,可以在高性能环境(如 C++)中运行。
+它是 Python 的一个高性能子集,旨在被 <strong>PyTorch JIT 编译器</strong> 使用,后者会对模型的计算进行运行时优化。
+TorchScript 是使用 PyTorch 模型进行大规模推理的推荐模型格式。更多信息,
+请参阅 <cite>pytorch.org_</cite> 上的 <cite>PyTorch TorchScript 入门教程</cite>、 <cite>在 C++ 中加载 TorchScript 模型教程</cite>
+和 <cite>完整的 TorchScript 文档_</cite> 。</p>
 </div>
-<div class="section" id="how-to-export-your-model">
-<h2>How to Export Your Model<a class="headerlink" href="#how-to-export-your-model" title="Permalink to this heading">¶</a></h2>
-<p>As an example, let’s take a pretrained vision model. All of the
-pretrained models in TorchVision are compatible with TorchScript.</p>
-<p>Run the following Python 3 code, either in a script or from the REPL:</p>
+<div class="section" id="id3">
+<h2>如何导出模型<a class="headerlink" href="#id3" title="Permalink to this heading">¶</a></h2>
+<p>作为示例,让我们使用一个预训练的视觉模型。TorchVision 中的所有预训练模型都与 TorchScript 兼容。</p>
+<p>运行以下 Python 3 代码,可以在脚本中或从 REPL 中运行:</p>
 <div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">import</span> <span class="nn">torch.nn.functional</span> <span class="k">as</span> <span class="nn">F</span>
 <span class="kn">import</span> <span class="nn">torchvision.models</span> <span class="k">as</span> <span class="nn">models</span>
 
-<span class="n">r18</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">resnet18</span><span class="p">(</span><span class="n">pretrained</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>       <span class="c1"># We now have an instance of the pretrained model</span>
-<span class="n">r18_scripted</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">script</span><span class="p">(</span><span class="n">r18</span><span class="p">)</span>         <span class="c1"># *** This is the TorchScript export</span>
-<span class="n">dummy_input</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">224</span><span class="p">,</span> <span class="mi">224</span><span class="p">)</span>     <span class="c1"># We should run a quick test</span>
+<span class="n">r18</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">resnet18</span><span class="p">(</span><span class="n">pretrained</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>       <span class="c1"># 现在我们有一个预训练模型的实例</span>
+<span class="n">r18_scripted</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">script</span><span class="p">(</span><span class="n">r18</span><span class="p">)</span>         <span class="c1"># *** 这是 TorchScript 导出</span>
+<span class="n">dummy_input</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">224</span><span class="p">,</span> <span class="mi">224</span><span class="p">)</span>     <span class="c1"># 快速测试一下</span>
 </pre></div>
 </div>
 <p>Let’s do a sanity check on the equivalence of the two models:</p>
@@ -780,7 +775,7 @@ and API reference</p></li>
         <a href="deployment_with_flask.html" class="btn btn-neutral float-right" title="Deploying with Flask" accesskey="n" rel="next">Next <img src="../_static/images/chevron-right-orange.svg" class="next-page"></a>
       
       
-        <a href="torch_compile_backend_ipex.html" class="btn btn-neutral" title="Intel® Extension for PyTorch* Backend" accesskey="p" rel="prev"><img src="../_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
+        <a href="torch_compile_backend_ipex.html" class="btn btn-neutral" title="Intel® PyTorch* 扩展后端" accesskey="p" rel="prev"><img src="../_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
       
     </div>
   
@@ -830,10 +825,10 @@ if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.i
           <div class="pytorch-right-menu" id="pytorch-right-menu">
             <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
               <ul>
-<li><a class="reference internal" href="#">TorchScript for Deployment</a><ul>
-<li><a class="reference internal" href="#requirements">Requirements</a></li>
-<li><a class="reference internal" href="#what-is-torchscript">What is TorchScript?</a></li>
-<li><a class="reference internal" href="#how-to-export-your-model">How to Export Your Model</a></li>
+<li><a class="reference internal" href="#">TorchScript 部署</a><ul>
+<li><a class="reference internal" href="#id1">环境要求</a></li>
+<li><a class="reference internal" href="#id2">什么是 TorchScript?</a></li>
+<li><a class="reference internal" href="#id3">如何导出模型</a></li>
 <li><a class="reference internal" href="#loading-torchscript-models-in-c">Loading TorchScript Models in C++</a></li>
 <li><a class="reference internal" href="#building-and-running-your-c-inference-engine">Building and Running Your C++ Inference Engine</a></li>
 <li><a class="reference internal" href="#important-resources">Important Resources</a></li>

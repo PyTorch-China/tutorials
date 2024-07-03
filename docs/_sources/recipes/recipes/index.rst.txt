@@ -91,18 +91,18 @@ PyTorch Recipes
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="Installation ---------------------- PyTorch should be installed to log models and metrics into ...">
+    <div class="sphx-glr-thumbcontainer" tooltip="安装 ---------------------- 应安装PyTorch以将模型和指标记录到TensorBoard日志 目录。以下命令将通过Anaconda(推荐)安装PyTorch 1.4...">
 
 .. only:: html
 
   .. image:: /recipes/recipes/images/thumb/sphx_glr_tensorboard_with_pytorch_thumb.png
-    :alt: How to use TensorBoard with PyTorch
+    :alt: 如何在PyTorch中使用TensorBoard
 
   :ref:`sphx_glr_recipes_recipes_tensorboard_with_pytorch.py`
 
 .. raw:: html
 
-      <div class="sphx-glr-thumbnail-title">How to use TensorBoard with PyTorch</div>
+      <div class="sphx-glr-thumbnail-title">如何在PyTorch中使用TensorBoard</div>
     </div>
 
 
@@ -159,6 +159,23 @@ PyTorch Recipes
 
 .. raw:: html
 
+    <div class="sphx-glr-thumbcontainer" tooltip="在使用PyTorch编写模型时,通常会遇到某一层的参数取决于前一层输出的形状的情况。例如, ``nn.Linear``层的``in_features``必须与输入的``size(-1)``相...">
+
+.. only:: html
+
+  .. image:: /recipes/recipes/images/thumb/sphx_glr_reasoning_about_shapes_thumb.png
+    :alt: 在PyTorch中推理形状
+
+  :ref:`sphx_glr_recipes_recipes_reasoning_about_shapes.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">在PyTorch中推理形状</div>
+    </div>
+
+
+.. raw:: html
+
     <div class="sphx-glr-thumbcontainer" tooltip="简介 ------------ 无论您是加载缺少某些键的部分 state_dict ,还是加载比预期的模型更多键的 state_dict, 您都可以通过 load_state_dict() ...">
 
 .. only:: html
@@ -188,23 +205,6 @@ PyTorch Recipes
 .. raw:: html
 
       <div class="sphx-glr-thumbnail-title">PyTorch 保存和加载通用检查点</div>
-    </div>
-
-
-.. raw:: html
-
-    <div class="sphx-glr-thumbcontainer" tooltip="When writing models with PyTorch, it is commonly the case that the parameters to a given layer ...">
-
-.. only:: html
-
-  .. image:: /recipes/recipes/images/thumb/sphx_glr_reasoning_about_shapes_thumb.png
-    :alt: Reasoning about Shapes in PyTorch
-
-  :ref:`sphx_glr_recipes_recipes_reasoning_about_shapes.py`
-
-.. raw:: html
-
-      <div class="sphx-glr-thumbnail-title">Reasoning about Shapes in PyTorch</div>
     </div>
 
 
@@ -278,23 +278,6 @@ PyTorch Recipes
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="If you&#x27;re loading a checkpoint and want to reduce compute and memory as much as possible, this ...">
-
-.. only:: html
-
-  .. image:: /recipes/recipes/images/thumb/sphx_glr_module_load_state_dict_tips_thumb.png
-    :alt: Tips for Loading an ``nn.Module`` from a Checkpoint
-
-  :ref:`sphx_glr_recipes_recipes_module_load_state_dict_tips.py`
-
-.. raw:: html
-
-      <div class="sphx-glr-thumbnail-title">Tips for Loading an ``nn.Module`` from a Checkpoint</div>
-    </div>
-
-
-.. raw:: html
-
     <div class="sphx-glr-thumbcontainer" tooltip="在本教程中,我们将介绍 torch.utils.benchmark.Timer 的主要API。 PyTorch Timer基于 `timeit.Timer &lt;https://docs.pyt...">
 
 .. only:: html
@@ -307,6 +290,40 @@ PyTorch Recipes
 .. raw:: html
 
       <div class="sphx-glr-thumbnail-title">Timer快速入门</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="使用 Captum 进行模型可解释性">
+
+.. only:: html
+
+  .. image:: /recipes/recipes/images/thumb/sphx_glr_Captum_Recipe_thumb.png
+    :alt: 使用 Captum 进行模型可解释性
+
+  :ref:`sphx_glr_recipes_recipes_Captum_Recipe.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">使用 Captum 进行模型可解释性</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="在这个示例中,您将看到如何利用动态量化来加速 LSTM 风格的循环神经网络的推理。这可以减小模型权重的大小,并加快模型执行速度。">
+
+.. only:: html
+
+  .. image:: /recipes/recipes/images/thumb/sphx_glr_dynamic_quantization_thumb.png
+    :alt: 动态量化
+
+  :ref:`sphx_glr_recipes_recipes_dynamic_quantization.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">动态量化</div>
     </div>
 
 
@@ -329,52 +346,35 @@ PyTorch Recipes
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="In this recipe you will see how to take advantage of Dynamic Quantization to accelerate inferen...">
+    <div class="sphx-glr-thumbcontainer" tooltip="如果你要加载一个检查点并希望尽可能减少计算和内存的使用，本教程将分享一些推荐的做法。特别是我们将讨论以下几点:">
 
 .. only:: html
 
-  .. image:: /recipes/recipes/images/thumb/sphx_glr_dynamic_quantization_thumb.png
-    :alt: Dynamic Quantization
+  .. image:: /recipes/recipes/images/thumb/sphx_glr_module_load_state_dict_tips_thumb.png
+    :alt: 从检查点加载 ``nn.Module`` 的技巧
 
-  :ref:`sphx_glr_recipes_recipes_dynamic_quantization.py`
+  :ref:`sphx_glr_recipes_recipes_module_load_state_dict_tips.py`
 
 .. raw:: html
 
-      <div class="sphx-glr-thumbnail-title">Dynamic Quantization</div>
+      <div class="sphx-glr-thumbnail-title">从检查点加载 ``nn.Module`` 的技巧</div>
     </div>
 
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="Model Interpretability using Captum">
-
-.. only:: html
-
-  .. image:: /recipes/recipes/images/thumb/sphx_glr_Captum_Recipe_thumb.png
-    :alt: Model Interpretability using Captum
-
-  :ref:`sphx_glr_recipes_recipes_Captum_Recipe.py`
-
-.. raw:: html
-
-      <div class="sphx-glr-thumbnail-title">Model Interpretability using Captum</div>
-    </div>
-
-
-.. raw:: html
-
-    <div class="sphx-glr-thumbcontainer" tooltip="This recipe introduces a new utility function torch.utils.swap_tensors as well as two new exten...">
+    <div class="sphx-glr-thumbcontainer" tooltip="本教程介绍了一个新的实用函数 torch.utils.swap_tensors， 以及在 nn.Module 中集成它的两个新扩展点:">
 
 .. only:: html
 
   .. image:: /recipes/recipes/images/thumb/sphx_glr_swap_tensors_thumb.png
-    :alt: Extension points in ``nn.Module`` for ``load_state_dict`` and tensor subclasses
+    :alt: 在 ``nn.Module`` 中为 ``load_state_dict`` 和张量子类提供扩展点
 
   :ref:`sphx_glr_recipes_recipes_swap_tensors.py`
 
 .. raw:: html
 
-      <div class="sphx-glr-thumbnail-title">Extension points in ``nn.Module`` for ``load_state_dict`` and tensor subclasses</div>
+      <div class="sphx-glr-thumbnail-title">在 ``nn.Module`` 中为 ``load_state_dict`` 和张量子类提供扩展点</div>
     </div>
 
 
@@ -442,18 +442,18 @@ PyTorch Recipes
    /recipes/recipes/saving_and_loading_models_for_inference
    /recipes/recipes/what_is_state_dict
    /recipes/recipes/loading_data_recipe
+   /recipes/recipes/reasoning_about_shapes
    /recipes/recipes/warmstarting_model_using_parameters_from_a_different_model
    /recipes/recipes/saving_and_loading_a_general_checkpoint
-   /recipes/recipes/reasoning_about_shapes
    /recipes/recipes/save_load_across_devices
    /recipes/recipes/defining_a_neural_network
    /recipes/recipes/saving_multiple_models_in_one_file
    /recipes/recipes/tuning_guide
-   /recipes/recipes/module_load_state_dict_tips
    /recipes/recipes/timer_quick_start
-   /recipes/recipes/zeroing_out_gradients
-   /recipes/recipes/dynamic_quantization
    /recipes/recipes/Captum_Recipe
+   /recipes/recipes/dynamic_quantization
+   /recipes/recipes/zeroing_out_gradients
+   /recipes/recipes/module_load_state_dict_tips
    /recipes/recipes/swap_tensors
    /recipes/recipes/profiler_recipe
    /recipes/recipes/amp_recipe

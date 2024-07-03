@@ -18,71 +18,70 @@
 .. _sphx_glr_recipes_recipes_tensorboard_with_pytorch.py:
 
 
-How to use TensorBoard with PyTorch
+如何在PyTorch中使用TensorBoard
 ===================================
-TensorBoard is a visualization toolkit for machine learning experimentation. 
-TensorBoard allows tracking and visualizing metrics such as loss and accuracy, 
-visualizing the model graph, viewing histograms, displaying images and much more. 
-In this tutorial we are going to cover TensorBoard installation, 
-basic usage with PyTorch, and how to visualize data you logged in TensorBoard UI.
+TensorBoard是一个用于机器学习实验的可视化工具包。
+TensorBoard允许跟踪和可视化指标,如损失和准确率,
+可视化模型图,查看直方图,显示图像等。
+在本教程中,我们将介绍TensorBoard的安装、
+在PyTorch中的基本用法,以及如何在TensorBoard UI中可视化您记录的数据。
 
-Installation
+安装
 ----------------------
-PyTorch should be installed to log models and metrics into TensorBoard log 
-directory. The following command will install PyTorch 1.4+ via 
-Anaconda (recommended):
+应安装PyTorch以将模型和指标记录到TensorBoard日志
+目录。以下命令将通过Anaconda(推荐)安装PyTorch 1.4+:
 
 .. code-block:: sh
 
-   $ conda install pytorch torchvision -c pytorch 
+   $ conda install pytorch torchvision -c pytorch
    
 
-or pip
+或者使用pip:
 
 .. code-block:: sh
 
    $ pip install torch torchvision
 
-.. GENERATED FROM PYTHON SOURCE LINES 30-36
+.. GENERATED FROM PYTHON SOURCE LINES 29-35
 
-Using TensorBoard in PyTorch
+在PyTorch中使用TensorBoard
 -----------------------------
 
-Let’s now try using TensorBoard with PyTorch! Before logging anything, 
-we need to create a ``SummaryWriter`` instance.
+现在让我们尝试在PyTorch中使用TensorBoard!在记录任何内容之前,
+我们需要创建一个 ``SummaryWriter`` 实例。
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 36-41
+.. GENERATED FROM PYTHON SOURCE LINES 35-41
 
 .. code-block:: default
 
 
     import torch
     from torch.utils.tensorboard import SummaryWriter
+
     writer = SummaryWriter()
 
 
 .. GENERATED FROM PYTHON SOURCE LINES 42-44
 
-Writer will output to ``./runs/`` directory by default.
+写入器默认将输出到 ``./runs/`` 目录。
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 47-59
+.. GENERATED FROM PYTHON SOURCE LINES 47-58
 
-Log scalars
+记录标量
 -----------
 
-In machine learning, it’s important to understand key metrics such as 
-loss and how they change during training. Scalar helps to save 
-the loss value of each training step, or the accuracy after each epoch. 
+在机器学习中,了解关键指标(如损失)及其在训练期间的变化非常重要。
+标量可用于保存每个训练步骤的损失值或每个epoch的准确率。
 
-To log a scalar value, use 
-``add_scalar(tag, scalar_value, global_step=None, walltime=None)``. 
-For example, lets create a simple linear regression training, and 
-log loss value using ``add_scalar``
+要记录标量值,请使用
+``add_scalar(tag, scalar_value, global_step=None, walltime=None)``。
+例如,让我们创建一个简单的线性回归训练,并
+使用 ``add_scalar`` 记录损失值
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 59-80
+.. GENERATED FROM PYTHON SOURCE LINES 58-81
 
 .. code-block:: default
 
@@ -92,7 +91,8 @@ log loss value using ``add_scalar``
 
     model = torch.nn.Linear(1, 1)
     criterion = torch.nn.MSELoss()
-    optimizer = torch.optim.SGD(model.parameters(), lr = 0.1)
+    optimizer = torch.optim.SGD(model.parameters(), lr=0.1)
+
 
     def train_model(iter):
         for epoch in range(iter):
@@ -102,24 +102,25 @@ log loss value using ``add_scalar``
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
-        
+
+
     train_model(10)
     writer.flush()
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 81-89
+.. GENERATED FROM PYTHON SOURCE LINES 82-90
 
-Call ``flush()`` method to make sure that all pending events 
-have been written to disk.
+调用 ``flush()`` 方法以确保所有待处理事件
+已写入磁盘。
 
-See `torch.utils.tensorboard tutorials <https://pytorch.org/docs/stable/tensorboard.html>`_ 
-to find more TensorBoard visualization types you can log.
+请参阅 `torch.utils.tensorboard 教程 <https://pytorch.org/docs/stable/tensorboard.html>`_
+以了解您可以记录的更多TensorBoard可视化类型。
 
-If you do not need the summary writer anymore, call ``close()`` method.
+如果您不再需要摘要写入器,请调用 ``close()`` 方法。
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 89-92
+.. GENERATED FROM PYTHON SOURCE LINES 90-93
 
 .. code-block:: default
 
@@ -127,45 +128,43 @@ If you do not need the summary writer anymore, call ``close()`` method.
     writer.close()
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 93-122
+.. GENERATED FROM PYTHON SOURCE LINES 94-121
 
-Run TensorBoard
+运行TensorBoard
 ----------------
 
-Install TensorBoard through the command line to visualize data you logged
+通过命令行安装TensorBoard以可视化您记录的数据
 
 .. code-block:: sh
 
    pip install tensorboard
 
 
-Now, start TensorBoard, specifying the root log directory you used above. 
-Argument ``logdir`` points to directory where TensorBoard will look to find 
-event files that it can display. TensorBoard will recursively walk 
-the directory structure rooted at ``logdir``, looking for ``.*tfevents.*`` files.
+现在,启动TensorBoard,指定您之前使用的根日志目录。
+参数 ``logdir`` 指向TensorBoard将查找可显示的事件文件的目录。
+TensorBoard将递归遍历 ``logdir`` 根目录下的目录结构,寻找 ``.*tfevents.*`` 文件。
 
 .. code-block:: sh
 
    tensorboard --logdir=runs
 
-Go to the URL it provides OR to `http://localhost:6006/ <http://localhost:6006/>`_
+转到它提供的URL或 `http://localhost:6006/ <http://localhost:6006/>`_
 
 .. image:: ../../_static/img/thumbnails/tensorboard_scalars.png
    :scale: 40 %
 
-This dashboard shows how the loss and accuracy change with every epoch. 
-You can use it to also track training speed, learning rate, and other 
-scalar values. It’s helpful to compare these metrics across different 
-training runs to improve your model.
+此仪表板显示了损失和准确率如何随着每个epoch而变化。
+您可以使用它来跟踪训练速度、学习率和其他标量值。
+比较不同训练运行的这些指标有助于改进您的模型。
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 125-131
+.. GENERATED FROM PYTHON SOURCE LINES 124-130
 
-Learn More
+了解更多
 ----------------------------
 
--  `torch.utils.tensorboard <https://pytorch.org/docs/stable/tensorboard.html>`_ docs
--  `Visualizing models, data, and training with TensorBoard <https://pytorch.org/tutorials/intermediate/tensorboard_tutorial.html>`_ tutorial
+-  `torch.utils.tensorboard <https://pytorch.org/docs/stable/tensorboard.html>`_ 文档
+-  `使用TensorBoard可视化模型、数据和训练 <https://pytorch.org/tutorials/intermediate/tensorboard_tutorial.html>`_ 教程
 
 
 

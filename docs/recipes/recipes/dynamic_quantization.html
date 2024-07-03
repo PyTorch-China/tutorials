@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Dynamic Quantization &mdash; PyTorch Tutorials 2.3.0 documentation</title>
+  <title>动态量化 &mdash; PyTorch Tutorials 2.3.0 documentation</title>
   
 
   
@@ -43,7 +43,7 @@
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="Automatic Mixed Precision" href="amp_recipe.html" />
-    <link rel="prev" title="How to use TensorBoard with PyTorch" href="tensorboard_with_pytorch.html" />
+    <link rel="prev" title="如何在PyTorch中使用TensorBoard" href="tensorboard_with_pytorch.html" />
   <!-- Google Tag Manager -->
     <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
     new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
@@ -535,7 +535,7 @@
         
           <li><a href="../recipes_index.html">PyTorch 示例</a> &gt;</li>
         
-      <li>Dynamic Quantization</li>
+      <li>动态量化</li>
     
     
       <li class="pytorch-breadcrumbs-aside">
@@ -599,259 +599,196 @@
 <p>Click <a class="reference internal" href="#sphx-glr-download-recipes-recipes-dynamic-quantization-py"><span class="std std-ref">here</span></a>
 to download the full example code</p>
 </div>
-<div class="sphx-glr-example-title section" id="dynamic-quantization">
-<span id="sphx-glr-recipes-recipes-dynamic-quantization-py"></span><h1>Dynamic Quantization<a class="headerlink" href="#dynamic-quantization" title="Permalink to this heading">¶</a></h1>
-<p>In this recipe you will see how to take advantage of Dynamic
-Quantization to accelerate inference on an LSTM-style recurrent neural
-network. This reduces the size of the model weights and speeds up model
-execution.</p>
-<div class="section" id="introduction">
-<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this heading">¶</a></h2>
-<p>There are a number of trade-offs that can be made when designing neural
-networks. During model development and training you can alter the
-number of layers and number of parameters in a recurrent neural network
-and trade-off accuracy against model size and/or model latency or
-throughput. Such changes can take lot of time and compute resources
-because you are iterating over the model training. Quantization gives
-you a way to make a similar trade off between performance and model
-accuracy with a known model after training is completed.</p>
-<p>You can give it a try in a single session and you will certainly reduce
-your model size significantly and may get a significant latency
-reduction without losing a lot of accuracy.</p>
+<div class="sphx-glr-example-title section" id="sphx-glr-recipes-recipes-dynamic-quantization-py">
+<span id="id1"></span><h1>动态量化<a class="headerlink" href="#sphx-glr-recipes-recipes-dynamic-quantization-py" title="Permalink to this heading">¶</a></h1>
+<p>在这个示例中,您将看到如何利用动态量化来加速 LSTM 风格的循环神经网络的推理。这可以减小模型权重的大小,并加快模型执行速度。</p>
+<div class="section" id="id2">
+<h2>介绍<a class="headerlink" href="#id2" title="Permalink to this heading">¶</a></h2>
+<p>在设计神经网络时,可以做出多种权衡。在模型开发和训练期间,您可以改变循环神经网络中的层数和参数数量,在模型大小和/或模型延迟或吞吐量与精度之间进行权衡。由于您需要重复模型训练过程,因此这种改变需要大量的时间和计算资源。量化为您提供了一种在已知模型上在性能和模型精度之间进行权衡的方式,而无需重新训练模型。</p>
+<p>您可以在单个会话中尝试一下,您肯定会显著减小模型大小,并可能在不会损失太多精度的情况下获得显著的延迟减少。</p>
 </div>
-<div class="section" id="what-is-dynamic-quantization">
-<h2>What is dynamic quantization?<a class="headerlink" href="#what-is-dynamic-quantization" title="Permalink to this heading">¶</a></h2>
-<p>Quantizing a network means converting it to use a reduced precision
-integer representation for the weights and/or activations. This saves on
-model size and allows the use of higher throughput math operations on
-your CPU or GPU.</p>
-<p>When converting from floating point to integer values you are
-essentially multiplying the floating point value by some scale factor
-and rounding the result to a whole number. The various quantization
-approaches differ in the way they approach determining that scale
-factor.</p>
-<p>The key idea with dynamic quantization as described here is that we are
-going to determine the scale factor for activations dynamically based on
-the data range observed at runtime. This ensures that the scale factor
-is “tuned” so that as much signal as possible about each observed
-dataset is preserved.</p>
-<p>The model parameters on the other hand are known during model conversion
-and they are converted ahead of time and stored in INT8 form.</p>
-<p>Arithmetic in the quantized model is done using vectorized INT8
-instructions. Accumulation is typically done with INT16 or INT32 to
-avoid overflow. This higher precision value is scaled back to INT8 if
-the next layer is quantized or converted to FP32 for output.</p>
-<p>Dynamic quantization is relatively free of tuning parameters which makes
-it well suited to be added into production pipelines as a standard part
-of converting LSTM models to deployment.</p>
+<div class="section" id="id3">
+<h2>什么是动态量化?<a class="headerlink" href="#id3" title="Permalink to this heading">¶</a></h2>
+<p>量化网络意味着将其转换为使用较低精度的整数表示形式来表示权重和/或激活。这可以减小模型大小,并允许在 CPU 或 GPU 上使用更高吞吐量的数学运算。</p>
+<p>从浮点数转换为整数值时,您实际上是将浮点数乘以某个比例因子,然后将结果舍入为整数。不同的量化方法在确定该比例因子的方式上有所不同。</p>
+<p>这里介绍的动态量化的关键思想是,我们将根据运行时观察到的数据范围动态确定激活的比例因子。这可确保比例因子被”调整”为尽可能保留每个观察到的数据集的信号。</p>
+<p>另一方面,模型参数在模型转换期间是已知的,它们会提前转换并以 INT8 形式存储。</p>
+<p>量化模型中的算术运算使用矢量化的 INT8 指令完成。累加通常使用 INT16 或 INT32 来避免溢出。如果下一层是量化的,则将此较高精度值缩放回 INT8;如果是输出,则将其转换为 FP32。</p>
+<p>动态量化相对来说没有太多需要调整的参数,因此非常适合作为将 LSTM 模型转换为部署的标准部分添加到生产管道中。</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Limitations on the approach taken here</p>
-<p>This recipe provides a quick introduction to the dynamic quantization
-features in PyTorch and the workflow for using it. Our focus is on
-explaining the specific functions used to convert the model. We will
-make a number of significant simplifications in the interest of brevity
-and clarity</p>
+<p>本示例中采用的方法的局限性</p>
+<p>本示例提供了对 PyTorch 中动态量化功能的快速介绍,以及使用它的工作流程。我们的重点是解释用于转换模型的特定函数。为了简洁和清晰,我们做出了一些重大简化,包括:</p>
 </div>
 <ol class="arabic simple">
-<li><p>You will start with a minimal LSTM network</p></li>
-<li><p>You are simply going to initialize the network with a random hidden
-state</p></li>
-<li><p>You are going to test the network with random inputs</p></li>
-<li><p>You are not going to train the network in this tutorial</p></li>
-<li><p>You will see that the quantized form of this network is smaller and
-runs faster than the floating point network we started with</p></li>
-<li><p>You will see that the output values are generally in the same
-ballpark as the output of the FP32 network, but we are not
-demonstrating here the expected accuracy loss on a real trained
-network</p></li>
+<li><p>您将从一个最小的 LSTM 网络开始</p></li>
+<li><p>您只需用随机隐藏状态初始化网络</p></li>
+<li><p>您将使用随机输入来测试网络</p></li>
+<li><p>您不会在本教程中训练网络</p></li>
+<li><p>您将看到,与我们开始时的浮点网络相比,量化后的网络更小且运行速度更快</p></li>
+<li><p>您将看到,量化网络产生的输出张量值与 FP32 网络输出的值在同一数量级,但我们并未在这里展示该技术在经过训练的 LSTM 上能够保留较高模型精度的情况</p></li>
 </ol>
-<p>You will see how dynamic quantization is done and be able to see
-suggestive reductions in memory use and latency times. Providing a
-demonstration that the technique can preserve high levels of model
-accuracy on a trained LSTM is left to a more advanced tutorial. If you
-want to move right away to that more rigorous treatment please proceed
-to the <a class="reference external" href="https://pytorch.org/tutorials/advanced/dynamic_quantization_tutorial.html">advanced dynamic quantization
-tutorial</a>.</p>
+<p>您将了解如何进行动态量化,并能够看到内存使用和延迟时间的潜在减小。关于该技术在经过训练的 LSTM 上能够保留较高模型精度的演示,将留待更高级的教程。如果您想直接进入更严格的处理,请继续学习 <a class="reference external" href="https://pytorch.org/tutorials/advanced/dynamic_quantization_tutorial.html">高级动态量化教程</a>。</p>
 </div>
-<div class="section" id="steps">
-<h2>Steps<a class="headerlink" href="#steps" title="Permalink to this heading">¶</a></h2>
-<p>This recipe has 5 steps.</p>
+<div class="section" id="id4">
+<h2>步骤<a class="headerlink" href="#id4" title="Permalink to this heading">¶</a></h2>
+<p>本示例包含 5 个步骤。</p>
 <ol class="arabic simple">
-<li><p>Set Up - Here you define a very simple LSTM, import modules, and establish
-some random input tensors.</p></li>
-<li><p>Do the Quantization - Here you instantiate a floating point model and then create quantized
-version of it.</p></li>
-<li><p>Look at Model Size - Here you show that the model size gets smaller.</p></li>
-<li><p>Look at Latency - Here you run the two models and compare model runtime (latency).</p></li>
-<li><p>Look at Accuracy - Here you run the two models and compare outputs.</p></li>
+<li><p>设置 - 在这里,您定义一个非常简单的 LSTM,导入模块,并建立一些随机输入张量。</p></li>
+<li><p>执行量化 - 在这里,您实例化一个浮点模型,然后创建其量化版本。</p></li>
+<li><p>查看模型大小 - 在这里,您显示模型大小变小了。</p></li>
+<li><p>查看延迟 - 在这里,您运行两个模型并比较模型运行时间(延迟)。</p></li>
+<li><p>查看精度 - 在这里,您运行两个模型并比较输出。</p></li>
 </ol>
-<div class="section" id="set-up">
-<h3>1: Set Up<a class="headerlink" href="#set-up" title="Permalink to this heading">¶</a></h3>
-<p>This is a straightforward bit of code to set up for the rest of the
-recipe.</p>
-<p>The unique module we are importing here is torch.quantization which
-includes PyTorch’s quantized operators and conversion functions. We also
-define a very simple LSTM model and set up some inputs.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># import the modules used here in this recipe</span>
-<span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">import</span> <span class="nn">torch.quantization</span>
-<span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
+<div class="section" id="id5">
+<h3>1: 设置<a class="headerlink" href="#id5" title="Permalink to this heading">¶</a></h3>
+<p>这是一段直接的代码,用于为本示例的其余部分做准备。</p>
+<p>我们在这里导入的唯一模块是 torch.quantization,它包含了 PyTorch 的量化算子和转换函数。我们还定义了一个非常简单的 LSTM 模型,并设置了一些输入。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># 导入本示例中使用的模块</span>
 <span class="kn">import</span> <span class="nn">copy</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">time</span>
 
-<span class="c1"># define a very, very simple LSTM for demonstration purposes</span>
-<span class="c1"># in this case, we are wrapping ``nn.LSTM``, one layer, no preprocessing or postprocessing</span>
-<span class="c1"># inspired by</span>
-<span class="c1"># `Sequence Models and Long Short-Term Memory Networks tutorial &lt;https://pytorch.org/tutorials/beginner/nlp/sequence_models_tutorial.html`_, by Robert Guthrie</span>
-<span class="c1"># and `Dynamic Quanitzation tutorial &lt;https://pytorch.org/tutorials/advanced/dynamic_quantization_tutorial.html&gt;`__.</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
+<span class="kn">import</span> <span class="nn">torch.quantization</span>
+
+
+<span class="c1"># 为演示目的定义一个非常简单的 LSTM</span>
+<span class="c1"># 在这种情况下,我们只是包装了 ``nn.LSTM``、一层,没有预处理或后处理</span>
+<span class="c1"># 受到以下教程的启发:</span>
+<span class="c1"># `序列模型和长短期记忆网络教程 &lt;https://pytorch.org/tutorials/beginner/nlp/sequence_models_tutorial.html&gt;`_, 作者 Robert Guthrie</span>
+<span class="c1"># 和 `动态量化教程 &lt;https://pytorch.org/tutorials/advanced/dynamic_quantization_tutorial.html&gt;`__。</span>
 <span class="k">class</span> <span class="nc">lstm_for_demonstration</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/generated/torch.nn.Module.html#torch.nn.Module" title="torch.nn.Module" class="sphx-glr-backref-module-torch-nn sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">nn</span><span class="o">.</span><span class="n">Module</span></a><span class="p">):</span>
-<span class="w">  </span><span class="sd">&quot;&quot;&quot;Elementary Long Short Term Memory style model which simply wraps ``nn.LSTM``</span>
-<span class="sd">     Not to be used for anything other than demonstration.</span>
-<span class="sd">  &quot;&quot;&quot;</span>
-  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">in_dim</span><span class="p">,</span><span class="n">out_dim</span><span class="p">,</span><span class="n">depth</span><span class="p">):</span>
-     <span class="nb">super</span><span class="p">(</span><span class="n">lstm_for_demonstration</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-     <span class="bp">self</span><span class="o">.</span><span class="n">lstm</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.nn.LSTM.html#torch.nn.LSTM" title="torch.nn.LSTM" class="sphx-glr-backref-module-torch-nn sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">nn</span><span class="o">.</span><span class="n">LSTM</span></a><span class="p">(</span><span class="n">in_dim</span><span class="p">,</span><span class="n">out_dim</span><span class="p">,</span><span class="n">depth</span><span class="p">)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;基本的长短期记忆风格模型,只是包装了 ``nn.LSTM``</span>
+<span class="sd">    不应用于除演示之外的任何其他用途。</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
-  <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">inputs</span><span class="p">,</span><span class="n">hidden</span><span class="p">):</span>
-     <span class="n">out</span><span class="p">,</span><span class="n">hidden</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lstm</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span><span class="n">hidden</span><span class="p">)</span>
-     <span class="k">return</span> <span class="n">out</span><span class="p">,</span> <span class="n">hidden</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">in_dim</span><span class="p">,</span> <span class="n">out_dim</span><span class="p">,</span> <span class="n">depth</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">lstm_for_demonstration</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lstm</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.nn.LSTM.html#torch.nn.LSTM" title="torch.nn.LSTM" class="sphx-glr-backref-module-torch-nn sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">nn</span><span class="o">.</span><span class="n">LSTM</span></a><span class="p">(</span><span class="n">in_dim</span><span class="p">,</span> <span class="n">out_dim</span><span class="p">,</span> <span class="n">depth</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">hidden</span><span class="p">):</span>
+        <span class="n">out</span><span class="p">,</span> <span class="n">hidden</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lstm</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="n">hidden</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span><span class="p">,</span> <span class="n">hidden</span>
 
 
-<a href="https://pytorch.org/docs/stable/generated/torch.manual_seed.html#torch.manual_seed" title="torch.manual_seed" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">manual_seed</span></a><span class="p">(</span><span class="mi">29592</span><span class="p">)</span>  <span class="c1"># set the seed for reproducibility</span>
+<a href="https://pytorch.org/docs/stable/generated/torch.manual_seed.html#torch.manual_seed" title="torch.manual_seed" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">manual_seed</span></a><span class="p">(</span><span class="mi">29592</span><span class="p">)</span>  <span class="c1"># 设置种子以获得可重复结果</span>
 
-<span class="c1">#shape parameters</span>
-<span class="n">model_dimension</span><span class="o">=</span><span class="mi">8</span>
-<span class="n">sequence_length</span><span class="o">=</span><span class="mi">20</span>
-<span class="n">batch_size</span><span class="o">=</span><span class="mi">1</span>
-<span class="n">lstm_depth</span><span class="o">=</span><span class="mi">1</span>
+<span class="c1"># 形状参数</span>
+<span class="n">model_dimension</span> <span class="o">=</span> <span class="mi">8</span>
+<span class="n">sequence_length</span> <span class="o">=</span> <span class="mi">20</span>
+<span class="n">batch_size</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">lstm_depth</span> <span class="o">=</span> <span class="mi">1</span>
 
-<span class="c1"># random data for input</span>
-<span class="n">inputs</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.randn.html#torch.randn" title="torch.randn" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">randn</span></a><span class="p">(</span><span class="n">sequence_length</span><span class="p">,</span><span class="n">batch_size</span><span class="p">,</span><span class="n">model_dimension</span><span class="p">)</span>
-<span class="c1"># hidden is actually is a tuple of the initial hidden state and the initial cell state</span>
-<span class="n">hidden</span> <span class="o">=</span> <span class="p">(</span><a href="https://pytorch.org/docs/stable/generated/torch.randn.html#torch.randn" title="torch.randn" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">randn</span></a><span class="p">(</span><span class="n">lstm_depth</span><span class="p">,</span><span class="n">batch_size</span><span class="p">,</span><span class="n">model_dimension</span><span class="p">),</span> <a href="https://pytorch.org/docs/stable/generated/torch.randn.html#torch.randn" title="torch.randn" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">randn</span></a><span class="p">(</span><span class="n">lstm_depth</span><span class="p">,</span><span class="n">batch_size</span><span class="p">,</span><span class="n">model_dimension</span><span class="p">))</span>
+<span class="c1"># 随机输入数据</span>
+<span class="n">inputs</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.randn.html#torch.randn" title="torch.randn" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">randn</span></a><span class="p">(</span><span class="n">sequence_length</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">,</span> <span class="n">model_dimension</span><span class="p">)</span>
+<span class="c1"># hidden 实际上是初始隐藏状态和初始细胞状态的元组</span>
+<span class="n">hidden</span> <span class="o">=</span> <span class="p">(</span>
+    <a href="https://pytorch.org/docs/stable/generated/torch.randn.html#torch.randn" title="torch.randn" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">randn</span></a><span class="p">(</span><span class="n">lstm_depth</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">,</span> <span class="n">model_dimension</span><span class="p">),</span>
+    <a href="https://pytorch.org/docs/stable/generated/torch.randn.html#torch.randn" title="torch.randn" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">randn</span></a><span class="p">(</span><span class="n">lstm_depth</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">,</span> <span class="n">model_dimension</span><span class="p">),</span>
+<span class="p">)</span>
 </pre></div>
 </div>
 </div>
-<div class="section" id="do-the-quantization">
-<h3>2: Do the Quantization<a class="headerlink" href="#do-the-quantization" title="Permalink to this heading">¶</a></h3>
-<p>Now we get to the fun part. First we create an instance of the model
-called <code class="docutils literal notranslate"><span class="pre">float\_lstm</span></code> then we are going to quantize it. We’re going to use
-the <a class="reference external" href="https://pytorch.org/docs/stable/quantization.html#torch.quantization.quantize_dynamic">torch.quantization.quantize_dynamic</a> function, which takes the model, then a list of the submodules
-which we want to
-have quantized if they appear, then the datatype we are targeting. This
-function returns a quantized version of the original model as a new
-module.</p>
-<p>That’s all it takes.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="c1"># here is our floating point instance</span>
-<span class="n">float_lstm</span> <span class="o">=</span> <span class="n">lstm_for_demonstration</span><span class="p">(</span><span class="n">model_dimension</span><span class="p">,</span> <span class="n">model_dimension</span><span class="p">,</span><span class="n">lstm_depth</span><span class="p">)</span>
+<div class="section" id="id6">
+<h3>2: 执行量化<a class="headerlink" href="#id6" title="Permalink to this heading">¶</a></h3>
+<p>现在我们来执行有趣的部分。首先,我们创建一个名为 <code class="docutils literal notranslate"><span class="pre">float_lstm</span></code> 的模型实例,然后我们将对其进行量化。我们将使用 <a class="reference external" href="https://pytorch.org/docs/stable/quantization.html#torch.quantization.quantize_dynamic">torch.quantization.quantize_dynamic</a> 函数,它接受模型、我们希望量化的子模块列表(如果存在)以及目标数据类型。此函数返回原始模型的量化版本,作为一个新模块。</p>
+<p>就这么简单。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># 这是我们的浮点实例</span>
+<span class="n">float_lstm</span> <span class="o">=</span> <span class="n">lstm_for_demonstration</span><span class="p">(</span><span class="n">model_dimension</span><span class="p">,</span> <span class="n">model_dimension</span><span class="p">,</span> <span class="n">lstm_depth</span><span class="p">)</span>
 
-<span class="c1"># this is the call that does the work</span>
+<span class="c1"># 这是执行量化的调用</span>
 <span class="n">quantized_lstm</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">quantization</span><span class="o">.</span><span class="n">quantize_dynamic</span><span class="p">(</span>
     <span class="n">float_lstm</span><span class="p">,</span> <span class="p">{</span><a href="https://pytorch.org/docs/stable/generated/torch.nn.LSTM.html#torch.nn.LSTM" title="torch.nn.LSTM" class="sphx-glr-backref-module-torch-nn sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">nn</span><span class="o">.</span><span class="n">LSTM</span></a><span class="p">,</span> <a href="https://pytorch.org/docs/stable/generated/torch.nn.Linear.html#torch.nn.Linear" title="torch.nn.Linear" class="sphx-glr-backref-module-torch-nn sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span></a><span class="p">},</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">qint8</span>
 <span class="p">)</span>
 
-<span class="c1"># show the changes that were made</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Here is the floating point version of this module:&#39;</span><span class="p">)</span>
+<span class="c1"># 显示所做的更改</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;这是该模块的浮点版本:&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">float_lstm</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;and now the quantized version:&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;现在是量化版本:&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">quantized_lstm</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
-<div class="section" id="look-at-model-size">
-<h3>3. Look at Model Size<a class="headerlink" href="#look-at-model-size" title="Permalink to this heading">¶</a></h3>
-<p>We’ve quantized the model. What does that get us? Well the first
-benefit is that we’ve replaced the FP32 model parameters with INT8
-values (and some recorded scale factors). This means about 75% less data
-to store and move around. With the default values the reduction shown
-below will be less than 75% but if you increase the model size above
-(for example you can set model dimension to something like 80) this will
-converge towards 4x smaller as the stored model size dominated more and
-more by the parameter values.</p>
+<div class="section" id="id7">
+<h3>3. 查看模型大小<a class="headerlink" href="#id7" title="Permalink to this heading">¶</a></h3>
+<p>我们已经量化了模型。这给我们带来了什么好处?好处之一是我们用 INT8 值(和一些记录的比例因子)替换了 FP32 模型参数。这意味着存储和移动数据的大小减小了约 75%。使用默认值时,下面显示的减小量将小于 75%,但如果您将模型大小增加到更大值(例如将 model_dimension 设置为 80),随着存储的模型大小越来越多地由参数值主导,减小量将趋近于 4 倍。</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">print_size_of_model</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
     <a href="https://pytorch.org/docs/stable/generated/torch.save.html#torch.save" title="torch.save" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">save</span></a><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">state_dict</span><span class="p">(),</span> <span class="s2">&quot;temp.p&quot;</span><span class="p">)</span>
-    <span class="n">size</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">getsize</span><span class="p">(</span><span class="s2">&quot;temp.p&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;model: &quot;</span><span class="p">,</span><span class="n">label</span><span class="p">,</span><span class="s1">&#39; </span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">,</span><span class="s1">&#39;Size (KB):&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">/</span><span class="mf">1e3</span><span class="p">)</span>
-    <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s1">&#39;temp.p&#39;</span><span class="p">)</span>
+    <span class="n">size</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">getsize</span><span class="p">(</span><span class="s2">&quot;temp.p&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;模型: &quot;</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="s2">&quot; </span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;大小 (KB):&quot;</span><span class="p">,</span> <span class="n">size</span> <span class="o">/</span> <span class="mf">1e3</span><span class="p">)</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s2">&quot;temp.p&quot;</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">size</span>
 
-<span class="c1"># compare the sizes</span>
-<span class="n">f</span><span class="o">=</span><span class="n">print_size_of_model</span><span class="p">(</span><span class="n">float_lstm</span><span class="p">,</span><span class="s2">&quot;fp32&quot;</span><span class="p">)</span>
-<span class="n">q</span><span class="o">=</span><span class="n">print_size_of_model</span><span class="p">(</span><span class="n">quantized_lstm</span><span class="p">,</span><span class="s2">&quot;int8&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{0:.2f}</span><span class="s2"> times smaller&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">f</span><span class="o">/</span><span class="n">q</span><span class="p">))</span>
+
+<span class="c1"># 比较大小</span>
+<span class="n">f</span> <span class="o">=</span> <span class="n">print_size_of_model</span><span class="p">(</span><span class="n">float_lstm</span><span class="p">,</span> <span class="s2">&quot;fp32&quot;</span><span class="p">)</span>
+<span class="n">q</span> <span class="o">=</span> <span class="n">print_size_of_model</span><span class="p">(</span><span class="n">quantized_lstm</span><span class="p">,</span> <span class="s2">&quot;int8&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{0:.2f}</span><span class="s2"> 倍更小&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">f</span> <span class="o">/</span> <span class="n">q</span><span class="p">))</span>
 </pre></div>
 </div>
 </div>
-<div class="section" id="look-at-latency">
-<h3>4. Look at Latency<a class="headerlink" href="#look-at-latency" title="Permalink to this heading">¶</a></h3>
-<p>The second benefit is that the quantized model will typically run
-faster. This is due to a combinations of effects including at least:</p>
+<div class="section" id="id8">
+<h3>4. 查看延迟<a class="headerlink" href="#id8" title="Permalink to this heading">¶</a></h3>
+<p>第二个好处是量化模型通常会运行得更快。这是由于多种效果的组合,至少包括:</p>
 <ol class="arabic simple">
-<li><p>Less time spent moving parameter data in</p></li>
-<li><p>Faster INT8 operations</p></li>
+<li><p>减少了移动参数数据所花费的时间</p></li>
+<li><p>INT8 操作更快</p></li>
 </ol>
-<p>As you will see the quantized version of this super-simple network runs
-faster. This will generally be true of more complex networks but as they
-say “your mileage may vary” depending on a number of factors including
-the structure of the model and the hardware you are running on.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># compare the performance</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Floating point FP32&quot;</span><span class="p">)</span>
+<p>如您所见,这个超级简单的网络的量化版本运行速度更快。对于更复杂的网络通常也是如此,但正如他们所说,”您的里程可能会有所不同”,这取决于许多因素,包括模型的结构和您运行的硬件。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># 比较性能</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;浮点 FP32&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">timeit</span> <span class="n">float_lstm</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="n">hidden</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Quantized INT8&quot;</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;量化 INT8&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">timeit</span> <span class="n">quantized_lstm</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span><span class="n">hidden</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
-<div class="section" id="look-at-accuracy">
-<h3>5: Look at Accuracy<a class="headerlink" href="#look-at-accuracy" title="Permalink to this heading">¶</a></h3>
-<p>We are not going to do a careful look at accuracy here because we are
-working with a randomly initialized network rather than a properly
-trained one. However, I think it is worth quickly showing that the
-quantized network does produce output tensors that are “in the same
-ballpark” as the original one.</p>
-<p>For a more detailed analysis please see the more advanced tutorials
-referenced at the end of this recipe.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># run the float model</span>
+<div class="section" id="id9">
+<h3>5: 查看精度<a class="headerlink" href="#id9" title="Permalink to this heading">¶</a></h3>
+<p>我们不会在这里仔细查看精度,因为我们使用的是随机初始化的网络,而不是经过正确训练的网络。但是,我认为值得快速展示一下量化网络确实产生了与原始网络”同一数量级”的输出张量值。</p>
+<p>有关更详细的分析,请参阅本示例结尾处引用的更高级教程。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># 运行浮点模型</span>
 <span class="n">out1</span><span class="p">,</span> <span class="n">hidden1</span> <span class="o">=</span> <span class="n">float_lstm</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="n">hidden</span><span class="p">)</span>
 <span class="n">mag1</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.mean.html#torch.mean" title="torch.mean" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">mean</span></a><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">out1</span><span class="p">))</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;mean absolute value of output tensor values in the FP32 model is </span><span class="si">{0:.5f}</span><span class="s1"> &#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mag1</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;FP32 模型中输出张量值的绝对值均值为 </span><span class="si">{0:.5f}</span><span class="s2"> &quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mag1</span><span class="p">))</span>
 
-<span class="c1"># run the quantized model</span>
+<span class="c1"># 运行量化模型</span>
 <span class="n">out2</span><span class="p">,</span> <span class="n">hidden2</span> <span class="o">=</span> <span class="n">quantized_lstm</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="n">hidden</span><span class="p">)</span>
 <span class="n">mag2</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.mean.html#torch.mean" title="torch.mean" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">mean</span></a><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">out2</span><span class="p">))</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;mean absolute value of output tensor values in the INT8 model is </span><span class="si">{0:.5f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mag2</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;INT8 模型中输出张量值的绝对值均值为 </span><span class="si">{0:.5f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mag2</span><span class="p">))</span>
 
-<span class="c1"># compare them</span>
-<span class="n">mag3</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.mean.html#torch.mean" title="torch.mean" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">mean</span></a><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">out1</span><span class="o">-</span><span class="n">out2</span><span class="p">))</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;mean absolute value of the difference between the output tensors is </span><span class="si">{0:.5f}</span><span class="s1"> or </span><span class="si">{1:.2f}</span><span class="s1"> percent&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mag3</span><span class="p">,</span><span class="n">mag3</span><span class="o">/</span><span class="n">mag1</span><span class="o">*</span><span class="mi">100</span><span class="p">))</span>
+<span class="c1"># 比较它们</span>
+<span class="n">mag3</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.mean.html#torch.mean" title="torch.mean" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">mean</span></a><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">out1</span> <span class="o">-</span> <span class="n">out2</span><span class="p">))</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span>
+    <span class="s2">&quot;输出张量之间差值的绝对值均值为 </span><span class="si">{0:.5f}</span><span class="s2">，或占 </span><span class="si">{1:.2f}</span><span class="s2"> 百分比&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+        <span class="n">mag3</span><span class="p">,</span> <span class="n">mag3</span> <span class="o">/</span> <span class="n">mag1</span> <span class="o">*</span> <span class="mi">100</span>
+    <span class="p">)</span>
+<span class="p">)</span>
 </pre></div>
 </div>
 </div>
 </div>
-<div class="section" id="learn-more">
-<h2>Learn More<a class="headerlink" href="#learn-more" title="Permalink to this heading">¶</a></h2>
-<p>We’ve explained what dynamic quantization is, what benefits it brings,
-and you have used the <code class="docutils literal notranslate"><span class="pre">torch.quantization.quantize_dynamic()</span></code> function
-to quickly quantize a simple LSTM model.</p>
-<p>This was a fast and high level treatment of this material; for more
-detail please continue learning with <a class="reference external" href="https://pytorch.org/tutorials/advanced/dynamic_quantization_tutorial.html">(beta) Dynamic Quantization on an LSTM Word Language Model Tutorial</a>.</p>
+<div class="section" id="id10">
+<h2>了解更多<a class="headerlink" href="#id10" title="Permalink to this heading">¶</a></h2>
+<p>我们已经解释了什么是动态量化,它带来了什么好处,您已经使用 <code class="docutils literal notranslate"><span class="pre">torch.quantization.quantize_dynamic()</span></code> 函数快速量化了一个简单的 LSTM 模型。</p>
+<p>这是对该材料的快速和高级处理;要了解更多详细信息,请继续学习 <a class="reference external" href="https://pytorch.org/tutorials/advanced/dynamic_quantization_tutorial.html">(beta) 动态量化 LSTM 词语言模型教程</a>。</p>
 </div>
-<div class="section" id="additional-resources">
-<h2>Additional Resources<a class="headerlink" href="#additional-resources" title="Permalink to this heading">¶</a></h2>
+<div class="section" id="id11">
+<h2>其他资源<a class="headerlink" href="#id11" title="Permalink to this heading">¶</a></h2>
 <ul class="simple">
-<li><p><a class="reference external" href="https://pytorch.org/docs/stable/quantization.html">Quantization API Documentaion</a></p></li>
-<li><p><a class="reference external" href="https://pytorch.org/tutorials/intermediate/dynamic_quantization_bert_tutorial.html">(beta) Dynamic Quantization on BERT</a></p></li>
-<li><p><a class="reference external" href="https://pytorch.org/tutorials/advanced/dynamic_quantization_tutorial.html">(beta) Dynamic Quantization on an LSTM Word Language Model</a></p></li>
-<li><p><a class="reference external" href="https://pytorch.org/blog/introduction-to-quantization-on-pytorch/">Introduction to Quantization on PyTorch</a></p></li>
+<li><p><a class="reference external" href="https://pytorch.org/docs/stable/quantization.html">量化 API 文档</a></p></li>
+<li><p><a class="reference external" href="https://pytorch.org/tutorials/intermediate/dynamic_quantization_bert_tutorial.html">(beta) 动态量化 BERT</a></p></li>
+<li><p><a class="reference external" href="https://pytorch.org/tutorials/advanced/dynamic_quantization_tutorial.html">(beta) 动态量化 LSTM 词语言模型</a></p></li>
+<li><p><a class="reference external" href="https://pytorch.org/blog/introduction-to-quantization-on-pytorch/">PyTorch 量化介绍</a></p></li>
 </ul>
 <p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.000 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-recipes-recipes-dynamic-quantization-py">
@@ -877,7 +814,7 @@ detail please continue learning with <a class="reference external" href="https:/
         <a href="amp_recipe.html" class="btn btn-neutral float-right" title="Automatic Mixed Precision" accesskey="n" rel="next">Next <img src="../../_static/images/chevron-right-orange.svg" class="next-page"></a>
       
       
-        <a href="tensorboard_with_pytorch.html" class="btn btn-neutral" title="How to use TensorBoard with PyTorch" accesskey="p" rel="prev"><img src="../../_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
+        <a href="tensorboard_with_pytorch.html" class="btn btn-neutral" title="如何在PyTorch中使用TensorBoard" accesskey="p" rel="prev"><img src="../../_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
       
     </div>
   
@@ -927,19 +864,19 @@ if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.i
           <div class="pytorch-right-menu" id="pytorch-right-menu">
             <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
               <ul>
-<li><a class="reference internal" href="#">Dynamic Quantization</a><ul>
-<li><a class="reference internal" href="#introduction">Introduction</a></li>
-<li><a class="reference internal" href="#what-is-dynamic-quantization">What is dynamic quantization?</a></li>
-<li><a class="reference internal" href="#steps">Steps</a><ul>
-<li><a class="reference internal" href="#set-up">1: Set Up</a></li>
-<li><a class="reference internal" href="#do-the-quantization">2: Do the Quantization</a></li>
-<li><a class="reference internal" href="#look-at-model-size">3. Look at Model Size</a></li>
-<li><a class="reference internal" href="#look-at-latency">4. Look at Latency</a></li>
-<li><a class="reference internal" href="#look-at-accuracy">5: Look at Accuracy</a></li>
+<li><a class="reference internal" href="#">动态量化</a><ul>
+<li><a class="reference internal" href="#id2">介绍</a></li>
+<li><a class="reference internal" href="#id3">什么是动态量化?</a></li>
+<li><a class="reference internal" href="#id4">步骤</a><ul>
+<li><a class="reference internal" href="#id5">1: 设置</a></li>
+<li><a class="reference internal" href="#id6">2: 执行量化</a></li>
+<li><a class="reference internal" href="#id7">3. 查看模型大小</a></li>
+<li><a class="reference internal" href="#id8">4. 查看延迟</a></li>
+<li><a class="reference internal" href="#id9">5: 查看精度</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#learn-more">Learn More</a></li>
-<li><a class="reference internal" href="#additional-resources">Additional Resources</a></li>
+<li><a class="reference internal" href="#id10">了解更多</a></li>
+<li><a class="reference internal" href="#id11">其他资源</a></li>
 </ul>
 </li>
 </ul>

@@ -1,26 +1,25 @@
 """
-
-Tips for Loading an ``nn.Module`` from a Checkpoint
+从检查点加载 ``nn.Module`` 的技巧
 ===================================================
-**Author:** `Mikayla Gawarecki <https://github.com/mikaylagawarecki>`_
+**作者:** `Mikayla Gawarecki <https://github.com/mikaylagawarecki>`_
 
-If you're loading a checkpoint and want to reduce compute and memory as much as possible,
-this tutorial shares some recommended practices. In particular, we will discuss
+如果你要加载一个检查点并希望尽可能减少计算和内存的使用，本教程将分享一些推荐的做法。特别是我们将讨论以下几点:
 
-1.  The ``mmap`` keyword argument on ``torch.load``
-2.  The ``torch.device()`` context manager
-3.  The ``assign`` keyword argument on ``nn.Module.load_state_dict()``
+1. ``torch.load`` 中的 ``mmap`` 关键字参数
+2. ``torch.device()`` 上下文管理器
+3. ``nn.Module.load_state_dict()`` 中的 ``assign`` 关键字参数
 
 .. note::
-   This recipe requires PyTorch 2.1.0 or later.
+   本教程需要 PyTorch 2.1.0 或更高版本。
 """
 
+import time
 
 ###############################################################################
-# Let us consider a simple ``nn.Module`` that contains a list of Linear layers:
+# 让我们考虑一个简单的 ``nn.Module``，它包含一个线性层列表:
 import torch
 from torch import nn
-import time
+
 
 class SomeModule(torch.nn.Module):
     def __init__(self, size):
@@ -32,68 +31,60 @@ class SomeModule(torch.nn.Module):
 
 
 m = SomeModule(1000)
-torch.save(m.state_dict(), 'checkpoint.pth')
+torch.save(m.state_dict(), "checkpoint.pth")
 
 #################################################################################
-# The following snippet demonstrates the use of the the ``mmap`` keyword argument
-# to ``torch.load``, the ``torch.device()`` context manager and the ``assign``
-# keyword argument to ``nn.Module.load_state_dict()``.
+# 以下代码片段演示了如何使用 ``torch.load`` 中的 ``mmap`` 关键字参数、``torch.device()`` 上下文管理器和 ``nn.Module.load_state_dict()`` 中的 ``assign`` 关键字参数。
 
-state_dict = torch.load('checkpoint.pth', mmap=True)
-with torch.device('meta'):
-  meta_m = SomeModule(1000)
+state_dict = torch.load("checkpoint.pth", mmap=True)
+with torch.device("meta"):
+    meta_m = SomeModule(1000)
 meta_m.load_state_dict(state_dict, assign=True)
 
 #############################################################################
-# Compare the snippet below to the one above:
+# 将下面的代码片段与上面的进行比较:
 
-state_dict = torch.load('checkpoint.pth')
+state_dict = torch.load("checkpoint.pth")
 m = SomeModule(1000)
 m.load_state_dict(state_dict)
 
 #############################################################################
-# The second example does not use any of the features listed above and will be
-# less compute and memory efficient for loading a checkpoint. In the following
-# sections, we will discuss each of the features in further detail.
+# 第二个示例没有使用上面列出的任何特性，因此在加载检查点时计算和内存效率会较低。在下面的部分中，我们将详细讨论每个特性。
 
 #####################################################################################
-# Using ``torch.load(mmap=True)``
+# 使用 ``torch.load(mmap=True)``
 # -------------------------------
-# First, let us consider what happens when we load the checkpoint with ``torch.load``.
-# When we save a checkpoint with ``torch.save``, tensor storages are tagged with the device they are
-# saved on. With ``torch.load``, tensor storages will be loaded to the device
-# they were tagged with (unless this behavior is overridden using the
-# ``map_location`` flag). For ease of explanation, let us assume that the tensors
-# were saved on CPU. This means that on the first line all tensor storages will be
-# loaded into CPU RAM, which can be undesirable when:
-#
-# * CPU RAM is smaller than the size of the checkpoint.
-# * Waiting for the entire checkpoint to be loaded into RAM before performing, for example, some per-tensor processing.
+# 首先，让我们考虑使用 ``torch.load`` 加载检查点时会发生什么。
+# 当我们使用 ``torch.save`` 保存检查点时，张量存储会被标记为保存时所在的设备。
+# 使用 ``torch.load`` 时，张量存储将被加载到它们被标记的设备上(除非使用 ``map_location`` 标志覆盖此行为)。
+# 为了解释方便，我们假设张量是保存在 CPU 上的。这意味着在第一行中，所有张量存储将被加载到 CPU 内存中，在以下情况下这是不可取的:
+
+# * CPU 内存小于检查点的大小。
+# * 在执行一些每张量处理之前等待整个检查点被加载到内存中。
 
 start_time = time.time()
-state_dict = torch.load('checkpoint.pth')
+state_dict = torch.load("checkpoint.pth")
 end_time = time.time()
-print(f"loading time without mmap={end_time - start_time}")
+print(f"不使用 mmap 的加载时间={end_time - start_time}")
 
 #################################################################################
-# The ``mmap`` keyword argument to ``torch.load`` attempts to solve the above two
-# problems. As its name implies, the ``mmap`` keyword argument to ``torch.load``
-# makes use of an `mmap call <https://man7.org/linux/man-pages/man2/mmap.2.html>`_
-# which maps a file on disk into virtual memory and lets the OS handle loading and
-# unloading into physical memory automatically. When this flag is passed, tensor
-# storages will be memory-mapped.
+# ``torch.load`` 中的 ``mmap`` 关键字参数试图解决上述两个问题。
+# 顾名思义，``torch.load`` 中的 ``mmap`` 关键字参数使用了 `mmap 调用 <https://man7.org/linux/man-pages/man2/mmap.2.html>`_,
+# 它将磁盘上的文件映射到虚拟内存中,并让操作系统自动处理加载和卸载到物理内存。
+# 当传递此标志时,张量存储将被内存映射。
 
 start_time = time.time()
-state_dict = torch.load('checkpoint.pth', mmap=True)
+state_dict = torch.load("checkpoint.pth", mmap=True)
 end_time = time.time()
-print(f"loading time with mmap={end_time - start_time}")
+print(f"使用 mmap 的加载时间={end_time - start_time}")
+
 
 ######################################################################################
-# As mentioned above, one can use this argument to do per-tensor processing on a
-# checkpoint without loading all tensor storages into CPU memory upfront. For example:
+# 如上所述,可以使用此参数在不将所有张量存储加载到 CPU 内存中的情况下对检查点执行每张量处理。例如:
 def my_special_routine(t, device):
-    # this could be a much fancier operation
+    # 这可能是一个更复杂的操作
     return t.to(dtype=torch.bfloat16, device=device)
+
 
 def my_processing_function(key, device):
     t = state_dict[key]
@@ -101,72 +92,61 @@ def my_processing_function(key, device):
     del t
     state_dict[key] = processed_t
 
+
 for key in state_dict.keys():
-    device = torch.device('cuda')
+    device = torch.device("cuda")
     my_processing_function(key, device)
 
 ##################################################
-# Using ``torch.device('meta')``
+# 使用 ``torch.device('meta')``
 # ------------------------------
-# Next, let's consider the creation of the module.
+# 接下来,让我们考虑模块的创建。
 m = SomeModule(1000)
 
 #######################################################################################################
-# This allocates memory for all parameters/buffers and initializes them per
-# the default initialization schemes defined in ``SomeModule.__init__()``, which
-# is wasteful when we want to load a checkpoint for the following reasons:
-#
-# * The result of the initialization kernels will be overwritten by ``load_state_dict()`` without ever being used, so
-#   initialization is wasteful.
-# * We are allocating memory for these parameters/buffers in RAM while ``torch.load`` of the saved state dictionary also
-#   allocates memory in RAM for the parameters/buffers in the checkpoint.
-#
-# In order to solve these two problems, we can use the ``torch.device()``
-# context manager with ``device='meta'`` when we instantiate the ``nn.Module()``.
-#
-# The `torch.device() <https://pytorch.org/docs/main/tensor_attributes.html#torch-device>`_
-# context manager makes sure that factory calls will be performed as if they
-# were passed the specified ``device`` as an argument. Tensors on ``torch.device('meta')`` do not
-# carry data. However, they possess all other metadata a tensor carries such as ``.size()``, ``.stride()``,
-# ``.requires_grad``, and others.
-with torch.device('meta'):
-  new_m = SomeModule(1000)
+# 这将为所有参数/缓冲区分配内存并根据 ``SomeModule.__init__()`` 中定义的默认初始化方案对其进行初始化,
+# 当我们想要加载检查点时,这是浪费的,原因如下:
+
+# * 初始化内核的结果将被 ``load_state_dict()`` 覆盖而从未被使用,因此初始化是浪费的。
+# * 我们在 RAM 中为这些参数/缓冲区分配了内存,而 ``torch.load`` 保存的状态字典也在 RAM 中为检查点中的参数/缓冲区分配了内存。
+
+# 为了解决这两个问题,我们可以在实例化 ``nn.Module()`` 时使用 ``device='meta'`` 的 ``torch.device()`` 上下文管理器。
+
+# `torch.device() <https://pytorch.org/docs/main/tensor_attributes.html#torch-device>`_
+# 上下文管理器确保工厂调用将被视为传递了指定的 ``device`` 作为参数。
+# 在 ``torch.device('meta')`` 上的张量不携带数据。
+# 但是,它们具有张量所携带的其他元数据,如 ``.size()``, ``.stride()``, ``.requires_grad`` 等。
+with torch.device("meta"):
+    new_m = SomeModule(1000)
 
 ########################################################
-# Using ``load_state_dict(assign=True)``
+# 使用 ``load_state_dict(assign=True)``
 # --------------------------------------
-# Next, we consider the loading of the state dictionary.
+# 接下来,我们考虑加载状态字典。
 
 m.load_state_dict(state_dict)
 
 ######################################################################################
-# ``nn.Module.load_state_dict()`` is usually implemented via an in-place
-# ``param_in_model.copy_(param_in_state_dict)``. This means that the parameter/buffer
-# with the corresponding key in the state dictionary is copied into the
-# parameter/buffer in the ``nn.Module``.
-#
-# However, an in-place copy into a tensor on the ``meta`` device is a no-op.
-# In order to avoid this, we can pass the ``assign=True`` keyword argument to
-# ``load_state_dict()``.
-#
-# A caveat here is that since optimizers hold a reference to
-# ``nn.Module.parameters()``, the optimizer must be initialized after the module
-# is loaded from state dict if ``assign=True`` is passed.
+# ``nn.Module.load_state_dict()`` 通常是通过 ``param_in_model.copy_(param_in_state_dict)`` 的就地复制实现的。
+# 这意味着状态字典中对应键的参数/缓冲区将被复制到 ``nn.Module`` 中的参数/缓冲区。
 
-# As of PyTorch 2.3.0, one can use ``torch.__future__.set_swap_module_params_on_conversion`` to
-# avoid this caveat. This `recipe <https://pytorch.org/tutorials/recipes/recipes/swap_tensors.html>`_
-# provides more details.
+# 然而,对 ``meta`` 设备上的张量进行就地复制是无操作的。
+# 为了避免这种情况,我们可以在 ``load_state_dict()`` 中传递 ``assign=True`` 关键字参数。
+
+# 这里的一个警告是,由于优化器持有对 ``nn.Module.parameters()`` 的引用,
+# 如果传递了 ``assign=True``,则必须在从状态字典加载模块后初始化优化器。
+
+# 从 PyTorch 2.3.0 开始,可以使用 ``torch.__future__.set_swap_module_params_on_conversion`` 来避免这个警告。
+# 这个 `教程 <https://pytorch.org/tutorials/recipes/recipes/swap_tensors.html>`_ 提供了更多细节。
 
 new_m.load_state_dict(state_dict, assign=True)
-# Before 2.3.0, this MUST be done AFTER the load_state_dict with assign.
-# In versions >= 2.3.0, one can consider setting ``torch.__future__.set_swap_module_params_on_conversion``
+# 在 2.3.0 之前,这一步必须在 load_state_dict 使用 assign 之后完成。
+# 在版本 >= 2.3.0 中,可以考虑设置 ``torch.__future__.set_swap_module_params_on_conversion``
 opt = torch.optim.SGD(new_m.parameters(), lr=1e-3)
 
 ###############################################################################
-# Conclusion
+# 结论
 # -------------
 #
-# To recap, in this tutorial we learned about ``torch.load(mmap=True)``, the
-# ``torch.device()`` context manager with ``device=meta``, and
-# ``nn.Module.load_state_dict(assign=True)`` as well as how these tools could
-# be used to aid when loading a model from a checkpoint.
+# 总结一下,在本教程中,我们学习了 ``torch.load(mmap=True)``、``device='meta'`` 的 ``torch.device()`` 上下文管理器和 ``nn.Module.load_state_dict(assign=True)``
+# 以及如何在从检查点加载模型时使用这些工具来提高效率。

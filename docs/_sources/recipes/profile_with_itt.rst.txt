@@ -1,112 +1,112 @@
-Profiling PyTorch workloads with The Instrumentation and Tracing Technology (ITT) API
+使用 Instrumentation and Tracing Technology (ITT) API 分析 PyTorch 工作负载
 =====================================================================================
 
-In this recipe, you will learn:
+在本教程中,您将学习:
 
-* What is Intel® VTune™ Profiler
-* What is Instrumentation and Tracing Technology (ITT) API
-* How to visualize PyTorch model hierarchy in Intel® VTune™ Profiler
-* A short sample code showcasing how to use PyTorch ITT APIs
+* 什么是 Intel® VTune™ Profiler
+* 什么是 Instrumentation and Tracing Technology (ITT) API
+* 如何在 Intel® VTune™ Profiler 中可视化 PyTorch 模型层次结构
+* 一个简短的示例代码,展示如何使用 PyTorch ITT API
 
 
-Requirements
+要求
 ------------
 
-* PyTorch 1.13 or later
+* PyTorch 1.13 或更高版本
 * Intel® VTune™ Profiler
 
-The instructions for installing PyTorch are available at `pytorch.org <https://pytorch.org/get-started/locally/>`__.
+安装 PyTorch 的说明可在 `pytorch.org <https://pytorch.org/get-started/locally/>`__ 上找到。
 
 
-What is Intel® VTune™ Profiler
+什么是 Intel® VTune™ Profiler
 ------------------------------
 
-Intel® VTune™ Profiler is a performance analysis tool for serial and multithreaded applications. For those who are familiar with Intel Architecture, Intel® VTune™ Profiler provides a rich set of metrics to help users understand how the application executed on Intel platforms, and thus have an idea where the performance bottleneck is.
+Intel® VTune™ Profiler 是一款用于串行和多线程应用程序的性能分析工具。对于熟悉 Intel 架构的人来说,Intel® VTune™ Profiler 提供了丰富的指标集,帮助用户了解应用程序在 Intel 平台上的执行情况,从而了解性能瓶颈所在。
 
-More detailed information, including a Getting Started guide, are available `on the Intel website <https://www.intel.com/content/www/us/en/developer/tools/oneapi/vtune-profiler.html>`__.
+更多详细信息,包括入门指南,可在 `Intel 网站 <https://www.intel.com/content/www/us/en/developer/tools/oneapi/vtune-profiler.html>`__ 上找到。
 
-What is Instrumentation and Tracing Technology (ITT) API
+什么是 Instrumentation and Tracing Technology (ITT) API
 --------------------------------------------------------
 
-`The Instrumentation and Tracing Technology API (ITT API) <https://www.intel.com/content/www/us/en/develop/documentation/vtune-help/top/api-support/instrumentation-and-tracing-technology-apis.html>`_ provided by the Intel® VTune™ Profiler enables target application to generate and control the collection of trace data during its execution.
+`Instrumentation and Tracing Technology API (ITT API) <https://www.intel.com/content/www/us/en/develop/documentation/vtune-help/top/api-support/instrumentation-and-tracing-technology-apis.html>`_ 由 Intel® VTune™ Profiler 提供,使目标应用程序能够在执行期间生成和控制跟踪数据的收集。
 
-The advantage of ITT feature is to label time span of individual PyTorch operators, as well as customized regions, on Intel® VTune™ Profiler GUI. When users find anything abnormal, it will be very helpful to locate which operator behaved unexpectedly.
+ITT 功能的优势在于能够在 Intel® VTune™ Profiler GUI 上标记单个 PyTorch 算子和自定义区域的时间跨度。当用户发现任何异常时,这将非常有助于定位哪个算子表现异常。
 
 .. note::
 
-   The ITT API had been integrated into PyTorch since 1.13. Users don't need to invoke the original ITT C/C++ APIs, but only need to invoke the Python APIs in PyTorch. More detailed information can be found at `PyTorch Docs <https://pytorch.org/docs/stable/profiler.html#intel-instrumentation-and-tracing-technology-apis>`__.
+   ITT API 已在 PyTorch 1.13 中集成。用户无需调用原始的 ITT C/C++ API,只需调用 PyTorch 中的 Python API 即可。更多详细信息可在 `PyTorch 文档 <https://pytorch.org/docs/stable/profiler.html#intel-instrumentation-and-tracing-technology-apis>`__ 中找到。
 
-How to visualize PyTorch model hierarchy in Intel® VTune™ Profiler
+如何在 Intel® VTune™ Profiler 中可视化 PyTorch 模型层次结构
 ------------------------------------------------------------------
 
-Two types of usage are provided in PyTorch:
+PyTorch 提供了两种使用方式:
 
-1. Implicit invocation: By default, all operators that are registered by following the PyTorch operator registration mechanism will be labeled by ITT feature automatically when its feature is enabled.
+1. 隐式调用: 默认情况下,所有通过 PyTorch 算子注册机制注册的算子在启用 ITT 功能时都会自动标记。
 
-2. Explicit invocation: If customized labeling is needed, users can use APIs mentioned at `PyTorch Docs <https://pytorch.org/docs/stable/profiler.html#intel-instrumentation-and-tracing-technology-apis>`__ explicitly to label a desired range.
+2. 显式调用: 如果需要自定义标记,用户可以在 `PyTorch 文档 <https://pytorch.org/docs/stable/profiler.html#intel-instrumentation-and-tracing-technology-apis>`__ 中使用显式 API 对所需范围进行标记。
 
 
-To enable explicit invocation, code which are expected to be labeled should be invoked under a `torch.autograd.profiler.emit_itt()` scope. For example:
+要启用显式调用,需要在 `torch.autograd.profiler.emit_itt()` 作用域下调用预期标记的代码。例如:
 
 .. code:: python3
 
    with torch.autograd.profiler.emit_itt():
      <code-to-be-profiled...>
 
-Launch Intel® VTune™ Profiler
+启动 Intel® VTune™ Profiler
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-To verify the functionality, you need to start an Intel® VTune™ Profiler instance. Please check the `Intel® VTune™ Profiler User Guide <https://www.intel.com/content/www/us/en/develop/documentation/vtune-help/top/launch.html>`__ for steps to launch Intel® VTune™ Profiler.
+要验证功能,您需要启动一个 Intel® VTune™ Profiler 实例。启动 Intel® VTune™ Profiler 的步骤请查看 `Intel® VTune™ Profiler 用户指南 <https://www.intel.com/content/www/us/en/develop/documentation/vtune-help/top/launch.html>`__。
 
-Once you get the Intel® VTune™ Profiler GUI launched, you should see a user interface as below:
+一旦启动了 Intel® VTune™ Profiler GUI,您应该会看到如下用户界面:
 
 .. figure:: /_static/img/itt_tutorial/vtune_start.png
    :width: 100%
    :align: center
 
-Three sample results are available on the left side navigation bar under `sample (matrix)` project. If you do not want profiling results appear in this default sample project, you can create a new project via the button `New Project...` under the blue `Configure Analysis...` button. To start a new profiling, click the blue `Configure Analysis...` button to initiate configuration of the profiling.
+左侧导航栏下的 `sample (matrix)` 项目中有三个示例结果。如果您不希望分析结果出现在此默认示例项目中,可以通过蓝色 `Configure Analysis...` 按钮下的 `New Project...` 按钮创建一个新项目。要启动新的分析,请单击蓝色的 `Configure Analysis...` 按钮以开始配置分析。
 
-Configure Profiling
+配置分析
 ~~~~~~~~~~~~~~~~~~~
 
-Once you click the `Configure Analysis...` button, you should see the screen below:
+单击 `Configure Analysis...` 按钮后,您应该会看到如下界面:
 
 .. figure:: /_static/img/itt_tutorial/vtune_config.png
    :width: 100%
    :align: center
 
-The right side of the windows is split into 3 parts: `WHERE` (top left), `WHAT` (bottom left), and `HOW` (right). With `WHERE`, you can assign a machine where you want to run the profiling on. With `WHAT`, you can set the path of the application that you want to profile. To profile a PyTorch script, it is recommended to wrap all manual steps, including activating a Python environment and setting required environment variables, into a bash script, then profile this bash script. In the screenshot above, we wrapped all steps into the `launch.sh` bash script and profile `bash` with the parameter to be `<path_of_launch.sh>`. On the right side `HOW`, you can choose whatever type that you would like to profile. Intel® VTune™ Profiler provides a bunch of profiling types that you can choose from. Details can be found at `Intel® VTune™ Profiler User Guide <https://www.intel.com/content/www/us/en/develop/documentation/vtune-help/top/analyze-performance.html>`__.
+窗口的右侧分为三部分: `WHERE`(左上角)、`WHAT`(左下角)和 `HOW`(右侧)。在 `WHERE` 中,您可以指定要在哪台机器上运行分析。在 `WHAT` 中,您可以设置要分析的应用程序的路径。要分析 PyTorch 脚本,建议将所有手动步骤(包括激活 Python 环境和设置所需环境变量)封装到一个 bash 脚本中,然后对该 bash 脚本进行分析。在上面的截图中,我们将所有步骤封装到 `launch.sh` bash 脚本中,并将 `bash` 的参数设置为 `<path_of_launch.sh>` 的路径。在右侧的 `HOW` 中,您可以选择要分析的类型。Intel® VTune™ Profiler 提供了多种可选的分析类型。详情请查看 `Intel® VTune™ Profiler 用户指南 <https://www.intel.com/content/www/us/en/develop/documentation/vtune-help/top/analyze-performance.html>`__。
 
-Read Profiling Result
+读取分析结果
 ~~~~~~~~~~~~~~~~~~~~~
 
-With a successful profiling with ITT, you can open `Platform` tab of the profiling result to see labels in the Intel® VTune™ Profiler timeline.
+成功进行了带有 ITT 的分析后,您可以打开分析结果的 `Platform` 选项卡,在 Intel® VTune™ Profiler 时间线上查看标记。
 
 .. figure:: /_static/img/itt_tutorial/vtune_timeline.png
    :width: 100%
    :align: center
 
 
-The timeline shows the main thread as a `python` thread on the top, and individual OpenMP threads below. Labeled PyTorch operators and customized regions are shown in the main thread row. All operators starting with `aten::` are operators labeled implicitly by the ITT feature in PyTorch. Labels `iteration_N` are explicitly labeled with specific APIs `torch.profiler.itt.range_push()`, `torch.profiler.itt.range_pop()` or `torch.profiler.itt.range()` scope. Please check the sample code in the next section for details.
+时间线显示了顶部的主线程作为 `python` 线程,下面是各个 OpenMP 线程。标记的 PyTorch 算子和自定义区域显示在主线程行中。所有以 `aten::` 开头的算子都是由 PyTorch 中的 ITT 功能隐式标记的。标签 `iteration_N` 是使用特定的 API `torch.profiler.itt.range_push()`、`torch.profiler.itt.range_pop()` 或 `torch.profiler.itt.range()` 作用域显式标记的。请查看下一节中的示例代码以了解详情。
 
 .. note::
 
-   Red boxes marked with `convolution` and `reorder` are labeled from Intel® oneAPI Deep Neural Network Library (oneDNN).
+   时间线中标记为 `convolution` 和 `reorder` 的红色框是由 Intel® oneAPI Deep Neural Network Library (oneDNN) 标记的。
 
-As illustrated on the right side navigation bar, brown portions in the timeline rows show CPU usage of individual threads. The percerntage of height of a thread row that the brown portion occupies at a timestamp aligns with that of the CPU usage in that thread at that timestamp. Thus, it is intuitive from this timeline to understand the followings:
+如右侧导航栏所示,时间线行中的棕色部分显示了各个线程的 CPU 使用情况。在某个时间点,棕色部分在线程行中所占的高度百分比与该线程在该时间点的 CPU 使用率相对应。因此,从这个时间线可以直观地了解以下几点:
 
-1. How well CPU cores are utilized on each thread.
-2. How balance CPU cores are utilized on all threads. Do all threads have good CPU usage?
-3. How well OpenMP threads are synchronized. Are there jitters when starting OpenMP threads or OpenMP threads finish.
+1. 每个线程的 CPU 核心利用率如何。
+2. 所有线程的 CPU 核心利用率是否平衡。所有线程的 CPU 使用情况是否良好?
+3. OpenMP 线程是否同步良好。启动 OpenMP 线程或 OpenMP 线程完成时是否存在抖动?
 
-Of course there are much more enriched sets of profiling features that Intel® VTune™ Profiler provides to help you understand a performance issue. When you understand the root cause of a performance issue, you can get it fixed. More detailed usage instructions are available at `Intel® VTune™ Profiler User Guide <https://www.intel.com/content/www/us/en/develop/documentation/vtune-help/top/analyze-performance.html>`__.
+当然,Intel® VTune™ Profiler 还提供了更多丰富的分析功能,帮助您了解性能问题的根源。一旦您了解了性能问题的根源,就可以加以修复。更多详细的使用说明可在 `Intel® VTune™ Profiler 用户指南 <https://www.intel.com/content/www/us/en/develop/documentation/vtune-help/top/analyze-performance.html>`__ 中找到。
 
-A short sample code showcasing how to use PyTorch ITT APIs
+一个简短的示例代码,展示如何使用 PyTorch ITT API
 ----------------------------------------------------------
 
-The sample code below is the script that was used for profiling in the screenshots above.
+下面的示例代码就是在上面的截图中用于分析的脚本。
 
-The topology is formed by two operators, `Conv2d` and `Linear`. Three iterations of inference were performed. Each iteration was labeled by PyTorch ITT APIs as text string `iteration_N`. Either pair of `torch.profile.itt.range_push` and `torch.profile.itt.range_pop` or `torch.profile.itt.range` scope does the customized labeling feature.
+该拓扑由两个算子 `Conv2d` 和 `Linear` 组成。进行了三次推理迭代,每次迭代都使用 PyTorch ITT API 标记为文本字符串 `iteration_N`。无论是使用 `torch.profile.itt.range_push` 和 `torch.profile.itt.range_pop` 的配对,还是使用 `torch.profile.itt.range` 作用域,都可以实现自定义标记功能。
 
 .. code:: python3
 
@@ -132,12 +132,12 @@ The topology is formed by two operators, `Conv2d` and `Linear`. Three iterations
      x = torch.rand(10, 3, 244, 244)
      with torch.autograd.profiler.emit_itt():
        for i in range(3)
-         # Labeling a region with pair of range_push and range_pop
+         # 使用 range_push 和 range_pop 配对标记区域
          #torch.profiler.itt.range_push(f'iteration_{i}')
          #m(x)
          #torch.profiler.itt.range_pop()
    
-         # Labeling a region with range scope
+         # 使用 range 作用域标记区域
          with torch.profiler.itt.range(f'iteration_{i}'):
            m(x)
    
@@ -145,7 +145,7 @@ The topology is formed by two operators, `Conv2d` and `Linear`. Three iterations
      main()
 
 
-The `launch.sh` bash script, mentioned in the Intel® VTune™ Profiler GUI screenshot, to wrap all manual steps is shown below.
+下面是在 Intel® VTune™ Profiler GUI 截图中提到的 `launch.sh` bash 脚本,用于封装所有手动步骤。
 
 .. code:: bash
 
@@ -153,8 +153,8 @@ The `launch.sh` bash script, mentioned in the Intel® VTune™ Profiler GUI scre
 
    #!/bin/bash
    
-   # Retrieve the directory path where the path contains both the sample.py and launch.sh so that this bash script can be invoked from any directory
+   # 获取包含 sample.py 和 launch.sh 的目录路径,以便从任何目录调用此 bash 脚本
    BASEFOLDER=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-   <Activate a Python environment>
+   <激活 Python 环境>
    cd ${BASEFOLDER}
    python sample.py
