@@ -1,18 +1,17 @@
-Intel® Extension for PyTorch* Backend
+Intel® PyTorch* 扩展后端
 =====================================
 
-To work better with `torch.compile`, Intel® Extension for PyTorch* implements a backend ``ipex``. 
-It targets to improve hardware resource usage efficiency on Intel platforms for better performance.
-The `ipex` backend is implemented with further customizations designed in Intel® Extension for
-PyTorch* for the model compilation.
+为了更好地与 `torch.compile` 协作，Intel® PyTorch* 扩展实现了一个名为 `ipex` 的后端。
+它旨在提高 Intel 平台上的硬件资源使用效率,从而获得更好的性能。
+`ipex` 后端是通过 Intel® PyTorch* 扩展中进一步的定制设计来实现模型编译的。
 
-Usage Example
+使用示例
 ~~~~~~~~~~~~~
 
-Train FP32
+FP32 训练
 ----------
 
-Check the example below to learn how to utilize the `ipex` backend with `torch.compile` for model training with FP32 data type.
+查看下面的示例,了解如何将 `ipex` 后端与 `torch.compile` 一起使用,进行 FP32 数据类型的模型训练。
 
 .. code:: python
 
@@ -44,10 +43,10 @@ Check the example below to learn how to utilize the `ipex` backend with `torch.c
    optimizer = torch.optim.SGD(model.parameters(), lr = LR, momentum=0.9)
    model.train()
 
-   #################### code changes ####################
+   #################### 代码修改 ####################
    import intel_extension_for_pytorch as ipex
 
-   # Invoke the following API optionally, to apply frontend optimizations
+   # 可选择调用以下 API,应用前端优化
    model, optimizer = ipex.optimize(model, optimizer=optimizer)
 
    compile_model = torch.compile(model, backend="ipex")
@@ -61,10 +60,10 @@ Check the example below to learn how to utilize the `ipex` backend with `torch.c
        optimizer.step()
 
 
-Train BF16
+BF16 训练
 ----------
 
-Check the example below to learn how to utilize the `ipex` backend with `torch.compile` for model training with BFloat16 data type.
+查看下面的示例,了解如何将 `ipex` 后端与 `torch.compile` 一起使用,进行 BFloat16 数据类型的模型训练。
 
 .. code:: python
 
@@ -96,10 +95,10 @@ Check the example below to learn how to utilize the `ipex` backend with `torch.c
    optimizer = torch.optim.SGD(model.parameters(), lr = LR, momentum=0.9)
    model.train()
 
-   #################### code changes ####################
+   #################### 代码修改 ####################
    import intel_extension_for_pytorch as ipex
 
-   # Invoke the following API optionally, to apply frontend optimizations
+   # 可选择调用以下 API,应用前端优化
    model, optimizer = ipex.optimize(model, dtype=torch.bfloat16, optimizer=optimizer)
 
    compile_model = torch.compile(model, backend="ipex")
@@ -114,10 +113,10 @@ Check the example below to learn how to utilize the `ipex` backend with `torch.c
            optimizer.step()
 
 
-Inference FP32
+FP32 推理
 --------------
 
-Check the example below to learn how to utilize the `ipex` backend with `torch.compile` for model inference with FP32 data type.
+查看下面的示例,了解如何将 `ipex` 后端与 `torch.compile` 一起使用,进行 FP32 数据类型的模型推理。
 
 .. code:: python
 
@@ -128,10 +127,10 @@ Check the example below to learn how to utilize the `ipex` backend with `torch.c
    model.eval()
    data = torch.rand(1, 3, 224, 224)
 
-   #################### code changes ####################
+   #################### 代码修改 ####################
    import intel_extension_for_pytorch as ipex
 
-   # Invoke the following API optionally, to apply frontend optimizations
+   # 可选择调用以下 API,应用前端优化
    model = ipex.optimize(model, weights_prepack=False)
 
    compile_model = torch.compile(model, backend="ipex")
@@ -141,10 +140,10 @@ Check the example below to learn how to utilize the `ipex` backend with `torch.c
        compile_model(data)
 
 
-Inference BF16
+BF16 推理
 --------------
 
-Check the example below to learn how to utilize the `ipex` backend with `torch.compile` for model inference with BFloat16 data type.
+查看下面的示例,了解如何将 `ipex` 后端与 `torch.compile` 一起使用,进行 BFloat16 数据类型的模型推理。
 
 .. code:: python
 
@@ -155,10 +154,10 @@ Check the example below to learn how to utilize the `ipex` backend with `torch.c
    model.eval()
    data = torch.rand(1, 3, 224, 224)
 
-   #################### code changes ####################
+   #################### 代码修改 ####################
    import intel_extension_for_pytorch as ipex
 
-   # Invoke the following API optionally, to apply frontend optimizations
+   # 可选择调用以下 API,应用前端优化
    model = ipex.optimize(model, dtype=torch.bfloat16, weights_prepack=False)
 
    compile_model = torch.compile(model, backend="ipex")
