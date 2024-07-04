@@ -636,9 +636,9 @@ TorchScript 是使用 PyTorch 模型进行大规模推理的推荐模型格式�
 <span class="n">dummy_input</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">224</span><span class="p">,</span> <span class="mi">224</span><span class="p">)</span>     <span class="c1"># 快速测试一下</span>
 </pre></div>
 </div>
-<p>Let’s do a sanity check on the equivalence of the two models:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">unscripted_output</span> <span class="o">=</span> <span class="n">r18</span><span class="p">(</span><span class="n">dummy_input</span><span class="p">)</span>         <span class="c1"># Get the unscripted model&#39;s prediction...</span>
-<span class="n">scripted_output</span> <span class="o">=</span> <span class="n">r18_scripted</span><span class="p">(</span><span class="n">dummy_input</span><span class="p">)</span>  <span class="c1"># ...and do the same for the scripted version</span>
+<p>让我们快速检查一下两个模型的等价性:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">unscripted_output</span> <span class="o">=</span> <span class="n">r18</span><span class="p">(</span><span class="n">dummy_input</span><span class="p">)</span>         <span class="c1"># 获取未脚本化模型的预测...</span>
+<span class="n">scripted_output</span> <span class="o">=</span> <span class="n">r18_scripted</span><span class="p">(</span><span class="n">dummy_input</span><span class="p">)</span>  <span class="c1"># ...并对脚本化版本做同样操作</span>
 
 <span class="n">unscripted_top5</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">unscripted_output</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">topk</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">indices</span>
 <span class="n">scripted_top5</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">scripted_output</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">topk</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">indices</span>
@@ -647,21 +647,21 @@ TorchScript 是使用 PyTorch 模型进行大规模推理的推荐模型格式�
 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;TorchScript model top 5 results:</span><span class="se">\n</span><span class="s1">  </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">scripted_top5</span><span class="p">))</span>
 </pre></div>
 </div>
-<p>You should see that both versions of the model give the same results:</p>
+<p>会看到两个版本的模型给出相同的结果:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Python</span> <span class="n">model</span> <span class="n">top</span> <span class="mi">5</span> <span class="n">results</span><span class="p">:</span>
   <span class="n">tensor</span><span class="p">([[</span><span class="mi">463</span><span class="p">,</span> <span class="mi">600</span><span class="p">,</span> <span class="mi">731</span><span class="p">,</span> <span class="mi">899</span><span class="p">,</span> <span class="mi">898</span><span class="p">]])</span>
 <span class="n">TorchScript</span> <span class="n">model</span> <span class="n">top</span> <span class="mi">5</span> <span class="n">results</span><span class="p">:</span>
   <span class="n">tensor</span><span class="p">([[</span><span class="mi">463</span><span class="p">,</span> <span class="mi">600</span><span class="p">,</span> <span class="mi">731</span><span class="p">,</span> <span class="mi">899</span><span class="p">,</span> <span class="mi">898</span><span class="p">]])</span>
 </pre></div>
 </div>
-<p>With that check confirmed, go ahead and save the model:</p>
+<p>确认检查通过后,继续保存模型:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">r18_scripted</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s1">&#39;r18_scripted.pt&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="loading-torchscript-models-in-c">
-<h2>Loading TorchScript Models in C++<a class="headerlink" href="#loading-torchscript-models-in-c" title="Permalink to this heading">¶</a></h2>
-<p>Create the following C++ file and name it <code class="docutils literal notranslate"><span class="pre">ts-infer.cpp</span></code>:</p>
+<p>Loading TorchScript Models in C++
+在 C++ 中加载 TorchScript 模型
+———————————</p>
+<p>创建以下 C++ 文件,并将其命名为 <code class="docutils literal notranslate"><span class="pre">ts-infer.cpp</span></code>:</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;torch/script.h&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;torch/nn/functional/activation.h&gt;</span>
 
@@ -674,7 +674,7 @@ TorchScript 是使用 PyTorch 模型进行大规模推理的推荐模型格式�
 
 <span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;Loading model...</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
 
-<span class="w">    </span><span class="c1">// deserialize ScriptModule</span>
+<span class="w">    </span><span class="c1">// 反序列化 ScriptModule</span>
 <span class="w">    </span><span class="n">torch</span><span class="o">::</span><span class="n">jit</span><span class="o">::</span><span class="n">script</span><span class="o">::</span><span class="n">Module</span><span class="w"> </span><span class="k">module</span><span class="p">;</span>
 <span class="w">    </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
 <span class="w">        </span><span class="k">module</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">torch</span><span class="o">::</span><span class="n">jit</span><span class="o">::</span><span class="n">load</span><span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span>
@@ -686,14 +686,14 @@ TorchScript 是使用 PyTorch 模型进行大规模推理的推荐模型格式�
 
 <span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;Model loaded successfully</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
 
-<span class="w">    </span><span class="n">torch</span><span class="o">::</span><span class="n">NoGradGuard</span><span class="w"> </span><span class="n">no_grad</span><span class="p">;</span><span class="w"> </span><span class="c1">// ensures that autograd is off</span>
-<span class="w">    </span><span class="k">module</span><span class="p">.</span><span class="n">eval</span><span class="p">();</span><span class="w"> </span><span class="c1">// turn off dropout and other training-time layers/functions</span>
+<span class="w">    </span><span class="n">torch</span><span class="o">::</span><span class="n">NoGradGuard</span><span class="w"> </span><span class="n">no_grad</span><span class="p">;</span><span class="w"> </span><span class="c1">// 确保自动梯度计算关闭</span>
+<span class="w">    </span><span class="k">module</span><span class="p">.</span><span class="n">eval</span><span class="p">();</span><span class="w"> </span><span class="c1">// 关闭 dropout 和其他训练时层/函数</span>
 
-<span class="w">    </span><span class="c1">// create an input &quot;image&quot;</span>
+<span class="w">    </span><span class="c1">// 创建一个输入&quot;图像&quot;</span>
 <span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">torch</span><span class="o">::</span><span class="n">jit</span><span class="o">::</span><span class="n">IValue</span><span class="o">&gt;</span><span class="w"> </span><span class="n">inputs</span><span class="p">;</span>
 <span class="w">    </span><span class="n">inputs</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="n">torch</span><span class="o">::</span><span class="n">rand</span><span class="p">({</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="mi">224</span><span class="p">,</span><span class="w"> </span><span class="mi">224</span><span class="p">}));</span>
 
-<span class="w">    </span><span class="c1">// execute model and package output as tensor</span>
+<span class="w">    </span><span class="c1">// 执行模型并将输出打包为张量</span>
 <span class="w">    </span><span class="n">at</span><span class="o">::</span><span class="n">Tensor</span><span class="w"> </span><span class="n">output</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">module</span><span class="p">.</span><span class="n">forward</span><span class="p">(</span><span class="n">inputs</span><span class="p">).</span><span class="n">toTensor</span><span class="p">();</span>
 
 <span class="w">    </span><span class="k">namespace</span><span class="w"> </span><span class="nn">F</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nn">torch</span><span class="o">::</span><span class="nn">nn</span><span class="o">::</span><span class="nn">functional</span><span class="p">;</span>
@@ -708,19 +708,18 @@ TorchScript 是使用 PyTorch 模型进行大规模推理的推荐模型格式�
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>This program:</p>
+<p>程序步骤:</p>
 <ul class="simple">
-<li><p>Loads the model you specify on the command line</p></li>
-<li><p>Creates a dummy “image” input tensor</p></li>
-<li><p>Performs inference on the input</p></li>
+<li><p>加载您在命令行上指定的模型</p></li>
+<li><p>创建一个虚拟的”图像”输入张量</p></li>
+<li><p>对输入执行推理</p></li>
 </ul>
-<p>Also, notice that there is no dependency on TorchVision in this code.
-The saved version of your TorchScript model has your learning weights
-<em>and</em> your computation graph - nothing else is needed.</p>
+<p>另外,请注意这段代码中没有依赖 TorchVision。
+保存的 TorchScript 模型包含您的学习权重和您的计算图。</p>
 </div>
-<div class="section" id="building-and-running-your-c-inference-engine">
-<h2>Building and Running Your C++ Inference Engine<a class="headerlink" href="#building-and-running-your-c-inference-engine" title="Permalink to this heading">¶</a></h2>
-<p>Create the following <code class="docutils literal notranslate"><span class="pre">CMakeLists.txt</span></code> file:</p>
+<div class="section" id="c">
+<h2>构建和运行您的 C++ 推理引擎<a class="headerlink" href="#c" title="Permalink to this heading">¶</a></h2>
+<p>创建以下 <code class="docutils literal notranslate"><span class="pre">CMakeLists.txt</span></code> 文件:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cmake_minimum_required</span><span class="p">(</span><span class="n">VERSION</span> <span class="mf">3.0</span> <span class="n">FATAL_ERROR</span><span class="p">)</span>
 <span class="n">project</span><span class="p">(</span><span class="n">custom_ops</span><span class="p">)</span>
 
@@ -731,12 +730,12 @@ The saved version of your TorchScript model has your learning weights
 <span class="n">set_property</span><span class="p">(</span><span class="n">TARGET</span> <span class="n">ts</span><span class="o">-</span><span class="n">infer</span> <span class="n">PROPERTY</span> <span class="n">CXX_STANDARD</span> <span class="mi">11</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Make the program:</p>
+<p>构建程序:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cmake</span> <span class="o">-</span><span class="n">DCMAKE_PREFIX_PATH</span><span class="o">=&lt;</span><span class="n">path</span> <span class="n">to</span> <span class="n">your</span> <span class="n">libtorch</span> <span class="n">installation</span><span class="o">&gt;</span>
 <span class="n">make</span>
 </pre></div>
 </div>
-<p>Now, we can run inference in C++, and verify that we get a result:</p>
+<p>现在,我们可以在 C++ 中运行推理,并验证我们得到结果:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ ./ts-infer r18_scripted.pt
 Loading model...
 Model loaded successfully
@@ -751,15 +750,12 @@ DONE
 </pre></div>
 </div>
 </div>
-<div class="section" id="important-resources">
-<h2>Important Resources<a class="headerlink" href="#important-resources" title="Permalink to this heading">¶</a></h2>
+<div class="section" id="id4">
+<h2>其他资源<a class="headerlink" href="#id4" title="Permalink to this heading">¶</a></h2>
 <ul class="simple">
-<li><p><a class="reference external" href="https://pytorch.org/">pytorch.org</a> for installation instructions, and more documentation
-and tutorials.</p></li>
-<li><p><a class="reference external" href="https://pytorch.org/tutorials/beginner/Intro_to_TorchScript_tutorial.html">Introduction to TorchScript tutorial</a> for a deeper initial
-exposition of TorchScript</p></li>
-<li><p><a class="reference external" href="https://pytorch.org/docs/stable/jit.html">Full TorchScript documentation</a> for complete TorchScript language
-and API reference</p></li>
+<li><p><a class="reference external" href="https://pytorch.org/">pytorch.org</a>  查看安装说明和更多文档和教程。</p></li>
+<li><p><a class="reference external" href="https://pytorch.org/tutorials/beginner/Intro_to_TorchScript_tutorial.html">TorchScript 入门教程</a> 对 TorchScript 进一步了解</p></li>
+<li><p><a class="reference external" href="https://pytorch.org/docs/stable/jit.html">TorchScript 文档</a> 查看完整的 TorchScript 语言和 API 参考</p></li>
 </ul>
 </div>
 </div>
@@ -829,9 +825,8 @@ if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.i
 <li><a class="reference internal" href="#id1">环境要求</a></li>
 <li><a class="reference internal" href="#id2">什么是 TorchScript?</a></li>
 <li><a class="reference internal" href="#id3">如何导出模型</a></li>
-<li><a class="reference internal" href="#loading-torchscript-models-in-c">Loading TorchScript Models in C++</a></li>
-<li><a class="reference internal" href="#building-and-running-your-c-inference-engine">Building and Running Your C++ Inference Engine</a></li>
-<li><a class="reference internal" href="#important-resources">Important Resources</a></li>
+<li><a class="reference internal" href="#c">构建和运行您的 C++ 推理引擎</a></li>
+<li><a class="reference internal" href="#id4">其他资源</a></li>
 </ul>
 </li>
 </ul>
