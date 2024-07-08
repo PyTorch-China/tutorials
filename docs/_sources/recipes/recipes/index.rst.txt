@@ -159,6 +159,23 @@ PyTorch Recipes
 
 .. raw:: html
 
+    <div class="sphx-glr-thumbcontainer" tooltip="性能调优指南是一组优化和最佳实践,可以加速PyTorch中深度学习模型的训练和推理。 提出的技术通常只需要更改几行代码,就可以应用于各个领域的广泛深度学习模型。">
+
+.. only:: html
+
+  .. image:: /recipes/recipes/images/thumb/sphx_glr_tuning_guide_thumb.png
+    :alt: 性能调优指南
+
+  :ref:`sphx_glr_recipes_recipes_tuning_guide.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">性能调优指南</div>
+    </div>
+
+
+.. raw:: html
+
     <div class="sphx-glr-thumbcontainer" tooltip="在使用PyTorch编写模型时,通常会遇到某一层的参数取决于前一层输出的形状的情况。例如, ``nn.Linear``层的``in_features``必须与输入的``size(-1)``相...">
 
 .. only:: html
@@ -256,23 +273,6 @@ PyTorch Recipes
 .. raw:: html
 
       <div class="sphx-glr-thumbnail-title">PyTorch 在一个文件中保存和加载多个模型</div>
-    </div>
-
-
-.. raw:: html
-
-    <div class="sphx-glr-thumbcontainer" tooltip="Performance Tuning Guide is a set of optimizations and best practices which can accelerate trai...">
-
-.. only:: html
-
-  .. image:: /recipes/recipes/images/thumb/sphx_glr_tuning_guide_thumb.png
-    :alt: Performance Tuning Guide
-
-  :ref:`sphx_glr_recipes_recipes_tuning_guide.py`
-
-.. raw:: html
-
-      <div class="sphx-glr-thumbnail-title">Performance Tuning Guide</div>
     </div>
 
 
@@ -397,18 +397,18 @@ PyTorch Recipes
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="`torch.cuda.amp &lt;https://pytorch.org/docs/stable/amp.html&gt;`_ provides convenience methods for m...">
+    <div class="sphx-glr-thumbcontainer" tooltip="`torch.cuda.amp &lt;https://pytorch.org/docs/stable/amp.html&gt;`_ 提供了混合精度的便利方法, 其中一些操作使用 torch.float...">
 
 .. only:: html
 
   .. image:: /recipes/recipes/images/thumb/sphx_glr_amp_recipe_thumb.png
-    :alt: Automatic Mixed Precision
+    :alt: 自动混合精度
 
   :ref:`sphx_glr_recipes_recipes_amp_recipe.py`
 
 .. raw:: html
 
-      <div class="sphx-glr-thumbnail-title">Automatic Mixed Precision</div>
+      <div class="sphx-glr-thumbnail-title">自动混合精度</div>
     </div>
 
 
@@ -442,13 +442,13 @@ PyTorch Recipes
    /recipes/recipes/saving_and_loading_models_for_inference
    /recipes/recipes/what_is_state_dict
    /recipes/recipes/loading_data_recipe
+   /recipes/recipes/tuning_guide
    /recipes/recipes/reasoning_about_shapes
    /recipes/recipes/warmstarting_model_using_parameters_from_a_different_model
    /recipes/recipes/saving_and_loading_a_general_checkpoint
    /recipes/recipes/save_load_across_devices
    /recipes/recipes/defining_a_neural_network
    /recipes/recipes/saving_multiple_models_in_one_file
-   /recipes/recipes/tuning_guide
    /recipes/recipes/timer_quick_start
    /recipes/recipes/Captum_Recipe
    /recipes/recipes/dynamic_quantization

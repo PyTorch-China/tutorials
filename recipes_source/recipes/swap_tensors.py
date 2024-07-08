@@ -29,7 +29,7 @@ torch.utils.swap_tensors(t1, t2)
 print(f"交换后, t1: {t1}, t2: {t2}")
 
 ################################################################################
-# 更具体地说,``swap_tensors`` 交换了两个张量的 Python ``__class__``、``__dict__``
+# 更具体地说, ``swap_tensors`` 交换了两个张量的 Python ``__class__``、``__dict__``
 # 和 ``__slots__``,以及它们相关的 ``at::Tensor``。
 #
 #
