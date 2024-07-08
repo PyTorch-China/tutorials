@@ -1,55 +1,45 @@
-Deploying with Flask
+使用 Flask 进行部署
 ====================
 
-In this recipe, you will learn:
+在这个教程中,您将学习:
 
--  How to wrap your trained PyTorch model in a Flask container to expose
-   it via a web API
--  How to translate incoming web requests into PyTorch tensors for your
-   model
--  How to package your model’s output for an HTTP response
+- 如何将训练好的 PyTorch 模型封装到 Flask 容器中,通过 Web API 暴露出去
+- 如何将传入的 Web 请求转换为 PyTorch 张量,以供您的模型使用
+- 如何为 HTTP 响应打包您模型的输出
 
-Requirements
+环境设置
 ------------
 
-You will need a Python 3 environment with the following packages (and
-their dependencies) installed:
+您需要一个安装了以下软件包(及其依赖项)的 Python 3 环境:
+
 
 -  PyTorch 1.5
 -  TorchVision 0.6.0
 -  Flask 1.1
 
-Optionally, to get some of the supporting files, you'll need git.
+另外,如果需要获取一些支持文件,您还需要 git。
 
-The instructions for installing PyTorch and TorchVision are available at
-`pytorch.org`_. Instructions for installing Flask are available on `the
-Flask site`_.
+安装 PyTorch 和 TorchVision 的说明在 `pytorch.org_` 上有介绍。安装 Flask 请查看 `Flask 官网_` 。
 
-What is Flask?
+
+什么是 Flask?
 --------------
 
-Flask is a lightweight web server written in Python. It provides a
-convenient way for you to quickly set up a web API for predictions from
-your trained PyTorch model, either for direct use, or as a web service
-within a larger system.
+Flask 是一个用 Python 编写的轻量级 Web 服务器。它为您提供了一种便捷的方式,快速建立一个 Web API,
+用于您训练好的 PyTorch 模型的预测,可直接使用,或作为更大系统中的 Web 服务。
 
-Setup and Supporting Files
+设置和支持文件
 --------------------------
 
-We're going to create a web service that takes in images, and maps them
-to one of the 1000 classes of the ImageNet dataset. To do this, you'll
-need an image file for testing. Optionally, you can also get a file that
-will map the class index output by the model to a human-readable class
-name.
+我们将创建一个 Web 服务,接收图像,并将其映射到 ImageNet 数据集的 1000 个类别之一。
+为此,您需要一个用于测试的图像文件。另外,您还可以获取一个文件,将模型输出的类索引映射为可读的类名。
 
-Option 1: To Get Both Files Quickly
+选项 1: 快速获取文件
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-You can pull both of the supporting files quickly by checking out the
-TorchServe repository and copying them to your working folder. *(NB:
-There is no dependency on TorchServe for this tutorial - it's just a
-quick way to get the files.)* Issue the following commands from your
-shell prompt:
+可以通过检出 TorchServe 仓库并将文件复制到您的工作文件夹来快速获取这两个支持文件。
+*(注意:本教程不依赖于 TorchServe - 这只是快速获取文件的一种方式。)* 
+从您的 shell 提示符下发出以下命令:
 
 ::
 
@@ -59,21 +49,20 @@ shell prompt:
 
 And you've got them!
 
-Option 2: Bring Your Own Image
+选项 2: 使用您自己的图像
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The ``index_to_name.json`` file is optional in the Flask service below.
-You can test your service with your own image - just make sure it's a
-3-color JPEG.
+``index_to_name.json`` 文件在下面的 Flask 服务中是可选的。
+您可以使用自己的图像测试您的服务 - 需确保是一个 3 色 JPEG 图像。
 
-Building Your Flask Service
+
+构建您的 Flask 服务
 ---------------------------
 
-The full Python script for the Flask service is shown at the end of this
-recipe; you can copy and paste that into your own ``app.py`` file. Below
-we'll look at individual sections to make their functions clear.
+Flask 服务的完整 Python 脚本在本教程的最后展示;您可以复制并粘贴到您自己的 ``app.py`` 文件中。
+下面我们将查看各个部分,以明确它们的功能。
 
-Imports
+导入
 ~~~~~~~
 
 ::
@@ -83,16 +72,14 @@ Imports
    from PIL import Image
    from flask import Flask, jsonify, request
 
-In order:
+按顺序:
 
--  We'll be using a pre-trained DenseNet model from
-   ``torchvision.models``
--  ``torchvision.transforms`` contains tools for manipulating your image
-   data
--  Pillow (``PIL``) is what we'll use to load the image file initially
--  And of course we'll need classes from ``flask``
+- 将使用来自 ``torchvision.models`` 的预训练 DenseNet 模型
+- ``torchvision.transforms`` 包含用于操作图像数据的工具
+- Pillow (``PIL``) 是我们最初加载图像文件时将使用的库
+- 当然我们还需要从 ``flask`` 导入一些类
 
-Pre-Processing
+预处理
 ~~~~~~~~~~~~~~
 
 ::
@@ -109,26 +96,18 @@ Pre-Processing
        timg.unsqueeze_(0)
        return timg
 
-The web request gave us an image file, but our model expects a PyTorch
-tensor of shape (N, 3, 224, 224) where *N* is the number of items in the
-input batch. (We will just have a batch size of 1.) The first thing we
-do is compose a set of TorchVision transforms that resize and crop the
-image, convert it to a tensor, then normalize the values in the tensor.
-(For more information on this normalization, see the documentation for
-``torchvision.models_``.)
+Web 请求给了我们一个图像文件,但我们的模型期望一个形状为 (N, 3, 224, 224) 的 PyTorch 张量,
+其中 *N* 是输入批次的数量。(我们将只使用批量大小为 1。)我们首先要做的是组合一组 TorchVision 转换,
+调整图像大小和裁剪图像,将其转换为张量,然后对张量中的值进行归一化。
+(有关此归一化的更多信息,请参阅 ``torchvision.models_`` 的文档。)
 
-After that, we open the file and apply the transforms. The transforms
-return a tensor of shape (3, 224, 224) - the 3 color channels of a
-224x224 image. Because we need to make this single image a batch, we use
-the ``unsqueeze_(0)`` call to modify the tensor in place by adding a new
-first dimension. The tensor contains the same data, but now has shape
-(1, 3, 224, 224).
+之后,我们打开文件并应用转换。转换返回一个形状为 (3, 224, 224) 的张量 - 224x224 图像的 3 个颜色通道。
+因为我们需要将这个单个图像变成一个批次,所以我们使用 ``unsqueeze_(0)`` 调用通过添加一个新的第一维来就地修改张量。
+张量包含相同的数据,但现在形状为 (1, 3, 224, 224)。
 
-In general, even if you're not working with image data, you will need to
-transform the input from your HTTP request into a tensor that PyTorch
-can consume.
+一般来说,即使您不是在处理图像数据,您也需要将来自 HTTP 请求的输入转换为 PyTorch 可以使用的张量。
 
-Inference
+推理
 ~~~~~~~~~
 
 ::
@@ -139,15 +118,12 @@ Inference
        prediction = y_hat.item()
        return prediction
 
-The inference itself is the simplest part: When we pass the input tensor
-to them model, we get back a tensor of values that represent the model's
-estimated likelihood that the image belongs to a particular class. The
-``max()`` call finds the class with the maximum likelihood value, and
-returns that value with the ImageNet class index. Finally, we extract
-that class index from the tensor containing it with the ``item()`` call, and
-return it.
+推理本身是最简单的部分:当我们将输入张量传递给模型时,我们会得到一个张量值,代表模型估计图像属于特定类别的可能性。
+``max()`` 调用找到具有最大可能性值的类别,并返回该值及其 ImageNet 类索引。
+最后,我们使用 ``item()`` 调用从包含它的张量中提取该类索引,并返回它。
 
-Post-Processing
+
+后处理
 ~~~~~~~~~~~~~~~
 
 ::
@@ -166,10 +142,14 @@ human-readable class label. It's typical, after getting the prediction
 from your model, to perform post-processing to make the prediction ready
 for either human consumption, or for another piece of software.
 
-Running The Full Flask App
+``render_prediction()`` 方法将预测的类索引映射为人类可读的类标签。在从您的模型获得预测之后,通常需要进行后处理,
+使预测可供人类使用或供另一个软件使用。
+
+
+运行完整的 Flask 应用
 --------------------------
 
-Paste the following into a file called ``app.py``:
+将以下内容粘贴到名为 ``app.py`` 的文件中:
 
 ::
 
@@ -184,41 +164,41 @@ Paste the following into a file called ``app.py``:
 
 
    app = Flask(__name__)
-   model = models.densenet121(pretrained=True)               # Trained on 1000 classes from ImageNet
-   model.eval()                                              # Turns off autograd 
+   model = models.densenet121(pretrained=True)               # 在 ImageNet 的 1000 个类别上训练
+   model.eval()                                              # 关闭自动梯度计算 
 
 
 
    img_class_map = None
-   mapping_file_path = 'index_to_name.json'                  # Human-readable names for Imagenet classes
+   mapping_file_path = 'index_to_name.json'                  # ImageNet 类别的可读名称
    if os.path.isfile(mapping_file_path):
        with open (mapping_file_path) as f:
            img_class_map = json.load(f)
 
 
 
-   # Transform input into the form our model expects
+   # 将输入转换为模型期望的形式
    def transform_image(infile):
-       input_transforms = [transforms.Resize(255),           # We use multiple TorchVision transforms to ready the image
+       input_transforms = [transforms.Resize(255),           # 我们使用多个 TorchVision 转换来准备图像
            transforms.CenterCrop(224),
            transforms.ToTensor(),
-           transforms.Normalize([0.485, 0.456, 0.406],       # Standard normalization for ImageNet model input
+           transforms.Normalize([0.485, 0.456, 0.406],       # ImageNet 模型输入的标准归一化
                [0.229, 0.224, 0.225])]
        my_transforms = transforms.Compose(input_transforms)
-       image = Image.open(infile)                            # Open the image file
-       timg = my_transforms(image)                           # Transform PIL image to appropriately-shaped PyTorch tensor
-       timg.unsqueeze_(0)                                    # PyTorch models expect batched input; create a batch of 1
+       image = Image.open(infile)                            # 打开图像文件
+       timg = my_transforms(image)                           # 将 PIL 图像转换为合适形状的 PyTorch 张量
+       timg.unsqueeze_(0)                                    # PyTorch 模型期望批量输入;创建批量大小为 1
        return timg
 
 
-   # Get a prediction
+   # 获取预测
    def get_prediction(input_tensor):
-       outputs = model.forward(input_tensor)                 # Get likelihoods for all ImageNet classes
-       _, y_hat = outputs.max(1)                             # Extract the most likely class
-       prediction = y_hat.item()                             # Extract the int value from the PyTorch tensor
+       outputs = model.forward(input_tensor)                 # 获取所有 ImageNet 类别的可能性
+       _, y_hat = outputs.max(1)                             # 提取最可能的类别
+       prediction = y_hat.item()                             # 从 PyTorch 张量中提取 int 值
        return prediction
 
-   # Make the prediction human-readable
+   # 使预测结果可读
    def render_prediction(prediction_idx):
        stridx = str(prediction_idx)
        class_name = 'Unknown'
@@ -248,37 +228,32 @@ Paste the following into a file called ``app.py``:
    if __name__ == '__main__':
        app.run()
 
-To start the server from your shell prompt, issue the following command:
+从 shell 提示符启动服务器,请执行以下命令:
 
 ::
 
    FLASK_APP=app.py flask run
 
-By default, your Flask server is listening on port 5000. Once the server
-is running, open another terminal window, and test your new inference
-server:
+默认情况下,您的 Flask 服务器监听 5000 端口。服务器运行后,打开另一个终端窗口,测试您新的推理服务器:
 
 ::
 
    curl -X POST -H "Content-Type: multipart/form-data" http://localhost:5000/predict -F "file=@kitten.jpg"
 
-If everything is set up correctly, you should recevie a response similar
-to the following:
+如果一切设置正确,您应该会收到类似如下的响应:
 
 ::
 
    {"class_id":285,"class_name":"Egyptian_cat"}
 
-Important Resources
+重要资源
 -------------------
 
--  `pytorch.org`_ for installation instructions, and more documentation
-   and tutorials
--  The `Flask site`_ has a `Quick Start guide`_ that goes into more
-   detail on setting up a simple Flask service
+- `pytorch.org`_ 提供安装说明,以及更多文档和教程
+- `Flask 官网`_ 有一个 `快速入门指南`_ ,对设置一个简单的 Flask 服务有更详细的介绍
 
 .. _pytorch.org: https://pytorch.org
-.. _Flask site: https://flask.palletsprojects.com/en/1.1.x/
+.. _Flask 官网: https://flask.palletsprojects.com/en/1.1.x/
 .. _Quick Start guide: https://flask.palletsprojects.com/en/1.1.x/quickstart/
 .. _torchvision.models: https://pytorch.org/vision/stable/models.html
-.. _the Flask site: https://flask.palletsprojects.com/en/1.1.x/installation/
+.. _Flask 官网: https://flask.palletsprojects.com/en/1.1.x/installation/

@@ -52,8 +52,8 @@ TorchScript 是使用 PyTorch 模型进行大规模推理的推荐模型格式�
 
 ::
 
-   unscripted_output = r18(dummy_input)         # 获取未脚本化模型的预测...
-   scripted_output = r18_scripted(dummy_input)  # ...并对脚本化版本做同样操作
+   unscripted_output = r18(dummy_input)         # Get the unscripted model's prediction...
+   scripted_output = r18_scripted(dummy_input)  # ...and do the same for the scripted version
 
    unscripted_top5 = F.softmax(unscripted_output, dim=1).topk(5).indices
    scripted_top5 = F.softmax(scripted_output, dim=1).topk(5).indices
@@ -76,7 +76,6 @@ TorchScript 是使用 PyTorch 模型进行大规模推理的推荐模型格式�
 
    r18_scripted.save('r18_scripted.pt')
 
-Loading TorchScript Models in C++
 在 C++ 中加载 TorchScript 模型
 ---------------------------------
 
@@ -142,7 +141,6 @@ Loading TorchScript Models in C++
 ----------------------------------------------
 
 创建以下 ``CMakeLists.txt`` 文件:
-
 
 ::
 

@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Deploying with Flask &mdash; PyTorch Tutorials 2.3.0 documentation</title>
+  <title>使用 Flask 进行部署 &mdash; PyTorch Tutorials 2.3.0 documentation</title>
   
 
   
@@ -535,7 +535,7 @@
         
           <li><a href="recipes_index.html">PyTorch 示例</a> &gt;</li>
         
-      <li>Deploying with Flask</li>
+      <li>使用 Flask 进行部署</li>
     
     
       <li class="pytorch-breadcrumbs-aside">
@@ -594,51 +594,39 @@
             <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
-  <div class="section" id="deploying-with-flask">
-<h1>Deploying with Flask<a class="headerlink" href="#deploying-with-flask" title="Permalink to this heading">¶</a></h1>
-<p>In this recipe, you will learn:</p>
+  <div class="section" id="flask">
+<h1>使用 Flask 进行部署<a class="headerlink" href="#flask" title="Permalink to this heading">¶</a></h1>
+<p>在这个教程中,您将学习:</p>
 <ul class="simple">
-<li><p>How to wrap your trained PyTorch model in a Flask container to expose
-it via a web API</p></li>
-<li><p>How to translate incoming web requests into PyTorch tensors for your
-model</p></li>
-<li><p>How to package your model’s output for an HTTP response</p></li>
+<li><p>如何将训练好的 PyTorch 模型封装到 Flask 容器中,通过 Web API 暴露出去</p></li>
+<li><p>如何将传入的 Web 请求转换为 PyTorch 张量,以供您的模型使用</p></li>
+<li><p>如何为 HTTP 响应打包您模型的输出</p></li>
 </ul>
-<div class="section" id="requirements">
-<h2>Requirements<a class="headerlink" href="#requirements" title="Permalink to this heading">¶</a></h2>
-<p>You will need a Python 3 environment with the following packages (and
-their dependencies) installed:</p>
+<div class="section" id="id1">
+<h2>环境设置<a class="headerlink" href="#id1" title="Permalink to this heading">¶</a></h2>
+<p>您需要一个安装了以下软件包(及其依赖项)的 Python 3 环境:</p>
 <ul class="simple">
 <li><p>PyTorch 1.5</p></li>
 <li><p>TorchVision 0.6.0</p></li>
 <li><p>Flask 1.1</p></li>
 </ul>
-<p>Optionally, to get some of the supporting files, you’ll need git.</p>
-<p>The instructions for installing PyTorch and TorchVision are available at
-<a class="reference external" href="https://pytorch.org">pytorch.org</a>. Instructions for installing Flask are available on <a class="reference external" href="https://flask.palletsprojects.com/en/1.1.x/installation/">the
-Flask site</a>.</p>
+<p>另外,如果需要获取一些支持文件,您还需要 git。</p>
+<p>安装 PyTorch 和 TorchVision 的说明在 <cite>pytorch.org_</cite> 上有介绍。安装 Flask 请查看 <cite>Flask 官网_</cite> 。</p>
 </div>
-<div class="section" id="what-is-flask">
-<h2>What is Flask?<a class="headerlink" href="#what-is-flask" title="Permalink to this heading">¶</a></h2>
-<p>Flask is a lightweight web server written in Python. It provides a
-convenient way for you to quickly set up a web API for predictions from
-your trained PyTorch model, either for direct use, or as a web service
-within a larger system.</p>
+<div class="section" id="id2">
+<h2>什么是 Flask?<a class="headerlink" href="#id2" title="Permalink to this heading">¶</a></h2>
+<p>Flask 是一个用 Python 编写的轻量级 Web 服务器。它为您提供了一种便捷的方式,快速建立一个 Web API,
+用于您训练好的 PyTorch 模型的预测,可直接使用,或作为更大系统中的 Web 服务。</p>
 </div>
-<div class="section" id="setup-and-supporting-files">
-<h2>Setup and Supporting Files<a class="headerlink" href="#setup-and-supporting-files" title="Permalink to this heading">¶</a></h2>
-<p>We’re going to create a web service that takes in images, and maps them
-to one of the 1000 classes of the ImageNet dataset. To do this, you’ll
-need an image file for testing. Optionally, you can also get a file that
-will map the class index output by the model to a human-readable class
-name.</p>
-<div class="section" id="option-1-to-get-both-files-quickly">
-<h3>Option 1: To Get Both Files Quickly<a class="headerlink" href="#option-1-to-get-both-files-quickly" title="Permalink to this heading">¶</a></h3>
-<p>You can pull both of the supporting files quickly by checking out the
-TorchServe repository and copying them to your working folder. <em>(NB:
-There is no dependency on TorchServe for this tutorial - it’s just a
-quick way to get the files.)</em> Issue the following commands from your
-shell prompt:</p>
+<div class="section" id="id3">
+<h2>设置和支持文件<a class="headerlink" href="#id3" title="Permalink to this heading">¶</a></h2>
+<p>我们将创建一个 Web 服务,接收图像,并将其映射到 ImageNet 数据集的 1000 个类别之一。
+为此,您需要一个用于测试的图像文件。另外,您还可以获取一个文件,将模型输出的类索引映射为可读的类名。</p>
+<div class="section" id="id4">
+<h3>选项 1: 快速获取文件<a class="headerlink" href="#id4" title="Permalink to this heading">¶</a></h3>
+<p>可以通过检出 TorchServe 仓库并将文件复制到您的工作文件夹来快速获取这两个支持文件。
+<em>(注意:本教程不依赖于 TorchServe - 这只是快速获取文件的一种方式。)</em>
+从您的 shell 提示符下发出以下命令:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">pytorch</span><span class="o">/</span><span class="n">serve</span>
 <span class="n">cp</span> <span class="n">serve</span><span class="o">/</span><span class="n">examples</span><span class="o">/</span><span class="n">image_classifier</span><span class="o">/</span><span class="n">kitten</span><span class="o">.</span><span class="n">jpg</span> <span class="o">.</span>
 <span class="n">cp</span> <span class="n">serve</span><span class="o">/</span><span class="n">examples</span><span class="o">/</span><span class="n">image_classifier</span><span class="o">/</span><span class="n">index_to_name</span><span class="o">.</span><span class="n">json</span> <span class="o">.</span>
@@ -646,38 +634,34 @@ shell prompt:</p>
 </div>
 <p>And you’ve got them!</p>
 </div>
-<div class="section" id="option-2-bring-your-own-image">
-<h3>Option 2: Bring Your Own Image<a class="headerlink" href="#option-2-bring-your-own-image" title="Permalink to this heading">¶</a></h3>
-<p>The <code class="docutils literal notranslate"><span class="pre">index_to_name.json</span></code> file is optional in the Flask service below.
-You can test your service with your own image - just make sure it’s a
-3-color JPEG.</p>
+<div class="section" id="id5">
+<h3>选项 2: 使用您自己的图像<a class="headerlink" href="#id5" title="Permalink to this heading">¶</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">index_to_name.json</span></code> 文件在下面的 Flask 服务中是可选的。
+您可以使用自己的图像测试您的服务 - 需确保是一个 3 色 JPEG 图像。</p>
 </div>
 </div>
-<div class="section" id="building-your-flask-service">
-<h2>Building Your Flask Service<a class="headerlink" href="#building-your-flask-service" title="Permalink to this heading">¶</a></h2>
-<p>The full Python script for the Flask service is shown at the end of this
-recipe; you can copy and paste that into your own <code class="docutils literal notranslate"><span class="pre">app.py</span></code> file. Below
-we’ll look at individual sections to make their functions clear.</p>
-<div class="section" id="imports">
-<h3>Imports<a class="headerlink" href="#imports" title="Permalink to this heading">¶</a></h3>
+<div class="section" id="id6">
+<h2>构建您的 Flask 服务<a class="headerlink" href="#id6" title="Permalink to this heading">¶</a></h2>
+<p>Flask 服务的完整 Python 脚本在本教程的最后展示;您可以复制并粘贴到您自己的 <code class="docutils literal notranslate"><span class="pre">app.py</span></code> 文件中。
+下面我们将查看各个部分,以明确它们的功能。</p>
+<div class="section" id="id7">
+<h3>导入<a class="headerlink" href="#id7" title="Permalink to this heading">¶</a></h3>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torchvision.models</span> <span class="k">as</span> <span class="nn">models</span>
 <span class="kn">import</span> <span class="nn">torchvision.transforms</span> <span class="k">as</span> <span class="nn">transforms</span>
 <span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">Image</span>
 <span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="n">Flask</span><span class="p">,</span> <span class="n">jsonify</span><span class="p">,</span> <span class="n">request</span>
 </pre></div>
 </div>
-<p>In order:</p>
+<p>按顺序:</p>
 <ul class="simple">
-<li><p>We’ll be using a pre-trained DenseNet model from
-<code class="docutils literal notranslate"><span class="pre">torchvision.models</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">torchvision.transforms</span></code> contains tools for manipulating your image
-data</p></li>
-<li><p>Pillow (<code class="docutils literal notranslate"><span class="pre">PIL</span></code>) is what we’ll use to load the image file initially</p></li>
-<li><p>And of course we’ll need classes from <code class="docutils literal notranslate"><span class="pre">flask</span></code></p></li>
+<li><p>将使用来自 <code class="docutils literal notranslate"><span class="pre">torchvision.models</span></code> 的预训练 DenseNet 模型</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">torchvision.transforms</span></code> 包含用于操作图像数据的工具</p></li>
+<li><p>Pillow (<code class="docutils literal notranslate"><span class="pre">PIL</span></code>) 是我们最初加载图像文件时将使用的库</p></li>
+<li><p>当然我们还需要从 <code class="docutils literal notranslate"><span class="pre">flask</span></code> 导入一些类</p></li>
 </ul>
 </div>
-<div class="section" id="pre-processing">
-<h3>Pre-Processing<a class="headerlink" href="#pre-processing" title="Permalink to this heading">¶</a></h3>
+<div class="section" id="id8">
+<h3>预处理<a class="headerlink" href="#id8" title="Permalink to this heading">¶</a></h3>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">transform_image</span><span class="p">(</span><span class="n">infile</span><span class="p">):</span>
     <span class="n">input_transforms</span> <span class="o">=</span> <span class="p">[</span><span class="n">transforms</span><span class="o">.</span><span class="n">Resize</span><span class="p">(</span><span class="mi">255</span><span class="p">),</span>
         <span class="n">transforms</span><span class="o">.</span><span class="n">CenterCrop</span><span class="p">(</span><span class="mi">224</span><span class="p">),</span>
@@ -691,25 +675,17 @@ data</p></li>
     <span class="k">return</span> <span class="n">timg</span>
 </pre></div>
 </div>
-<p>The web request gave us an image file, but our model expects a PyTorch
-tensor of shape (N, 3, 224, 224) where <em>N</em> is the number of items in the
-input batch. (We will just have a batch size of 1.) The first thing we
-do is compose a set of TorchVision transforms that resize and crop the
-image, convert it to a tensor, then normalize the values in the tensor.
-(For more information on this normalization, see the documentation for
-<code class="docutils literal notranslate"><span class="pre">torchvision.models_</span></code>.)</p>
-<p>After that, we open the file and apply the transforms. The transforms
-return a tensor of shape (3, 224, 224) - the 3 color channels of a
-224x224 image. Because we need to make this single image a batch, we use
-the <code class="docutils literal notranslate"><span class="pre">unsqueeze_(0)</span></code> call to modify the tensor in place by adding a new
-first dimension. The tensor contains the same data, but now has shape
-(1, 3, 224, 224).</p>
-<p>In general, even if you’re not working with image data, you will need to
-transform the input from your HTTP request into a tensor that PyTorch
-can consume.</p>
+<p>Web 请求给了我们一个图像文件,但我们的模型期望一个形状为 (N, 3, 224, 224) 的 PyTorch 张量,
+其中 <em>N</em> 是输入批次的数量。(我们将只使用批量大小为 1。)我们首先要做的是组合一组 TorchVision 转换,
+调整图像大小和裁剪图像,将其转换为张量,然后对张量中的值进行归一化。
+(有关此归一化的更多信息,请参阅 <code class="docutils literal notranslate"><span class="pre">torchvision.models_</span></code> 的文档。)</p>
+<p>之后,我们打开文件并应用转换。转换返回一个形状为 (3, 224, 224) 的张量 - 224x224 图像的 3 个颜色通道。
+因为我们需要将这个单个图像变成一个批次,所以我们使用 <code class="docutils literal notranslate"><span class="pre">unsqueeze_(0)</span></code> 调用通过添加一个新的第一维来就地修改张量。
+张量包含相同的数据,但现在形状为 (1, 3, 224, 224)。</p>
+<p>一般来说,即使您不是在处理图像数据,您也需要将来自 HTTP 请求的输入转换为 PyTorch 可以使用的张量。</p>
 </div>
-<div class="section" id="inference">
-<h3>Inference<a class="headerlink" href="#inference" title="Permalink to this heading">¶</a></h3>
+<div class="section" id="id9">
+<h3>推理<a class="headerlink" href="#id9" title="Permalink to this heading">¶</a></h3>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">get_prediction</span><span class="p">(</span><span class="n">input_tensor</span><span class="p">):</span>
     <span class="n">outputs</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">input_tensor</span><span class="p">)</span>
     <span class="n">_</span><span class="p">,</span> <span class="n">y_hat</span> <span class="o">=</span> <span class="n">outputs</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
@@ -717,16 +693,12 @@ can consume.</p>
     <span class="k">return</span> <span class="n">prediction</span>
 </pre></div>
 </div>
-<p>The inference itself is the simplest part: When we pass the input tensor
-to them model, we get back a tensor of values that represent the model’s
-estimated likelihood that the image belongs to a particular class. The
-<code class="docutils literal notranslate"><span class="pre">max()</span></code> call finds the class with the maximum likelihood value, and
-returns that value with the ImageNet class index. Finally, we extract
-that class index from the tensor containing it with the <code class="docutils literal notranslate"><span class="pre">item()</span></code> call, and
-return it.</p>
+<p>推理本身是最简单的部分:当我们将输入张量传递给模型时,我们会得到一个张量值,代表模型估计图像属于特定类别的可能性。
+<code class="docutils literal notranslate"><span class="pre">max()</span></code> 调用找到具有最大可能性值的类别,并返回该值及其 ImageNet 类索引。
+最后,我们使用 <code class="docutils literal notranslate"><span class="pre">item()</span></code> 调用从包含它的张量中提取该类索引,并返回它。</p>
 </div>
-<div class="section" id="post-processing">
-<h3>Post-Processing<a class="headerlink" href="#post-processing" title="Permalink to this heading">¶</a></h3>
+<div class="section" id="id10">
+<h3>后处理<a class="headerlink" href="#id10" title="Permalink to this heading">¶</a></h3>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">render_prediction</span><span class="p">(</span><span class="n">prediction_idx</span><span class="p">):</span>
     <span class="n">stridx</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">prediction_idx</span><span class="p">)</span>
     <span class="n">class_name</span> <span class="o">=</span> <span class="s1">&#39;Unknown&#39;</span>
@@ -741,11 +713,13 @@ return it.</p>
 human-readable class label. It’s typical, after getting the prediction
 from your model, to perform post-processing to make the prediction ready
 for either human consumption, or for another piece of software.</p>
+<p><code class="docutils literal notranslate"><span class="pre">render_prediction()</span></code> 方法将预测的类索引映射为人类可读的类标签。在从您的模型获得预测之后,通常需要进行后处理,
+使预测可供人类使用或供另一个软件使用。</p>
 </div>
 </div>
-<div class="section" id="running-the-full-flask-app">
-<h2>Running The Full Flask App<a class="headerlink" href="#running-the-full-flask-app" title="Permalink to this heading">¶</a></h2>
-<p>Paste the following into a file called <code class="docutils literal notranslate"><span class="pre">app.py</span></code>:</p>
+<div class="section" id="id11">
+<h2>运行完整的 Flask 应用<a class="headerlink" href="#id11" title="Permalink to this heading">¶</a></h2>
+<p>将以下内容粘贴到名为 <code class="docutils literal notranslate"><span class="pre">app.py</span></code> 的文件中:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">io</span>
 <span class="kn">import</span> <span class="nn">json</span>
 <span class="kn">import</span> <span class="nn">os</span>
@@ -757,41 +731,41 @@ for either human consumption, or for another piece of software.</p>
 
 
 <span class="n">app</span> <span class="o">=</span> <span class="n">Flask</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
-<span class="n">model</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">densenet121</span><span class="p">(</span><span class="n">pretrained</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>               <span class="c1"># Trained on 1000 classes from ImageNet</span>
-<span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>                                              <span class="c1"># Turns off autograd</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">densenet121</span><span class="p">(</span><span class="n">pretrained</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>               <span class="c1"># 在 ImageNet 的 1000 个类别上训练</span>
+<span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>                                              <span class="c1"># 关闭自动梯度计算</span>
 
 
 
 <span class="n">img_class_map</span> <span class="o">=</span> <span class="kc">None</span>
-<span class="n">mapping_file_path</span> <span class="o">=</span> <span class="s1">&#39;index_to_name.json&#39;</span>                  <span class="c1"># Human-readable names for Imagenet classes</span>
+<span class="n">mapping_file_path</span> <span class="o">=</span> <span class="s1">&#39;index_to_name.json&#39;</span>                  <span class="c1"># ImageNet 类别的可读名称</span>
 <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">mapping_file_path</span><span class="p">):</span>
     <span class="k">with</span> <span class="nb">open</span> <span class="p">(</span><span class="n">mapping_file_path</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
         <span class="n">img_class_map</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
 
 
 
-<span class="c1"># Transform input into the form our model expects</span>
+<span class="c1"># 将输入转换为模型期望的形式</span>
 <span class="k">def</span> <span class="nf">transform_image</span><span class="p">(</span><span class="n">infile</span><span class="p">):</span>
-    <span class="n">input_transforms</span> <span class="o">=</span> <span class="p">[</span><span class="n">transforms</span><span class="o">.</span><span class="n">Resize</span><span class="p">(</span><span class="mi">255</span><span class="p">),</span>           <span class="c1"># We use multiple TorchVision transforms to ready the image</span>
+    <span class="n">input_transforms</span> <span class="o">=</span> <span class="p">[</span><span class="n">transforms</span><span class="o">.</span><span class="n">Resize</span><span class="p">(</span><span class="mi">255</span><span class="p">),</span>           <span class="c1"># 我们使用多个 TorchVision 转换来准备图像</span>
         <span class="n">transforms</span><span class="o">.</span><span class="n">CenterCrop</span><span class="p">(</span><span class="mi">224</span><span class="p">),</span>
         <span class="n">transforms</span><span class="o">.</span><span class="n">ToTensor</span><span class="p">(),</span>
-        <span class="n">transforms</span><span class="o">.</span><span class="n">Normalize</span><span class="p">([</span><span class="mf">0.485</span><span class="p">,</span> <span class="mf">0.456</span><span class="p">,</span> <span class="mf">0.406</span><span class="p">],</span>       <span class="c1"># Standard normalization for ImageNet model input</span>
+        <span class="n">transforms</span><span class="o">.</span><span class="n">Normalize</span><span class="p">([</span><span class="mf">0.485</span><span class="p">,</span> <span class="mf">0.456</span><span class="p">,</span> <span class="mf">0.406</span><span class="p">],</span>       <span class="c1"># ImageNet 模型输入的标准归一化</span>
             <span class="p">[</span><span class="mf">0.229</span><span class="p">,</span> <span class="mf">0.224</span><span class="p">,</span> <span class="mf">0.225</span><span class="p">])]</span>
     <span class="n">my_transforms</span> <span class="o">=</span> <span class="n">transforms</span><span class="o">.</span><span class="n">Compose</span><span class="p">(</span><span class="n">input_transforms</span><span class="p">)</span>
-    <span class="n">image</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">infile</span><span class="p">)</span>                            <span class="c1"># Open the image file</span>
-    <span class="n">timg</span> <span class="o">=</span> <span class="n">my_transforms</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>                           <span class="c1"># Transform PIL image to appropriately-shaped PyTorch tensor</span>
-    <span class="n">timg</span><span class="o">.</span><span class="n">unsqueeze_</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>                                    <span class="c1"># PyTorch models expect batched input; create a batch of 1</span>
+    <span class="n">image</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">infile</span><span class="p">)</span>                            <span class="c1"># 打开图像文件</span>
+    <span class="n">timg</span> <span class="o">=</span> <span class="n">my_transforms</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>                           <span class="c1"># 将 PIL 图像转换为合适形状的 PyTorch 张量</span>
+    <span class="n">timg</span><span class="o">.</span><span class="n">unsqueeze_</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>                                    <span class="c1"># PyTorch 模型期望批量输入;创建批量大小为 1</span>
     <span class="k">return</span> <span class="n">timg</span>
 
 
-<span class="c1"># Get a prediction</span>
+<span class="c1"># 获取预测</span>
 <span class="k">def</span> <span class="nf">get_prediction</span><span class="p">(</span><span class="n">input_tensor</span><span class="p">):</span>
-    <span class="n">outputs</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">input_tensor</span><span class="p">)</span>                 <span class="c1"># Get likelihoods for all ImageNet classes</span>
-    <span class="n">_</span><span class="p">,</span> <span class="n">y_hat</span> <span class="o">=</span> <span class="n">outputs</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>                             <span class="c1"># Extract the most likely class</span>
-    <span class="n">prediction</span> <span class="o">=</span> <span class="n">y_hat</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>                             <span class="c1"># Extract the int value from the PyTorch tensor</span>
+    <span class="n">outputs</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">input_tensor</span><span class="p">)</span>                 <span class="c1"># 获取所有 ImageNet 类别的可能性</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">y_hat</span> <span class="o">=</span> <span class="n">outputs</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>                             <span class="c1"># 提取最可能的类别</span>
+    <span class="n">prediction</span> <span class="o">=</span> <span class="n">y_hat</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>                             <span class="c1"># 从 PyTorch 张量中提取 int 值</span>
     <span class="k">return</span> <span class="n">prediction</span>
 
-<span class="c1"># Make the prediction human-readable</span>
+<span class="c1"># 使预测结果可读</span>
 <span class="k">def</span> <span class="nf">render_prediction</span><span class="p">(</span><span class="n">prediction_idx</span><span class="p">):</span>
     <span class="n">stridx</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">prediction_idx</span><span class="p">)</span>
     <span class="n">class_name</span> <span class="o">=</span> <span class="s1">&#39;Unknown&#39;</span>
@@ -822,29 +796,24 @@ for either human consumption, or for another piece of software.</p>
     <span class="n">app</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
 </pre></div>
 </div>
-<p>To start the server from your shell prompt, issue the following command:</p>
+<p>从 shell 提示符启动服务器,请执行以下命令:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">FLASK_APP</span><span class="o">=</span><span class="n">app</span><span class="o">.</span><span class="n">py</span> <span class="n">flask</span> <span class="n">run</span>
 </pre></div>
 </div>
-<p>By default, your Flask server is listening on port 5000. Once the server
-is running, open another terminal window, and test your new inference
-server:</p>
+<p>默认情况下,您的 Flask 服务器监听 5000 端口。服务器运行后,打开另一个终端窗口,测试您新的推理服务器:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">curl</span> <span class="o">-</span><span class="n">X</span> <span class="n">POST</span> <span class="o">-</span><span class="n">H</span> <span class="s2">&quot;Content-Type: multipart/form-data&quot;</span> <span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">localhost</span><span class="p">:</span><span class="mi">5000</span><span class="o">/</span><span class="n">predict</span> <span class="o">-</span><span class="n">F</span> <span class="s2">&quot;file=@kitten.jpg&quot;</span>
 </pre></div>
 </div>
-<p>If everything is set up correctly, you should recevie a response similar
-to the following:</p>
+<p>如果一切设置正确,您应该会收到类似如下的响应:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="s2">&quot;class_id&quot;</span><span class="p">:</span><span class="mi">285</span><span class="p">,</span><span class="s2">&quot;class_name&quot;</span><span class="p">:</span><span class="s2">&quot;Egyptian_cat&quot;</span><span class="p">}</span>
 </pre></div>
 </div>
 </div>
-<div class="section" id="important-resources">
-<h2>Important Resources<a class="headerlink" href="#important-resources" title="Permalink to this heading">¶</a></h2>
+<div class="section" id="id12">
+<h2>重要资源<a class="headerlink" href="#id12" title="Permalink to this heading">¶</a></h2>
 <ul class="simple">
-<li><p><a class="reference external" href="https://pytorch.org">pytorch.org</a> for installation instructions, and more documentation
-and tutorials</p></li>
-<li><p>The <a class="reference external" href="https://flask.palletsprojects.com/en/1.1.x/">Flask site</a> has a <a class="reference external" href="https://flask.palletsprojects.com/en/1.1.x/quickstart/">Quick Start guide</a> that goes into more
-detail on setting up a simple Flask service</p></li>
+<li><p><a class="reference external" href="https://pytorch.org">pytorch.org</a> 提供安装说明,以及更多文档和教程</p></li>
+<li><p><a href="#id15"><span class="problematic" id="id16">`Flask 官网`_</span></a> 有一个 <a href="#id17"><span class="problematic" id="id18">`快速入门指南`_</span></a> ,对设置一个简单的 Flask 服务有更详细的介绍</p></li>
 </ul>
 </div>
 </div>
@@ -910,23 +879,23 @@ if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.i
           <div class="pytorch-right-menu" id="pytorch-right-menu">
             <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
               <ul>
-<li><a class="reference internal" href="#">Deploying with Flask</a><ul>
-<li><a class="reference internal" href="#requirements">Requirements</a></li>
-<li><a class="reference internal" href="#what-is-flask">What is Flask?</a></li>
-<li><a class="reference internal" href="#setup-and-supporting-files">Setup and Supporting Files</a><ul>
-<li><a class="reference internal" href="#option-1-to-get-both-files-quickly">Option 1: To Get Both Files Quickly</a></li>
-<li><a class="reference internal" href="#option-2-bring-your-own-image">Option 2: Bring Your Own Image</a></li>
+<li><a class="reference internal" href="#">使用 Flask 进行部署</a><ul>
+<li><a class="reference internal" href="#id1">环境设置</a></li>
+<li><a class="reference internal" href="#id2">什么是 Flask?</a></li>
+<li><a class="reference internal" href="#id3">设置和支持文件</a><ul>
+<li><a class="reference internal" href="#id4">选项 1: 快速获取文件</a></li>
+<li><a class="reference internal" href="#id5">选项 2: 使用您自己的图像</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#building-your-flask-service">Building Your Flask Service</a><ul>
-<li><a class="reference internal" href="#imports">Imports</a></li>
-<li><a class="reference internal" href="#pre-processing">Pre-Processing</a></li>
-<li><a class="reference internal" href="#inference">Inference</a></li>
-<li><a class="reference internal" href="#post-processing">Post-Processing</a></li>
+<li><a class="reference internal" href="#id6">构建您的 Flask 服务</a><ul>
+<li><a class="reference internal" href="#id7">导入</a></li>
+<li><a class="reference internal" href="#id8">预处理</a></li>
+<li><a class="reference internal" href="#id9">推理</a></li>
+<li><a class="reference internal" href="#id10">后处理</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#running-the-full-flask-app">Running The Full Flask App</a></li>
-<li><a class="reference internal" href="#important-resources">Important Resources</a></li>
+<li><a class="reference internal" href="#id11">运行完整的 Flask 应用</a></li>
+<li><a class="reference internal" href="#id12">重要资源</a></li>
 </ul>
 </li>
 </ul>

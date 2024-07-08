@@ -42,7 +42,7 @@
   <link rel="stylesheet" href="../_static/css/custom2.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Deploying with Flask" href="deployment_with_flask.html" />
+    <link rel="next" title="使用 Flask 进行部署" href="deployment_with_flask.html" />
     <link rel="prev" title="Intel® PyTorch* 扩展后端" href="torch_compile_backend_ipex.html" />
   <!-- Google Tag Manager -->
     <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -637,8 +637,8 @@ TorchScript 是使用 PyTorch 模型进行大规模推理的推荐模型格式�
 </pre></div>
 </div>
 <p>让我们快速检查一下两个模型的等价性:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">unscripted_output</span> <span class="o">=</span> <span class="n">r18</span><span class="p">(</span><span class="n">dummy_input</span><span class="p">)</span>         <span class="c1"># 获取未脚本化模型的预测...</span>
-<span class="n">scripted_output</span> <span class="o">=</span> <span class="n">r18_scripted</span><span class="p">(</span><span class="n">dummy_input</span><span class="p">)</span>  <span class="c1"># ...并对脚本化版本做同样操作</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">unscripted_output</span> <span class="o">=</span> <span class="n">r18</span><span class="p">(</span><span class="n">dummy_input</span><span class="p">)</span>         <span class="c1"># Get the unscripted model&#39;s prediction...</span>
+<span class="n">scripted_output</span> <span class="o">=</span> <span class="n">r18_scripted</span><span class="p">(</span><span class="n">dummy_input</span><span class="p">)</span>  <span class="c1"># ...and do the same for the scripted version</span>
 
 <span class="n">unscripted_top5</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">unscripted_output</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">topk</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">indices</span>
 <span class="n">scripted_top5</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">scripted_output</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">topk</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">indices</span>
@@ -658,9 +658,9 @@ TorchScript 是使用 PyTorch 模型进行大规模推理的推荐模型格式�
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">r18_scripted</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s1">&#39;r18_scripted.pt&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Loading TorchScript Models in C++
-在 C++ 中加载 TorchScript 模型
-———————————</p>
+</div>
+<div class="section" id="c-torchscript">
+<h2>在 C++ 中加载 TorchScript 模型<a class="headerlink" href="#c-torchscript" title="Permalink to this heading">¶</a></h2>
 <p>创建以下 C++ 文件,并将其命名为 <code class="docutils literal notranslate"><span class="pre">ts-infer.cpp</span></code>:</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;torch/script.h&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;torch/nn/functional/activation.h&gt;</span>
@@ -768,7 +768,7 @@ DONE
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="deployment_with_flask.html" class="btn btn-neutral float-right" title="Deploying with Flask" accesskey="n" rel="next">Next <img src="../_static/images/chevron-right-orange.svg" class="next-page"></a>
+        <a href="deployment_with_flask.html" class="btn btn-neutral float-right" title="使用 Flask 进行部署" accesskey="n" rel="next">Next <img src="../_static/images/chevron-right-orange.svg" class="next-page"></a>
       
       
         <a href="torch_compile_backend_ipex.html" class="btn btn-neutral" title="Intel® PyTorch* 扩展后端" accesskey="p" rel="prev"><img src="../_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
@@ -825,6 +825,7 @@ if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.i
 <li><a class="reference internal" href="#id1">环境要求</a></li>
 <li><a class="reference internal" href="#id2">什么是 TorchScript?</a></li>
 <li><a class="reference internal" href="#id3">如何导出模型</a></li>
+<li><a class="reference internal" href="#c-torchscript">在 C++ 中加载 TorchScript 模型</a></li>
 <li><a class="reference internal" href="#c">构建和运行您的 C++ 推理引擎</a></li>
 <li><a class="reference internal" href="#id4">其他资源</a></li>
 </ul>
