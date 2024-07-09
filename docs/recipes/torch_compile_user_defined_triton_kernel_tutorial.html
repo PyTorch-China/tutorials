@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Using User-Defined Triton Kernels with torch.compile &mdash; PyTorch Tutorials 2.3.0 documentation</title>
+  <title>使用 torch.compile 和用户自定义的 Triton 内核 &mdash; PyTorch Tutorials 2.3.0 documentation</title>
   
 
   
@@ -531,7 +531,7 @@
       </li>
 
         
-      <li>Using User-Defined Triton Kernels with <code class="docutils literal notranslate"><span class="pre">torch.compile</span></code></li>
+      <li>使用 <code class="docutils literal notranslate"><span class="pre">torch.compile</span></code> 和用户自定义的 Triton 内核</li>
     
     
       <li class="pytorch-breadcrumbs-aside">
@@ -595,41 +595,38 @@
 <p>Click <a class="reference internal" href="#sphx-glr-download-recipes-torch-compile-user-defined-triton-kernel-tutorial-py"><span class="std std-ref">here</span></a>
 to download the full example code</p>
 </div>
-<div class="sphx-glr-example-title section" id="using-user-defined-triton-kernels-with-torch-compile">
-<span id="sphx-glr-recipes-torch-compile-user-defined-triton-kernel-tutorial-py"></span><h1>Using User-Defined Triton Kernels with <code class="docutils literal notranslate"><span class="pre">torch.compile</span></code><a class="headerlink" href="#using-user-defined-triton-kernels-with-torch-compile" title="Permalink to this heading">¶</a></h1>
-<p><strong>Author:</strong> <a class="reference external" href="https://github.com/oulgen">Oguz Ulgen</a></p>
-<p>User-defined Triton kernels can be used to optimize specific parts of your
-model’s computation. These kernels are written in Triton’s language, which is designed
-to make it easier to achieve peak hardware performance. By using user-defined Triton
-kernels with <code class="docutils literal notranslate"><span class="pre">torch.compile</span></code>, you can integrate these optimized computations into
-your PyTorch model, potentially achieving significant performance improvements.</p>
-<p>This recipes demonstrates how you can use user-defined Triton kernels with <code class="docutils literal notranslate"><span class="pre">torch.compile</span></code>.</p>
-<div class="section" id="prerequisites">
-<h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Permalink to this heading">¶</a></h2>
-<p>Before starting this recipe, make sure that you have the following:</p>
+<div class="sphx-glr-example-title section" id="torch-compile-triton">
+<span id="sphx-glr-recipes-torch-compile-user-defined-triton-kernel-tutorial-py"></span><h1>使用 <code class="docutils literal notranslate"><span class="pre">torch.compile</span></code> 和用户自定义的 Triton 内核<a class="headerlink" href="#torch-compile-triton" title="Permalink to this heading">¶</a></h1>
+<p><strong>作者:</strong> <a class="reference external" href="https://github.com/oulgen">Oguz Ulgen</a></p>
+<p>用户自定义的 Triton 内核可用于优化模型计算的特定部分。这些内核是用 Triton 语言编写的,
+旨在更容易实现硬件的峰值性能。通过在 <code class="docutils literal notranslate"><span class="pre">torch.compile</span></code> 中使用用户自定义的 Triton 内核,
+您可以将这些优化过的计算集成到 PyTorch 模型中,从而可能获得显著的性能提升。</p>
+<p>本教程演示了如何在 <code class="docutils literal notranslate"><span class="pre">torch.compile</span></code> 中使用用户自定义的 Triton 内核。</p>
+<div class="section" id="id1">
+<h2>先决条件<a class="headerlink" href="#id1" title="Permalink to this heading">¶</a></h2>
+<p>在开始本教程之前,请确保您具备以下条件:</p>
 <ul class="simple">
-<li><p>Basic understanding of <code class="docutils literal notranslate"><span class="pre">torch.compile</span></code> and Triton. See:</p>
+<li><p>对 <code class="docutils literal notranslate"><span class="pre">torch.compile</span></code> 和 Triton 有基本的了解。参见:</p>
 <ul>
-<li><p><a class="reference external" href="https://pytorch.org/docs/stable/torch.compiler.html#torch-compiler">torch.compiler API documentation</a></p></li>
-<li><p><a class="reference external" href="https://pytorch.org/tutorials/intermediate/torch_compile_tutorial.html">Introduction to torch.compile</a></p></li>
-<li><p><a class="reference external" href="https://triton-lang.org/main/index.html">Triton language documentation</a></p></li>
+<li><p><a class="reference external" href="https://pytorch.org/docs/stable/torch.compiler.html#torch-compiler">torch.compiler API 文档</a></p></li>
+<li><p><a class="reference external" href="https://pytorch.org/tutorials/intermediate/torch_compile_tutorial.html">torch.compile 介绍</a></p></li>
+<li><p><a class="reference external" href="https://triton-lang.org/main/index.html">Triton 语言文档</a></p></li>
 </ul>
 </li>
-<li><p>PyTorch 2.3 or later</p></li>
-<li><p>A GPU that supports Triton</p></li>
+<li><p>PyTorch 2.3 或更高版本</p></li>
+<li><p>支持 Triton 的 GPU</p></li>
 </ul>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">from</span> <span class="nn">torch.utils._triton</span> <span class="kn">import</span> <span class="n">has_triton</span>
 </pre></div>
 </div>
 </div>
-<div class="section" id="basic-usage">
-<h2>Basic Usage<a class="headerlink" href="#basic-usage" title="Permalink to this heading">¶</a></h2>
-<p>In this example, we will use a simple vector addition kernel from the Triton documentation
-with <code class="docutils literal notranslate"><span class="pre">torch.compile</span></code>.
-For reference, see <a class="reference external" href="https://triton-lang.org/main/getting-started/tutorials/01-vector-add.html">Triton documentation</a>.</p>
+<div class="section" id="id2">
+<h2>基本用法<a class="headerlink" href="#id2" title="Permalink to this heading">¶</a></h2>
+<p>在此示例中,我们将使用来自 Triton 文档的一个简单向量加法内核与 <code class="docutils literal notranslate"><span class="pre">torch.compile</span></code>。
+参考 <a class="reference external" href="https://triton-lang.org/main/getting-started/tutorials/01-vector-add.html">Triton 文档</a>。</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="ow">not</span> <span class="n">has_triton</span><span class="p">():</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Skipping because triton is not supported on this device.&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;由于此设备不支持 triton,因此跳过。&quot;</span><span class="p">)</span>
 <span class="k">else</span><span class="p">:</span>
     <span class="kn">import</span> <span class="nn">triton</span>
     <span class="kn">from</span> <span class="nn">triton</span> <span class="kn">import</span> <span class="n">language</span> <span class="k">as</span> <span class="n">tl</span>
@@ -662,24 +659,22 @@ For reference, see <a class="reference external" href="https://triton-lang.org/m
     <span class="n">x</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.randn.html#torch.randn" title="torch.randn" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">randn</span></a><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cuda&quot;</span><span class="p">)</span>
     <span class="n">y</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.randn.html#torch.randn" title="torch.randn" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">randn</span></a><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cuda&quot;</span><span class="p">)</span>
     <span class="n">out</span> <span class="o">=</span> <span class="n">add_fn</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Vector addition of</span><span class="se">\n</span><span class="s2">X:</span><span class="se">\t</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="se">\n</span><span class="s2">Y:</span><span class="se">\t</span><span class="si">{</span><span class="n">y</span><span class="si">}</span><span class="se">\n</span><span class="s2">is equal to</span><span class="se">\n</span><span class="si">{</span><span class="n">out</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;向量加法</span><span class="se">\n</span><span class="s2">X:</span><span class="se">\t</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="se">\n</span><span class="s2">Y:</span><span class="se">\t</span><span class="si">{</span><span class="n">y</span><span class="si">}</span><span class="se">\n</span><span class="s2">结果为</span><span class="se">\n</span><span class="si">{</span><span class="n">out</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
-<div class="section" id="advanced-usage">
-<h2>Advanced Usage<a class="headerlink" href="#advanced-usage" title="Permalink to this heading">¶</a></h2>
-<p>Triton’s autotune feature is a powerful tool that automatically optimizes the configuration
-parameters of your Triton kernels. It explores a range of possible configurations and
-selects the one that delivers the best performance for your specific use case.</p>
-<p>When used with <code class="docutils literal notranslate"><span class="pre">torch.compile</span></code>, <code class="docutils literal notranslate"><span class="pre">triton.autotune</span></code> can help ensure that your PyTorch
-model is running as efficiently as possible. Here is an example of using <code class="docutils literal notranslate"><span class="pre">torch.compile</span></code>
-and <code class="docutils literal notranslate"><span class="pre">triton.autotune</span></code>.</p>
+<div class="section" id="id3">
+<h2>高级用法<a class="headerlink" href="#id3" title="Permalink to this heading">¶</a></h2>
+<p>Triton 的自动调优功能是一个强大的工具,可自动优化 Triton 内核的配置参数。
+它探索一系列可能的配置,并选择为您的特定用例提供最佳性能的配置。</p>
+<p>与 <code class="docutils literal notranslate"><span class="pre">torch.compile</span></code> 一起使用时, <code class="docutils literal notranslate"><span class="pre">triton.autotune</span></code> 可以帮助确保您的 PyTorch 模型以最高效的方式运行。
+下面是使用 <code class="docutils literal notranslate"><span class="pre">torch.compile</span></code> 和 <code class="docutils literal notranslate"><span class="pre">triton.autotune</span></code> 的示例。</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p><code class="docutils literal notranslate"><span class="pre">torch.compile</span></code> only supports configs and key arguments to <code class="docutils literal notranslate"><span class="pre">triton.autotune</span></code>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">torch.compile</span></code> 仅支持 <code class="docutils literal notranslate"><span class="pre">triton.autotune</span></code> 的配置和关键参数。</p>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="ow">not</span> <span class="n">has_triton</span><span class="p">():</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Skipping because triton is not supported on this device.&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;由于此设备不支持 triton,因此跳过。&quot;</span><span class="p">)</span>
 <span class="k">else</span><span class="p">:</span>
     <span class="kn">import</span> <span class="nn">triton</span>
     <span class="kn">from</span> <span class="nn">triton</span> <span class="kn">import</span> <span class="n">language</span> <span class="k">as</span> <span class="n">tl</span>
@@ -721,38 +716,34 @@ and <code class="docutils literal notranslate"><span class="pre">triton.autotune
     <span class="n">x</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.randn.html#torch.randn" title="torch.randn" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">randn</span></a><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cuda&quot;</span><span class="p">)</span>
     <span class="n">y</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.randn.html#torch.randn" title="torch.randn" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">randn</span></a><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cuda&quot;</span><span class="p">)</span>
     <span class="n">out</span> <span class="o">=</span> <span class="n">add_fn</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Vector addition of</span><span class="se">\n</span><span class="s2">X:</span><span class="se">\t</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="se">\n</span><span class="s2">Y:</span><span class="se">\t</span><span class="si">{</span><span class="n">y</span><span class="si">}</span><span class="se">\n</span><span class="s2">is equal to</span><span class="se">\n</span><span class="si">{</span><span class="n">out</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;向量加法</span><span class="se">\n</span><span class="s2">X:</span><span class="se">\t</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="se">\n</span><span class="s2">Y:</span><span class="se">\t</span><span class="si">{</span><span class="n">y</span><span class="si">}</span><span class="se">\n</span><span class="s2">结果为</span><span class="se">\n</span><span class="si">{</span><span class="n">out</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
-<div class="section" id="composibility-and-limitations">
-<h2>Composibility and Limitations<a class="headerlink" href="#composibility-and-limitations" title="Permalink to this heading">¶</a></h2>
-<p>As of PyTorch 2.3, the support for user-defined Triton kernels in <code class="docutils literal notranslate"><span class="pre">torch.compile</span></code>
-includes dynamic shapes, <code class="docutils literal notranslate"><span class="pre">torch.autograd.Function</span></code>, JIT inductor, and AOT inductor.
-You can use these features together to build complex, high-performance models.</p>
-<p>However, there are certain limitations to be aware of:</p>
+<div class="section" id="id4">
+<h2>可组合性和限制<a class="headerlink" href="#id4" title="Permalink to this heading">¶</a></h2>
+<p>从 PyTorch 2.3 开始, <code class="docutils literal notranslate"><span class="pre">torch.compile</span></code> 中对用户自定义 Triton 内核的支持包括动态形状、
+<code class="docutils literal notranslate"><span class="pre">torch.autograd.Function</span></code>、JIT inductor 和 AOT inductor。
+您可以将这些功能组合在一起构建复杂的高性能模型。</p>
+<p>但是,也需要注意一些限制:</p>
 <ul class="simple">
-<li><p><strong>Tensor Subclasses:</strong> Currently, there is no support for
-tensor subclasses and other advanced features.</p></li>
-<li><p><strong>Triton Features:</strong> While <code class="docutils literal notranslate"><span class="pre">triton.heuristics</span></code> can be used either standalone or
-before <code class="docutils literal notranslate"><span class="pre">triton.autotune</span></code>, it cannot be used after <code class="docutils literal notranslate"><span class="pre">`triton.autotune</span></code>. This
-implies that if <code class="docutils literal notranslate"><span class="pre">triton.heuristics</span></code> and <code class="docutils literal notranslate"><span class="pre">triton.autotune</span></code> are to be used
-together, <code class="docutils literal notranslate"><span class="pre">triton.heuristics</span></code> must be used first.</p></li>
+<li><p><strong>Tensor 子类:</strong> 目前不支持张量子类和其他高级功能。</p></li>
+<li><p><strong>Triton 功能:</strong> 虽然 <code class="docutils literal notranslate"><span class="pre">triton.heuristics</span></code> 可以单独使用或在 <code class="docutils literal notranslate"><span class="pre">triton.autotune</span></code> 之前使用,
+但不能在 <code class="docutils literal notranslate"><span class="pre">triton.autotune</span></code> 之后使用。这意味着如果要一起使用 <code class="docutils literal notranslate"><span class="pre">triton.heuristics</span></code> 和 <code class="docutils literal notranslate"><span class="pre">triton.autotune</span></code>,
+则必须先使用 <code class="docutils literal notranslate"><span class="pre">triton.heuristics</span></code>。</p></li>
 </ul>
 </div>
-<div class="section" id="conclusion">
-<h2>Conclusion<a class="headerlink" href="#conclusion" title="Permalink to this heading">¶</a></h2>
-<p>In this recipe, we explored how to utilize user-defined Triton kernels
-with <code class="docutils literal notranslate"><span class="pre">torch.compile</span></code>. We delved into the basic usage of a simple
-vector addition kernel and advanced usage involving Triton’s autotune
-feature. We also discussed the composability of user-defined Triton
-kernels with other PyTorch features and highlighted some current limitations.</p>
+<div class="section" id="id5">
+<h2>结论<a class="headerlink" href="#id5" title="Permalink to this heading">¶</a></h2>
+<p>在本教程中,我们探讨了如何在 <code class="docutils literal notranslate"><span class="pre">torch.compile</span></code> 中使用用户自定义的 Triton 内核。
+我们深入研究了使用简单向量加法内核的基本用法,以及涉及 Triton 自动调优功能的高级用法。
+我们还讨论了用户自定义 Triton 内核与其他 PyTorch 功能的可组合性,并强调了一些当前的限制。</p>
 </div>
-<div class="section" id="see-also">
-<h2>See Also<a class="headerlink" href="#see-also" title="Permalink to this heading">¶</a></h2>
+<div class="section" id="id6">
+<h2>另请参阅<a class="headerlink" href="#id6" title="Permalink to this heading">¶</a></h2>
 <ul class="simple">
-<li><p><a class="reference external" href="https://pytorch.org/tutorials/recipes/compiling_optimizer.html">Compiling the Optimizers</a></p></li>
-<li><p><a class="reference external" href="https://pytorch.org/tutorials/intermediate/scaled_dot_product_attention_tutorial.html">Implementing High-Performance Transformers with Scaled Dot Product Attention</a></p></li>
+<li><p><a class="reference external" href="https://pytorch.org/tutorials/recipes/compiling_optimizer.html">编译优化器</a></p></li>
+<li><p><a class="reference external" href="https://pytorch.org/tutorials/intermediate/scaled_dot_product_attention_tutorial.html">使用缩放点积注意力实现高性能 Transformer</a></p></li>
 </ul>
 <p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.000 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-recipes-torch-compile-user-defined-triton-kernel-tutorial-py">
@@ -819,13 +810,13 @@ if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.i
           <div class="pytorch-right-menu" id="pytorch-right-menu">
             <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
               <ul>
-<li><a class="reference internal" href="#">Using User-Defined Triton Kernels with <code class="docutils literal notranslate"><span class="pre">torch.compile</span></code></a><ul>
-<li><a class="reference internal" href="#prerequisites">Prerequisites</a></li>
-<li><a class="reference internal" href="#basic-usage">Basic Usage</a></li>
-<li><a class="reference internal" href="#advanced-usage">Advanced Usage</a></li>
-<li><a class="reference internal" href="#composibility-and-limitations">Composibility and Limitations</a></li>
-<li><a class="reference internal" href="#conclusion">Conclusion</a></li>
-<li><a class="reference internal" href="#see-also">See Also</a></li>
+<li><a class="reference internal" href="#">使用 <code class="docutils literal notranslate"><span class="pre">torch.compile</span></code> 和用户自定义的 Triton 内核</a><ul>
+<li><a class="reference internal" href="#id1">先决条件</a></li>
+<li><a class="reference internal" href="#id2">基本用法</a></li>
+<li><a class="reference internal" href="#id3">高级用法</a></li>
+<li><a class="reference internal" href="#id4">可组合性和限制</a></li>
+<li><a class="reference internal" href="#id5">结论</a></li>
+<li><a class="reference internal" href="#id6">另请参阅</a></li>
 </ul>
 </li>
 </ul>

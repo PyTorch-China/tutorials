@@ -1,25 +1,21 @@
-(beta) Compiling the optimizer with torch.compile
+(beta) 使用 torch.compile 编译优化器
 ==========================================================================================
 
-**Author:** `Michael Lazos <https://github.com/mlazos>`_
+**作者:** `Michael Lazos <https://github.com/mlazos>`_
 
-The optimizer is a key algorithm for training any deep learning model.
-Since it is responsible for updating every model parameter, it can often
-become the bottleneck in training performance for large models. In this recipe, 
-we will apply ``torch.compile`` to the optimizer to observe the GPU performance 
-improvement.
+优化器是训练任何深度学习模型的关键算法。由于它负责更新每个模型参数,因此对于大型模型,它往往会成为训练性能的瓶颈。
+在本教程中,我们将在优化器使用 ``torch.compile`` ,提升在 GPU 上的性能。
 
 .. note::
 
-   This tutorial requires PyTorch 2.2.0 or later.
+   本教程需要 PyTorch 2.2.0 或更高版本。
 
-Model Setup
+模型设置
 ~~~~~~~~~~~~~~~~~~~~~
-For this example, we'll use a simple sequence of linear layers.
-Since we are only benchmarking the optimizer, the choice of model doesn't matter
-because optimizer performance is a function of the number of parameters.
+对于本例,我们将使用一个简单的线性层序列。由于我们只是对优化器进行基准测试,所选择的模型并不重要,
+因为优化器的性能与函数参数数量有关。
 
-Depending on what machine you are using, your exact results may vary.
+根据您使用的机器不同,结果可能会有所不同。
 
 .. code-block:: python
 
@@ -32,19 +28,17 @@ Depending on what machine you are using, your exact results may vary.
    output = model(input)
    output.sum().backward()
 
-Setting up and running the optimizer benchmark
+设置和运行优化器基准测试
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-In this example, we'll use the Adam optimizer
-and create a helper function to wrap the step()
-in ``torch.compile()``.
+在本例中,我们将使用 Adam 优化器,并创建一个辅助函数来将 step() 包装在 ``torch.compile()`` 中。
 
 .. note::
    
-   ``torch.compile`` is only supported on cuda devices with compute capability >= 7.0
+   ``torch.compile`` 仅支持device_capability >= 7.0 的 CUDA 设备
 
 .. code-block:: python
 
-   # exit cleanly if we are on a device that doesn't support torch.compile
+   # 如果我们在不支持 torch.compile 的设备上,则干净地退出
    if torch.cuda.get_device_capability() < (7, 0):
        print("Exiting because torch.compile is not supported on this device.")
        import sys
@@ -59,7 +53,7 @@ in ``torch.compile()``.
        opt.step()
    
    
-   # Let's define a helpful benchmarking function:
+   # 让我们定义一个有用的基准测试函数:
    import torch.utils.benchmark as benchmark
    
    
@@ -70,7 +64,7 @@ in ``torch.compile()``.
        return t0.blocked_autorange().mean * 1e6
 
 
-   # Warmup runs to compile the function
+   # 预热运行以编译函数
    for _ in range(5):
        fn()
    
@@ -82,13 +76,13 @@ in ``torch.compile()``.
    print(f"eager runtime: {eager_runtime}us")
    print(f"compiled runtime: {compiled_runtime}us")
 
-Sample Results:
+示例结果:
 
 * Eager runtime: 747.2437149845064us
 * Compiled runtime: 392.07384741178us
 
-See Also
+另请参阅
 ~~~~~~~~~
 
-* For an in-depth technical overview, see
-`Compiling the optimizer with PT2 <https://dev-discuss.pytorch.org/t/compiling-the-optimizer-with-pt2/1669>`__
+* 有关深入的技术概述,请参阅
+`使用 PT2 编译优化器 <https://dev-discuss.pytorch.org/t/compiling-the-optimizer-with-pt2/1669>`__

@@ -18,36 +18,34 @@
 .. _sphx_glr_recipes_torch_compile_user_defined_triton_kernel_tutorial.py:
 
 
-Using User-Defined Triton Kernels with ``torch.compile``
+使用 ``torch.compile`` 和用户自定义的 Triton 内核
 =========================================================
-**Author:** `Oguz Ulgen <https://github.com/oulgen>`_
+**作者:** `Oguz Ulgen <https://github.com/oulgen>`_
 
-.. GENERATED FROM PYTHON SOURCE LINES 10-32
+.. GENERATED FROM PYTHON SOURCE LINES 10-30
 
-User-defined Triton kernels can be used to optimize specific parts of your
-model's computation. These kernels are written in Triton's language, which is designed
-to make it easier to achieve peak hardware performance. By using user-defined Triton
-kernels with ``torch.compile``, you can integrate these optimized computations into
-your PyTorch model, potentially achieving significant performance improvements.
+用户自定义的 Triton 内核可用于优化模型计算的特定部分。这些内核是用 Triton 语言编写的,
+旨在更容易实现硬件的峰值性能。通过在 ``torch.compile`` 中使用用户自定义的 Triton 内核,
+您可以将这些优化过的计算集成到 PyTorch 模型中,从而可能获得显著的性能提升。
 
-This recipes demonstrates how you can use user-defined Triton kernels with ``torch.compile``.
+本教程演示了如何在 ``torch.compile`` 中使用用户自定义的 Triton 内核。
 
-Prerequisites
+先决条件
 -------------------
 
-Before starting this recipe, make sure that you have the following:
+在开始本教程之前,请确保您具备以下条件:
 
-* Basic understanding of ``torch.compile`` and Triton. See:
+* 对 ``torch.compile`` 和 Triton 有基本的了解。参见:
 
-  * `torch.compiler API documentation <https://pytorch.org/docs/stable/torch.compiler.html#torch-compiler>`__
-  * `Introduction to torch.compile <https://pytorch.org/tutorials/intermediate/torch_compile_tutorial.html>`__
-  * `Triton language documentation <https://triton-lang.org/main/index.html>`__
+  * `torch.compiler API 文档 <https://pytorch.org/docs/stable/torch.compiler.html#torch-compiler>`__
+  * `torch.compile 介绍 <https://pytorch.org/tutorials/intermediate/torch_compile_tutorial.html>`__
+  * `Triton 语言文档 <https://triton-lang.org/main/index.html>`__
 
-* PyTorch 2.3 or later
-* A GPU that supports Triton
+* PyTorch 2.3 或更高版本
+* 支持 Triton 的 GPU
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 32-36
+.. GENERATED FROM PYTHON SOURCE LINES 30-34
 
 .. code-block:: default
 
@@ -56,23 +54,22 @@ Before starting this recipe, make sure that you have the following:
     from torch.utils._triton import has_triton
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 37-44
+.. GENERATED FROM PYTHON SOURCE LINES 35-41
 
-Basic Usage
+基本用法
 --------------------
 
-In this example, we will use a simple vector addition kernel from the Triton documentation
-with ``torch.compile``.
-For reference, see `Triton documentation <https://triton-lang.org/main/getting-started/tutorials/01-vector-add.html>`__.
+在此示例中,我们将使用来自 Triton 文档的一个简单向量加法内核与 ``torch.compile``。
+参考 `Triton 文档 <https://triton-lang.org/main/getting-started/tutorials/01-vector-add.html>`__。
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 44-81
+.. GENERATED FROM PYTHON SOURCE LINES 41-78
 
 .. code-block:: default
 
 
     if not has_triton():
-        print("Skipping because triton is not supported on this device.")
+        print("由于此设备不支持 triton,因此跳过。")
     else:
         import triton
         from triton import language as tl
@@ -105,33 +102,31 @@ For reference, see `Triton documentation <https://triton-lang.org/main/getting-s
         x = torch.randn(4, device="cuda")
         y = torch.randn(4, device="cuda")
         out = add_fn(x, y)
-        print(f"Vector addition of\nX:\t{x}\nY:\t{y}\nis equal to\n{out}")
+        print(f"向量加法\nX:\t{x}\nY:\t{y}\n结果为\n{out}")
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 82-96
+.. GENERATED FROM PYTHON SOURCE LINES 79-91
 
-Advanced Usage
+高级用法
 -------------------------------------------------------------------
 
-Triton's autotune feature is a powerful tool that automatically optimizes the configuration
-parameters of your Triton kernels. It explores a range of possible configurations and
-selects the one that delivers the best performance for your specific use case.
+Triton 的自动调优功能是一个强大的工具,可自动优化 Triton 内核的配置参数。
+它探索一系列可能的配置,并选择为您的特定用例提供最佳性能的配置。
 
-When used with ``torch.compile``, ``triton.autotune`` can help ensure that your PyTorch
-model is running as efficiently as possible. Here is an example of using ``torch.compile``
-and ``triton.autotune``.
+与 ``torch.compile`` 一起使用时, ``triton.autotune`` 可以帮助确保您的 PyTorch 模型以最高效的方式运行。
+下面是使用 ``torch.compile`` 和 ``triton.autotune`` 的示例。
 
 .. note::
 
-  ``torch.compile`` only supports configs and key arguments to ``triton.autotune``.
+  ``torch.compile`` 仅支持 ``triton.autotune`` 的配置和关键参数。
 
-.. GENERATED FROM PYTHON SOURCE LINES 96-142
+.. GENERATED FROM PYTHON SOURCE LINES 91-137
 
 .. code-block:: default
 
 
     if not has_triton():
-        print("Skipping because triton is not supported on this device.")
+        print("由于此设备不支持 triton,因此跳过。")
     else:
         import triton
         from triton import language as tl
@@ -173,40 +168,36 @@ and ``triton.autotune``.
         x = torch.randn(4, device="cuda")
         y = torch.randn(4, device="cuda")
         out = add_fn(x, y)
-        print(f"Vector addition of\nX:\t{x}\nY:\t{y}\nis equal to\n{out}")
+        print(f"向量加法\nX:\t{x}\nY:\t{y}\n结果为\n{out}")
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 143-172
+.. GENERATED FROM PYTHON SOURCE LINES 138-163
 
-Composibility and Limitations
+可组合性和限制
 --------------------------------------------------------------------
 
-As of PyTorch 2.3, the support for user-defined Triton kernels in ``torch.compile``
-includes dynamic shapes, ``torch.autograd.Function``, JIT inductor, and AOT inductor.
-You can use these features together to build complex, high-performance models.
+从 PyTorch 2.3 开始, ``torch.compile`` 中对用户自定义 Triton 内核的支持包括动态形状、
+``torch.autograd.Function``、JIT inductor 和 AOT inductor。
+您可以将这些功能组合在一起构建复杂的高性能模型。
 
-However, there are certain limitations to be aware of:
+但是,也需要注意一些限制:
 
-* **Tensor Subclasses:** Currently, there is no support for
-  tensor subclasses and other advanced features.
-* **Triton Features:** While ``triton.heuristics`` can be used either standalone or
-  before ``triton.autotune``, it cannot be used after ```triton.autotune``. This
-  implies that if ``triton.heuristics`` and ``triton.autotune`` are to be used
-  together, ``triton.heuristics`` must be used first.
+* **Tensor 子类:** 目前不支持张量子类和其他高级功能。
+* **Triton 功能:** 虽然 ``triton.heuristics`` 可以单独使用或在 ``triton.autotune`` 之前使用,
+  但不能在 ``triton.autotune`` 之后使用。这意味着如果要一起使用 ``triton.heuristics`` 和 ``triton.autotune``,
+  则必须先使用 ``triton.heuristics``。
 
-Conclusion
+结论
 -----------
-In this recipe, we explored how to utilize user-defined Triton kernels
-with ``torch.compile``. We delved into the basic usage of a simple
-vector addition kernel and advanced usage involving Triton's autotune
-feature. We also discussed the composability of user-defined Triton
-kernels with other PyTorch features and highlighted some current limitations.
+在本教程中,我们探讨了如何在 ``torch.compile`` 中使用用户自定义的 Triton 内核。
+我们深入研究了使用简单向量加法内核的基本用法,以及涉及 Triton 自动调优功能的高级用法。
+我们还讨论了用户自定义 Triton 内核与其他 PyTorch 功能的可组合性,并强调了一些当前的限制。
 
-See Also
+另请参阅
 ---------
 
-* `Compiling the Optimizers <https://pytorch.org/tutorials/recipes/compiling_optimizer.html>`__
-* `Implementing High-Performance Transformers with Scaled Dot Product Attention <https://pytorch.org/tutorials/intermediate/scaled_dot_product_attention_tutorial.html>`__
+* `编译优化器 <https://pytorch.org/tutorials/recipes/compiling_optimizer.html>`__
+* `使用缩放点积注意力实现高性能 Transformer <https://pytorch.org/tutorials/intermediate/scaled_dot_product_attention_tutorial.html>`__
 
 
 .. rst-class:: sphx-glr-timing

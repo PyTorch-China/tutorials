@@ -1,38 +1,40 @@
-(Beta) PyTorch Inference Performance Tuning on AWS Graviton Processors
+
+
+(Beta) PyTorch在AWS Graviton处理器上的推理性能优化
 ======================================================================
 
-**Author**: `Sunita Nadampalli <https://github.com/snadampal>`_
+**作者**: `Sunita Nadampalli <https://github.com/snadampal>`_
 
-`AWS Graviton <https://aws.amazon.com/ec2/graviton/>`_ is a series of ARM-based processors designed by AWS. AWS Graviton3 processors are optimized for Machine Learning (ML) workloads, including support for ``bfloat16``, Scalable Vector Extension (SVE) and twice the Single Instruction Multiple Data (SIMD) bandwidth compared to Graviton2.
+`AWS Graviton <https://aws.amazon.com/ec2/graviton/>`_ 是一系列由AWS设计的基于ARM的处理器。AWS Graviton3处理器针对机器学习(ML)工作负载进行了优化,包括支持 ``bfloat16``、可扩展向量扩展(SVE)以及比Graviton2高两倍的单指令多数据(SIMD)带宽。
 
-PyTorch provides native reference ATen kernels for the machine learning operators like convolutions, matmul, relu, etc. These operators can be accelerated with platform specific kernel implementations from Basic Linear Algebra (BLAS) libraries. On AWS Graviton CPUs, MKLDNN with Arm Compute Library (`ACL <https://github.com/ARM-software/ComputeLibrary>`_) and `OpenBLAS <https://github.com/OpenMathLib/OpenBLAS>`_ libraries provide optimized implementations for a subset of the operators. Both these libraries are integrated into PyTorch with PyTorch 2.0 version.
+PyTorch为机器学习算子(如卷积、矩阵乘法、relu等)提供了原生参考ATen内核。这些算子可以通过来自基本线性代数(BLAS)库的特定于平台的内核实现进行加速。在AWS Graviton CPU上,MKLDNN与Arm Compute Library (`ACL <https://github.com/ARM-software/ComputeLibrary>`_) 和 `OpenBLAS <https://github.com/OpenMathLib/OpenBLAS>`_ 库为一部分算子提供了优化实现。从PyTorch 2.0版本开始,这两个库都集成到了PyTorch中。
 
-In this tutorial we will cover how to achieve the best inference performance for linear layer neural network on AWS Graviton3 CPUs (`AWS c7g instance <https://aws.amazon.com/ec2/instance-types/c7g/>`_) with ``bfloa16`` kernels and with the right backend selection.
+在本教程中,我们将介绍如何通过 ``bfloat16`` 内核和正确的后端选择,在AWS Graviton3 CPU (`AWS c7g实例 <https://aws.amazon.com/ec2/instance-types/c7g/>`_) 上实现线性层神经网络的最佳推理性能。
 
-Contents
+内容
 --------
-1. Basic Usage
-2. Speed up inference with Bfloat16 fast math kernels
-3. Improve inference performance with OpenBLAS for smaller batch dimensions
-4. Optimize memory allocation overhead with Linux Transparent huge pages
-5. Conclusion
+1. 基本用法
+2. 使用Bfloat16快速数学内核加速推理
+3. 对于较小的批次维度,使用OpenBLAS提高推理性能
+4. 使用Linux透明大页优化内存分配开销
+5. 总结
 
 .. note::
-   To successfully run this tutorial and reproduce the speedup numbers shown below, you need an instance from the Graviton3 family (``c7g/r7g/m7g``) of hardware. For this tutorial, we used the `c7g.xl (4vcpu) instance <https://aws.amazon.com/ec2/instance-types/c7g/>`_ .
+   要成功运行本教程并重现下面显示的加速数字,您需要来自Graviton3系列(``c7g/r7g/m7g``)的硬件实例。对于本教程,我们使用了 `c7g.xl (4vcpu)实例 <https://aws.amazon.com/ec2/instance-types/c7g/>`_ 。
 
-Basic Usage
+基本用法
 ---------------
 
-PyTorch natively supports AWS Graviton3 optimizations starting with PyTorch 2.0 version.
-Please refer to this `blog <https://pytorch.org/blog/optimized-pytorch-w-graviton/>`_ for more details on the optimizations.
+从PyTorch 2.0版本开始,PyTorch原生支持AWS Graviton3优化。
+更多详细信息请参阅此 `博客 <https://pytorch.org/blog/optimized-pytorch-w-graviton/>`_。
 
-1. Install PyTorch by running the following command:
+1. 运行以下命令安装PyTorch:
 
    .. code-block::
 
       python3 -m pip install torch
 
-2. We will start by importing the required dependencies and defining the device will run on:
+2. 我们将从导入所需的依赖项并定义将在其上运行的设备开始:
 
 .. code-block:: python
 
@@ -45,7 +47,7 @@ Please refer to this `blog <https://pytorch.org/blog/optimized-pytorch-w-gravito
     print(f"Using {device} device")
 
 
-3. Given linear layers are at the heart of several neural networks, including transformers, we take a linear layer for this demo. We define our neural network by subclassing ``nn.Module``, and initializing the layers in ``__init__``. We construct the network with a typical large language model parameters to match the real world scenario:
+3. 鉴于线性层是许多神经网络(包括Transformer)的核心,我们在此演示中使用线性层。我们通过子类化 ``nn.Module`` 并在 ``__init__`` 中初始化层来定义我们的神经网络。我们使用典型的大型语言模型参数构建网络,以匹配真实世界场景:
 
 .. code-block:: python
 
@@ -66,14 +68,14 @@ Please refer to this `blog <https://pytorch.org/blog/optimized-pytorch-w-gravito
         logits = self.linear_relu_stack(x)
         return logits
 
-4. Let's create an instance of ``MyNeuralNetwork``, and move it to the device:
+4. 让我们创建一个 ``MyNeuralNetwork`` 的实例,并将其移动到设备上:
 
 .. code-block:: python
 
     model = MyNeuralNetwork().to(device)
     print(model)
 
-Next, let's get the prediction probabilities by passing them through an instance of the ``nn.Softmax`` module:
+接下来,让我们通过将它们传递给 ``nn.Softmax`` 模块的实例来获取预测概率:
 
 .. code-block:: python
 
@@ -83,19 +85,19 @@ Next, let's get the prediction probabilities by passing them through an instance
     y_pred = pred_probab.argmax(1)
     print(f"Predicted class: {y_pred}")
 
-output:
+输出:
 
 .. code-block::
 
     Predicted class: tensor([2])
 
-Our network functionality is verified. Next, we will profile the performance. Lets' check two different scenarios: small and large batch dimensions.
+我们已验证了网络功能。接下来,我们将分析性能。让我们检查两种不同的情况:小批次维度和大批次维度。
 
-**Scenario 1:** A larger batch dimension, for example 256:
+**情况1:** 较大的批次维度,例如256:
 
 .. code-block:: python
 
-    # warm it up first and loop over multiple times to have enough execution time
+    # 首先进行预热,并循环多次以获得足够的执行时间
 
     X = torch.rand(256, 64, 64, device=device)
 
@@ -110,7 +112,7 @@ Our network functionality is verified. Next, we will profile the performance. Le
     print(prof.key_averages().table(sort_by="self_cpu_time_total"))
 
 
-Following is the profiler output with the default PyTorch configuration:
+使用默认PyTorch配置时的分析器输出如下:
 
 .. table::
    :widths: auto
@@ -130,17 +132,17 @@ Following is the profiler output with the default PyTorch configuration:
 **Self CPU time total:** 16.201s
 
 
-Speed up Inference with ``bfloat16`` Fast Math Kernels
+使用 ``bfloat16`` Fast Math Kernels加速推理
 ----------------------------------------------------------
 
-AWS Graviton3 processors support `bfloat16 MMLA instructions <https://developer.arm.com/documentation/ddi0596/2020-12/SVE-Instructions/BFMMLA--BFloat16-floating-point-matrix-multiply-accumulate->`_. Arm Compute Library (`ACL <https://github.com/ARM-software/ComputeLibrary>`_) provides optimized ``bfloat16`` General Matrix Multiplication (GEMM) kernels for AWS Graviton processors, and are integrated into PyTorch via MKLDNN backend starting with PyTorch 2.0.  The inference performance can be optimized with the fast math GEMM kernels. The fast math mode is not enabled by default because these kernels perform GEMM in ``bfloat16`` precision instead of ``float``, and hence results in a slight drop in the model inference accuracy. However, the accuracy drop is within the ``cosine similarity`` threshold defined for ``bfloat16`` backend in ``torchbench`` test suite, and hence acceptable for majority of the applications. To enable the fast math GEMM kernels, set the following environment variable:
+AWS Graviton3处理器支持 `bfloat16 MMLA指令 <https://developer.arm.com/documentation/ddi0596/2020-12/SVE-Instructions/BFMMLA--BFloat16-floating-point-matrix-multiply-accumulate->`_。Arm Compute Library (`ACL <https://github.com/ARM-software/ComputeLibrary>`_) 为AWS Graviton处理器提供了优化的 ``bfloat16`` 通用矩阵乘法(GEMM)内核,并从PyTorch 2.0版本开始通过MKLDNN后端集成到PyTorch中。可以使用快速数学GEMM内核优化推理性能。默认情况下不启用快速数学模式,因为这些内核以 ``bfloat16`` 精度而不是 ``float`` 执行GEMM,因此会导致模型推理精度略有下降。但是,精度下降在 ``torchbench`` 测试套件中为 ``bfloat16`` 后端定义的 ``余弦相似度`` 阈值范围内,因此对大多数应用程序来说是可以接受的。要启用快速数学GEMM内核,请设置以下环境变量:
 
 .. code-block:: bash
 
     $ export DNNL_DEFAULT_FPMATH_MODE=BF16
 
 
-When you run the above inference script, you should see the following profiler output with the MKLDNN fast math mode enabled:
+当您运行上述推理脚本时,应该会看到启用MKLDNN快速数学模式后的分析器输出:
 
 .. table::
    :widths: auto
@@ -160,16 +162,16 @@ When you run the above inference script, you should see the following profiler o
 **Self CPU time total:** 7.262s
 
 
-This is around ``2x (7.262s vs 16.201s)`` performance improvement with the ``bfloat16`` fastmath kernels. Next, let’s look at the smaller batch dimension scenario.
+这比默认配置快约 ``2倍 (7.262s vs 16.201s)``。接下来,让我们看看较小批次维度的情况。
 
-**Scenario 2:** A smaller batch dimension, for example, 32:
+**场景 2:** 较小的批量维度，例如 32:
 
 .. code-block:: python
 
     X = torch.rand(32, 64, 64, device=device)
     with torch.set_grad_enabled(False):
         for _ in range(50):
-            model(X) #Warmup
+            model(X) #预热
         with profile(activities=[ProfilerActivity.CPU]) as prof:
             with record_function("mymodel_inference"):
                 for _ in range(100):
@@ -178,13 +180,13 @@ This is around ``2x (7.262s vs 16.201s)`` performance improvement with the ``bfl
     print(prof.key_averages().table(sort_by="self_cpu_time_total"))
 
 
-You should see the following profiler output when the above script is run with the PyTorch default configuration:
+使用 PyTorch 默认配置运行上述脚本时，您应该会看到以下 profiler 输出:
 
 .. table::
    :widths: auto
 
    ======================  =============  ============  ============  ============  ============  ============
-                     Name    Self CPU %      Self CPU   CPU total %     CPU total   CPU time avg    # of Calls
+                     名称    自身 CPU %      自身 CPU   CPU 总计 %     CPU 总计   CPU 平均时间    调用次数
    ======================  =============  ============  ============  ============  ============  ============
            aten::addmm        95.51%         5.821s        97.04%        5.914s      19.713ms           300
        aten::clamp_min         2.33%      142.244ms         2.33%     142.244ms     711.220us           200
@@ -195,10 +197,10 @@ You should see the following profiler output when the above script is run with t
             aten::relu         0.03%        1.942ms         2.37%     144.186ms     720.930us           200
    ======================  =============  ============  ============  ============  ============  ============
 
-**Self CPU time total:** 6.094s
+**自身 CPU 总计:** 6.094s
 
 
-The following output is the profiler output when run with the MKLDNN fast math mode enabled:
+以下是启用 MKLDNN 快速数学模式时的 profiler 输出:
 
 .. code-block:: bash
 
@@ -208,7 +210,7 @@ The following output is the profiler output when run with the MKLDNN fast math m
    :widths: auto
 
    ======================  ============  ============  ============  ============  ============   =============
-                   Name     Self CPU %      Self CPU    CPU total %   CPU total    CPU time avg    # of Calls
+                   名称     自身 CPU %      自身 CPU    CPU 总计 %   CPU 总计    CPU 平均时间    调用次数
    ======================  ============  ============  ============  ============  ============   =============
            aten::addmm        93.31%        3.848s        95.66%        3.944s      13.148ms           300
        aten::clamp_min         3.43%     141.309ms         3.43%     141.309ms     706.545us           200
@@ -219,27 +221,29 @@ The following output is the profiler output when run with the MKLDNN fast math m
             aten::relu         0.05%       1.928ms         3.47%     143.237ms     716.185us           200
    ======================  ============  ============  ============  ============  ============   =============
 
-**Self CPU time total:** 4.123s
+**自身 CPU 总计:** 4.123s
 
-The MKLDNN fast math mode yields approximately a **1.47x  (4.123s vs 6.094s)**  performance improvement for smaller batch dimensions. Although this improvement is noteworthy, the overall performance still leaves room for improvement. This is because of the runtime overhead (weights reorders and kernel launch time) from oneDNN and ACL backend outweighing the compute benefits from the ACL GEMM kernels for the smaller batch compute.
+MKLDNN 快速数学模式为较小的批量维度提供了大约 **1.47x (4.123s vs 6.094s)** 的性能提升。
+尽管性能提升明显,但整体仍有提升空间。因为来自 oneDNN 和 ACL 后端的运行时开销(权重重排和内核启动时间)
+超过了 ACL GEMM 内核对较小批量计算的计算优势。
 
 
-Improve Inference Performance with OpenBLAS for Smaller Batch Dimensions
-------------------------------------------------------------------------
+使用 OpenBLAS 提高较小批量维度的推理性能
+----------------------------------------
 
-The inference performance for smaller batch dimensions can be improved by offloading the smaller shapes from MKLDNN to OpenBLAS backend. We are working on making the backend selection automatic, with robust heuristics, for the future releases. Till the heuristics are implemented, the smaller shapes can be offloaded to OpenBLAS by increasing the threshold for MKLDNN backend selection. In the following example, we use ``64`` as the threshold, so that input with ``batch dimension of 32`` is not dispatched to MKLDNN. Instead, it is dispatched to OpenBLAS.
+可以通过将较小的形状从 MKLDNN 卸载到 OpenBLAS 后端来提高较小批量维度的推理性能。我们正在努力为未来版本实现自动化的后端选择,并具有健壮的启发式算法。在实现启发式算法之前,可以通过增加 MKLDNN 后端选择的阈值将较小的形状卸载到 OpenBLAS。在以下示例中,我们使用 ``64`` 作为阈值,因此批量维度为 ``32`` 的输入不会分派到 MKLDNN。相反,它会被分派到 OpenBLAS。
 
 .. code-block:: bash
 
    $ export TORCH_MKLDNN_MATMUL_MIN_DIM=64
 
-Here is the profiler output with OpenBLAS backend:
+以下是使用 OpenBLAS 后端时的 profiler 输出:
 
 .. table::
    :widths: auto
 
    ======================  ============  ============  ============  =============  ============  =============
-                     Name    Self CPU %      Self CPU   CPU total %     CPU total   CPU time avg    # of Calls
+                     名称    自身 CPU %      自身 CPU   CPU 总计 %     CPU 总计   CPU 平均时间    调用次数
    ======================  ============  ============  ============  =============  ============  =============
            aten::addmm        96.25%        1.958s        97.51%        1.984s        6.612ms           300
        aten::clamp_min         1.28%      26.124ms         1.28%      26.124ms      130.620us           200
@@ -250,17 +254,18 @@ Here is the profiler output with OpenBLAS backend:
             aten::relu         0.06%       1.258ms         1.35%      27.382ms      136.910us           200
    ======================  ============  ============  ============  =============  ============  =============
 
-**Self CPU time total:** 2.034s
+**自身 CPU 总计:** 2.034s
 
 
-As you can see above, switching to OpenBLAS doubled the performance **(2.034s vs 4.123s)** compared to the default MKLDNN backend configuration. This becomes significant for even smaller batch dimensions, for example, for a batch dimension of 10:
+如您所见,切换到 OpenBLAS 将性能提高了一倍 **(2.034s vs 4.123s)** 与默认的 MKLDNN 后端配置相比。
+对于更小的批量维度,例如批量维度为 10,这一点更加显著:
 
 .. code-block:: python
 
     X = torch.rand(10, 64, 64, device=device)
     with torch.set_grad_enabled(False):
         for _ in range(50):
-            model(X) #Warmup
+            model(X) #预热
         with profile(activities=[ProfilerActivity.CPU]) as prof:
             with record_function("mymodel_inference"):
                 for _ in range(100):
@@ -269,13 +274,13 @@ As you can see above, switching to OpenBLAS doubled the performance **(2.034s vs
     print(prof.key_averages().table(sort_by="self_cpu_time_total"))
 
 
-The following is the profiler output with MKLDNN fast math mode:
+以下是启用 MKLDNN 快速数学模式时的 profiler 输出:
 
 .. table::
    :widths: auto
 
    ======================  ============  ============  ============  ============  =============  =============
-                     Name    Self CPU %      Self CPU   CPU total %     CPU total   CPU time avg    # of Calls
+                     名称    自身 CPU %      自身 CPU   CPU 总计 %     CPU 总计   CPU 平均时间    调用次数
    ======================  ============  ============  ============  ============  =============  =============
            aten::addmm        87.81%        3.613s        91.90%        3.781s      12.604ms           300
        aten::clamp_min         7.18%     295.437ms         7.18%     295.437ms       1.477ms           200
@@ -286,10 +291,10 @@ The following is the profiler output with MKLDNN fast math mode:
             aten::relu         0.05%       1.932ms         7.23%     297.369ms       1.487ms           200
    ======================  ============  ============  ============  ============  =============  =============
 
-**Self CPU time total:** 4.115s
+**自身 CPU 总计:** 4.115s
 
 
-and the following is the profiler output with the OpenBLAS backend:
+以下是使用 OpenBLAS 后端时的 profiler 输出:
 
 .. code-block:: bash
 
@@ -299,7 +304,7 @@ and the following is the profiler output with the OpenBLAS backend:
    :widths: auto
 
    ======================  =============  ============  ============  ============  =============  ============
-                   Name     Self CPU %      Self CPU     CPU total %   CPU total    CPU time avg    # of Calls
+                   名称     自身 CPU %      自身 CPU     CPU 总计 %   CPU 总计    CPU 平均时间    调用次数
    ======================  =============  ============  ============  ============  =============  ============
            aten::addmm        92.66%        1.179s        95.23%        1.211s         4.038ms           300
        aten::clamp_min         2.83%      36.060ms         2.83%      36.060ms       180.300us           200
@@ -310,29 +315,28 @@ and the following is the profiler output with the OpenBLAS backend:
             aten::relu         0.10%       1.285ms         2.94%      37.345ms       186.725us           200
    ======================  =============  ============  ============  ============  =============  ============
 
-**Self CPU time total:** 1.272s
+**自身 CPU 总计:** 1.272s
 
+这里我们观察到通过适当调整后端阈值,**性能提高了3.2倍(1.272s vs 4.115s)**。
 
-Here we observed **3.2x (1.272s vs 4.115s)** performance improvement by tuning the backend thresholds appropriately.
+使用 Linux Transparent Huge Pages (THP) 优化内存分配开销
+------------------------------------------------------
 
-
-Optimize Memory Allocation Overhead with Linux Transparent Huge Pages (THP)
----------------------------------------------------------------------------
-
-We also observed that for these larger networks, tensor memory allocations take significant portion of the inference latency. This can be optimized by enabling Linux transparent huge page allocations from PyTorch C10 memory allocator. Currently the feature is not enabled by default because it will increase the memory footprint marginally. Set the following environment variable to enable it:
+我们还观察到,对于这些较大的网络,张量内存分配占推理延迟的很大一部分。这可以通过从PyTorch C10内存分配器
+启用 THP 来优化。目前,该功能默认未启用,因为它会略微增加内存占用。设置以下环境变量以启用它:
 
 .. code-block:: bash
 
     $ export THP_MEM_ALLOC_ENABLE=1
 
-For the batch dimension of 256 and with MKLDNN fast math mode:
+对于批量维度为 256 且启用 MKLDNN Fast Math 模式:
 
 .. code-block:: python
 
     X = torch.rand(256, 64, 64, device=device)
     with torch.set_grad_enabled(False):
         for _ in range(50):
-            model(X) #Warmup
+            model(X) #预热
         with profile(activities=[ProfilerActivity.CPU]) as prof:
             with record_function("mymodel_inference"):
                 for _ in range(100):
@@ -340,14 +344,13 @@ For the batch dimension of 256 and with MKLDNN fast math mode:
 
     print(prof.key_averages().table(sort_by="self_cpu_time_total"))
 
-
-The following is the profiler output with THP memory allocations enabled:
+启用THP内存分配后,profiler的输出如下:
 
 .. table::
    :widths: auto
 
    ======================  ============  ============  ============  ============  ==============  ============
-                     Name   Self CPU %    Self CPU     CPU total %    CPU total     CPU time avg    # of Calls
+                     名称    自身CPU%      自身CPU       CPU总%        CPU总        CPU平均时间     调用次数
    ======================  ============  ============  ============  ============  ==============  ============
            aten::addmm        91.31%        6.115s        94.39%        6.321s      21.069ms           300
        aten::clamp_min         4.82%     322.568ms         4.82%     322.568ms       1.613ms           200
@@ -357,12 +360,14 @@ The following is the profiler output with THP memory allocations enabled:
             aten::relu         0.04%       2.547ms         4.85%     325.115ms       1.626ms           200
    ======================  ============  ============  ============  ============  ==============  ============
 
-**Self CPU time total:** 6.697s
+**自身CPU总时间:** 6.697s
 
-This is an additional **1.08x or 8% (6.697s vs 7.262s)** improvement on top of the already optimized MKLDNN fast math mode measured above.
+这比上面测量的已优化的 MKLDNN Fast Math 模式又提高了 **1.08倍或8%(6.697s vs 7.262s)**。
 
-
-Conclusion
+结论
 ------------
 
-In this tutorial, we covered PyTorch inference on AWS Graviton3 instances by covering the basic usage, demonstrating speedups with fast math kernels, comparing different backends for different batch dimensions, and how to optimize tensor memory allocation latencies with Linux transparent huge pages. The recommendation is to use MKLDNN backend with Bfloat16 fastmath mode and THP memory allocations for larger tensor shapes and to use OpenBLAS backend for smaller tensor shapes. We hope that you will give it a try!
+在本教程中,我们介绍了在AWS Graviton3实例上的PyTorch推理,包括基本用法、使用快速数学内核的加速、
+比较不同批量维度下不同后端的性能,以及如何使用Linux透明大页面优化张量内存分配延迟。
+对于较大的张量形状,建议使用MKLDNN后端和Bfloat16快速数学模式以及THP内存分配;对于较小的张量形状,
+建议使用OpenBLAS后端。希望您能尝试一下!
