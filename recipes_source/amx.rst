@@ -1,38 +1,31 @@
 ==============================================
-Leverage Intel® Advanced Matrix Extensions
+利用英特尔®高级矩阵扩展(Intel® Advanced Matrix Extensions)
 ==============================================
 
-Introduction
-============
+简介
+====
 
-Advanced Matrix Extensions (AMX), also known as Intel® Advanced Matrix Extensions (Intel® AMX), is an x86 extension,
-which introduce two new components: a 2-dimensional register file called 'tiles' and an accelerator of Tile Matrix Multiplication (TMUL) that is able to operate on those tiles.
-AMX is designed to work on matrices to accelerate deep-learning training and inference on the CPU and is ideal for workloads like natural-language processing, recommendation systems and image recognition.
+高级矩阵扩展(AMX)，也称为英特尔®高级矩阵扩展(Intel® AMX)，是一种x86扩展，引入了两个新组件:一个称为"tile"的二维寄存器文件和一个能够在这些tile上进行矩阵乘法(TMUL)的加速器。AMX旨在加速CPU上的深度学习训练和推理工作负载,非常适合自然语言处理、推荐系统和图像识别等工作负载。
 
-Intel advances AI capabilities with 4th Gen Intel® Xeon® Scalable processors and Intel® AMX, delivering 3x to 10x higher inference and training performance versus the previous generation, see `Accelerate AI Workloads with Intel® AMX`_.
-Compared to 3rd Gen Intel Xeon Scalable processors running Intel® Advanced Vector Extensions 512 Neural Network Instructions (Intel® AVX-512 VNNI),
-4th Gen Intel Xeon Scalable processors running Intel AMX can perform 2,048 INT8 operations per cycle, rather than 256 INT8 operations per cycle. They can also perform 1,024 BF16 operations per cycle, as compared to 64 FP32 operations per cycle, see page 4 of `Accelerate AI Workloads with Intel® AMX`_.
-For more detailed information of AMX, see `Intel® AMX Overview`_.
+英特尔通过第4代英特尔®至强®可扩展处理器和英特尔®AMX推进了AI能力,相比上一代产品,推理和训练性能提高了3倍至10倍,详见`使用Intel® AMX加速AI工作负载`_。与运行Intel®高级矢量扩展512神经网络指令(Intel® AVX-512 VNNI)的第3代英特尔至强可扩展处理器相比,运行Intel AMX的第4代英特尔至强可扩展处理器每周期可执行2,048个INT8操作,而不是256个INT8操作;它们还可以每周期执行1,024个BF16操作,而不是64个FP32操作,详见`使用Intel® AMX加速AI工作负载`_第4页。有关AMX的更多详细信息,请参阅`Intel® AMX概述`_。
 
-
-AMX in PyTorch
+PyTorch中的AMX
 ==============
 
-PyTorch leverages AMX for computing intensive operators with BFloat16 and quantization with INT8 by its backend oneDNN
-to get higher performance out-of-box on x86 CPUs with AMX support.
-For more detailed information of oneDNN, see `oneDNN`_.
+PyTorch通过其后端oneDNN利用AMX来计算BFloat16和INT8量化的计算密集型算子,从而在支持AMX的x86 CPU上获得更高的性能。
+有关oneDNN的更多详细信息,请参阅`oneDNN`_。
 
-The operation is fully handled by oneDNN according to the execution code path generated. For example, when a supported operation gets executed into oneDNN implementation on a hardware platform with AMX support, AMX instructions will be invoked automatically inside oneDNN.
-Since oneDNN is the default acceleration library for PyTorch CPU, no manual operations are required to enable the AMX support.
+操作完全由oneDNN根据生成的执行代码路径处理。例如,当支持的操作在支持AMX的硬件平台上执行到oneDNN实现时,AMX指令将在oneDNN内部自动调用。
+由于oneDNN是PyTorch CPU的默认加速库,因此无需手动操作即可启用AMX支持。
 
-Guidelines of leveraging AMX with workloads
+利用AMX加速工作负载的指南
 -------------------------------------------
 
-This section provides guidelines on how to leverage AMX with various workloads.
+本节提供了如何利用AMX加速各种工作负载的指南。
 
-- BFloat16 data type: 
+- BFloat16数据类型:
 
-  - Using ``torch.cpu.amp`` or ``torch.autocast("cpu")`` would utilize AMX acceleration for supported operators.
+  - 使用``torch.cpu.amp``或``torch.autocast("cpu")``将利用AMX加速支持的算子。
 
    ::
 
@@ -40,23 +33,23 @@ This section provides guidelines on how to leverage AMX with various workloads.
       with torch.cpu.amp.autocast():
          output = model(input)
 
-.. note:: Use ``torch.channels_last`` memory format to get better performance. 
+.. note:: 使用``torch.channels_last``内存格式可获得更好的性能。
 
-- Quantization:
+- 量化:
 
-  - Applying quantization would utilize AMX acceleration for supported operators.
+  - 应用量化将利用AMX加速支持的算子。
 
 - torch.compile:
 
-  - When the generated graph model runs into oneDNN implementations with the supported operators, AMX accelerations will be activated.
+  - 当生成的图模型运行到oneDNN实现的支持算子时,AMX加速将被激活。
 
-.. note:: When using PyTorch on CPUs that support AMX, the framework will automatically enable AMX usage by default. This means that PyTorch will attempt to leverage the AMX feature whenever possible to speed up matrix multiplication operations. However, it's important to note that the decision to dispatch to the AMX kernel ultimately depends on the internal optimization strategy of the oneDNN library and the quantization backend, which PyTorch relies on for performance enhancements. The specific details of how AMX utilization is handled internally by PyTorch and the oneDNN library may be subject to change with updates and improvements to the framework.
+.. note:: 在支持AMX的CPU上使用PyTorch时,框架将默认自动启用AMX使用。这意味着PyTorch将尽可能利用AMX功能来加速矩阵乘法操作。但是,重要的是要注意,是否调度到AMX内核最终取决于PyTorch所依赖的oneDNN库和量化后端的内部优化策略。PyTorch和oneDNN库内部如何处理AMX利用的具体细节可能会随着框架的更新和改进而发生变化。
 
 
-CPU operators that can leverage AMX:
+可利用AMX的CPU算子:
 ------------------------------------
 
-BF16 CPU ops that can leverage AMX:
+可利用AMX的BF16 CPU算子:
 
 - ``conv1d``
 - ``conv2d``
@@ -72,7 +65,7 @@ BF16 CPU ops that can leverage AMX:
 - ``linear``
 - ``matmul``
 
-Quantization CPU ops that can leverage AMX:
+可利用AMX的量化CPU算子:
 
 - ``conv1d``
 - ``conv2d``
@@ -84,10 +77,10 @@ Quantization CPU ops that can leverage AMX:
 
 
 
-Confirm AMX is being utilized
+确认AMX正在被利用
 ------------------------------
 
-Set environment variable ``export ONEDNN_VERBOSE=1``, or use ``torch.backends.mkldnn.verbose`` to enable oneDNN to dump verbose messages.
+设置环境变量``export ONEDNN_VERBOSE=1``或使用``torch.backends.mkldnn.verbose``以启用oneDNN转储详细消息。
 
 ::
 
@@ -95,7 +88,7 @@ Set environment variable ``export ONEDNN_VERBOSE=1``, or use ``torch.backends.mk
        with torch.cpu.amp.autocast():
            model(input)
 
-For example, get oneDNN verbose:
+例如,获取oneDNN详细输出:
 
 ::
 
@@ -111,24 +104,21 @@ For example, get oneDNN verbose:
    onednn_verbose,exec,cpu,matmul,brg:avx512_core_amx_int8,undef,src_s8::blocked:ab:f0 wei_s8:p:blocked:BA16a64b4a:f0 dst_s8::blocked:ab:f0,attr-scratchpad:user ,,1x30522:30522x768:1x768,7.66382
    ...
 
-If you get the verbose of ``avx512_core_amx_bf16`` for BFloat16 or ``avx512_core_amx_int8`` for quantization with INT8, it indicates that AMX is activated.
+如果你获得了``avx512_core_amx_bf16``的详细输出(用于BFloat16)或``avx512_core_amx_int8``(用于INT8量化),则表示AMX已被激活。
 
 
-Conclusion
+结论
 ----------
 
+在本教程中,我们简要介绍了AMX、如何在PyTorch中利用AMX来加速工作负载,以及如何确认AMX正在被利用。
 
-In this tutorial, we briefly introduced AMX, how to utilize AMX in PyTorch to accelerate workloads, and how to confirm that AMX is being utilized.
+随着PyTorch和oneDNN的改进和更新,AMX的利用情况可能会相应发生变化。
 
-With the improvements and updates of PyTorch and oneDNN, the utilization of AMX may be subject to change accordingly.
-
-As always, if you run into any problems or have any questions, you can use
-`forum <https://discuss.pytorch.org/>`_ or `GitHub issues
-<https://github.com/pytorch/pytorch/issues>`_ to get in touch. 
+如果您遇到任何问题或有任何疑问,您可以使用`论坛 <https://discuss.pytorch.org/>`_或`GitHub issues <https://github.com/pytorch/pytorch/issues>`_与我们联系。
 
 
-.. _Accelerate AI Workloads with Intel® AMX: https://www.intel.com/content/www/us/en/products/docs/accelerator-engines/advanced-matrix-extensions/ai-solution-brief.html
+.. _使用Intel® AMX加速AI工作负载: https://www.intel.com/content/www/us/en/products/docs/accelerator-engines/advanced-matrix-extensions/ai-solution-brief.html
 
-.. _Intel® AMX Overview: https://www.intel.com/content/www/us/en/products/docs/accelerator-engines/advanced-matrix-extensions/overview.html
+.. _Intel® AMX概述: https://www.intel.com/content/www/us/en/products/docs/accelerator-engines/advanced-matrix-extensions/overview.html
 
 .. _oneDNN: https://oneapi-src.github.io/oneDNN/index.html

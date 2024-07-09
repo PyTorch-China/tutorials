@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>(beta) Compiling the optimizer with torch.compile &mdash; PyTorch Tutorials 2.3.0 documentation</title>
+  <title>(beta) 使用 torch.compile 编译优化器 &mdash; PyTorch Tutorials 2.3.0 documentation</title>
   
 
   
@@ -535,7 +535,7 @@
         
           <li><a href="recipes_index.html">PyTorch 示例</a> &gt;</li>
         
-      <li>(beta) Compiling the optimizer with torch.compile</li>
+      <li>(beta) 使用 torch.compile 编译优化器</li>
     
     
       <li class="pytorch-breadcrumbs-aside">
@@ -594,24 +594,20 @@
             <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
-  <div class="section" id="beta-compiling-the-optimizer-with-torch-compile">
-<h1>(beta) Compiling the optimizer with torch.compile<a class="headerlink" href="#beta-compiling-the-optimizer-with-torch-compile" title="Permalink to this heading">¶</a></h1>
-<p><strong>Author:</strong> <a class="reference external" href="https://github.com/mlazos">Michael Lazos</a></p>
-<p>The optimizer is a key algorithm for training any deep learning model.
-Since it is responsible for updating every model parameter, it can often
-become the bottleneck in training performance for large models. In this recipe,
-we will apply <code class="docutils literal notranslate"><span class="pre">torch.compile</span></code> to the optimizer to observe the GPU performance
-improvement.</p>
+  <div class="section" id="beta-torch-compile">
+<h1>(beta) 使用 torch.compile 编译优化器<a class="headerlink" href="#beta-torch-compile" title="Permalink to this heading">¶</a></h1>
+<p><strong>作者:</strong> <a class="reference external" href="https://github.com/mlazos">Michael Lazos</a></p>
+<p>优化器是训练任何深度学习模型的关键算法。由于它负责更新每个模型参数,因此对于大型模型,它往往会成为训练性能的瓶颈。
+在本教程中,我们将在优化器使用 <code class="docutils literal notranslate"><span class="pre">torch.compile</span></code> ,提升在 GPU 上的性能。</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>This tutorial requires PyTorch 2.2.0 or later.</p>
+<p>本教程需要 PyTorch 2.2.0 或更高版本。</p>
 </div>
-<div class="section" id="model-setup">
-<h2>Model Setup<a class="headerlink" href="#model-setup" title="Permalink to this heading">¶</a></h2>
-<p>For this example, we’ll use a simple sequence of linear layers.
-Since we are only benchmarking the optimizer, the choice of model doesn’t matter
-because optimizer performance is a function of the number of parameters.</p>
-<p>Depending on what machine you are using, your exact results may vary.</p>
+<div class="section" id="id1">
+<h2>模型设置<a class="headerlink" href="#id1" title="Permalink to this heading">¶</a></h2>
+<p>对于本例,我们将使用一个简单的线性层序列。由于我们只是对优化器进行基准测试,所选择的模型并不重要,
+因为优化器的性能与函数参数数量有关。</p>
+<p>根据您使用的机器不同,结果可能会有所不同。</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
 
 <span class="n">model</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
@@ -623,16 +619,14 @@ because optimizer performance is a function of the number of parameters.</p>
 </pre></div>
 </div>
 </div>
-<div class="section" id="setting-up-and-running-the-optimizer-benchmark">
-<h2>Setting up and running the optimizer benchmark<a class="headerlink" href="#setting-up-and-running-the-optimizer-benchmark" title="Permalink to this heading">¶</a></h2>
-<p>In this example, we’ll use the Adam optimizer
-and create a helper function to wrap the step()
-in <code class="docutils literal notranslate"><span class="pre">torch.compile()</span></code>.</p>
+<div class="section" id="id2">
+<h2>设置和运行优化器基准测试<a class="headerlink" href="#id2" title="Permalink to this heading">¶</a></h2>
+<p>在本例中,我们将使用 Adam 优化器,并创建一个辅助函数来将 step() 包装在 <code class="docutils literal notranslate"><span class="pre">torch.compile()</span></code> 中。</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p><code class="docutils literal notranslate"><span class="pre">torch.compile</span></code> is only supported on cuda devices with compute capability &gt;= 7.0</p>
+<p><code class="docutils literal notranslate"><span class="pre">torch.compile</span></code> 仅支持device_capability &gt;= 7.0 的 CUDA 设备</p>
 </div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># exit cleanly if we are on a device that doesn&#39;t support torch.compile</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># 如果我们在不支持 torch.compile 的设备上,则干净地退出</span>
 <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">get_device_capability</span><span class="p">()</span> <span class="o">&lt;</span> <span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Exiting because torch.compile is not supported on this device.&quot;</span><span class="p">)</span>
     <span class="kn">import</span> <span class="nn">sys</span>
@@ -647,7 +641,7 @@ in <code class="docutils literal notranslate"><span class="pre">torch.compile()<
     <span class="n">opt</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
 
 
-<span class="c1"># Let&#39;s define a helpful benchmarking function:</span>
+<span class="c1"># 让我们定义一个有用的基准测试函数:</span>
 <span class="kn">import</span> <span class="nn">torch.utils.benchmark</span> <span class="k">as</span> <span class="nn">benchmark</span>
 
 
@@ -658,7 +652,7 @@ in <code class="docutils literal notranslate"><span class="pre">torch.compile()<
     <span class="k">return</span> <span class="n">t0</span><span class="o">.</span><span class="n">blocked_autorange</span><span class="p">()</span><span class="o">.</span><span class="n">mean</span> <span class="o">*</span> <span class="mf">1e6</span>
 
 
-<span class="c1"># Warmup runs to compile the function</span>
+<span class="c1"># 预热运行以编译函数</span>
 <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">):</span>
     <span class="n">fn</span><span class="p">()</span>
 
@@ -671,18 +665,18 @@ in <code class="docutils literal notranslate"><span class="pre">torch.compile()<
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;compiled runtime: </span><span class="si">{</span><span class="n">compiled_runtime</span><span class="si">}</span><span class="s2">us&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Sample Results:</p>
+<p>示例结果:</p>
 <ul class="simple">
 <li><p>Eager runtime: 747.2437149845064us</p></li>
 <li><p>Compiled runtime: 392.07384741178us</p></li>
 </ul>
 </div>
-<div class="section" id="see-also">
-<h2>See Also<a class="headerlink" href="#see-also" title="Permalink to this heading">¶</a></h2>
+<div class="section" id="id3">
+<h2>另请参阅<a class="headerlink" href="#id3" title="Permalink to this heading">¶</a></h2>
 <ul class="simple">
-<li><p>For an in-depth technical overview, see</p></li>
+<li><p>有关深入的技术概述,请参阅</p></li>
 </ul>
-<p><a class="reference external" href="https://dev-discuss.pytorch.org/t/compiling-the-optimizer-with-pt2/1669">Compiling the optimizer with PT2</a></p>
+<p><a class="reference external" href="https://dev-discuss.pytorch.org/t/compiling-the-optimizer-with-pt2/1669">使用 PT2 编译优化器</a></p>
 </div>
 </div>
 
@@ -747,10 +741,10 @@ if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.i
           <div class="pytorch-right-menu" id="pytorch-right-menu">
             <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
               <ul>
-<li><a class="reference internal" href="#">(beta) Compiling the optimizer with torch.compile</a><ul>
-<li><a class="reference internal" href="#model-setup">Model Setup</a></li>
-<li><a class="reference internal" href="#setting-up-and-running-the-optimizer-benchmark">Setting up and running the optimizer benchmark</a></li>
-<li><a class="reference internal" href="#see-also">See Also</a></li>
+<li><a class="reference internal" href="#">(beta) 使用 torch.compile 编译优化器</a><ul>
+<li><a class="reference internal" href="#id1">模型设置</a></li>
+<li><a class="reference internal" href="#id2">设置和运行优化器基准测试</a></li>
+<li><a class="reference internal" href="#id3">另请参阅</a></li>
 </ul>
 </li>
 </ul>

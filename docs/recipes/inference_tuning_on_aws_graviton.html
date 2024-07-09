@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>(Beta) PyTorch Inference Performance Tuning on AWS Graviton Processors &mdash; PyTorch Tutorials 2.3.0 documentation</title>
+  <title>(Beta) PyTorch在AWS Graviton处理器上的推理性能优化 &mdash; PyTorch Tutorials 2.3.0 documentation</title>
   
 
   
@@ -531,7 +531,7 @@
       </li>
 
         
-      <li>(Beta) PyTorch Inference Performance Tuning on AWS Graviton Processors</li>
+      <li>(Beta) PyTorch在AWS Graviton处理器上的推理性能优化</li>
     
     
       <li class="pytorch-breadcrumbs-aside">
@@ -590,37 +590,37 @@
             <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
-  <div class="section" id="beta-pytorch-inference-performance-tuning-on-aws-graviton-processors">
-<h1>(Beta) PyTorch Inference Performance Tuning on AWS Graviton Processors<a class="headerlink" href="#beta-pytorch-inference-performance-tuning-on-aws-graviton-processors" title="Permalink to this heading">¶</a></h1>
-<p><strong>Author</strong>: <a class="reference external" href="https://github.com/snadampal">Sunita Nadampalli</a></p>
-<p><a class="reference external" href="https://aws.amazon.com/ec2/graviton/">AWS Graviton</a> is a series of ARM-based processors designed by AWS. AWS Graviton3 processors are optimized for Machine Learning (ML) workloads, including support for <code class="docutils literal notranslate"><span class="pre">bfloat16</span></code>, Scalable Vector Extension (SVE) and twice the Single Instruction Multiple Data (SIMD) bandwidth compared to Graviton2.</p>
-<p>PyTorch provides native reference ATen kernels for the machine learning operators like convolutions, matmul, relu, etc. These operators can be accelerated with platform specific kernel implementations from Basic Linear Algebra (BLAS) libraries. On AWS Graviton CPUs, MKLDNN with Arm Compute Library (<a class="reference external" href="https://github.com/ARM-software/ComputeLibrary">ACL</a>) and <a class="reference external" href="https://github.com/OpenMathLib/OpenBLAS">OpenBLAS</a> libraries provide optimized implementations for a subset of the operators. Both these libraries are integrated into PyTorch with PyTorch 2.0 version.</p>
-<p>In this tutorial we will cover how to achieve the best inference performance for linear layer neural network on AWS Graviton3 CPUs (<a class="reference external" href="https://aws.amazon.com/ec2/instance-types/c7g/">AWS c7g instance</a>) with <code class="docutils literal notranslate"><span class="pre">bfloa16</span></code> kernels and with the right backend selection.</p>
-<div class="section" id="contents">
-<h2>Contents<a class="headerlink" href="#contents" title="Permalink to this heading">¶</a></h2>
+  <div class="section" id="beta-pytorchaws-graviton">
+<h1>(Beta) PyTorch在AWS Graviton处理器上的推理性能优化<a class="headerlink" href="#beta-pytorchaws-graviton" title="Permalink to this heading">¶</a></h1>
+<p><strong>作者</strong>: <a class="reference external" href="https://github.com/snadampal">Sunita Nadampalli</a></p>
+<p><a class="reference external" href="https://aws.amazon.com/ec2/graviton/">AWS Graviton</a> 是一系列由AWS设计的基于ARM的处理器。AWS Graviton3处理器针对机器学习(ML)工作负载进行了优化,包括支持 <code class="docutils literal notranslate"><span class="pre">bfloat16</span></code>、可扩展向量扩展(SVE)以及比Graviton2高两倍的单指令多数据(SIMD)带宽。</p>
+<p>PyTorch为机器学习算子(如卷积、矩阵乘法、relu等)提供了原生参考ATen内核。这些算子可以通过来自基本线性代数(BLAS)库的特定于平台的内核实现进行加速。在AWS Graviton CPU上,MKLDNN与Arm Compute Library (<a class="reference external" href="https://github.com/ARM-software/ComputeLibrary">ACL</a>) 和 <a class="reference external" href="https://github.com/OpenMathLib/OpenBLAS">OpenBLAS</a> 库为一部分算子提供了优化实现。从PyTorch 2.0版本开始,这两个库都集成到了PyTorch中。</p>
+<p>在本教程中,我们将介绍如何通过 <code class="docutils literal notranslate"><span class="pre">bfloat16</span></code> 内核和正确的后端选择,在AWS Graviton3 CPU (<a class="reference external" href="https://aws.amazon.com/ec2/instance-types/c7g/">AWS c7g实例</a>) 上实现线性层神经网络的最佳推理性能。</p>
+<div class="section" id="id1">
+<h2>内容<a class="headerlink" href="#id1" title="Permalink to this heading">¶</a></h2>
 <ol class="arabic simple">
-<li><p>Basic Usage</p></li>
-<li><p>Speed up inference with Bfloat16 fast math kernels</p></li>
-<li><p>Improve inference performance with OpenBLAS for smaller batch dimensions</p></li>
-<li><p>Optimize memory allocation overhead with Linux Transparent huge pages</p></li>
-<li><p>Conclusion</p></li>
+<li><p>基本用法</p></li>
+<li><p>使用Bfloat16快速数学内核加速推理</p></li>
+<li><p>对于较小的批次维度,使用OpenBLAS提高推理性能</p></li>
+<li><p>使用Linux透明大页优化内存分配开销</p></li>
+<li><p>总结</p></li>
 </ol>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>To successfully run this tutorial and reproduce the speedup numbers shown below, you need an instance from the Graviton3 family (<code class="docutils literal notranslate"><span class="pre">c7g/r7g/m7g</span></code>) of hardware. For this tutorial, we used the <a class="reference external" href="https://aws.amazon.com/ec2/instance-types/c7g/">c7g.xl (4vcpu) instance</a> .</p>
+<p>要成功运行本教程并重现下面显示的加速数字,您需要来自Graviton3系列(<code class="docutils literal notranslate"><span class="pre">c7g/r7g/m7g</span></code>)的硬件实例。对于本教程,我们使用了 <a class="reference external" href="https://aws.amazon.com/ec2/instance-types/c7g/">c7g.xl (4vcpu)实例</a> 。</p>
 </div>
 </div>
-<div class="section" id="basic-usage">
-<h2>Basic Usage<a class="headerlink" href="#basic-usage" title="Permalink to this heading">¶</a></h2>
-<p>PyTorch natively supports AWS Graviton3 optimizations starting with PyTorch 2.0 version.
-Please refer to this <a class="reference external" href="https://pytorch.org/blog/optimized-pytorch-w-graviton/">blog</a> for more details on the optimizations.</p>
+<div class="section" id="id2">
+<h2>基本用法<a class="headerlink" href="#id2" title="Permalink to this heading">¶</a></h2>
+<p>从PyTorch 2.0版本开始,PyTorch原生支持AWS Graviton3优化。
+更多详细信息请参阅此 <a class="reference external" href="https://pytorch.org/blog/optimized-pytorch-w-graviton/">博客</a>。</p>
 <ol class="arabic">
-<li><p>Install PyTorch by running the following command:</p>
+<li><p>运行以下命令安装PyTorch:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python3</span> <span class="o">-</span><span class="n">m</span> <span class="n">pip</span> <span class="n">install</span> <span class="n">torch</span>
 </pre></div>
 </div>
 </li>
-<li><p>We will start by importing the required dependencies and defining the device will run on:</p></li>
+<li><p>我们将从导入所需的依赖项并定义将在其上运行的设备开始:</p></li>
 </ol>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
@@ -632,7 +632,7 @@ Please refer to this <a class="reference external" href="https://pytorch.org/blo
 </pre></div>
 </div>
 <ol class="arabic simple" start="3">
-<li><p>Given linear layers are at the heart of several neural networks, including transformers, we take a linear layer for this demo. We define our neural network by subclassing <code class="docutils literal notranslate"><span class="pre">nn.Module</span></code>, and initializing the layers in <code class="docutils literal notranslate"><span class="pre">__init__</span></code>. We construct the network with a typical large language model parameters to match the real world scenario:</p></li>
+<li><p>鉴于线性层是许多神经网络(包括Transformer)的核心,我们在此演示中使用线性层。我们通过子类化 <code class="docutils literal notranslate"><span class="pre">nn.Module</span></code> 并在 <code class="docutils literal notranslate"><span class="pre">__init__</span></code> 中初始化层来定义我们的神经网络。我们使用典型的大型语言模型参数构建网络,以匹配真实世界场景:</p></li>
 </ol>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">MyNeuralNetwork</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
   <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -653,13 +653,13 @@ Please refer to this <a class="reference external" href="https://pytorch.org/blo
 </pre></div>
 </div>
 <ol class="arabic simple" start="4">
-<li><p>Let’s create an instance of <code class="docutils literal notranslate"><span class="pre">MyNeuralNetwork</span></code>, and move it to the device:</p></li>
+<li><p>让我们创建一个 <code class="docutils literal notranslate"><span class="pre">MyNeuralNetwork</span></code> 的实例,并将其移动到设备上:</p></li>
 </ol>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">model</span> <span class="o">=</span> <span class="n">MyNeuralNetwork</span><span class="p">()</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Next, let’s get the prediction probabilities by passing them through an instance of the <code class="docutils literal notranslate"><span class="pre">nn.Softmax</span></code> module:</p>
+<p>接下来,让我们通过将它们传递给 <code class="docutils literal notranslate"><span class="pre">nn.Softmax</span></code> 模块的实例来获取预测概率:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">X</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
 <span class="n">logits</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
 <span class="n">pred_probab</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Softmax</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)(</span><span class="n">logits</span><span class="p">)</span>
@@ -667,13 +667,13 @@ Please refer to this <a class="reference external" href="https://pytorch.org/blo
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Predicted class: </span><span class="si">{</span><span class="n">y_pred</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>output:</p>
+<p>输出:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Predicted</span> <span class="n">class</span><span class="p">:</span> <span class="n">tensor</span><span class="p">([</span><span class="mi">2</span><span class="p">])</span>
 </pre></div>
 </div>
-<p>Our network functionality is verified. Next, we will profile the performance. Lets’ check two different scenarios: small and large batch dimensions.</p>
-<p><strong>Scenario 1:</strong> A larger batch dimension, for example 256:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># warm it up first and loop over multiple times to have enough execution time</span>
+<p>我们已验证了网络功能。接下来,我们将分析性能。让我们检查两种不同的情况:小批次维度和大批次维度。</p>
+<p><strong>情况1:</strong> 较大的批次维度,例如256:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># 首先进行预热,并循环多次以获得足够的执行时间</span>
 
 <span class="n">X</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">256</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
 
@@ -688,7 +688,7 @@ Please refer to this <a class="reference external" href="https://pytorch.org/blo
 <span class="nb">print</span><span class="p">(</span><span class="n">prof</span><span class="o">.</span><span class="n">key_averages</span><span class="p">()</span><span class="o">.</span><span class="n">table</span><span class="p">(</span><span class="n">sort_by</span><span class="o">=</span><span class="s2">&quot;self_cpu_time_total&quot;</span><span class="p">))</span>
 </pre></div>
 </div>
-<p>Following is the profiler output with the default PyTorch configuration:</p>
+<p>使用默认PyTorch配置时的分析器输出如下:</p>
 <table class="colwidths-auto docutils align-default">
 <thead>
 <tr class="row-odd"><th class="head"><p>Name</p></th>
@@ -761,13 +761,13 @@ Please refer to this <a class="reference external" href="https://pytorch.org/blo
 </table>
 <p><strong>Self CPU time total:</strong> 16.201s</p>
 </div>
-<div class="section" id="speed-up-inference-with-bfloat16-fast-math-kernels">
-<h2>Speed up Inference with <code class="docutils literal notranslate"><span class="pre">bfloat16</span></code> Fast Math Kernels<a class="headerlink" href="#speed-up-inference-with-bfloat16-fast-math-kernels" title="Permalink to this heading">¶</a></h2>
-<p>AWS Graviton3 processors support <a class="reference external" href="https://developer.arm.com/documentation/ddi0596/2020-12/SVE-Instructions/BFMMLA--BFloat16-floating-point-matrix-multiply-accumulate-">bfloat16 MMLA instructions</a>. Arm Compute Library (<a class="reference external" href="https://github.com/ARM-software/ComputeLibrary">ACL</a>) provides optimized <code class="docutils literal notranslate"><span class="pre">bfloat16</span></code> General Matrix Multiplication (GEMM) kernels for AWS Graviton processors, and are integrated into PyTorch via MKLDNN backend starting with PyTorch 2.0.  The inference performance can be optimized with the fast math GEMM kernels. The fast math mode is not enabled by default because these kernels perform GEMM in <code class="docutils literal notranslate"><span class="pre">bfloat16</span></code> precision instead of <code class="docutils literal notranslate"><span class="pre">float</span></code>, and hence results in a slight drop in the model inference accuracy. However, the accuracy drop is within the <code class="docutils literal notranslate"><span class="pre">cosine</span> <span class="pre">similarity</span></code> threshold defined for <code class="docutils literal notranslate"><span class="pre">bfloat16</span></code> backend in <code class="docutils literal notranslate"><span class="pre">torchbench</span></code> test suite, and hence acceptable for majority of the applications. To enable the fast math GEMM kernels, set the following environment variable:</p>
+<div class="section" id="bfloat16-fast-math-kernels">
+<h2>使用 <code class="docutils literal notranslate"><span class="pre">bfloat16</span></code> Fast Math Kernels加速推理<a class="headerlink" href="#bfloat16-fast-math-kernels" title="Permalink to this heading">¶</a></h2>
+<p>AWS Graviton3处理器支持 <a class="reference external" href="https://developer.arm.com/documentation/ddi0596/2020-12/SVE-Instructions/BFMMLA--BFloat16-floating-point-matrix-multiply-accumulate-">bfloat16 MMLA指令</a>。Arm Compute Library (<a class="reference external" href="https://github.com/ARM-software/ComputeLibrary">ACL</a>) 为AWS Graviton处理器提供了优化的 <code class="docutils literal notranslate"><span class="pre">bfloat16</span></code> 通用矩阵乘法(GEMM)内核,并从PyTorch 2.0版本开始通过MKLDNN后端集成到PyTorch中。可以使用快速数学GEMM内核优化推理性能。默认情况下不启用快速数学模式,因为这些内核以 <code class="docutils literal notranslate"><span class="pre">bfloat16</span></code> 精度而不是 <code class="docutils literal notranslate"><span class="pre">float</span></code> 执行GEMM,因此会导致模型推理精度略有下降。但是,精度下降在 <code class="docutils literal notranslate"><span class="pre">torchbench</span></code> 测试套件中为 <code class="docutils literal notranslate"><span class="pre">bfloat16</span></code> 后端定义的 <code class="docutils literal notranslate"><span class="pre">余弦相似度</span></code> 阈值范围内,因此对大多数应用程序来说是可以接受的。要启用快速数学GEMM内核,请设置以下环境变量:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span><span class="nb">export</span><span class="w"> </span><span class="nv">DNNL_DEFAULT_FPMATH_MODE</span><span class="o">=</span>BF16
 </pre></div>
 </div>
-<p>When you run the above inference script, you should see the following profiler output with the MKLDNN fast math mode enabled:</p>
+<p>当您运行上述推理脚本时,应该会看到启用MKLDNN快速数学模式后的分析器输出:</p>
 <table class="colwidths-auto docutils align-default">
 <thead>
 <tr class="row-odd"><th class="head"><p>Name</p></th>
@@ -839,12 +839,12 @@ Please refer to this <a class="reference external" href="https://pytorch.org/blo
 </tbody>
 </table>
 <p><strong>Self CPU time total:</strong> 7.262s</p>
-<p>This is around <code class="docutils literal notranslate"><span class="pre">2x</span> <span class="pre">(7.262s</span> <span class="pre">vs</span> <span class="pre">16.201s)</span></code> performance improvement with the <code class="docutils literal notranslate"><span class="pre">bfloat16</span></code> fastmath kernels. Next, let’s look at the smaller batch dimension scenario.</p>
-<p><strong>Scenario 2:</strong> A smaller batch dimension, for example, 32:</p>
+<p>这比默认配置快约 <code class="docutils literal notranslate"><span class="pre">2倍</span> <span class="pre">(7.262s</span> <span class="pre">vs</span> <span class="pre">16.201s)</span></code>。接下来,让我们看看较小批次维度的情况。</p>
+<p><strong>场景 2:</strong> 较小的批量维度，例如 32:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">X</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">32</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
 <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">set_grad_enabled</span><span class="p">(</span><span class="kc">False</span><span class="p">):</span>
     <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">50</span><span class="p">):</span>
-        <span class="n">model</span><span class="p">(</span><span class="n">X</span><span class="p">)</span> <span class="c1">#Warmup</span>
+        <span class="n">model</span><span class="p">(</span><span class="n">X</span><span class="p">)</span> <span class="c1">#预热</span>
     <span class="k">with</span> <span class="n">profile</span><span class="p">(</span><span class="n">activities</span><span class="o">=</span><span class="p">[</span><span class="n">ProfilerActivity</span><span class="o">.</span><span class="n">CPU</span><span class="p">])</span> <span class="k">as</span> <span class="n">prof</span><span class="p">:</span>
         <span class="k">with</span> <span class="n">record_function</span><span class="p">(</span><span class="s2">&quot;mymodel_inference&quot;</span><span class="p">):</span>
             <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">100</span><span class="p">):</span>
@@ -853,238 +853,31 @@ Please refer to this <a class="reference external" href="https://pytorch.org/blo
 <span class="nb">print</span><span class="p">(</span><span class="n">prof</span><span class="o">.</span><span class="n">key_averages</span><span class="p">()</span><span class="o">.</span><span class="n">table</span><span class="p">(</span><span class="n">sort_by</span><span class="o">=</span><span class="s2">&quot;self_cpu_time_total&quot;</span><span class="p">))</span>
 </pre></div>
 </div>
-<p>You should see the following profiler output when the above script is run with the PyTorch default configuration:</p>
-<table class="colwidths-auto docutils align-default">
-<thead>
-<tr class="row-odd"><th class="head"><p>Name</p></th>
-<th class="head"><p>Self CPU %</p></th>
-<th class="head"><p>Self CPU</p></th>
-<th class="head"><p>CPU total %</p></th>
-<th class="head"><p>CPU total</p></th>
-<th class="head"><p>CPU time avg</p></th>
-<th class="head"><p># of Calls</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p>aten::addmm</p></td>
-<td><p>95.51%</p></td>
-<td><p>5.821s</p></td>
-<td><p>97.04%</p></td>
-<td><p>5.914s</p></td>
-<td><p>19.713ms</p></td>
-<td><p>300</p></td>
-</tr>
-<tr class="row-odd"><td><p>aten::clamp_min</p></td>
-<td><p>2.33%</p></td>
-<td><p>142.244ms</p></td>
-<td><p>2.33%</p></td>
-<td><p>142.244ms</p></td>
-<td><p>711.220us</p></td>
-<td><p>200</p></td>
-</tr>
-<tr class="row-even"><td><p>aten::copy</p></td>
-<td><p>1.51%</p></td>
-<td><p>92.322ms</p></td>
-<td><p>1.51%</p></td>
-<td><p>92.322ms</p></td>
-<td><p>307.740us</p></td>
-<td><p>300</p></td>
-</tr>
-<tr class="row-odd"><td><p>mymodel_inference</p></td>
-<td><p>0.45%</p></td>
-<td><p>27.713ms</p></td>
-<td><p>100.00%</p></td>
-<td><p>6.094s</p></td>
-<td><p>6.094s</p></td>
-<td><p>1</p></td>
-</tr>
-<tr class="row-even"><td><p>aten::linear</p></td>
-<td><p>0.04%</p></td>
-<td><p>2.495ms</p></td>
-<td><p>97.16%</p></td>
-<td><p>5.921s</p></td>
-<td><p>19.736ms</p></td>
-<td><p>300</p></td>
-</tr>
-<tr class="row-odd"><td><p>aten::t</p></td>
-<td><p>0.03%</p></td>
-<td><p>2.131ms</p></td>
-<td><p>0.07%</p></td>
-<td><p>4.441ms</p></td>
-<td><p>14.803us</p></td>
-<td><p>300</p></td>
-</tr>
-<tr class="row-even"><td><p>aten::relu</p></td>
-<td><p>0.03%</p></td>
-<td><p>1.942ms</p></td>
-<td><p>2.37%</p></td>
-<td><p>144.186ms</p></td>
-<td><p>720.930us</p></td>
-<td><p>200</p></td>
-</tr>
-</tbody>
-</table>
-<p><strong>Self CPU time total:</strong> 6.094s</p>
-<p>The following output is the profiler output when run with the MKLDNN fast math mode enabled:</p>
+<p>使用 PyTorch 默认配置运行上述脚本时，您应该会看到以下 profiler 输出:</p>
+<p><strong>自身 CPU 总计:</strong> 6.094s</p>
+<p>以下是启用 MKLDNN 快速数学模式时的 profiler 输出:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span><span class="nb">export</span><span class="w"> </span><span class="nv">DNNL_DEFAULT_FPMATH_MODE</span><span class="o">=</span>BF16
 </pre></div>
 </div>
-<table class="colwidths-auto docutils align-default">
-<thead>
-<tr class="row-odd"><th class="head"><p>Name</p></th>
-<th class="head"><p>Self CPU %</p></th>
-<th class="head"><p>Self CPU</p></th>
-<th class="head"><p>CPU total %</p></th>
-<th class="head"><p>CPU total</p></th>
-<th class="head"><p>CPU time avg</p></th>
-<th class="head"><p># of Calls</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p>aten::addmm</p></td>
-<td><p>93.31%</p></td>
-<td><p>3.848s</p></td>
-<td><p>95.66%</p></td>
-<td><p>3.944s</p></td>
-<td><p>13.148ms</p></td>
-<td><p>300</p></td>
-</tr>
-<tr class="row-odd"><td><p>aten::clamp_min</p></td>
-<td><p>3.43%</p></td>
-<td><p>141.309ms</p></td>
-<td><p>3.43%</p></td>
-<td><p>141.309ms</p></td>
-<td><p>706.545us</p></td>
-<td><p>200</p></td>
-</tr>
-<tr class="row-even"><td><p>aten::copy</p></td>
-<td><p>2.33%</p></td>
-<td><p>95.916ms</p></td>
-<td><p>2.33%</p></td>
-<td><p>95.916ms</p></td>
-<td><p>319.720us</p></td>
-<td><p>300</p></td>
-</tr>
-<tr class="row-odd"><td><p>mymodel_inference</p></td>
-<td><p>0.67%</p></td>
-<td><p>27.431ms</p></td>
-<td><p>100.00%</p></td>
-<td><p>4.123s</p></td>
-<td><p>4.123s</p></td>
-<td><p>1</p></td>
-</tr>
-<tr class="row-even"><td><p>aten::linear</p></td>
-<td><p>0.06%</p></td>
-<td><p>2.471ms</p></td>
-<td><p>95.83%</p></td>
-<td><p>3.951s</p></td>
-<td><p>13.170ms</p></td>
-<td><p>300</p></td>
-</tr>
-<tr class="row-odd"><td><p>aten::t</p></td>
-<td><p>0.05%</p></td>
-<td><p>2.027ms</p></td>
-<td><p>0.10%</p></td>
-<td><p>4.243ms</p></td>
-<td><p>14.143us</p></td>
-<td><p>300</p></td>
-</tr>
-<tr class="row-even"><td><p>aten::relu</p></td>
-<td><p>0.05%</p></td>
-<td><p>1.928ms</p></td>
-<td><p>3.47%</p></td>
-<td><p>143.237ms</p></td>
-<td><p>716.185us</p></td>
-<td><p>200</p></td>
-</tr>
-</tbody>
-</table>
-<p><strong>Self CPU time total:</strong> 4.123s</p>
-<p>The MKLDNN fast math mode yields approximately a <strong>1.47x  (4.123s vs 6.094s)</strong>  performance improvement for smaller batch dimensions. Although this improvement is noteworthy, the overall performance still leaves room for improvement. This is because of the runtime overhead (weights reorders and kernel launch time) from oneDNN and ACL backend outweighing the compute benefits from the ACL GEMM kernels for the smaller batch compute.</p>
+<p><strong>自身 CPU 总计:</strong> 4.123s</p>
+<p>MKLDNN 快速数学模式为较小的批量维度提供了大约 <strong>1.47x (4.123s vs 6.094s)</strong> 的性能提升。
+尽管性能提升明显,但整体仍有提升空间。因为来自 oneDNN 和 ACL 后端的运行时开销(权重重排和内核启动时间)
+超过了 ACL GEMM 内核对较小批量计算的计算优势。</p>
 </div>
-<div class="section" id="improve-inference-performance-with-openblas-for-smaller-batch-dimensions">
-<h2>Improve Inference Performance with OpenBLAS for Smaller Batch Dimensions<a class="headerlink" href="#improve-inference-performance-with-openblas-for-smaller-batch-dimensions" title="Permalink to this heading">¶</a></h2>
-<p>The inference performance for smaller batch dimensions can be improved by offloading the smaller shapes from MKLDNN to OpenBLAS backend. We are working on making the backend selection automatic, with robust heuristics, for the future releases. Till the heuristics are implemented, the smaller shapes can be offloaded to OpenBLAS by increasing the threshold for MKLDNN backend selection. In the following example, we use <code class="docutils literal notranslate"><span class="pre">64</span></code> as the threshold, so that input with <code class="docutils literal notranslate"><span class="pre">batch</span> <span class="pre">dimension</span> <span class="pre">of</span> <span class="pre">32</span></code> is not dispatched to MKLDNN. Instead, it is dispatched to OpenBLAS.</p>
+<div class="section" id="id5">
+<h2>使用 OpenBLAS 提高较小批量维度的推理性能<a class="headerlink" href="#id5" title="Permalink to this heading">¶</a></h2>
+<p>可以通过将较小的形状从 MKLDNN 卸载到 OpenBLAS 后端来提高较小批量维度的推理性能。我们正在努力为未来版本实现自动化的后端选择,并具有健壮的启发式算法。在实现启发式算法之前,可以通过增加 MKLDNN 后端选择的阈值将较小的形状卸载到 OpenBLAS。在以下示例中,我们使用 <code class="docutils literal notranslate"><span class="pre">64</span></code> 作为阈值,因此批量维度为 <code class="docutils literal notranslate"><span class="pre">32</span></code> 的输入不会分派到 MKLDNN。相反,它会被分派到 OpenBLAS。</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span><span class="nb">export</span><span class="w"> </span><span class="nv">TORCH_MKLDNN_MATMUL_MIN_DIM</span><span class="o">=</span><span class="m">64</span>
 </pre></div>
 </div>
-<p>Here is the profiler output with OpenBLAS backend:</p>
-<table class="colwidths-auto docutils align-default">
-<thead>
-<tr class="row-odd"><th class="head"><p>Name</p></th>
-<th class="head"><p>Self CPU %</p></th>
-<th class="head"><p>Self CPU</p></th>
-<th class="head"><p>CPU total %</p></th>
-<th class="head"><p>CPU total</p></th>
-<th class="head"><p>CPU time avg</p></th>
-<th class="head"><p># of Calls</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p>aten::addmm</p></td>
-<td><p>96.25%</p></td>
-<td><p>1.958s</p></td>
-<td><p>97.51%</p></td>
-<td><p>1.984s</p></td>
-<td><p>6.612ms</p></td>
-<td><p>300</p></td>
-</tr>
-<tr class="row-odd"><td><p>aten::clamp_min</p></td>
-<td><p>1.28%</p></td>
-<td><p>26.124ms</p></td>
-<td><p>1.28%</p></td>
-<td><p>26.124ms</p></td>
-<td><p>130.620us</p></td>
-<td><p>200</p></td>
-</tr>
-<tr class="row-even"><td><p>aten::copy</p></td>
-<td><p>1.23%</p></td>
-<td><p>24.951ms</p></td>
-<td><p>1.23%</p></td>
-<td><p>24.951ms</p></td>
-<td><p>83.170us</p></td>
-<td><p>300</p></td>
-</tr>
-<tr class="row-odd"><td><p>mymodel_inference</p></td>
-<td><p>0.86%</p></td>
-<td><p>17.423ms</p></td>
-<td><p>100.00%</p></td>
-<td><p>2.034s</p></td>
-<td><p>2.034s</p></td>
-<td><p>1</p></td>
-</tr>
-<tr class="row-even"><td><p>aten::linear</p></td>
-<td><p>0.08%</p></td>
-<td><p>1.691ms</p></td>
-<td><p>97.74%</p></td>
-<td><p>1.988s</p></td>
-<td><p>6.628ms</p></td>
-<td><p>300</p></td>
-</tr>
-<tr class="row-odd"><td><p>aten::t</p></td>
-<td><p>0.07%</p></td>
-<td><p>1.520ms</p></td>
-<td><p>0.14%</p></td>
-<td><p>2.945ms</p></td>
-<td><p>9.817us</p></td>
-<td><p>300</p></td>
-</tr>
-<tr class="row-even"><td><p>aten::relu</p></td>
-<td><p>0.06%</p></td>
-<td><p>1.258ms</p></td>
-<td><p>1.35%</p></td>
-<td><p>27.382ms</p></td>
-<td><p>136.910us</p></td>
-<td><p>200</p></td>
-</tr>
-</tbody>
-</table>
-<p><strong>Self CPU time total:</strong> 2.034s</p>
-<p>As you can see above, switching to OpenBLAS doubled the performance <strong>(2.034s vs 4.123s)</strong> compared to the default MKLDNN backend configuration. This becomes significant for even smaller batch dimensions, for example, for a batch dimension of 10:</p>
+<p>以下是使用 OpenBLAS 后端时的 profiler 输出:</p>
+<p><strong>自身 CPU 总计:</strong> 2.034s</p>
+<p>如您所见,切换到 OpenBLAS 将性能提高了一倍 <strong>(2.034s vs 4.123s)</strong> 与默认的 MKLDNN 后端配置相比。
+对于更小的批量维度,例如批量维度为 10,这一点更加显著:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">X</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
 <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">set_grad_enabled</span><span class="p">(</span><span class="kc">False</span><span class="p">):</span>
     <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">50</span><span class="p">):</span>
-        <span class="n">model</span><span class="p">(</span><span class="n">X</span><span class="p">)</span> <span class="c1">#Warmup</span>
+        <span class="n">model</span><span class="p">(</span><span class="n">X</span><span class="p">)</span> <span class="c1">#预热</span>
     <span class="k">with</span> <span class="n">profile</span><span class="p">(</span><span class="n">activities</span><span class="o">=</span><span class="p">[</span><span class="n">ProfilerActivity</span><span class="o">.</span><span class="n">CPU</span><span class="p">])</span> <span class="k">as</span> <span class="n">prof</span><span class="p">:</span>
         <span class="k">with</span> <span class="n">record_function</span><span class="p">(</span><span class="s2">&quot;mymodel_inference&quot;</span><span class="p">):</span>
             <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">100</span><span class="p">):</span>
@@ -1093,166 +886,27 @@ Please refer to this <a class="reference external" href="https://pytorch.org/blo
 <span class="nb">print</span><span class="p">(</span><span class="n">prof</span><span class="o">.</span><span class="n">key_averages</span><span class="p">()</span><span class="o">.</span><span class="n">table</span><span class="p">(</span><span class="n">sort_by</span><span class="o">=</span><span class="s2">&quot;self_cpu_time_total&quot;</span><span class="p">))</span>
 </pre></div>
 </div>
-<p>The following is the profiler output with MKLDNN fast math mode:</p>
-<table class="colwidths-auto docutils align-default">
-<thead>
-<tr class="row-odd"><th class="head"><p>Name</p></th>
-<th class="head"><p>Self CPU %</p></th>
-<th class="head"><p>Self CPU</p></th>
-<th class="head"><p>CPU total %</p></th>
-<th class="head"><p>CPU total</p></th>
-<th class="head"><p>CPU time avg</p></th>
-<th class="head"><p># of Calls</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p>aten::addmm</p></td>
-<td><p>87.81%</p></td>
-<td><p>3.613s</p></td>
-<td><p>91.90%</p></td>
-<td><p>3.781s</p></td>
-<td><p>12.604ms</p></td>
-<td><p>300</p></td>
-</tr>
-<tr class="row-odd"><td><p>aten::clamp_min</p></td>
-<td><p>7.18%</p></td>
-<td><p>295.437ms</p></td>
-<td><p>7.18%</p></td>
-<td><p>295.437ms</p></td>
-<td><p>1.477ms</p></td>
-<td><p>200</p></td>
-</tr>
-<tr class="row-even"><td><p>aten::copy</p></td>
-<td><p>4.07%</p></td>
-<td><p>167.516ms</p></td>
-<td><p>4.07%</p></td>
-<td><p>167.516ms</p></td>
-<td><p>558.387us</p></td>
-<td><p>300</p></td>
-</tr>
-<tr class="row-odd"><td><p>mymodel_inference</p></td>
-<td><p>0.67%</p></td>
-<td><p>27.708ms</p></td>
-<td><p>100.00%</p></td>
-<td><p>4.115s</p></td>
-<td><p>4.115s</p></td>
-<td><p>1</p></td>
-</tr>
-<tr class="row-even"><td><p>aten::linear</p></td>
-<td><p>0.06%</p></td>
-<td><p>2.499ms</p></td>
-<td><p>92.06%</p></td>
-<td><p>3.788s</p></td>
-<td><p>12.627ms</p></td>
-<td><p>300</p></td>
-</tr>
-<tr class="row-odd"><td><p>aten::t</p></td>
-<td><p>0.05%</p></td>
-<td><p>1.982ms</p></td>
-<td><p>0.11%</p></td>
-<td><p>4.385ms</p></td>
-<td><p>14.617us</p></td>
-<td><p>300</p></td>
-</tr>
-<tr class="row-even"><td><p>aten::relu</p></td>
-<td><p>0.05%</p></td>
-<td><p>1.932ms</p></td>
-<td><p>7.23%</p></td>
-<td><p>297.369ms</p></td>
-<td><p>1.487ms</p></td>
-<td><p>200</p></td>
-</tr>
-</tbody>
-</table>
-<p><strong>Self CPU time total:</strong> 4.115s</p>
-<p>and the following is the profiler output with the OpenBLAS backend:</p>
+<p>以下是启用 MKLDNN 快速数学模式时的 profiler 输出:</p>
+<p><strong>自身 CPU 总计:</strong> 4.115s</p>
+<p>以下是使用 OpenBLAS 后端时的 profiler 输出:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span><span class="nb">export</span><span class="w"> </span><span class="nv">TORCH_MKLDNN_MATMUL_MIN_DIM</span><span class="o">=</span><span class="m">64</span>
 </pre></div>
 </div>
-<table class="colwidths-auto docutils align-default">
-<thead>
-<tr class="row-odd"><th class="head"><p>Name</p></th>
-<th class="head"><p>Self CPU %</p></th>
-<th class="head"><p>Self CPU</p></th>
-<th class="head"><p>CPU total %</p></th>
-<th class="head"><p>CPU total</p></th>
-<th class="head"><p>CPU time avg</p></th>
-<th class="head"><p># of Calls</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p>aten::addmm</p></td>
-<td><p>92.66%</p></td>
-<td><p>1.179s</p></td>
-<td><p>95.23%</p></td>
-<td><p>1.211s</p></td>
-<td><p>4.038ms</p></td>
-<td><p>300</p></td>
-</tr>
-<tr class="row-odd"><td><p>aten::clamp_min</p></td>
-<td><p>2.83%</p></td>
-<td><p>36.060ms</p></td>
-<td><p>2.83%</p></td>
-<td><p>36.060ms</p></td>
-<td><p>180.300us</p></td>
-<td><p>200</p></td>
-</tr>
-<tr class="row-even"><td><p>aten::copy</p></td>
-<td><p>2.52%</p></td>
-<td><p>32.013ms</p></td>
-<td><p>2.52%</p></td>
-<td><p>32.013ms</p></td>
-<td><p>106.710us</p></td>
-<td><p>300</p></td>
-</tr>
-<tr class="row-odd"><td><p>mymodel_inference</p></td>
-<td><p>1.38%</p></td>
-<td><p>17.521ms</p></td>
-<td><p>100.00%</p></td>
-<td><p>1.272s</p></td>
-<td><p>1.272s</p></td>
-<td><p>1</p></td>
-</tr>
-<tr class="row-even"><td><p>aten::linear</p></td>
-<td><p>0.14%</p></td>
-<td><p>1.750ms</p></td>
-<td><p>95.60%</p></td>
-<td><p>1.216s</p></td>
-<td><p>4.054ms</p></td>
-<td><p>300</p></td>
-</tr>
-<tr class="row-odd"><td><p>aten::t</p></td>
-<td><p>0.12%</p></td>
-<td><p>1.475ms</p></td>
-<td><p>0.24%</p></td>
-<td><p>3.033ms</p></td>
-<td><p>10.110us</p></td>
-<td><p>300</p></td>
-</tr>
-<tr class="row-even"><td><p>aten::relu</p></td>
-<td><p>0.10%</p></td>
-<td><p>1.285ms</p></td>
-<td><p>2.94%</p></td>
-<td><p>37.345ms</p></td>
-<td><p>186.725us</p></td>
-<td><p>200</p></td>
-</tr>
-</tbody>
-</table>
-<p><strong>Self CPU time total:</strong> 1.272s</p>
-<p>Here we observed <strong>3.2x (1.272s vs 4.115s)</strong> performance improvement by tuning the backend thresholds appropriately.</p>
+<p><strong>自身 CPU 总计:</strong> 1.272s</p>
+<p>这里我们观察到通过适当调整后端阈值,**性能提高了3.2倍(1.272s vs 4.115s)**。</p>
 </div>
-<div class="section" id="optimize-memory-allocation-overhead-with-linux-transparent-huge-pages-thp">
-<h2>Optimize Memory Allocation Overhead with Linux Transparent Huge Pages (THP)<a class="headerlink" href="#optimize-memory-allocation-overhead-with-linux-transparent-huge-pages-thp" title="Permalink to this heading">¶</a></h2>
-<p>We also observed that for these larger networks, tensor memory allocations take significant portion of the inference latency. This can be optimized by enabling Linux transparent huge page allocations from PyTorch C10 memory allocator. Currently the feature is not enabled by default because it will increase the memory footprint marginally. Set the following environment variable to enable it:</p>
+<div class="section" id="linux-transparent-huge-pages-thp">
+<h2>使用 Linux Transparent Huge Pages (THP) 优化内存分配开销<a class="headerlink" href="#linux-transparent-huge-pages-thp" title="Permalink to this heading">¶</a></h2>
+<p>我们还观察到,对于这些较大的网络,张量内存分配占推理延迟的很大一部分。这可以通过从PyTorch C10内存分配器
+启用 THP 来优化。目前,该功能默认未启用,因为它会略微增加内存占用。设置以下环境变量以启用它:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span><span class="nb">export</span><span class="w"> </span><span class="nv">THP_MEM_ALLOC_ENABLE</span><span class="o">=</span><span class="m">1</span>
 </pre></div>
 </div>
-<p>For the batch dimension of 256 and with MKLDNN fast math mode:</p>
+<p>对于批量维度为 256 且启用 MKLDNN Fast Math 模式:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">X</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">256</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
 <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">set_grad_enabled</span><span class="p">(</span><span class="kc">False</span><span class="p">):</span>
     <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">50</span><span class="p">):</span>
-        <span class="n">model</span><span class="p">(</span><span class="n">X</span><span class="p">)</span> <span class="c1">#Warmup</span>
+        <span class="n">model</span><span class="p">(</span><span class="n">X</span><span class="p">)</span> <span class="c1">#预热</span>
     <span class="k">with</span> <span class="n">profile</span><span class="p">(</span><span class="n">activities</span><span class="o">=</span><span class="p">[</span><span class="n">ProfilerActivity</span><span class="o">.</span><span class="n">CPU</span><span class="p">])</span> <span class="k">as</span> <span class="n">prof</span><span class="p">:</span>
         <span class="k">with</span> <span class="n">record_function</span><span class="p">(</span><span class="s2">&quot;mymodel_inference&quot;</span><span class="p">):</span>
             <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">100</span><span class="p">):</span>
@@ -1261,16 +915,16 @@ Please refer to this <a class="reference external" href="https://pytorch.org/blo
 <span class="nb">print</span><span class="p">(</span><span class="n">prof</span><span class="o">.</span><span class="n">key_averages</span><span class="p">()</span><span class="o">.</span><span class="n">table</span><span class="p">(</span><span class="n">sort_by</span><span class="o">=</span><span class="s2">&quot;self_cpu_time_total&quot;</span><span class="p">))</span>
 </pre></div>
 </div>
-<p>The following is the profiler output with THP memory allocations enabled:</p>
+<p>启用THP内存分配后,profiler的输出如下:</p>
 <table class="colwidths-auto docutils align-default">
 <thead>
-<tr class="row-odd"><th class="head"><p>Name</p></th>
-<th class="head"><p>Self CPU %</p></th>
-<th class="head"><p>Self CPU</p></th>
-<th class="head"><p>CPU total %</p></th>
-<th class="head"><p>CPU total</p></th>
-<th class="head"><p>CPU time avg</p></th>
-<th class="head"><p># of Calls</p></th>
+<tr class="row-odd"><th class="head"><p>名称</p></th>
+<th class="head"><p>自身CPU%</p></th>
+<th class="head"><p>自身CPU</p></th>
+<th class="head"><p>CPU总%</p></th>
+<th class="head"><p>CPU总</p></th>
+<th class="head"><p>CPU平均时间</p></th>
+<th class="head"><p>调用次数</p></th>
 </tr>
 </thead>
 <tbody>
@@ -1324,12 +978,15 @@ Please refer to this <a class="reference external" href="https://pytorch.org/blo
 </tr>
 </tbody>
 </table>
-<p><strong>Self CPU time total:</strong> 6.697s</p>
-<p>This is an additional <strong>1.08x or 8% (6.697s vs 7.262s)</strong> improvement on top of the already optimized MKLDNN fast math mode measured above.</p>
+<p><strong>自身CPU总时间:</strong> 6.697s</p>
+<p>这比上面测量的已优化的 MKLDNN Fast Math 模式又提高了 <strong>1.08倍或8%(6.697s vs 7.262s)</strong>。</p>
 </div>
-<div class="section" id="conclusion">
-<h2>Conclusion<a class="headerlink" href="#conclusion" title="Permalink to this heading">¶</a></h2>
-<p>In this tutorial, we covered PyTorch inference on AWS Graviton3 instances by covering the basic usage, demonstrating speedups with fast math kernels, comparing different backends for different batch dimensions, and how to optimize tensor memory allocation latencies with Linux transparent huge pages. The recommendation is to use MKLDNN backend with Bfloat16 fastmath mode and THP memory allocations for larger tensor shapes and to use OpenBLAS backend for smaller tensor shapes. We hope that you will give it a try!</p>
+<div class="section" id="id6">
+<h2>结论<a class="headerlink" href="#id6" title="Permalink to this heading">¶</a></h2>
+<p>在本教程中,我们介绍了在AWS Graviton3实例上的PyTorch推理,包括基本用法、使用快速数学内核的加速、
+比较不同批量维度下不同后端的性能,以及如何使用Linux透明大页面优化张量内存分配延迟。
+对于较大的张量形状,建议使用MKLDNN后端和Bfloat16快速数学模式以及THP内存分配;对于较小的张量形状,
+建议使用OpenBLAS后端。希望您能尝试一下!</p>
 </div>
 </div>
 
@@ -1385,13 +1042,13 @@ if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.i
           <div class="pytorch-right-menu" id="pytorch-right-menu">
             <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
               <ul>
-<li><a class="reference internal" href="#">(Beta) PyTorch Inference Performance Tuning on AWS Graviton Processors</a><ul>
-<li><a class="reference internal" href="#contents">Contents</a></li>
-<li><a class="reference internal" href="#basic-usage">Basic Usage</a></li>
-<li><a class="reference internal" href="#speed-up-inference-with-bfloat16-fast-math-kernels">Speed up Inference with <code class="docutils literal notranslate"><span class="pre">bfloat16</span></code> Fast Math Kernels</a></li>
-<li><a class="reference internal" href="#improve-inference-performance-with-openblas-for-smaller-batch-dimensions">Improve Inference Performance with OpenBLAS for Smaller Batch Dimensions</a></li>
-<li><a class="reference internal" href="#optimize-memory-allocation-overhead-with-linux-transparent-huge-pages-thp">Optimize Memory Allocation Overhead with Linux Transparent Huge Pages (THP)</a></li>
-<li><a class="reference internal" href="#conclusion">Conclusion</a></li>
+<li><a class="reference internal" href="#">(Beta) PyTorch在AWS Graviton处理器上的推理性能优化</a><ul>
+<li><a class="reference internal" href="#id1">内容</a></li>
+<li><a class="reference internal" href="#id2">基本用法</a></li>
+<li><a class="reference internal" href="#bfloat16-fast-math-kernels">使用 <code class="docutils literal notranslate"><span class="pre">bfloat16</span></code> Fast Math Kernels加速推理</a></li>
+<li><a class="reference internal" href="#id5">使用 OpenBLAS 提高较小批量维度的推理性能</a></li>
+<li><a class="reference internal" href="#linux-transparent-huge-pages-thp">使用 Linux Transparent Huge Pages (THP) 优化内存分配开销</a></li>
+<li><a class="reference internal" href="#id6">结论</a></li>
 </ul>
 </li>
 </ul>
