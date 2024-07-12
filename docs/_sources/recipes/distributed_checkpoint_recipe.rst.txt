@@ -1,52 +1,51 @@
-Getting Started with Distributed Checkpoint (DCP)
+分布式检查点 (DCP) 入门
 =====================================================
 
-**Author**: `Iris Zhang <https://github.com/wz337>`__, `Rodrigo Kumpera <https://github.com/kumpera>`__, `Chien-Chin Huang <https://github.com/fegin>`__, `Lucas Pasqualin <https://github.com/lucasllc>`__
+**作者**: `Iris Zhang <https://github.com/wz337>`__, `Rodrigo Kumpera <https://github.com/kumpera>`__, `Chien-Chin Huang <https://github.com/fegin>`__, `Lucas Pasqualin <https://github.com/lucasllc>`__
 
 .. note::
-   |edit| View and edit this tutorial in `github <https://github.com/pytorch/tutorials/blob/main/recipes_source/distributed_checkpoint_recipe.rst>`__.
+   |edit| 在 `github <https://github.com/pytorch/tutorials/blob/main/recipes_source/distributed_checkpoint_recipe.rst>`__ 上查看和编辑本教程。
 
 
-Prerequisites:
+先决条件:
 
--  `FullyShardedDataParallel API documents <https://pytorch.org/docs/master/fsdp.html>`__
--  `torch.load API documents <https://pytorch.org/docs/stable/generated/torch.load.html>`__
-
-
-Checkpointing AI models during distributed training could be challenging, as parameters and gradients are partitioned across trainers and the number of trainers available could change when you resume training.
-Pytorch Distributed Checkpointing (DCP) can help make this process easier.
-
-In this tutorial, we show how to use DCP APIs with a simple FSDP wrapped model.
+-  `FullyShardedDataParallel API 文档 <https://pytorch.org/docs/master/fsdp.html>`__
+-  `torch.load API 文档 <https://pytorch.org/docs/stable/generated/torch.load.html>`__
 
 
-How DCP works
+在分布式训练过程中对 AI 模型进行检查点保存可能具有挑战性，因为参数和梯度分布在不同的训练器上，而且恢复训练时可用的训练器数量可能会发生变化。
+Pytorch 分布式检查点 (DCP) 可以帮助简化这个过程。
+
+在本教程中，我们将展示如何使用 DCP API 处理一个简单的 FSDP 包装模型。
+
+
+DCP 如何工作
 --------------
 
-:func:`torch.distributed.checkpoint` enables saving and loading models from multiple ranks in parallel. You can use this module to save on any number of ranks in parallel,
-and then re-shard across differing cluster topologies at load time.
+:func:`torch.distributed.checkpoint` 允许并行地从多个 rank 保存和加载模型。您可以使用此模块在任意数量的 rank 上并行保存，
+然后在加载时重新分片到不同的集群拓扑结构。
 
-Addditionally, through the use of modules in :func:`torch.distributed.checkpoint.state_dict`,
-DCP offers support for gracefully handling ``state_dict`` generation and loading in distributed settings.
-This includes managing fully-qualified-name (FQN) mappings across models and optimizers, and setting default parameters for PyTorch provided parallelisms.
+此外，通过使用 :func:`torch.distributed.checkpoint.state_dict` 中的模块，
+DCP 提供了在分布式设置中优雅处理 ``state_dict`` 生成和加载的支持。
+这包括管理模型和优化器之间的全限定名称 (FQN) 映射，以及为 PyTorch 提供的并行性设置默认参数。
 
-DCP is different from :func:`torch.save` and :func:`torch.load` in a few significant ways:
+DCP 与 :func:`torch.save` 和 :func:`torch.load` 在几个重要方面有所不同：
 
-* It produces multiple files per checkpoint, with at least one per rank.
-* It operates in place, meaning that the model should allocate its data first and DCP uses that storage instead.
+* 它为每个检查点生成多个文件，每个 rank 至少一个。
+* 它就地操作，这意味着模型应该首先分配其数据，DCP 使用该存储而不是创建新的存储。
 
 .. note::
-  The code in this tutorial runs on an 8-GPU server, but it can be easily
-  generalized to other environments.
+  本教程中的代码在 8-GPU 服务器上运行，但可以轻松地推广到其他环境。
 
-How to use DCP
+如何使用 DCP
 --------------
 
-Here we use a toy model wrapped with FSDP for demonstration purposes. Similarly, the APIs and logic can be applied to larger models for checkpointing.
+这里我们使用一个用 FSDP 包装的玩具模型进行演示。同样，这些 API 和逻辑可以应用于更大的模型进行检查点保存。
 
-Saving
+保存
 ~~~~~~
 
-Now, let's create a toy module, wrap it with FSDP, feed it with some dummy input data, and save it.
+现在，让我们创建一个玩具模块，用 FSDP 包装它，用一些虚拟输入数据对其进行训练，然后保存它。
 
 .. code-block:: python
 
@@ -80,7 +79,7 @@ Now, let's create a toy module, wrap it with FSDP, feed it with some dummy input
         os.environ["MASTER_ADDR"] = "localhost"
         os.environ["MASTER_PORT"] = "12355 "
 
-        # initialize the process group
+        # 初始化进程组
         dist.init_process_group("nccl", rank=rank, world_size=world_size)
         torch.cuda.set_device(rank)
 
@@ -90,10 +89,10 @@ Now, let's create a toy module, wrap it with FSDP, feed it with some dummy input
 
 
     def run_fsdp_checkpoint_save_example(rank, world_size):
-        print(f"Running basic FSDP checkpoint saving example on rank {rank}.")
+        print(f"在 rank {rank} 上运行基本的 FSDP 检查点保存示例。")
         setup(rank, world_size)
 
-        # create a model and move it to GPU with id rank
+        # 创建一个模型并将其移动到 ID 为 rank 的 GPU 上
         model = ToyModel().to(rank)
         model = FSDP(model)
 
@@ -104,7 +103,7 @@ Now, let's create a toy module, wrap it with FSDP, feed it with some dummy input
         model(torch.rand(8, 16, device="cuda")).sum().backward()
         optimizer.step()
 
-        # this line automatically manages FSDP FQN's, as well as sets the default state dict type to FSDP.SHARDED_STATE_DICT
+        # 这行代码自动管理 FSDP FQN，并将默认状态字典类型设置为 FSDP.SHARDED_STATE_DICT
         model_state_dict, optimizer_state_dict = get_state_dict(model, optimizer)
         state_dict = {
             "model": model_state_dict,
@@ -118,7 +117,7 @@ Now, let's create a toy module, wrap it with FSDP, feed it with some dummy input
 
     if __name__ == "__main__":
         world_size = torch.cuda.device_count()
-        print(f"Running fsdp checkpoint example on {world_size} devices.")
+        print(f"在 {world_size} 个设备上运行 FSDP 检查点示例。")
         mp.spawn(
             run_fsdp_checkpoint_save_example,
             args=(world_size,),
@@ -126,24 +125,24 @@ Now, let's create a toy module, wrap it with FSDP, feed it with some dummy input
             join=True,
         )
 
-Please go ahead and check the `checkpoint` directory. You should see 8 checkpoint files as shown below.
+请查看 `checkpoint` 目录。您应该看到 8 个检查点文件，如下所示。
 
 .. figure:: /_static/img/distributed/distributed_checkpoint_generated_files.png
    :width: 100%
    :align: center
-   :alt: Distributed Checkpoint
+   :alt: 分布式检查点
 
-Loading
+加载
 ~~~~~~~
 
-After saving, let’s create the same FSDP-wrapped model, and load the saved state dict from storage into the model. You can load in the same world size or different world size.
+保存之后，让我们创建相同的 FSDP 包装模型，并从存储中加载保存的状态字典到模型中。您可以在相同的世界大小或不同的世界大小中加载。
 
-Please note that you will have to call :func:`model.state_dict` prior to loading and pass it to DCP's :func:`load_state_dict` API.
-This is fundamentally different from :func:`torch.load`, as :func:`torch.load` simply requires the path to the checkpoint prior for loading.
-The reason that we need the ``state_dict`` prior to loading is:
+请注意，您需要在加载之前调用 :func:`model.state_dict`，并将其传递给 DCP 的 :func:`load_state_dict` API。
+这与 :func:`torch.load` 有根本的不同，因为 :func:`torch.load` 只需要加载前的检查点路径。
+我们需要在加载之前提供 ``state_dict`` 的原因是：
 
-* DCP uses the pre-allocated storage from model state_dict to load from the checkpoint directory. During loading, the state_dict passed in will be updated in place.
-* DCP requires the sharding information from the model prior to loading to support resharding.
+* DCP 使用模型状态字典中预分配的存储来从检查点目录加载。在加载过程中，传入的状态字典将被就地更新。
+* DCP 在加载之前需要模型的分片信息以支持重新分片。
 
 .. code-block:: python
 
@@ -176,7 +175,7 @@ The reason that we need the ``state_dict`` prior to loading is:
         os.environ["MASTER_ADDR"] = "localhost"
         os.environ["MASTER_PORT"] = "12355 "
 
-        # initialize the process group
+        # 初始化进程组
         dist.init_process_group("nccl", rank=rank, world_size=world_size)
         torch.cuda.set_device(rank)
 
@@ -186,14 +185,14 @@ The reason that we need the ``state_dict`` prior to loading is:
 
 
     def run_fsdp_checkpoint_load_example(rank, world_size):
-        print(f"Running basic FSDP checkpoint loading example on rank {rank}.")
+        print(f"在 rank {rank} 上运行基本的 FSDP 检查点加载示例。")
         setup(rank, world_size)
 
-        # create a model and move it to GPU with id rank
+        # 创建一个模型并将其移动到 ID 为 rank 的 GPU 上
         model = ToyModel().to(rank)
         model = FSDP(model)
 
-        # generates the state dict we will load into
+        # 生成我们将加载到的状态字典
         model_state_dict, optimizer_state_dict = get_state_dict(model, optimizer)
         state_dict = {
             "model": model_state_dict,
@@ -203,7 +202,7 @@ The reason that we need the ``state_dict`` prior to loading is:
             state_dict=state_dict,
             checkpoint_id=CHECKPOINT_DIR,
         )
-        # sets our state dicts on the model and optimizer, now that we've loaded
+        # 在加载完成后，将我们的状态字典设置到模型和优化器上
         set_state_dict(
             model,
             optimizer,
@@ -216,7 +215,7 @@ The reason that we need the ``state_dict`` prior to loading is:
 
     if __name__ == "__main__":
         world_size = torch.cuda.device_count()
-        print(f"Running fsdp checkpoint example on {world_size} devices.")
+        print(f"在 {world_size} 个设备上运行 FSDP 检查点示例。")
         mp.spawn(
             run_fsdp_checkpoint_load_example,
             args=(world_size,),
@@ -224,12 +223,12 @@ The reason that we need the ``state_dict`` prior to loading is:
             join=True,
         )
 
-If you would like to load the saved checkpoint into a non-FSDP wrapped model in a non-distributed setup, perhaps for inference, you can also do that with DCP.
-By default, DCP saves and loads a distributed ``state_dict`` in Single Program Multiple Data(SPMD) style. However if no process group is initialized, DCP infers
-the intent is to save or load in "non-distributed" style, meaning entirely in the current process.
+如果您想在非分布式设置中将保存的检查点加载到非 FSDP 包装的模型中，可能是为了推理，您也可以使用 DCP 来实现。
+默认情况下，DCP 以单程序多数据 (SPMD) 风格保存和加载分布式 ``state_dict``。但是，如果没有初始化进程组，
+DCP 会推断意图是以"非分布式"方式保存或加载，这意味着完全在当前进程中进行。
 
 .. note::
-  Distributed checkpoint support for Multi-Program Multi-Data is still under development.
+  多程序多数据的分布式检查点支持仍在开发中。
 
 .. code-block:: python
 
@@ -255,13 +254,13 @@ the intent is to save or load in "non-distributed" style, meaning entirely in th
 
 
     def run_checkpoint_load_example():
-        # create the non FSDP-wrapped toy model
+        # 创建非 FSDP 包装的玩具模型
         model = ToyModel()
         state_dict = {
             "model": model.state_dict(),
         }
 
-        # since no progress group is initialized, DCP will disable any collectives.
+        # 由于没有初始化进程组，DCP 将禁用任何集体操作
         dcp.load(
             state_dict=state_dict,
             checkpoint_id=CHECKPOINT_DIR,
@@ -269,17 +268,16 @@ the intent is to save or load in "non-distributed" style, meaning entirely in th
         model.load_state_dict(state_dict["model"])
 
     if __name__ == "__main__":
-        print(f"Running basic DCP checkpoint loading example.")
+        print(f"运行基本的 DCP 检查点加载示例。")
         run_checkpoint_load_example()
 
 
-Conclusion
+结论
 ----------
-In conclusion, we have learned how to use DCP's :func:`save` and :func:`load` APIs, as well as how they are different form :func:`torch.save` and :func:`torch.load`.
-Additionally, we've learned how to use :func:`get_state_dict` and :func:`set_state_dict` to automatically manage parallelism-specific FQN's and defaults during state dict
-generation and loading.
+总之，我们学习了如何使用 DCP 的 :func:`save` 和 :func:`load` API，以及它们与 :func:`torch.save` 和 :func:`torch.load` 的不同之处。
+此外，我们还学习了如何使用 :func:`get_state_dict` 和 :func:`set_state_dict` 在状态字典生成和加载期间自动管理并行性特定的 FQN 和默认值。
 
-For more information, please see the following:
+更多信息，请参阅以下内容：
 
--  `Saving and loading models tutorial <https://pytorch.org/tutorials/beginner/saving_loading_models.html>`__
--  `Getting started with FullyShardedDataParallel tutorial <https://pytorch.org/tutorials/intermediate/FSDP_tutorial.html>`__
+-  `保存和加载模型教程 <https://pytorch.org/tutorials/beginner/saving_loading_models.html>`__
+-  `FullyShardedDataParallel 入门教程 <https://pytorch.org/tutorials/intermediate/FSDP_tutorial.html>`__

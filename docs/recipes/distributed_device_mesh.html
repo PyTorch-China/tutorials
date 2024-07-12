@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Getting Started with DeviceMesh &mdash; PyTorch Tutorials 2.3.0 documentation</title>
+  <title>开始使用 DeviceMesh &mdash; PyTorch Tutorials 2.3.0 documentation</title>
   
 
   
@@ -531,7 +531,7 @@
       </li>
 
         
-      <li>Getting Started with DeviceMesh</li>
+      <li>开始使用 DeviceMesh</li>
     
     
       <li class="pytorch-breadcrumbs-aside">
@@ -590,55 +590,55 @@
             <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
-  <div class="section" id="getting-started-with-devicemesh">
-<h1>Getting Started with DeviceMesh<a class="headerlink" href="#getting-started-with-devicemesh" title="Permalink to this heading">¶</a></h1>
-<p><strong>Author</strong>: <a class="reference external" href="https://github.com/wz337">Iris Zhang</a>, <a class="reference external" href="https://github.com/wanchaol">Wanchao Liang</a></p>
+  <div class="section" id="devicemesh">
+<h1>开始使用 DeviceMesh<a class="headerlink" href="#devicemesh" title="Permalink to this heading">¶</a></h1>
+<p><strong>作者</strong>: <a class="reference external" href="https://github.com/wz337">Iris Zhang</a>, <a class="reference external" href="https://github.com/wanchaol">Wanchao Liang</a></p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p><a class="reference internal" href="../_images/pencil-16.png"><img alt="edit" src="../_images/pencil-16.png" style="width: 16px; height: 16px;" /></a> View and edit this tutorial in <a class="reference external" href="https://github.com/pytorch/tutorials/blob/main/recipes_source/distributed_device_mesh.rst">github</a>.</p>
+<p><a class="reference internal" href="../_images/pencil-16.png"><img alt="edit" src="../_images/pencil-16.png" style="width: 16px; height: 16px;" /></a> 在 <a class="reference external" href="https://github.com/pytorch/tutorials/blob/main/recipes_source/distributed_device_mesh.rst">github</a> 上查看和编辑本教程。</p>
 </div>
-<p>Prerequisites:</p>
+<p>先决条件:</p>
 <ul class="simple">
-<li><p><a class="reference external" href="https://pytorch.org/docs/stable/distributed.html">Distributed Communication Package - torch.distributed</a></p></li>
+<li><p><a class="reference external" href="https://pytorch.org/docs/stable/distributed.html">分布式通信包 - torch.distributed</a></p></li>
 <li><p>Python 3.8 - 3.11</p></li>
 <li><p>PyTorch 2.2</p></li>
 </ul>
-<p>Setting up distributed communicators, i.e. NVIDIA Collective Communication Library (NCCL) communicators, for distributed training can pose a significant challenge. For workloads where users need to compose different parallelisms,
-users would need to manually set up and manage NCCL communicators (for example, <code class="xref py py-class docutils literal notranslate"><span class="pre">ProcessGroup</span></code>) for each parallelism solution. This process could be complicated and susceptible to errors.
-<code class="xref py py-class docutils literal notranslate"><span class="pre">DeviceMesh</span></code> can simplify this process, making it more manageable and less prone to errors.</p>
-<div class="section" id="what-is-devicemesh">
-<h2>What is DeviceMesh<a class="headerlink" href="#what-is-devicemesh" title="Permalink to this heading">¶</a></h2>
-<p><code class="xref py py-class docutils literal notranslate"><span class="pre">DeviceMesh</span></code> is a higher level abstraction that manages <code class="xref py py-class docutils literal notranslate"><span class="pre">ProcessGroup</span></code>. It allows users to effortlessly
-create inter-node and intra-node process groups without worrying about how to set up ranks correctly for different sub process groups.
-Users can also easily manage the underlying process_groups/devices for multi-dimensional parallelism via <code class="xref py py-class docutils literal notranslate"><span class="pre">DeviceMesh</span></code>.</p>
+<p>为分布式训练设置分布式通信器（例如 NVIDIA 集体通信库 (NCCL) 通信器）可能是一个重大挑战。
+对于需要组合不同并行性的工作负载，用户需要为每个并行性解决方案手动设置和管理 NCCL 通信器（例如，<code class="xref py py-class docutils literal notranslate"><span class="pre">ProcessGroup</span></code>）。
+这个过程可能很复杂且容易出错。<code class="xref py py-class docutils literal notranslate"><span class="pre">DeviceMesh</span></code> 可以简化这个过程，使其更易于管理和减少错误。</p>
+<div class="section" id="id1">
+<h2>什么是 DeviceMesh<a class="headerlink" href="#id1" title="Permalink to this heading">¶</a></h2>
+<p><code class="xref py py-class docutils literal notranslate"><span class="pre">DeviceMesh</span></code> 是一个管理 <code class="xref py py-class docutils literal notranslate"><span class="pre">ProcessGroup</span></code> 的高级抽象。它允许用户轻松创建节点间和节点内进程组，
+而无需担心如何为不同的子进程组正确设置等级。
+用户还可以通过 <code class="xref py py-class docutils literal notranslate"><span class="pre">DeviceMesh</span></code> 轻松管理多维并行性的底层进程组/设备。</p>
 <div class="figure align-center">
 <a class="reference internal image-reference" href="../_images/device_mesh.png"><img alt="PyTorch DeviceMesh" src="../_images/device_mesh.png" style="width: 100%;" /></a>
 </div>
 </div>
-<div class="section" id="why-devicemesh-is-useful">
-<h2>Why DeviceMesh is Useful<a class="headerlink" href="#why-devicemesh-is-useful" title="Permalink to this heading">¶</a></h2>
-<p>DeviceMesh is useful when working with multi-dimensional parallelism (i.e. 3-D parallel) where parallelism composability is required. For example, when your parallelism solutions require both communication across hosts and within each host.
-The image above shows that we can create a 2D mesh that connects the devices within each host, and connects each device with its counterpart on the other hosts in a homogenous setup.</p>
-<p>Without DeviceMesh, users would need to manually set up NCCL communicators, cuda devices on each process before applying any parallelism, which could be quite complicated.
-The following code snippet illustrates a hybrid sharding 2-D Parallel pattern setup without <code class="xref py py-class docutils literal notranslate"><span class="pre">DeviceMesh</span></code>.
-First, we need to manually calculate the shard group and replicate group. Then, we need to assign the correct shard and
-replicate group to each rank.</p>
+<div class="section" id="id2">
+<h2>为什么 DeviceMesh 有用<a class="headerlink" href="#id2" title="Permalink to this heading">¶</a></h2>
+<p>当处理多维并行性（例如 3-D 并行）时，DeviceMesh 非常有用，因为这种情况需要并行性组合。
+例如，当您的并行性解决方案需要跨主机和每个主机内部进行通信时。上图显示，我们可以创建一个 2D 网格，
+连接每个主机内的设备，并在同构设置中将每个设备与其他主机上的对应设备连接起来。</p>
+<p>如果没有 DeviceMesh，用户在应用任何并行性之前需要手动设置每个进程上的 NCCL 通信器和 CUDA 设备，这可能相当复杂。
+以下代码片段说明了如何在没有 <code class="xref py py-class docutils literal notranslate"><span class="pre">DeviceMesh</span></code> 的情况下设置混合分片 2-D 并行模式。
+首先，我们需要手动计算分片组和复制组。然后，我们需要为每个等级分配正确的分片和复制组。</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
 
 <span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">import</span> <span class="nn">torch.distributed</span> <span class="k">as</span> <span class="nn">dist</span>
 
-<span class="c1"># Understand world topology</span>
+<span class="c1"># 了解世界拓扑</span>
 <span class="n">rank</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;RANK&quot;</span><span class="p">])</span>
 <span class="n">world_size</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;WORLD_SIZE&quot;</span><span class="p">])</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Running example on </span><span class="si">{</span><span class="n">rank</span><span class="si">=}</span><span class="s2"> in a world with </span><span class="si">{</span><span class="n">world_size</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;在 </span><span class="si">{</span><span class="n">rank</span><span class="si">=}</span><span class="s2"> 上运行示例，世界大小为 </span><span class="si">{</span><span class="n">world_size</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
 
-<span class="c1"># Create process groups to manage 2-D like parallel pattern</span>
+<span class="c1"># 创建进程组以管理 2-D 类似的并行模式</span>
 <span class="n">dist</span><span class="o">.</span><span class="n">init_process_group</span><span class="p">(</span><span class="s2">&quot;nccl&quot;</span><span class="p">)</span>
 <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">set_device</span><span class="p">(</span><span class="n">rank</span><span class="p">)</span>
 
-<span class="c1"># Create shard groups (e.g. (0, 1, 2, 3), (4, 5, 6, 7))</span>
-<span class="c1"># and assign the correct shard group to each rank</span>
+<span class="c1"># 创建分片组（例如 (0, 1, 2, 3), (4, 5, 6, 7)）</span>
+<span class="c1"># 并为每个等级分配正确的分片组</span>
 <span class="n">num_node_devices</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">device_count</span><span class="p">()</span>
 <span class="n">shard_rank_lists</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">num_node_devices</span> <span class="o">//</span> <span class="mi">2</span><span class="p">)),</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">num_node_devices</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span> <span class="n">num_node_devices</span><span class="p">))</span>
 <span class="n">shard_groups</span> <span class="o">=</span> <span class="p">(</span>
@@ -649,8 +649,8 @@ replicate group to each rank.</p>
     <span class="n">shard_groups</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">rank</span> <span class="ow">in</span> <span class="n">shard_rank_lists</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">else</span> <span class="n">shard_groups</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
 <span class="p">)</span>
 
-<span class="c1"># Create replicate groups (for example, (0, 4), (1, 5), (2, 6), (3, 7))</span>
-<span class="c1"># and assign the correct replicate group to each rank</span>
+<span class="c1"># 创建复制组（例如，(0, 4), (1, 5), (2, 6), (3, 7)）</span>
+<span class="c1"># 并为每个等级分配正确的复制组</span>
 <span class="n">current_replicate_group</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="n">shard_factor</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">shard_rank_lists</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_node_devices</span> <span class="o">//</span> <span class="mi">2</span><span class="p">):</span>
@@ -660,36 +660,36 @@ replicate group to each rank.</p>
         <span class="n">current_replicate_group</span> <span class="o">=</span> <span class="n">replicate_group</span>
 </pre></div>
 </div>
-<p>To run the above code snippet, we can leverage PyTorch Elastic. Let’s create a file named <code class="docutils literal notranslate"><span class="pre">2d_setup.py</span></code>.
-Then, run the following <a class="reference external" href="https://pytorch.org/docs/stable/elastic/quickstart.html">torch elastic/torchrun</a> command.</p>
+<p>要运行上面的代码片段，我们可以利用 PyTorch Elastic。让我们创建一个名为 <code class="docutils literal notranslate"><span class="pre">2d_setup.py</span></code> 的文件。
+然后，运行以下 <a class="reference external" href="https://pytorch.org/docs/stable/elastic/quickstart.html">torch elastic/torchrun</a> 命令。</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">torchrun</span> <span class="o">--</span><span class="n">nproc_per_node</span><span class="o">=</span><span class="mi">8</span> <span class="o">--</span><span class="n">rdzv_id</span><span class="o">=</span><span class="mi">100</span> <span class="o">--</span><span class="n">rdzv_endpoint</span><span class="o">=</span><span class="n">localhost</span><span class="p">:</span><span class="mi">29400</span> <span class="mi">2</span><span class="n">d_setup</span><span class="o">.</span><span class="n">py</span>
 </pre></div>
 </div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>For simplicity of demonstration, we are simulating 2D parallel using only one node. Note that this code snippet can also be used when running on multi hosts setup.</p>
+<p>为了简化演示，我们仅使用一个节点模拟 2D 并行。请注意，此代码片段也可用于多主机设置。</p>
 </div>
-<p>With the help of <code class="xref py py-func docutils literal notranslate"><span class="pre">init_device_mesh()</span></code>, we can accomplish the above 2D setup in just two lines, and we can still
-access the underlying <code class="xref py py-class docutils literal notranslate"><span class="pre">ProcessGroup</span></code> if needed.</p>
+<p>借助 <code class="xref py py-func docutils literal notranslate"><span class="pre">init_device_mesh()</span></code>，我们可以仅用两行代码完成上述 2D 设置，并且如果需要，
+我们仍然可以访问底层的 <code class="xref py py-class docutils literal notranslate"><span class="pre">ProcessGroup</span></code>。</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torch.distributed.device_mesh</span> <span class="kn">import</span> <span class="n">init_device_mesh</span>
 <span class="n">mesh_2d</span> <span class="o">=</span> <span class="n">init_device_mesh</span><span class="p">(</span><span class="s2">&quot;cuda&quot;</span><span class="p">,</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="n">mesh_dim_names</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;replicate&quot;</span><span class="p">,</span> <span class="s2">&quot;shard&quot;</span><span class="p">))</span>
 
-<span class="c1"># Users can access the underlying process group thru `get_group` API.</span>
+<span class="c1"># 用户可以通过 `get_group` API 访问底层进程组。</span>
 <span class="n">replicate_group</span> <span class="o">=</span> <span class="n">mesh_2d</span><span class="o">.</span><span class="n">get_group</span><span class="p">(</span><span class="n">mesh_dim</span><span class="o">=</span><span class="s2">&quot;replicate&quot;</span><span class="p">)</span>
 <span class="n">shard_group</span> <span class="o">=</span> <span class="n">mesh_2d</span><span class="o">.</span><span class="n">get_group</span><span class="p">(</span><span class="n">mesh_dim</span><span class="o">=</span><span class="s2">&quot;shard&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Let’s create a file named <code class="docutils literal notranslate"><span class="pre">2d_setup_with_device_mesh.py</span></code>.
-Then, run the following <a class="reference external" href="https://pytorch.org/docs/stable/elastic/quickstart.html">torch elastic/torchrun</a> command.</p>
+<p>让我们创建一个名为 <code class="docutils literal notranslate"><span class="pre">2d_setup_with_device_mesh.py</span></code> 的文件。
+然后，运行以下 <a class="reference external" href="https://pytorch.org/docs/stable/elastic/quickstart.html">torch elastic/torchrun</a> 命令。</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">torchrun</span> <span class="o">--</span><span class="n">nproc_per_node</span><span class="o">=</span><span class="mi">8</span> <span class="mi">2</span><span class="n">d_setup_with_device_mesh</span><span class="o">.</span><span class="n">py</span>
 </pre></div>
 </div>
 </div>
-<div class="section" id="how-to-use-devicemesh-with-hsdp">
-<h2>How to use DeviceMesh with HSDP<a class="headerlink" href="#how-to-use-devicemesh-with-hsdp" title="Permalink to this heading">¶</a></h2>
-<p>Hybrid Sharding Data Parallel(HSDP) is 2D strategy to perform FSDP within a host and DDP across hosts.</p>
-<p>Let’s see an example of how DeviceMesh can assist with applying HSDP to your model with a simple setup. With DeviceMesh,
-users would not need to manually create and manage shard group and replicate group.</p>
+<div class="section" id="devicemesh-hsdp">
+<h2>如何将 DeviceMesh 与 HSDP 一起使用<a class="headerlink" href="#devicemesh-hsdp" title="Permalink to this heading">¶</a></h2>
+<p>混合分片数据并行（HSDP）是一种 2D 策略，在主机内执行 FSDP，在主机间执行 DDP。</p>
+<p>让我们看一个示例，说明 DeviceMesh 如何帮助将 HSDP 应用到您的模型，使用简单的设置。使用 DeviceMesh，
+用户无需手动创建和管理分片组和复制组。</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
 
@@ -715,20 +715,20 @@ users would not need to manually create and manage shard group and replicate gro
 <span class="p">)</span>
 </pre></div>
 </div>
-<p>Let’s create a file named <code class="docutils literal notranslate"><span class="pre">hsdp.py</span></code>.
-Then, run the following <a class="reference external" href="https://pytorch.org/docs/stable/elastic/quickstart.html">torch elastic/torchrun</a> command.</p>
+<p>让我们创建一个名为 <code class="docutils literal notranslate"><span class="pre">hsdp.py</span></code> 的文件。
+然后，运行以下 <a class="reference external" href="https://pytorch.org/docs/stable/elastic/quickstart.html">torch elastic/torchrun</a> 命令。</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">torchrun</span> <span class="o">--</span><span class="n">nproc_per_node</span><span class="o">=</span><span class="mi">8</span> <span class="n">hsdp</span><span class="o">.</span><span class="n">py</span>
 </pre></div>
 </div>
 </div>
-<div class="section" id="conclusion">
-<h2>Conclusion<a class="headerlink" href="#conclusion" title="Permalink to this heading">¶</a></h2>
-<p>In conclusion, we have learned about <code class="xref py py-class docutils literal notranslate"><span class="pre">DeviceMesh</span></code> and <code class="xref py py-func docutils literal notranslate"><span class="pre">init_device_mesh()</span></code>, as well as how
-they can be used to describe the layout of devices across the cluster.</p>
-<p>For more information, please see the following:</p>
+<div class="section" id="id3">
+<h2>结论<a class="headerlink" href="#id3" title="Permalink to this heading">¶</a></h2>
+<p>总之，我们已经了解了 <code class="xref py py-class docutils literal notranslate"><span class="pre">DeviceMesh</span></code> 和 <code class="xref py py-func docutils literal notranslate"><span class="pre">init_device_mesh()</span></code>，以及如何
+使用它们来描述集群中设备的布局。</p>
+<p>欲了解更多信息，请参阅以下内容：</p>
 <ul class="simple">
-<li><p><a class="reference external" href="https://github.com/pytorch/examples/blob/main/distributed/tensor_parallelism/fsdp_tp_example.py">2D parallel combining Tensor/Sequance Parallel with FSDP</a></p></li>
-<li><p><a class="reference external" href="chrome-extension://efaidnbmnnnibpcajpcglclefindmkaj/https://static.sched.com/hosted_files/pytorch2023/d1/%5BPTC%2023%5D%20Composable%20PyTorch%20Distributed%20with%20PT2.pdf">Composable PyTorch Distributed with PT2</a></p></li>
+<li><p><a class="reference external" href="https://github.com/pytorch/examples/blob/main/distributed/tensor_parallelism/fsdp_tp_example.py">将张量/序列并行与 FSDP 结合的 2D 并行</a></p></li>
+<li><p><a class="reference external" href="chrome-extension://efaidnbmnnnibpcajpcglclefindmkaj/https://static.sched.com/hosted_files/pytorch2023/d1/%5BPTC%2023%5D%20Composable%20PyTorch%20Distributed%20with%20PT2.pdf">使用 PT2 的可组合 PyTorch 分布式</a></p></li>
 </ul>
 </div>
 </div>
@@ -785,11 +785,11 @@ if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.i
           <div class="pytorch-right-menu" id="pytorch-right-menu">
             <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
               <ul>
-<li><a class="reference internal" href="#">Getting Started with DeviceMesh</a><ul>
-<li><a class="reference internal" href="#what-is-devicemesh">What is DeviceMesh</a></li>
-<li><a class="reference internal" href="#why-devicemesh-is-useful">Why DeviceMesh is Useful</a></li>
-<li><a class="reference internal" href="#how-to-use-devicemesh-with-hsdp">How to use DeviceMesh with HSDP</a></li>
-<li><a class="reference internal" href="#conclusion">Conclusion</a></li>
+<li><a class="reference internal" href="#">开始使用 DeviceMesh</a><ul>
+<li><a class="reference internal" href="#id1">什么是 DeviceMesh</a></li>
+<li><a class="reference internal" href="#id2">为什么 DeviceMesh 有用</a></li>
+<li><a class="reference internal" href="#devicemesh-hsdp">如何将 DeviceMesh 与 HSDP 一起使用</a></li>
+<li><a class="reference internal" href="#id3">结论</a></li>
 </ul>
 </li>
 </ul>

@@ -1,43 +1,37 @@
-Deploying a PyTorch Stable Diffusion model as a Vertex AI Endpoint
-==================================================================
+将 PyTorch Stable Diffusion 模型部署为 Vertex AI 端点
+==================================================
 
-Deploying large models, like Stable Diffusion, can be challenging and time-consuming.
+部署大型模型(如 Stable Diffusion)可能具有挑战性且耗时。
 
-In this recipe, we will show how you can streamline the deployment of a PyTorch Stable Diffusion
-model by leveraging Vertex AI.
+在本教程中,我们将展示如何通过利用 Vertex AI 来简化 PyTorch Stable Diffusion 模型的部署过程。
 
-PyTorch is the framework used by Stability AI on Stable
-Diffusion v1.5.  Vertex AI is a fully-managed machine learning platform with tools and
-infrastructure designed to help ML practitioners accelerate and scale ML in production with
-the benefit of open-source frameworks like PyTorch.
+PyTorch 是 Stability AI 在 Stable Diffusion v1.5 上使用的框架。Vertex AI 是一个全托管的机器学习平台,
+提供工具和基础设施,旨在帮助 ML 从业者加速和扩展生产中的 ML,同时受益于 PyTorch 等开源框架。
 
-In four steps you can deploy a PyTorch Stable Diffusion model (v1.5).
+您可以通过四个步骤部署 PyTorch Stable Diffusion 模型(v1.5)。
 
-Deploying your Stable Diffusion model on a Vertex AI Endpoint can be done in four steps:
+在 Vertex AI 端点上部署 Stable Diffusion 模型可以通过以下四个步骤完成:
 
-* Create a custom TorchServe handler.
+* 创建自定义 TorchServe 处理程序。
 
-* Upload model artifacts to Google Cloud Storage (GCS).
+* 将模型工件上传到 Google Cloud Storage (GCS)。
 
-* Create a Vertex AI model with the model artifacts and a prebuilt PyTorch container image.
+* 使用模型工件和预构建的 PyTorch 容器镜像创建 Vertex AI 模型。
 
-* Deploy the Vertex AI model onto an endpoint.
+* 将 Vertex AI 模型部署到端点。
 
-Let’s have a look at each step in more detail. You can follow and implement the steps using the
-`Notebook example <https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/community/vertex_endpoints/torchserve/dreambooth_stablediffusion.ipynb>`__.
+让我们详细看看每个步骤。您可以使用 `Notebook 示例 <https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/community/vertex_endpoints/torchserve/dreambooth_stablediffusion.ipynb>`__ 来跟随并实施这些步骤。
 
-NOTE: Please keep in mind that this recipe requires a billable Vertex AI as explained in more details in the notebook example.
+注意:请记住,此教程需要一个计费的 Vertex AI,如 notebook 示例中更详细地解释的那样。
 
-Create a custom TorchServe handler
-----------------------------------
+创建自定义 TorchServe 处理程序
+---------------------------
 
-TorchServe is an easy and flexible tool for serving PyTorch models. The model deployed to Vertex AI
-uses TorchServe to handle requests and return responses from the model.
-You must create a custom TorchServe handler to include in the model artifacts uploaded to Vertex AI. Include the handler file in the
-directory with the other model artifacts, like this: `model_artifacts/handler.py`.
+TorchServe 是一个简单灵活的 PyTorch 模型服务工具。部署到 Vertex AI 的模型使用 TorchServe 来处理请求并从模型返回响应。
+您必须创建一个自定义 TorchServe 处理程序,以包含在上传到 Vertex AI 的模型工件中。将处理程序文件包含在与其他模型工件相同的目录中,如下所示: `model_artifacts/handler.py`。
 
-After creating the handler file, you must package the handler as a model archiver (MAR) file.
-The output file must be named `model.mar`.
+创建处理程序文件后,您必须将处理程序打包为模型归档(MAR)文件。
+输出文件必须命名为 `model.mar`。
 
 
 .. code:: shell
@@ -49,13 +43,11 @@ The output file must be named `model.mar`.
      --handler model_artifacts/handler.py \
     --export-path model_artifacts
 
-Upload model artifacts to Google Cloud Storage (GCS)
-----------------------------------------------------
+将模型工件上传到 Google Cloud Storage (GCS)
+----------------------------------------
 
-In this step we are uploading
-`model artifacts <https://github.com/pytorch/serve/tree/master/model-archiver#artifact-details>`__
-to GCS, like the model file or handler. The advantage of storing your artifacts on GCS is that you can
-track the artifacts in a central bucket.
+在这一步中,我们将 `模型工件 <https://github.com/pytorch/serve/tree/master/model-archiver#artifact-details>`__ 上传到 GCS,
+例如模型文件或处理程序。将工件存储在 GCS 上的优势在于您可以在中央存储桶中跟踪工件。
 
 
 .. code:: shell
@@ -63,19 +55,16 @@ track the artifacts in a central bucket.
     BUCKET_NAME = "your-bucket-name-unique"  # @param {type:"string"}
     BUCKET_URI = f"gs://{BUCKET_NAME}/"
 
-    # Will copy the artifacts into the bucket
+    # 将工件复制到存储桶中
     !gsutil cp -r model_artifacts $BUCKET_URI
 
-Create a Vertex AI model with the model artifacts and a prebuilt PyTorch container image
-----------------------------------------------------------------------------------------
+使用模型工件和预构建的 PyTorch 容器镜像创建 Vertex AI 模型
+------------------------------------------------------
 
-Once you've uploaded the model artifacts into a GCS bucket, you can upload your PyTorch model to
-`Vertex AI Model Registry <https://cloud.google.com/vertex-ai/docs/model-registry/introduction>`__.
-From the Vertex AI Model Registry, you have an overview of your models
-so you can better organize, track, and train new versions. For this you can use the
+将模型工件上传到 GCS 存储桶后,您可以将 PyTorch 模型上传到 `Vertex AI 模型注册表 <https://cloud.google.com/vertex-ai/docs/model-registry/introduction>`__。
+从 Vertex AI 模型注册表中,您可以概览您的模型,以便更好地组织、跟踪和训练新版本。为此,您可以使用
 `Vertex AI SDK <https://cloud.google.com/vertex-ai/docs/python-sdk/use-vertex-ai-python-sdk>`__
-and this
-`pre-built PyTorch container <https://cloud.google.com/blog/products/ai-machine-learning/prebuilt-containers-with-pytorch-and-vertex-ai>`__.
+和这个 `预构建的 PyTorch 容器 <https://cloud.google.com/blog/products/ai-machine-learning/prebuilt-containers-with-pytorch-and-vertex-ai>`__。
 
 
 .. code:: shell
@@ -96,13 +85,12 @@ and this
         artifact_uri=BUCKET_URI,
     )
 
-Deploy the Vertex AI model onto an endpoint
--------------------------------------------
+将 Vertex AI 模型部署到端点
+-------------------------
 
-Once the model has been uploaded to Vertex AI Model Registry you can then take it and deploy
-it to an Vertex AI Endpoint. For this you can use the Console or the Vertex AI SDK. In this
-example you will deploy the model on a NVIDIA Tesla P100 GPU and n1-standard-8 machine. You can
-specify your machine type.
+将模型上传到 Vertex AI 模型注册表后,您可以将其部署到 Vertex AI 端点。为此,您可以使用控制台或 Vertex AI SDK。在此
+示例中,您将在 NVIDIA Tesla P100 GPU 和 n1-standard-8 机器上部署模型。您可以
+指定您的机器类型。
 
 
 .. code:: shell
@@ -120,9 +108,8 @@ specify your machine type.
         sync=True,
     )
 
-If you follow this
-`notebook <https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/community/vertex_endpoints/torchserve/dreambooth_stablediffusion.ipynb>`__
-you can also get online predictions using the Vertex AI SDK as shown in the following snippet.
+如果您按照这个 `notebook <https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/community/vertex_endpoints/torchserve/dreambooth_stablediffusion.ipynb>`__
+操作,您还可以使用 Vertex AI SDK 获取在线预测,如下面的代码片段所示。
 
 
 .. code:: shell
@@ -135,10 +122,10 @@ you can also get online predictions using the Vertex AI SDK as shown in the foll
 
     display.Image("img.jpg")
 
-Create a Vertex AI model with the model artifacts and a prebuilt PyTorch container image
+使用模型工件和预构建的 PyTorch 容器镜像创建 Vertex AI 模型
 
-More resources
---------------
+更多资源
+-------
 
-This tutorial was created using the vendor documentation. To refer to the original documentation on the vendor site, please see
-`torchserve example <https://cloud.google.com/blog/products/ai-machine-learning/get-your-genai-model-going-in-four-easy-steps>`__.
+本教程是使用供应商文档创建的。要参考供应商网站上的原始文档,请参阅
+`torchserve 示例 <https://cloud.google.com/blog/products/ai-machine-learning/get-your-genai-model-going-in-four-easy-steps>`__。

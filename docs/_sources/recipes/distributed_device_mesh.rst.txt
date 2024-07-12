@@ -1,42 +1,42 @@
-Getting Started with DeviceMesh
+开始使用 DeviceMesh
 =====================================================
 
-**Author**: `Iris Zhang <https://github.com/wz337>`__, `Wanchao Liang <https://github.com/wanchaol>`__
+**作者**: `Iris Zhang <https://github.com/wz337>`__, `Wanchao Liang <https://github.com/wanchaol>`__
 
 .. note::
-   |edit| View and edit this tutorial in `github <https://github.com/pytorch/tutorials/blob/main/recipes_source/distributed_device_mesh.rst>`__.
+   |edit| 在 `github <https://github.com/pytorch/tutorials/blob/main/recipes_source/distributed_device_mesh.rst>`__ 上查看和编辑本教程。
 
-Prerequisites:
+先决条件:
 
-- `Distributed Communication Package - torch.distributed <https://pytorch.org/docs/stable/distributed.html>`__
+- `分布式通信包 - torch.distributed <https://pytorch.org/docs/stable/distributed.html>`__
 - Python 3.8 - 3.11
 - PyTorch 2.2
 
 
-Setting up distributed communicators, i.e. NVIDIA Collective Communication Library (NCCL) communicators, for distributed training can pose a significant challenge. For workloads where users need to compose different parallelisms,
-users would need to manually set up and manage NCCL communicators (for example, :class:`ProcessGroup`) for each parallelism solution. This process could be complicated and susceptible to errors.
-:class:`DeviceMesh` can simplify this process, making it more manageable and less prone to errors.
+为分布式训练设置分布式通信器（例如 NVIDIA 集体通信库 (NCCL) 通信器）可能是一个重大挑战。
+对于需要组合不同并行性的工作负载，用户需要为每个并行性解决方案手动设置和管理 NCCL 通信器（例如，:class:`ProcessGroup`）。
+这个过程可能很复杂且容易出错。:class:`DeviceMesh` 可以简化这个过程，使其更易于管理和减少错误。
 
-What is DeviceMesh
+什么是 DeviceMesh
 ------------------
-:class:`DeviceMesh` is a higher level abstraction that manages :class:`ProcessGroup`. It allows users to effortlessly
-create inter-node and intra-node process groups without worrying about how to set up ranks correctly for different sub process groups.
-Users can also easily manage the underlying process_groups/devices for multi-dimensional parallelism via :class:`DeviceMesh`.
+:class:`DeviceMesh` 是一个管理 :class:`ProcessGroup` 的高级抽象。它允许用户轻松创建节点间和节点内进程组，
+而无需担心如何为不同的子进程组正确设置等级。
+用户还可以通过 :class:`DeviceMesh` 轻松管理多维并行性的底层进程组/设备。
 
 .. figure:: /_static/img/distributed/device_mesh.png
    :width: 100%
    :align: center
    :alt: PyTorch DeviceMesh
 
-Why DeviceMesh is Useful
+为什么 DeviceMesh 有用
 ------------------------
-DeviceMesh is useful when working with multi-dimensional parallelism (i.e. 3-D parallel) where parallelism composability is required. For example, when your parallelism solutions require both communication across hosts and within each host.
-The image above shows that we can create a 2D mesh that connects the devices within each host, and connects each device with its counterpart on the other hosts in a homogenous setup.
+当处理多维并行性（例如 3-D 并行）时，DeviceMesh 非常有用，因为这种情况需要并行性组合。
+例如，当您的并行性解决方案需要跨主机和每个主机内部进行通信时。上图显示，我们可以创建一个 2D 网格，
+连接每个主机内的设备，并在同构设置中将每个设备与其他主机上的对应设备连接起来。
 
-Without DeviceMesh, users would need to manually set up NCCL communicators, cuda devices on each process before applying any parallelism, which could be quite complicated.
-The following code snippet illustrates a hybrid sharding 2-D Parallel pattern setup without :class:`DeviceMesh`.
-First, we need to manually calculate the shard group and replicate group. Then, we need to assign the correct shard and
-replicate group to each rank.
+如果没有 DeviceMesh，用户在应用任何并行性之前需要手动设置每个进程上的 NCCL 通信器和 CUDA 设备，这可能相当复杂。
+以下代码片段说明了如何在没有 :class:`DeviceMesh` 的情况下设置混合分片 2-D 并行模式。
+首先，我们需要手动计算分片组和复制组。然后，我们需要为每个等级分配正确的分片和复制组。
 
 .. code-block:: python
 
@@ -45,17 +45,17 @@ replicate group to each rank.
     import torch
     import torch.distributed as dist
 
-    # Understand world topology
+    # 了解世界拓扑
     rank = int(os.environ["RANK"])
     world_size = int(os.environ["WORLD_SIZE"])
-    print(f"Running example on {rank=} in a world with {world_size=}")
+    print(f"在 {rank=} 上运行示例，世界大小为 {world_size=}")
 
-    # Create process groups to manage 2-D like parallel pattern
+    # 创建进程组以管理 2-D 类似的并行模式
     dist.init_process_group("nccl")
     torch.cuda.set_device(rank)
 
-    # Create shard groups (e.g. (0, 1, 2, 3), (4, 5, 6, 7))
-    # and assign the correct shard group to each rank
+    # 创建分片组（例如 (0, 1, 2, 3), (4, 5, 6, 7)）
+    # 并为每个等级分配正确的分片组
     num_node_devices = torch.cuda.device_count()
     shard_rank_lists = list(range(0, num_node_devices // 2)), list(range(num_node_devices // 2, num_node_devices))
     shard_groups = (
@@ -66,8 +66,8 @@ replicate group to each rank.
         shard_groups[0] if rank in shard_rank_lists[0] else shard_groups[1]
     )
 
-    # Create replicate groups (for example, (0, 4), (1, 5), (2, 6), (3, 7))
-    # and assign the correct replicate group to each rank
+    # 创建复制组（例如，(0, 4), (1, 5), (2, 6), (3, 7)）
+    # 并为每个等级分配正确的复制组
     current_replicate_group = None
     shard_factor = len(shard_rank_lists[0])
     for i in range(num_node_devices // 2):
@@ -76,18 +76,18 @@ replicate group to each rank.
         if rank in replicate_group_ranks:
             current_replicate_group = replicate_group
 
-To run the above code snippet, we can leverage PyTorch Elastic. Let's create a file named ``2d_setup.py``.
-Then, run the following `torch elastic/torchrun <https://pytorch.org/docs/stable/elastic/quickstart.html>`__ command.
+要运行上面的代码片段，我们可以利用 PyTorch Elastic。让我们创建一个名为 ``2d_setup.py`` 的文件。
+然后，运行以下 `torch elastic/torchrun <https://pytorch.org/docs/stable/elastic/quickstart.html>`__ 命令。
 
 .. code-block:: python
 
     torchrun --nproc_per_node=8 --rdzv_id=100 --rdzv_endpoint=localhost:29400 2d_setup.py
 
 .. note::
-    For simplicity of demonstration, we are simulating 2D parallel using only one node. Note that this code snippet can also be used when running on multi hosts setup.
+    为了简化演示，我们仅使用一个节点模拟 2D 并行。请注意，此代码片段也可用于多主机设置。
 
-With the help of :func:`init_device_mesh`, we can accomplish the above 2D setup in just two lines, and we can still
-access the underlying :class:`ProcessGroup` if needed.
+借助 :func:`init_device_mesh`，我们可以仅用两行代码完成上述 2D 设置，并且如果需要，
+我们仍然可以访问底层的 :class:`ProcessGroup`。
 
 
 .. code-block:: python
@@ -95,25 +95,25 @@ access the underlying :class:`ProcessGroup` if needed.
     from torch.distributed.device_mesh import init_device_mesh
     mesh_2d = init_device_mesh("cuda", (2, 4), mesh_dim_names=("replicate", "shard"))
 
-    # Users can access the underlying process group thru `get_group` API.
+    # 用户可以通过 `get_group` API 访问底层进程组。
     replicate_group = mesh_2d.get_group(mesh_dim="replicate")
     shard_group = mesh_2d.get_group(mesh_dim="shard")
 
-Let's create a file named ``2d_setup_with_device_mesh.py``.
-Then, run the following `torch elastic/torchrun <https://pytorch.org/docs/stable/elastic/quickstart.html>`__ command.
+让我们创建一个名为 ``2d_setup_with_device_mesh.py`` 的文件。
+然后，运行以下 `torch elastic/torchrun <https://pytorch.org/docs/stable/elastic/quickstart.html>`__ 命令。
 
 .. code-block:: python
 
     torchrun --nproc_per_node=8 2d_setup_with_device_mesh.py
 
 
-How to use DeviceMesh with HSDP
+如何将 DeviceMesh 与 HSDP 一起使用
 -------------------------------
 
-Hybrid Sharding Data Parallel(HSDP) is 2D strategy to perform FSDP within a host and DDP across hosts.
+混合分片数据并行（HSDP）是一种 2D 策略，在主机内执行 FSDP，在主机间执行 DDP。
 
-Let's see an example of how DeviceMesh can assist with applying HSDP to your model with a simple setup. With DeviceMesh,
-users would not need to manually create and manage shard group and replicate group.
+让我们看一个示例，说明 DeviceMesh 如何帮助将 HSDP 应用到您的模型，使用简单的设置。使用 DeviceMesh，
+用户无需手动创建和管理分片组和复制组。
 
 .. code-block:: python
 
@@ -141,19 +141,19 @@ users would not need to manually create and manage shard group and replicate gro
         ToyModel(), device_mesh=mesh_2d, sharding_strategy=ShardingStrategy.HYBRID_SHARD
     )
 
-Let's create a file named ``hsdp.py``.
-Then, run the following `torch elastic/torchrun <https://pytorch.org/docs/stable/elastic/quickstart.html>`__ command.
+让我们创建一个名为 ``hsdp.py`` 的文件。
+然后，运行以下 `torch elastic/torchrun <https://pytorch.org/docs/stable/elastic/quickstart.html>`__ 命令。
 
 .. code-block:: python
 
     torchrun --nproc_per_node=8 hsdp.py
 
-Conclusion
+结论
 ----------
-In conclusion, we have learned about :class:`DeviceMesh` and :func:`init_device_mesh`, as well as how
-they can be used to describe the layout of devices across the cluster.
+总之，我们已经了解了 :class:`DeviceMesh` 和 :func:`init_device_mesh`，以及如何
+使用它们来描述集群中设备的布局。
 
-For more information, please see the following:
+欲了解更多信息，请参阅以下内容：
 
-- `2D parallel combining Tensor/Sequance Parallel with FSDP <https://github.com/pytorch/examples/blob/main/distributed/tensor_parallelism/fsdp_tp_example.py>`__
-- `Composable PyTorch Distributed with PT2 <chrome-extension://efaidnbmnnnibpcajpcglclefindmkaj/https://static.sched.com/hosted_files/pytorch2023/d1/%5BPTC%2023%5D%20Composable%20PyTorch%20Distributed%20with%20PT2.pdf>`__
+- `将张量/序列并行与 FSDP 结合的 2D 并行 <https://github.com/pytorch/examples/blob/main/distributed/tensor_parallelism/fsdp_tp_example.py>`__
+- `使用 PT2 的可组合 PyTorch 分布式 <chrome-extension://efaidnbmnnnibpcajpcglclefindmkaj/https://static.sched.com/hosted_files/pytorch2023/d1/%5BPTC%2023%5D%20Composable%20PyTorch%20Distributed%20with%20PT2.pdf>`__

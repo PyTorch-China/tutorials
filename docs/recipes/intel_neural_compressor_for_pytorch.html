@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Ease-of-use quantization for PyTorch with Intel® Neural Compressor &mdash; PyTorch Tutorials 2.3.0 documentation</title>
+  <title>使用Intel® Neural Compressor实现PyTorch的简易量化 &mdash; PyTorch Tutorials 2.3.0 documentation</title>
   
 
   
@@ -531,7 +531,7 @@
       </li>
 
         
-      <li>Ease-of-use quantization for PyTorch with Intel® Neural Compressor</li>
+      <li>使用Intel® Neural Compressor实现PyTorch的简易量化</li>
     
     
       <li class="pytorch-breadcrumbs-aside">
@@ -590,83 +590,68 @@
             <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
-  <div class="section" id="ease-of-use-quantization-for-pytorch-with-intel-neural-compressor">
-<h1>Ease-of-use quantization for PyTorch with Intel® Neural Compressor<a class="headerlink" href="#ease-of-use-quantization-for-pytorch-with-intel-neural-compressor" title="Permalink to this heading">¶</a></h1>
-<div class="section" id="overview">
-<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this heading">¶</a></h2>
-<p>Most deep learning applications are using 32-bits of floating-point precision
-for inference. But low precision data types, especially int8, are getting more
-focus due to significant performance boost. One of the essential concerns on
-adopting low precision is how to easily mitigate the possible accuracy loss
-and reach predefined accuracy requirement.</p>
-<p>Intel® Neural Compressor aims to address the aforementioned concern by extending
-PyTorch with accuracy-driven automatic tuning strategies to help user quickly find
-out the best quantized model on Intel hardware, including Intel Deep Learning
-Boost (<a class="reference external" href="https://www.intel.com/content/www/us/en/artificial-intelligence/deep-learning-boost.html">Intel DL Boost</a>)
-and Intel Advanced Matrix Extensions (<a class="reference external" href="https://www.intel.com/content/www/us/en/develop/documentation/cpp-compiler-developer-guide-and-reference/top/compiler-reference/intrinsics/intrinsics-for-amx-instructions/intrinsics-for-amx-tile-instructions.html">Intel AMX</a>).</p>
-<p>Intel® Neural Compressor has been released as an open-source project
-at <a class="reference external" href="https://github.com/intel/neural-compressor">Github</a>.</p>
+  <div class="section" id="intel-neural-compressorpytorch">
+<h1>使用Intel® Neural Compressor实现PyTorch的简易量化<a class="headerlink" href="#intel-neural-compressorpytorch" title="Permalink to this heading">¶</a></h1>
+<div class="section" id="id1">
+<h2>概述<a class="headerlink" href="#id1" title="Permalink to this heading">¶</a></h2>
+<p>大多数深度学习应用程序在推理时使用32位浮点精度。但是由于显著的性能提升，低精度数据类型（尤其是int8）正受到越来越多的关注。采用低精度时的一个主要问题是如何轻松地减轻可能的精度损失并达到预定的精度要求。</p>
+<p>Intel® Neural Compressor 旨在通过扩展 PyTorch 的精度驱动自动调优策略来解决上述问题，帮助用户在Intel硬件上快速找到最佳量化模型，
+包括Intel Deep Learning Boost（ <a class="reference external" href="https://www.intel.com/content/www/us/en/artificial-intelligence/deep-learning-boost.html">Intel DL Boost</a>）
+和Intel Advanced Matrix Extensions（ <a class="reference external" href="https://www.intel.com/content/www/us/en/develop/documentation/cpp-compiler-developer-guide-and-reference/top/compiler-reference/intrinsics/intrinsics-for-amx-instructions/intrinsics-for-amx-tile-instructions.html">Intel AMX</a>）。</p>
+<p>Intel® Neural Compressor已作为开源项目发布在 <a href="#id2"><span class="problematic" id="id3">`</span></a>Github &lt;<a class="reference external" href="https://github.com/intel/neural-compressor">https://github.com/intel/neural-compressor</a>&gt;`_上。</p>
 </div>
-<div class="section" id="features">
-<h2>Features<a class="headerlink" href="#features" title="Permalink to this heading">¶</a></h2>
+<div class="section" id="id4">
+<h2>特性<a class="headerlink" href="#id4" title="Permalink to this heading">¶</a></h2>
 <ul class="simple">
-<li><p><strong>Ease-of-use Python API:</strong> Intel® Neural Compressor provides simple frontend
-Python APIs and utilities for users to do neural network compression with few
-line code changes.
-Typically, only 5 to 6 clauses are required to be added to the original code.</p></li>
-<li><p><strong>Quantization:</strong> Intel® Neural Compressor supports accuracy-driven automatic
-tuning process on post-training static quantization, post-training dynamic
-quantization, and quantization-aware training on PyTorch fx graph mode and
-eager model.</p></li>
+<li><p><strong>易用的Python API：</strong> Intel® Neural Compressor 提供简单的前端Python API和实用工具，用户只需更改几行代码即可进行神经网络压缩。</p></li>
 </ul>
-<p><em>This tutorial mainly focuses on the quantization part. As for how to use Intel®
-Neural Compressor to do pruning and distillation, please refer to corresponding
-documents in the Intel® Neural Compressor github repo.</em></p>
+<p>通常只需要在原始代码中添加5到6个子句。</p>
+<ul class="simple">
+<li><p><strong>量化：</strong> Intel® Neural Compressor 支持在 PyTorch fx 图模式和 eager 模式下进行精度驱动的自动调优过程，</p></li>
+</ul>
+<p>包括训练后静态量化、训练后动态量化和量化感知训练。</p>
+<p><em>本教程主要关注量化部分。关于如何使用 Intel® Neural Compressor 进行剪枝和蒸馏，请参考 Intel® Neural Compressor github仓库中的相应文档。</em></p>
 </div>
-<div class="section" id="getting-started">
-<h2>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this heading">¶</a></h2>
-<div class="section" id="installation">
-<h3>Installation<a class="headerlink" href="#installation" title="Permalink to this heading">¶</a></h3>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># install stable version from pip</span>
+<div class="section" id="id5">
+<h2>入门<a class="headerlink" href="#id5" title="Permalink to this heading">¶</a></h2>
+<div class="section" id="id6">
+<h3>安装<a class="headerlink" href="#id6" title="Permalink to this heading">¶</a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># 从pip安装稳定版本</span>
 pip<span class="w"> </span>install<span class="w"> </span>neural-compressor
 
-<span class="c1"># install nightly version from pip</span>
+<span class="c1"># 从pip安装每日构建版本</span>
 pip<span class="w"> </span>install<span class="w"> </span>-i<span class="w"> </span>https://test.pypi.org/simple/<span class="w"> </span>neural-compressor
 
-<span class="c1"># install stable version from from conda</span>
+<span class="c1"># 从conda安装稳定版本</span>
 conda<span class="w"> </span>install<span class="w"> </span>neural-compressor<span class="w"> </span>-c<span class="w"> </span>conda-forge<span class="w"> </span>-c<span class="w"> </span>intel
 </pre></div>
 </div>
-<p><em>Supported python versions are 3.6 or 3.7 or 3.8 or 3.9</em></p>
+<p><em>支持的Python版本为3.6、3.7、3.8或3.9</em></p>
 </div>
-<div class="section" id="usages">
-<h3>Usages<a class="headerlink" href="#usages" title="Permalink to this heading">¶</a></h3>
-<p>Minor code changes are required for users to get started with Intel® Neural Compressor
-quantization API. Both PyTorch fx graph mode and eager mode are supported.</p>
-<p>Intel® Neural Compressor takes a FP32 model and a yaml configuration file as inputs.
-To construct the quantization process, users can either specify the below settings via
-the yaml configuration file or python APIs:</p>
+<div class="section" id="id7">
+<h3>用法<a class="headerlink" href="#id7" title="Permalink to this heading">¶</a></h3>
+<p>用户只需进行少量代码更改即可开始使用 Intel® Neural Compressor 量化API。支持 PyTorch fx 图模式和 eager 模式。</p>
+<p>Intel® Neural Compressor 接受一个 FP32 模型和一个 yaml 配置文件作为输入。要构建量化过程，用户可以通过 yaml 配置文件
+或 Python API 指定以下设置：</p>
 <ol class="arabic simple">
-<li><p>Calibration Dataloader (Needed for static quantization)</p></li>
-<li><p>Evaluation Dataloader</p></li>
-<li><p>Evaluation Metric</p></li>
+<li><p>校准数据加载器（静态量化需要）</p></li>
+<li><p>评估数据加载器</p></li>
+<li><p>评估指标</p></li>
 </ol>
-<p>Intel® Neural Compressor supports some popular dataloaders and evaluation metrics. For
-how to configure them in yaml configuration file, user could refer to <a class="reference external" href="https://github.com/intel/neural-compressor/blob/master/docs/dataset.md">Built-in Datasets</a>.</p>
-<p>If users want to use a self-developed dataloader or evaluation metric, Intel® Neural
-Compressor supports this by the registration of customized dataloader/metric using python code.</p>
-<p>For the yaml configuration file format please refer to <a class="reference external" href="https://github.com/intel/neural-compressor/blob/master/neural_compressor/template/ptq.yaml">yaml template</a>.</p>
-<p>The code changes that are required for <em>Intel® Neural Compressor</em> are highlighted with
-comments in the line above.</p>
-<div class="section" id="model">
-<h4>Model<a class="headerlink" href="#model" title="Permalink to this heading">¶</a></h4>
-<p>In this tutorial, the LeNet model is used to demonstrate how to deal with <em>Intel® Neural Compressor</em>.</p>
+<p>Intel® Neural Compressor 支持一些常用的数据加载器和评估指标。关于如何在 yaml 配置文件中配置它们，用户可以参考
+<a class="reference external" href="https://github.com/intel/neural-compressor/blob/master/docs/dataset.md">内置数据集</a>。</p>
+<p>如果用户想使用自定义的数据加载器或评估指标，Intel® Neural Compressor 支持通过 Python 代码注册自定义数据加载器/指标。</p>
+<p>关于yaml配置文件格式，请参考 <a class="reference external" href="https://github.com/intel/neural-compressor/blob/master/neural_compressor/template/ptq.yaml">yaml模板</a> 。</p>
+<p><em>Intel® Neural Compressor</em> 所需的代码更改在上面的注释中突出显示。</p>
+<div class="section" id="id9">
+<h4>模型<a class="headerlink" href="#id9" title="Permalink to this heading">¶</a></h4>
+<p>在本教程中，我们使用LeNet模型来演示如何使用 <em>Intel® Neural Compressor</em> 。</p>
 <div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># main.py</span>
 <span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
 <span class="kn">import</span> <span class="nn">torch.nn.functional</span> <span class="k">as</span> <span class="nn">F</span>
 
-<span class="c1"># LeNet Model definition</span>
+<span class="c1"># LeNet模型定义</span>
 <span class="k">class</span> <span class="nc">Net</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">Net</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
@@ -690,15 +675,13 @@ comments in the line above.</p>
 <span class="n">model</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;./lenet_mnist_model.pth&#39;</span><span class="p">))</span>
 </pre></div>
 </div>
-<p>The pretrained model weight <cite>lenet_mnist_model.pth</cite> comes from
-<a class="reference external" href="https://drive.google.com/drive/folders/1fn83DF14tWmit0RTKWRhPq5uVXt73e0h?usp=sharing">here</a>.</p>
+<p>预训练模型权重 <cite>lenet_mnist_model.pth</cite> 来自
+<a class="reference external" href="https://drive.google.com/drive/folders/1fn83DF14tWmit0RTKWRhPq5uVXt73e0h?usp=sharing">这里</a> 。</p>
 </div>
-<div class="section" id="accuracy-driven-quantization">
-<h4>Accuracy driven quantization<a class="headerlink" href="#accuracy-driven-quantization" title="Permalink to this heading">¶</a></h4>
-<p>Intel® Neural Compressor supports accuracy-driven automatic tuning to generate the optimal
-int8 model which meets a predefined accuracy goal.</p>
-<p>Below is an example of how to quantize a simple network on PyTorch
-<a class="reference external" href="https://pytorch.org/docs/stable/fx.html">FX graph mode</a> by auto-tuning.</p>
+<div class="section" id="id11">
+<h4>精度驱动量化<a class="headerlink" href="#id11" title="Permalink to this heading">¶</a></h4>
+<p>Intel® Neural Compressor 支持精度驱动的自动调优，以生成满足预定精度目标的最佳 int8 模型。</p>
+<p>以下是通过自动调优在PyTorch <a class="reference external" href="https://pytorch.org/docs/stable/fx.html">FX图模式</a> 上量化简单网络的示例。</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># conf.yaml</span>
 <span class="nt">model</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">LeNet</span>
@@ -725,7 +708,7 @@ int8 model which meets a predefined accuracy goal.</p>
                    <span class="p">])),</span>
     <span class="n">batch_size</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
-<span class="c1"># launch code for Intel® Neural Compressor</span>
+<span class="c1"># Intel® Neural Compressor启动代码</span>
 <span class="kn">from</span> <span class="nn">neural_compressor.experimental</span> <span class="kn">import</span> <span class="n">Quantization</span>
 <span class="n">quantizer</span> <span class="o">=</span> <span class="n">Quantization</span><span class="p">(</span><span class="s2">&quot;./conf.yaml&quot;</span><span class="p">)</span>
 <span class="n">quantizer</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">model</span>
@@ -735,12 +718,10 @@ int8 model which meets a predefined accuracy goal.</p>
 <span class="n">q_model</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s1">&#39;./output&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>In the <cite>conf.yaml</cite> file, the built-in metric <cite>top1</cite> of Intel® Neural Compressor is specified as
-the evaluation method, and <cite>1%</cite> relative accuracy loss is set as the accuracy target for auto-tuning.
-Intel® Neural Compressor will traverse all possible quantization config combinations on per-op level
-to find out the optimal int8 model that reaches the predefined accuracy target.</p>
-<p>Besides those built-in metrics, Intel® Neural Compressor also supports customized metric through
-python code:</p>
+<p>在 <cite>conf.yaml</cite> 文件中，指定了 Intel® Neural Compressor 的内置指标 <cite>top1</cite> 作为评估方法，
+并将 <cite>1%</cite> 的相对精度损失设置为自动调优的精度目标。Intel® Neural Compressor 将遍历每个操作级别上所有可能的量化配置组合，
+以找出达到预定精度目标的最佳 int8 模型。</p>
+<p>除了这些内置指标外，Intel® Neural Compressor 还支持通过 Python 代码自定义指标：</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># conf.yaml</span>
 <span class="nt">model</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">LeNet</span>
@@ -762,7 +743,7 @@ python code:</p>
                    <span class="p">])),</span>
     <span class="n">batch_size</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
-<span class="c1"># define a customized metric</span>
+<span class="c1"># 定义自定义指标</span>
 <span class="k">class</span> <span class="nc">Top1Metric</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">correct</span> <span class="o">=</span> <span class="mi">0</span>
@@ -774,7 +755,7 @@ python code:</p>
     <span class="k">def</span> <span class="nf">result</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="mf">100.</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">correct</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">test_loader</span><span class="o">.</span><span class="n">dataset</span><span class="p">)</span>
 
-<span class="c1"># launch code for Intel® Neural Compressor</span>
+<span class="c1"># Intel® Neural Compressor启动代码</span>
 <span class="kn">from</span> <span class="nn">neural_compressor.experimental</span> <span class="kn">import</span> <span class="n">Quantization</span>
 <span class="n">quantizer</span> <span class="o">=</span> <span class="n">Quantization</span><span class="p">(</span><span class="s2">&quot;./conf.yaml&quot;</span><span class="p">)</span>
 <span class="n">quantizer</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">model</span>
@@ -785,15 +766,12 @@ python code:</p>
 <span class="n">q_model</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s1">&#39;./output&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>In the above example, a <cite>class</cite> which contains <cite>update()</cite> and <cite>result()</cite> function is implemented
-to record per mini-batch result and calculate final accuracy at the end.</p>
+<p>在上面的示例中，实现了一个包含 <cite>update()</cite> 和 <cite>result()</cite> 函数的 <cite>class</cite> ，用于记录每个小批量的结果并在最后计算最终精度。</p>
 </div>
-<div class="section" id="quantization-aware-training">
-<h4>Quantization aware training<a class="headerlink" href="#quantization-aware-training" title="Permalink to this heading">¶</a></h4>
-<p>Besides post-training static quantization and post-training dynamic quantization, Intel® Neural
-Compressor supports quantization-aware training with an accuracy-driven automatic tuning mechanism.</p>
-<p>Below is an example of how to do quantization aware training on a simple network on PyTorch
-<a class="reference external" href="https://pytorch.org/docs/stable/fx.html">FX graph mode</a>.</p>
+<div class="section" id="id12">
+<h4>量化感知训练<a class="headerlink" href="#id12" title="Permalink to this heading">¶</a></h4>
+<p>除了训练后静态量化和训练后动态量化外，Intel® Neural Compressor 还支持具有精度驱动自动调优机制的量化感知训练。</p>
+<p>以下是在PyTorch <a class="reference external" href="https://pytorch.org/docs/stable/fx.html">FX图模式</a> 上对简单网络进行量化感知训练的示例。</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># conf.yaml</span>
 <span class="nt">model</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">LeNet</span>
@@ -843,11 +821,11 @@ Compressor supports quantization-aware training with an accuracy-driven automati
             <span class="n">loss</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">nll_loss</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
             <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
             <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Train Epoch: </span><span class="si">{}</span><span class="s1"> [</span><span class="si">{}</span><span class="s1">/</span><span class="si">{}</span><span class="s1"> (</span><span class="si">{:.0f}</span><span class="s1">%)]</span><span class="se">\t</span><span class="s1">Loss: </span><span class="si">{:.6f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;训练轮次: </span><span class="si">{}</span><span class="s1"> [</span><span class="si">{}</span><span class="s1">/</span><span class="si">{}</span><span class="s1"> (</span><span class="si">{:.0f}</span><span class="s1">%)]</span><span class="se">\t</span><span class="s1">损失: </span><span class="si">{:.6f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                   <span class="n">epoch</span><span class="p">,</span> <span class="n">batch_idx</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">train_loader</span><span class="o">.</span><span class="n">dataset</span><span class="p">),</span>
                   <span class="mf">100.</span> <span class="o">*</span> <span class="n">batch_idx</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">train_loader</span><span class="p">),</span> <span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">()))</span>
 
-<span class="c1"># launch code for Intel® Neural Compressor</span>
+<span class="c1"># Intel® Neural Compressor 启动代码</span>
 <span class="kn">from</span> <span class="nn">neural_compressor.experimental</span> <span class="kn">import</span> <span class="n">Quantization</span>
 <span class="n">quantizer</span> <span class="o">=</span> <span class="n">Quantization</span><span class="p">(</span><span class="s2">&quot;./conf.yaml&quot;</span><span class="p">)</span>
 <span class="n">quantizer</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">model</span>
@@ -858,12 +836,10 @@ Compressor supports quantization-aware training with an accuracy-driven automati
 </pre></div>
 </div>
 </div>
-<div class="section" id="performance-only-quantization">
-<h4>Performance only quantization<a class="headerlink" href="#performance-only-quantization" title="Permalink to this heading">¶</a></h4>
-<p>Intel® Neural Compressor supports directly yielding int8 model with dummy dataset for the
-performance benchmarking purpose.</p>
-<p>Below is an example of how to quantize a simple network on PyTorch
-<a class="reference external" href="https://pytorch.org/docs/stable/fx.html">FX graph mode</a> with a dummy dataset.</p>
+<div class="section" id="id14">
+<h4>仅性能量化<a class="headerlink" href="#id14" title="Permalink to this heading">¶</a></h4>
+<p>Intel® Neural Compressor 支持使用虚拟数据集直接生成 int8 模型，用于性能基准测试目的。</p>
+<p>以下是使用虚拟数据集在PyTorch <a class="reference external" href="https://pytorch.org/docs/stable/fx.html">FX图模式</a> 上量化简单网络的示例。</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># conf.yaml</span>
 <span class="nt">model</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">lenet</span>
@@ -873,7 +849,7 @@ performance benchmarking purpose.</p>
 <div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># main.py</span>
 <span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
 
-<span class="c1"># launch code for Intel® Neural Compressor</span>
+<span class="c1"># Intel® Neural Compressor启动代码</span>
 <span class="kn">from</span> <span class="nn">neural_compressor.experimental</span> <span class="kn">import</span> <span class="n">Quantization</span><span class="p">,</span> <span class="n">common</span>
 <span class="kn">from</span> <span class="nn">neural_compressor.experimental.data.datasets.dummy_dataset</span> <span class="kn">import</span> <span class="n">DummyDataset</span>
 <span class="n">quantizer</span> <span class="o">=</span> <span class="n">Quantization</span><span class="p">(</span><span class="s2">&quot;./conf.yaml&quot;</span><span class="p">)</span>
@@ -885,10 +861,9 @@ performance benchmarking purpose.</p>
 </div>
 </div>
 </div>
-<div class="section" id="quantization-outputs">
-<h3>Quantization outputs<a class="headerlink" href="#quantization-outputs" title="Permalink to this heading">¶</a></h3>
-<p>Users could know how many ops get quantized from log printed by Intel® Neural Compressor
-like below:</p>
+<div class="section" id="id16">
+<h3>量化输出<a class="headerlink" href="#id16" title="Permalink to this heading">¶</a></h3>
+<p>用户可以从 Intel® Neural Compressor 打印的日志中了解有多少操作被量化，如下所示：</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">2021</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">08</span> <span class="mi">14</span><span class="p">:</span><span class="mi">58</span><span class="p">:</span><span class="mi">35</span> <span class="p">[</span><span class="n">INFO</span><span class="p">]</span> <span class="o">|********</span><span class="n">Mixed</span> <span class="n">Precision</span> <span class="n">Statistics</span><span class="o">*******|</span>
 <span class="mi">2021</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">08</span> <span class="mi">14</span><span class="p">:</span><span class="mi">58</span><span class="p">:</span><span class="mi">35</span> <span class="p">[</span><span class="n">INFO</span><span class="p">]</span> <span class="o">+------------------------+--------+-------+</span>
 <span class="mi">2021</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">08</span> <span class="mi">14</span><span class="p">:</span><span class="mi">58</span><span class="p">:</span><span class="mi">35</span> <span class="p">[</span><span class="n">INFO</span><span class="p">]</span> <span class="o">|</span>        <span class="n">Op</span> <span class="n">Type</span>         <span class="o">|</span> <span class="n">Total</span>  <span class="o">|</span>  <span class="n">INT8</span> <span class="o">|</span>
@@ -903,25 +878,26 @@ like below:</p>
 <span class="mi">2021</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">08</span> <span class="mi">14</span><span class="p">:</span><span class="mi">58</span><span class="p">:</span><span class="mi">35</span> <span class="p">[</span><span class="n">INFO</span><span class="p">]</span> <span class="o">+------------------------+--------+-------+</span>
 </pre></div>
 </div>
-<p>The quantized model will be generated under <cite>./output</cite> directory, in which there are two files:
-1. best_configure.yaml
-2. best_model_weights.pt</p>
-<p>The first file contains the quantization configurations of each op, the second file contains
-int8 weights and zero point and scale info of activations.</p>
+<p>量化模型将在 <cite>./output</cite> 目录下生成，其中包含两个文件：</p>
+<ol class="arabic simple">
+<li><p>best_configure.yaml</p></li>
+<li><p>best_model_weights.pt</p></li>
+</ol>
+<p>第一个文件包含每个操作的量化配置，第二个文件包含 int8 权重以及激活的零点和比例信息。</p>
 </div>
-<div class="section" id="deployment">
-<h3>Deployment<a class="headerlink" href="#deployment" title="Permalink to this heading">¶</a></h3>
-<p>Users could use the below code to load quantized model and then do inference or performance benchmark.</p>
+<div class="section" id="id17">
+<h3>部署<a class="headerlink" href="#id17" title="Permalink to this heading">¶</a></h3>
+<p>用户可以使用以下代码加载量化模型，然后进行推理或性能基准测试。</p>
 <div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">neural_compressor.utils.pytorch</span> <span class="kn">import</span> <span class="n">load</span>
 <span class="n">int8_model</span> <span class="o">=</span> <span class="n">load</span><span class="p">(</span><span class="s1">&#39;./output&#39;</span><span class="p">,</span> <span class="n">model</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 </div>
-<div class="section" id="tutorials">
-<h2>Tutorials<a class="headerlink" href="#tutorials" title="Permalink to this heading">¶</a></h2>
-<p>Please visit <a class="reference external" href="https://github.com/intel/neural-compressor">Intel® Neural Compressor Github repo</a>
-for more tutorials.</p>
+<div class="section" id="id18">
+<h2>教程<a class="headerlink" href="#id18" title="Permalink to this heading">¶</a></h2>
+<p>请访问 <a class="reference external" href="https://github.com/intel/neural-compressor">Intel® Neural Compressor Github 仓库</a>
+获取更多教程。</p>
 </div>
 </div>
 
@@ -977,23 +953,23 @@ if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.i
           <div class="pytorch-right-menu" id="pytorch-right-menu">
             <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
               <ul>
-<li><a class="reference internal" href="#">Ease-of-use quantization for PyTorch with Intel® Neural Compressor</a><ul>
-<li><a class="reference internal" href="#overview">Overview</a></li>
-<li><a class="reference internal" href="#features">Features</a></li>
-<li><a class="reference internal" href="#getting-started">Getting Started</a><ul>
-<li><a class="reference internal" href="#installation">Installation</a></li>
-<li><a class="reference internal" href="#usages">Usages</a><ul>
-<li><a class="reference internal" href="#model">Model</a></li>
-<li><a class="reference internal" href="#accuracy-driven-quantization">Accuracy driven quantization</a></li>
-<li><a class="reference internal" href="#quantization-aware-training">Quantization aware training</a></li>
-<li><a class="reference internal" href="#performance-only-quantization">Performance only quantization</a></li>
+<li><a class="reference internal" href="#">使用Intel® Neural Compressor实现PyTorch的简易量化</a><ul>
+<li><a class="reference internal" href="#id1">概述</a></li>
+<li><a class="reference internal" href="#id4">特性</a></li>
+<li><a class="reference internal" href="#id5">入门</a><ul>
+<li><a class="reference internal" href="#id6">安装</a></li>
+<li><a class="reference internal" href="#id7">用法</a><ul>
+<li><a class="reference internal" href="#id9">模型</a></li>
+<li><a class="reference internal" href="#id11">精度驱动量化</a></li>
+<li><a class="reference internal" href="#id12">量化感知训练</a></li>
+<li><a class="reference internal" href="#id14">仅性能量化</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#quantization-outputs">Quantization outputs</a></li>
-<li><a class="reference internal" href="#deployment">Deployment</a></li>
+<li><a class="reference internal" href="#id16">量化输出</a></li>
+<li><a class="reference internal" href="#id17">部署</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#tutorials">Tutorials</a></li>
+<li><a class="reference internal" href="#id18">教程</a></li>
 </ul>
 </li>
 </ul>
