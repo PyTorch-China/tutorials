@@ -1,57 +1,48 @@
-Shard Optimizer States with ZeroRedundancyOptimizer
-===================================================
+使用ZeroRedundancyOptimizer分片优化器状态
+=========================================
 
-In this recipe, you will learn:
+在本教程中，您将学习：
 
-- The high-level idea of `ZeroRedundancyOptimizer <https://pytorch.org/docs/master/distributed.optim.html>`__.
-- How to use `ZeroRedundancyOptimizer <https://pytorch.org/docs/master/distributed.optim.html>`__
-  in distributed training and its impact.
+- `ZeroRedundancyOptimizer <https://pytorch.org/docs/master/distributed.optim.html>`__ 的高级概念。
+- 如何在分布式训练中使用 `ZeroRedundancyOptimizer <https://pytorch.org/docs/master/distributed.optim.html>`__
+  及其影响。
 
 
-Requirements
-------------
+要求
+----
 
 - PyTorch 1.8+
-- `Getting Started With Distributed Data Parallel <https://pytorch.org/tutorials/intermediate/ddp_tutorial.html>`_
+- `分布式数据并行入门 <https://pytorch.org/tutorials/intermediate/ddp_tutorial.html>`_
 
 
-What is ``ZeroRedundancyOptimizer``?
+什么是 ``ZeroRedundancyOptimizer``？
 ------------------------------------
 
-The idea of `ZeroRedundancyOptimizer <https://pytorch.org/docs/master/distributed.optim.html>`__
-comes from `DeepSpeed/ZeRO project <https://github.com/microsoft/DeepSpeed>`_ and
-`Marian <https://github.com/marian-nmt/marian-dev>`_ that shard
-optimizer states across distributed data-parallel processes to
-reduce per-process memory footprint. In the
-`Getting Started With Distributed Data Parallel <https://pytorch.org/tutorials/intermediate/ddp_tutorial.html>`_
-tutorial, we have shown how to use
-`DistributedDataParallel <https://pytorch.org/docs/stable/generated/torch.nn.parallel.DistributedDataParallel.html>`_
-(DDP) to train models. In that tutorial, each process keeps a dedicated replica
-of the optimizer. Since DDP has already synchronized gradients in the
-backward pass, all optimizer replicas will operate on the same parameter and
-gradient values in every iteration, and this is how DDP keeps model replicas in
-the same state. Oftentimes, optimizers also maintain local states. For example,
-the ``Adam`` optimizer uses per-parameter ``exp_avg`` and ``exp_avg_sq`` states. As a
-result, the ``Adam`` optimizer's memory consumption is at least twice the model
-size. Given this observation, we can reduce the optimizer memory footprint by
-sharding optimizer states across DDP processes. More specifically, instead of
-creating per-param states for all parameters, each optimizer instance in
-different DDP processes only keeps optimizer states for a shard of all model
-parameters. The optimizer ``step()`` function only updates the parameters in its
-shard and then broadcasts its updated parameters to all other peer DDP
-processes, so that all model replicas still land in the same state.
-
-How to use ``ZeroRedundancyOptimizer``?
----------------------------------------
-
-The code below demonstrates how to use
-`ZeroRedundancyOptimizer <https://pytorch.org/docs/master/distributed.optim.html>`__.
-The majority of the code is similar to the simple DDP example presented in
-`Distributed Data Parallel notes <https://pytorch.org/docs/stable/notes/ddp.html>`_.
-The main difference is the ``if-else`` clause in the ``example`` function which
-wraps optimizer constructions, toggling between
 `ZeroRedundancyOptimizer <https://pytorch.org/docs/master/distributed.optim.html>`__
-and ``Adam`` optimizer.
+的想法来自 `DeepSpeed/ZeRO 项目 <https://github.com/microsoft/DeepSpeed>`_ 和
+`Marian <https://github.com/marian-nmt/marian-dev>`_，它们在分布式数据并行进程中
+分片优化器状态，以减少每个进程的内存占用。
+
+在 `分布式数据并行入门 <https://pytorch.org/tutorials/intermediate/ddp_tutorial.html>`_
+教程中，我们展示了如何使用
+`DistributedDataParallel <https://pytorch.org/docs/stable/generated/torch.nn.parallel.DistributedDataParallel.html>`_
+(DDP) 来训练模型。在该教程中，每个进程都保留一个专用的优化器副本。由于DDP已经在反向传播中同步了梯度，
+所有优化器副本在每次迭代中都将对相同的参数和梯度值进行操作，这就是DDP保持模型副本处于相同状态的方式。
+通常，优化器还会维护本地状态。例如， ``Adam`` 优化器使用每个参数的 ``exp_avg`` 和 ``exp_avg_sq`` 状态。
+因此， ``Adam`` 优化器的内存消耗至少是模型大小的两倍。基于这个观察，我们可以通过在DDP进程之间分片
+优化器状态来减少优化器的内存占用。具体来说，不是为所有参数创建每个参数的状态，而是每个DDP进程中的优化器实例
+只保留所有模型参数中一个分片的优化器状态。优化器的 ``step()`` 函数只更新其分片中的参数，
+然后将更新后的参数广播到所有其他对等DDP进程，以便所有模型副本仍然处于相同的状态。
+
+如何使用 ``ZeroRedundancyOptimizer``？
+--------------------------------------
+
+以下代码演示了如何使用
+`ZeroRedundancyOptimizer <https://pytorch.org/docs/master/distributed.optim.html>`__。
+大部分代码与 `分布式数据并行说明 <https://pytorch.org/docs/stable/notes/ddp.html>`_
+中的简单DDP示例相似。主要区别在于 ``example`` 函数中的 ``if-else`` 子句，它包装了优化器构造，
+在 `ZeroRedundancyOptimizer <https://pytorch.org/docs/master/distributed.optim.html>`__
+和 ``Adam`` 优化器之间切换。
 
 
 ::
@@ -74,18 +65,18 @@ and ``Adam`` optimizer.
         torch.cuda.manual_seed(0)
         os.environ['MASTER_ADDR'] = 'localhost'
         os.environ['MASTER_PORT'] = '29500'
-        # create default process group
+        # 创建默认进程组
         dist.init_process_group("gloo", rank=rank, world_size=world_size)
 
-        # create local model
+        # 创建本地模型
         model = nn.Sequential(*[nn.Linear(2000, 2000).to(rank) for _ in range(20)])
-        print_peak_memory("Max memory allocated after creating local model", rank)
+        print_peak_memory("创建本地模型后的最大内存分配", rank)
 
-        # construct DDP model
+        # 构建DDP模型
         ddp_model = DDP(model, device_ids=[rank])
-        print_peak_memory("Max memory allocated after creating DDP", rank)
+        print_peak_memory("创建DDP后的最大内存分配", rank)
 
-        # define loss function and optimizer
+        # 定义损失函数和优化器
         loss_fn = nn.MSELoss()
         if use_zero:
             optimizer = ZeroRedundancyOptimizer(
@@ -96,18 +87,18 @@ and ``Adam`` optimizer.
         else:
             optimizer = torch.optim.Adam(ddp_model.parameters(), lr=0.01)
 
-        # forward pass
+        # 前向传播
         outputs = ddp_model(torch.randn(20, 2000).to(rank))
         labels = torch.randn(20, 2000).to(rank)
-        # backward pass
+        # 反向传播
         loss_fn(outputs, labels).backward()
 
-        # update parameters
-        print_peak_memory("Max memory allocated before optimizer step()", rank)
+        # 更新参数
+        print_peak_memory("优化器step()之前的最大内存分配", rank)
         optimizer.step()
-        print_peak_memory("Max memory allocated after optimizer step()", rank)
+        print_peak_memory("优化器step()之后的最大内存分配", rank)
 
-        print(f"params sum is: {sum(model.parameters()).sum()}")
+        print(f"参数总和为: {sum(model.parameters()).sum()}")
 
 
 
@@ -128,13 +119,10 @@ and ``Adam`` optimizer.
     if __name__=="__main__":
         main()
 
-The output is shown below. When enabling ``ZeroRedundancyOptimizer`` with ``Adam``,
-the optimizer ``step()`` peak memory consumption is half of vanilla ``Adam``'s
-memory consumption. This agrees with our expectation, as we are sharding
-``Adam`` optimizer states across two processes. The output also shows that, with
-``ZeroRedundancyOptimizer``, the model parameters still end up with the same
-values after one iterations (the parameters sum is the same with and without
-``ZeroRedundancyOptimizer``).
+输出如下所示。当使用 ``ZeroRedundancyOptimizer`` 和 ``Adam`` 时，优化器 ``step()``的峰值内存消耗
+是普通 ``Adam`` 内存消耗的一半。这符合我们的预期，因为我们在两个进程之间分片了 ``Adam`` 优化器状态。
+输出还显示，使用 ``ZeroRedundancyOptimizer`` 时，模型参数在一次迭代后仍然得到相同的值
+（使用和不使用 ``ZeroRedundancyOptimizer`` 时参数总和相同）。
 
 ::
 

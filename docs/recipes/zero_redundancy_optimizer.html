@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Shard Optimizer States with ZeroRedundancyOptimizer &mdash; PyTorch Tutorials 2.3.0 documentation</title>
+  <title>使用ZeroRedundancyOptimizer分片优化器状态 &mdash; PyTorch Tutorials 2.3.0 documentation</title>
   
 
   
@@ -42,7 +42,7 @@
   <link rel="stylesheet" href="../_static/css/custom2.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Direct Device-to-Device Communication with TensorPipe CUDA RPC" href="cuda_rpc.html" />
+    <link rel="next" title="使用TensorPipe CUDA RPC进行设备到设备通信" href="cuda_rpc.html" />
     <link rel="prev" title="Profiling PyTorch RPC-Based Workloads" href="distributed_rpc_profiling.html" />
   <!-- Google Tag Manager -->
     <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -535,7 +535,7 @@
         
           <li><a href="recipes_index.html">PyTorch 示例</a> &gt;</li>
         
-      <li>Shard Optimizer States with ZeroRedundancyOptimizer</li>
+      <li>使用ZeroRedundancyOptimizer分片优化器状态</li>
     
     
       <li class="pytorch-breadcrumbs-aside">
@@ -594,56 +594,46 @@
             <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
-  <div class="section" id="shard-optimizer-states-with-zeroredundancyoptimizer">
-<h1>Shard Optimizer States with ZeroRedundancyOptimizer<a class="headerlink" href="#shard-optimizer-states-with-zeroredundancyoptimizer" title="Permalink to this heading">¶</a></h1>
-<p>In this recipe, you will learn:</p>
+  <div class="section" id="zeroredundancyoptimizer">
+<h1>使用ZeroRedundancyOptimizer分片优化器状态<a class="headerlink" href="#zeroredundancyoptimizer" title="Permalink to this heading">¶</a></h1>
+<p>在本教程中，您将学习：</p>
 <ul class="simple">
-<li><p>The high-level idea of <a class="reference external" href="https://pytorch.org/docs/master/distributed.optim.html">ZeroRedundancyOptimizer</a>.</p></li>
-<li><p>How to use <a class="reference external" href="https://pytorch.org/docs/master/distributed.optim.html">ZeroRedundancyOptimizer</a>
-in distributed training and its impact.</p></li>
+<li><p><a class="reference external" href="https://pytorch.org/docs/master/distributed.optim.html">ZeroRedundancyOptimizer</a> 的高级概念。</p></li>
+<li><p>如何在分布式训练中使用 <a class="reference external" href="https://pytorch.org/docs/master/distributed.optim.html">ZeroRedundancyOptimizer</a>
+及其影响。</p></li>
 </ul>
-<div class="section" id="requirements">
-<h2>Requirements<a class="headerlink" href="#requirements" title="Permalink to this heading">¶</a></h2>
+<div class="section" id="id1">
+<h2>要求<a class="headerlink" href="#id1" title="Permalink to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>PyTorch 1.8+</p></li>
-<li><p><a class="reference external" href="https://pytorch.org/tutorials/intermediate/ddp_tutorial.html">Getting Started With Distributed Data Parallel</a></p></li>
+<li><p><a class="reference external" href="https://pytorch.org/tutorials/intermediate/ddp_tutorial.html">分布式数据并行入门</a></p></li>
 </ul>
 </div>
-<div class="section" id="what-is-zeroredundancyoptimizer">
-<h2>What is <code class="docutils literal notranslate"><span class="pre">ZeroRedundancyOptimizer</span></code>?<a class="headerlink" href="#what-is-zeroredundancyoptimizer" title="Permalink to this heading">¶</a></h2>
-<p>The idea of <a class="reference external" href="https://pytorch.org/docs/master/distributed.optim.html">ZeroRedundancyOptimizer</a>
-comes from <a class="reference external" href="https://github.com/microsoft/DeepSpeed">DeepSpeed/ZeRO project</a> and
-<a class="reference external" href="https://github.com/marian-nmt/marian-dev">Marian</a> that shard
-optimizer states across distributed data-parallel processes to
-reduce per-process memory footprint. In the
-<a class="reference external" href="https://pytorch.org/tutorials/intermediate/ddp_tutorial.html">Getting Started With Distributed Data Parallel</a>
-tutorial, we have shown how to use
+<div class="section" id="id3">
+<h2>什么是 <code class="docutils literal notranslate"><span class="pre">ZeroRedundancyOptimizer</span></code>？<a class="headerlink" href="#id3" title="Permalink to this heading">¶</a></h2>
+<p><a class="reference external" href="https://pytorch.org/docs/master/distributed.optim.html">ZeroRedundancyOptimizer</a>
+的想法来自 <a class="reference external" href="https://github.com/microsoft/DeepSpeed">DeepSpeed/ZeRO 项目</a> 和
+<a class="reference external" href="https://github.com/marian-nmt/marian-dev">Marian</a>，它们在分布式数据并行进程中
+分片优化器状态，以减少每个进程的内存占用。</p>
+<p>在 <a class="reference external" href="https://pytorch.org/tutorials/intermediate/ddp_tutorial.html">分布式数据并行入门</a>
+教程中，我们展示了如何使用
 <a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.nn.parallel.DistributedDataParallel.html">DistributedDataParallel</a>
-(DDP) to train models. In that tutorial, each process keeps a dedicated replica
-of the optimizer. Since DDP has already synchronized gradients in the
-backward pass, all optimizer replicas will operate on the same parameter and
-gradient values in every iteration, and this is how DDP keeps model replicas in
-the same state. Oftentimes, optimizers also maintain local states. For example,
-the <code class="docutils literal notranslate"><span class="pre">Adam</span></code> optimizer uses per-parameter <code class="docutils literal notranslate"><span class="pre">exp_avg</span></code> and <code class="docutils literal notranslate"><span class="pre">exp_avg_sq</span></code> states. As a
-result, the <code class="docutils literal notranslate"><span class="pre">Adam</span></code> optimizer’s memory consumption is at least twice the model
-size. Given this observation, we can reduce the optimizer memory footprint by
-sharding optimizer states across DDP processes. More specifically, instead of
-creating per-param states for all parameters, each optimizer instance in
-different DDP processes only keeps optimizer states for a shard of all model
-parameters. The optimizer <code class="docutils literal notranslate"><span class="pre">step()</span></code> function only updates the parameters in its
-shard and then broadcasts its updated parameters to all other peer DDP
-processes, so that all model replicas still land in the same state.</p>
+(DDP) 来训练模型。在该教程中，每个进程都保留一个专用的优化器副本。由于DDP已经在反向传播中同步了梯度，
+所有优化器副本在每次迭代中都将对相同的参数和梯度值进行操作，这就是DDP保持模型副本处于相同状态的方式。
+通常，优化器还会维护本地状态。例如， <code class="docutils literal notranslate"><span class="pre">Adam</span></code> 优化器使用每个参数的 <code class="docutils literal notranslate"><span class="pre">exp_avg</span></code> 和 <code class="docutils literal notranslate"><span class="pre">exp_avg_sq</span></code> 状态。
+因此， <code class="docutils literal notranslate"><span class="pre">Adam</span></code> 优化器的内存消耗至少是模型大小的两倍。基于这个观察，我们可以通过在DDP进程之间分片
+优化器状态来减少优化器的内存占用。具体来说，不是为所有参数创建每个参数的状态，而是每个DDP进程中的优化器实例
+只保留所有模型参数中一个分片的优化器状态。优化器的 <code class="docutils literal notranslate"><span class="pre">step()</span></code> 函数只更新其分片中的参数，
+然后将更新后的参数广播到所有其他对等DDP进程，以便所有模型副本仍然处于相同的状态。</p>
 </div>
-<div class="section" id="how-to-use-zeroredundancyoptimizer">
-<h2>How to use <code class="docutils literal notranslate"><span class="pre">ZeroRedundancyOptimizer</span></code>?<a class="headerlink" href="#how-to-use-zeroredundancyoptimizer" title="Permalink to this heading">¶</a></h2>
-<p>The code below demonstrates how to use
-<a class="reference external" href="https://pytorch.org/docs/master/distributed.optim.html">ZeroRedundancyOptimizer</a>.
-The majority of the code is similar to the simple DDP example presented in
-<a class="reference external" href="https://pytorch.org/docs/stable/notes/ddp.html">Distributed Data Parallel notes</a>.
-The main difference is the <code class="docutils literal notranslate"><span class="pre">if-else</span></code> clause in the <code class="docutils literal notranslate"><span class="pre">example</span></code> function which
-wraps optimizer constructions, toggling between
-<a class="reference external" href="https://pytorch.org/docs/master/distributed.optim.html">ZeroRedundancyOptimizer</a>
-and <code class="docutils literal notranslate"><span class="pre">Adam</span></code> optimizer.</p>
+<div class="section" id="id5">
+<h2>如何使用 <code class="docutils literal notranslate"><span class="pre">ZeroRedundancyOptimizer</span></code>？<a class="headerlink" href="#id5" title="Permalink to this heading">¶</a></h2>
+<p>以下代码演示了如何使用
+<a class="reference external" href="https://pytorch.org/docs/master/distributed.optim.html">ZeroRedundancyOptimizer</a>。
+大部分代码与 <a class="reference external" href="https://pytorch.org/docs/stable/notes/ddp.html">分布式数据并行说明</a>
+中的简单DDP示例相似。主要区别在于 <code class="docutils literal notranslate"><span class="pre">example</span></code> 函数中的 <code class="docutils literal notranslate"><span class="pre">if-else</span></code> 子句，它包装了优化器构造，
+在 <a class="reference external" href="https://pytorch.org/docs/master/distributed.optim.html">ZeroRedundancyOptimizer</a>
+和 <code class="docutils literal notranslate"><span class="pre">Adam</span></code> 优化器之间切换。</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">import</span> <span class="nn">torch.distributed</span> <span class="k">as</span> <span class="nn">dist</span>
@@ -662,18 +652,18 @@ and <code class="docutils literal notranslate"><span class="pre">Adam</span></co
     <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">manual_seed</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
     <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;MASTER_ADDR&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;localhost&#39;</span>
     <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;MASTER_PORT&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;29500&#39;</span>
-    <span class="c1"># create default process group</span>
+    <span class="c1"># 创建默认进程组</span>
     <span class="n">dist</span><span class="o">.</span><span class="n">init_process_group</span><span class="p">(</span><span class="s2">&quot;gloo&quot;</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="n">rank</span><span class="p">,</span> <span class="n">world_size</span><span class="o">=</span><span class="n">world_size</span><span class="p">)</span>
 
-    <span class="c1"># create local model</span>
+    <span class="c1"># 创建本地模型</span>
     <span class="n">model</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span><span class="o">*</span><span class="p">[</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">2000</span><span class="p">,</span> <span class="mi">2000</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">rank</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">20</span><span class="p">)])</span>
-    <span class="n">print_peak_memory</span><span class="p">(</span><span class="s2">&quot;Max memory allocated after creating local model&quot;</span><span class="p">,</span> <span class="n">rank</span><span class="p">)</span>
+    <span class="n">print_peak_memory</span><span class="p">(</span><span class="s2">&quot;创建本地模型后的最大内存分配&quot;</span><span class="p">,</span> <span class="n">rank</span><span class="p">)</span>
 
-    <span class="c1"># construct DDP model</span>
+    <span class="c1"># 构建DDP模型</span>
     <span class="n">ddp_model</span> <span class="o">=</span> <span class="n">DDP</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">device_ids</span><span class="o">=</span><span class="p">[</span><span class="n">rank</span><span class="p">])</span>
-    <span class="n">print_peak_memory</span><span class="p">(</span><span class="s2">&quot;Max memory allocated after creating DDP&quot;</span><span class="p">,</span> <span class="n">rank</span><span class="p">)</span>
+    <span class="n">print_peak_memory</span><span class="p">(</span><span class="s2">&quot;创建DDP后的最大内存分配&quot;</span><span class="p">,</span> <span class="n">rank</span><span class="p">)</span>
 
-    <span class="c1"># define loss function and optimizer</span>
+    <span class="c1"># 定义损失函数和优化器</span>
     <span class="n">loss_fn</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">MSELoss</span><span class="p">()</span>
     <span class="k">if</span> <span class="n">use_zero</span><span class="p">:</span>
         <span class="n">optimizer</span> <span class="o">=</span> <span class="n">ZeroRedundancyOptimizer</span><span class="p">(</span>
@@ -684,18 +674,18 @@ and <code class="docutils literal notranslate"><span class="pre">Adam</span></co
     <span class="k">else</span><span class="p">:</span>
         <span class="n">optimizer</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="n">ddp_model</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="mf">0.01</span><span class="p">)</span>
 
-    <span class="c1"># forward pass</span>
+    <span class="c1"># 前向传播</span>
     <span class="n">outputs</span> <span class="o">=</span> <span class="n">ddp_model</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">2000</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">rank</span><span class="p">))</span>
     <span class="n">labels</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">2000</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">rank</span><span class="p">)</span>
-    <span class="c1"># backward pass</span>
+    <span class="c1"># 反向传播</span>
     <span class="n">loss_fn</span><span class="p">(</span><span class="n">outputs</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
 
-    <span class="c1"># update parameters</span>
-    <span class="n">print_peak_memory</span><span class="p">(</span><span class="s2">&quot;Max memory allocated before optimizer step()&quot;</span><span class="p">,</span> <span class="n">rank</span><span class="p">)</span>
+    <span class="c1"># 更新参数</span>
+    <span class="n">print_peak_memory</span><span class="p">(</span><span class="s2">&quot;优化器step()之前的最大内存分配&quot;</span><span class="p">,</span> <span class="n">rank</span><span class="p">)</span>
     <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
-    <span class="n">print_peak_memory</span><span class="p">(</span><span class="s2">&quot;Max memory allocated after optimizer step()&quot;</span><span class="p">,</span> <span class="n">rank</span><span class="p">)</span>
+    <span class="n">print_peak_memory</span><span class="p">(</span><span class="s2">&quot;优化器step()之后的最大内存分配&quot;</span><span class="p">,</span> <span class="n">rank</span><span class="p">)</span>
 
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;params sum is: </span><span class="si">{</span><span class="nb">sum</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">())</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;参数总和为: </span><span class="si">{</span><span class="nb">sum</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">())</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
 
 
@@ -717,13 +707,10 @@ and <code class="docutils literal notranslate"><span class="pre">Adam</span></co
     <span class="n">main</span><span class="p">()</span>
 </pre></div>
 </div>
-<p>The output is shown below. When enabling <code class="docutils literal notranslate"><span class="pre">ZeroRedundancyOptimizer</span></code> with <code class="docutils literal notranslate"><span class="pre">Adam</span></code>,
-the optimizer <code class="docutils literal notranslate"><span class="pre">step()</span></code> peak memory consumption is half of vanilla <code class="docutils literal notranslate"><span class="pre">Adam</span></code>’s
-memory consumption. This agrees with our expectation, as we are sharding
-<code class="docutils literal notranslate"><span class="pre">Adam</span></code> optimizer states across two processes. The output also shows that, with
-<code class="docutils literal notranslate"><span class="pre">ZeroRedundancyOptimizer</span></code>, the model parameters still end up with the same
-values after one iterations (the parameters sum is the same with and without
-<code class="docutils literal notranslate"><span class="pre">ZeroRedundancyOptimizer</span></code>).</p>
+<p>输出如下所示。当使用 <code class="docutils literal notranslate"><span class="pre">ZeroRedundancyOptimizer</span></code> 和 <code class="docutils literal notranslate"><span class="pre">Adam</span></code> 时，优化器 <code class="docutils literal notranslate"><span class="pre">step()``的峰值内存消耗</span>
+<span class="pre">是普通</span> <span class="pre">``Adam</span></code> 内存消耗的一半。这符合我们的预期，因为我们在两个进程之间分片了 <code class="docutils literal notranslate"><span class="pre">Adam</span></code> 优化器状态。
+输出还显示，使用 <code class="docutils literal notranslate"><span class="pre">ZeroRedundancyOptimizer</span></code> 时，模型参数在一次迭代后仍然得到相同的值
+（使用和不使用 <code class="docutils literal notranslate"><span class="pre">ZeroRedundancyOptimizer</span></code> 时参数总和相同）。</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">===</span> <span class="n">Using</span> <span class="n">ZeroRedundancyOptimizer</span> <span class="o">===</span>
 <span class="n">Max</span> <span class="n">memory</span> <span class="n">allocated</span> <span class="n">after</span> <span class="n">creating</span> <span class="n">local</span> <span class="n">model</span><span class="p">:</span> <span class="mf">335.0</span><span class="n">MB</span>
 <span class="n">Max</span> <span class="n">memory</span> <span class="n">allocated</span> <span class="n">after</span> <span class="n">creating</span> <span class="n">DDP</span><span class="p">:</span> <span class="mf">656.0</span><span class="n">MB</span>
@@ -751,7 +738,7 @@ values after one iterations (the parameters sum is the same with and without
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="cuda_rpc.html" class="btn btn-neutral float-right" title="Direct Device-to-Device Communication with TensorPipe CUDA RPC" accesskey="n" rel="next">Next <img src="../_static/images/chevron-right-orange.svg" class="next-page"></a>
+        <a href="cuda_rpc.html" class="btn btn-neutral float-right" title="使用TensorPipe CUDA RPC进行设备到设备通信" accesskey="n" rel="next">Next <img src="../_static/images/chevron-right-orange.svg" class="next-page"></a>
       
       
         <a href="distributed_rpc_profiling.html" class="btn btn-neutral" title="Profiling PyTorch RPC-Based Workloads" accesskey="p" rel="prev"><img src="../_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
@@ -804,10 +791,10 @@ if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.i
           <div class="pytorch-right-menu" id="pytorch-right-menu">
             <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
               <ul>
-<li><a class="reference internal" href="#">Shard Optimizer States with ZeroRedundancyOptimizer</a><ul>
-<li><a class="reference internal" href="#requirements">Requirements</a></li>
-<li><a class="reference internal" href="#what-is-zeroredundancyoptimizer">What is <code class="docutils literal notranslate"><span class="pre">ZeroRedundancyOptimizer</span></code>?</a></li>
-<li><a class="reference internal" href="#how-to-use-zeroredundancyoptimizer">How to use <code class="docutils literal notranslate"><span class="pre">ZeroRedundancyOptimizer</span></code>?</a></li>
+<li><a class="reference internal" href="#">使用ZeroRedundancyOptimizer分片优化器状态</a><ul>
+<li><a class="reference internal" href="#id1">要求</a></li>
+<li><a class="reference internal" href="#id3">什么是 <code class="docutils literal notranslate"><span class="pre">ZeroRedundancyOptimizer</span></code>？</a></li>
+<li><a class="reference internal" href="#id5">如何使用 <code class="docutils literal notranslate"><span class="pre">ZeroRedundancyOptimizer</span></code>？</a></li>
 </ul>
 </li>
 </ul>

@@ -1,91 +1,72 @@
-Ease-of-use quantization for PyTorch with Intel® Neural Compressor
-==================================================================
+使用Intel® Neural Compressor实现PyTorch的简易量化
+==================================================
 
-Overview
+概述
 --------
 
-Most deep learning applications are using 32-bits of floating-point precision
-for inference. But low precision data types, especially int8, are getting more
-focus due to significant performance boost. One of the essential concerns on
-adopting low precision is how to easily mitigate the possible accuracy loss
-and reach predefined accuracy requirement.
+大多数深度学习应用程序在推理时使用32位浮点精度。但是由于显著的性能提升，低精度数据类型（尤其是int8）正受到越来越多的关注。采用低精度时的一个主要问题是如何轻松地减轻可能的精度损失并达到预定的精度要求。
 
-Intel® Neural Compressor aims to address the aforementioned concern by extending
-PyTorch with accuracy-driven automatic tuning strategies to help user quickly find
-out the best quantized model on Intel hardware, including Intel Deep Learning
-Boost (`Intel DL Boost <https://www.intel.com/content/www/us/en/artificial-intelligence/deep-learning-boost.html>`_)
-and Intel Advanced Matrix Extensions (`Intel AMX <https://www.intel.com/content/www/us/en/develop/documentation/cpp-compiler-developer-guide-and-reference/top/compiler-reference/intrinsics/intrinsics-for-amx-instructions/intrinsics-for-amx-tile-instructions.html>`_).
+Intel® Neural Compressor 旨在通过扩展 PyTorch 的精度驱动自动调优策略来解决上述问题，帮助用户在Intel硬件上快速找到最佳量化模型，
+包括Intel Deep Learning Boost（ `Intel DL Boost <https://www.intel.com/content/www/us/en/artificial-intelligence/deep-learning-boost.html>`_）
+和Intel Advanced Matrix Extensions（ `Intel AMX <https://www.intel.com/content/www/us/en/develop/documentation/cpp-compiler-developer-guide-and-reference/top/compiler-reference/intrinsics/intrinsics-for-amx-instructions/intrinsics-for-amx-tile-instructions.html>`_）。
 
-Intel® Neural Compressor has been released as an open-source project
-at `Github <https://github.com/intel/neural-compressor>`_.
+Intel® Neural Compressor已作为开源项目发布在 `Github <https://github.com/intel/neural-compressor>`_上。
 
-Features
+特性
 --------
 
-- **Ease-of-use Python API:** Intel® Neural Compressor provides simple frontend
-  Python APIs and utilities for users to do neural network compression with few
-  line code changes.
-  Typically, only 5 to 6 clauses are required to be added to the original code.
+- **易用的Python API：** Intel® Neural Compressor 提供简单的前端Python API和实用工具，用户只需更改几行代码即可进行神经网络压缩。
+通常只需要在原始代码中添加5到6个子句。
 
-- **Quantization:** Intel® Neural Compressor supports accuracy-driven automatic
-  tuning process on post-training static quantization, post-training dynamic
-  quantization, and quantization-aware training on PyTorch fx graph mode and
-  eager model.
+- **量化：** Intel® Neural Compressor 支持在 PyTorch fx 图模式和 eager 模式下进行精度驱动的自动调优过程，
+包括训练后静态量化、训练后动态量化和量化感知训练。
 
-*This tutorial mainly focuses on the quantization part. As for how to use Intel®
-Neural Compressor to do pruning and distillation, please refer to corresponding
-documents in the Intel® Neural Compressor github repo.*
+*本教程主要关注量化部分。关于如何使用 Intel® Neural Compressor 进行剪枝和蒸馏，请参考 Intel® Neural Compressor github仓库中的相应文档。*
 
-Getting Started
+入门
 ---------------
 
-Installation
+安装
 ~~~~~~~~~~~~
 
 .. code:: bash
 
-    # install stable version from pip
+    # 从pip安装稳定版本
     pip install neural-compressor
 
-    # install nightly version from pip
+    # 从pip安装每日构建版本
     pip install -i https://test.pypi.org/simple/ neural-compressor
 
-    # install stable version from from conda
+    # 从conda安装稳定版本
     conda install neural-compressor -c conda-forge -c intel
 
-*Supported python versions are 3.6 or 3.7 or 3.8 or 3.9*
+*支持的Python版本为3.6、3.7、3.8或3.9*
 
-Usages
+用法
 ~~~~~~
 
-Minor code changes are required for users to get started with Intel® Neural Compressor
-quantization API. Both PyTorch fx graph mode and eager mode are supported.
+用户只需进行少量代码更改即可开始使用 Intel® Neural Compressor 量化API。支持 PyTorch fx 图模式和 eager 模式。
 
-Intel® Neural Compressor takes a FP32 model and a yaml configuration file as inputs.
-To construct the quantization process, users can either specify the below settings via
-the yaml configuration file or python APIs:
+Intel® Neural Compressor 接受一个 FP32 模型和一个 yaml 配置文件作为输入。要构建量化过程，用户可以通过 yaml 配置文件
+或 Python API 指定以下设置：
 
-1. Calibration Dataloader (Needed for static quantization)
-2. Evaluation Dataloader
-3. Evaluation Metric
+1. 校准数据加载器（静态量化需要）
+2. 评估数据加载器
+3. 评估指标
 
-Intel® Neural Compressor supports some popular dataloaders and evaluation metrics. For
-how to configure them in yaml configuration file, user could refer to `Built-in Datasets
-<https://github.com/intel/neural-compressor/blob/master/docs/dataset.md>`_.
+Intel® Neural Compressor 支持一些常用的数据加载器和评估指标。关于如何在 yaml 配置文件中配置它们，用户可以参考
+`内置数据集 <https://github.com/intel/neural-compressor/blob/master/docs/dataset.md>`_。
 
-If users want to use a self-developed dataloader or evaluation metric, Intel® Neural
-Compressor supports this by the registration of customized dataloader/metric using python code.
+如果用户想使用自定义的数据加载器或评估指标，Intel® Neural Compressor 支持通过 Python 代码注册自定义数据加载器/指标。
 
-For the yaml configuration file format please refer to `yaml template
-<https://github.com/intel/neural-compressor/blob/master/neural_compressor/template/ptq.yaml>`_.
+关于yaml配置文件格式，请参考 `yaml模板 <https://github.com/intel/neural-compressor/blob/master/neural_compressor/template/ptq.yaml>`_ 。
 
-The code changes that are required for *Intel® Neural Compressor* are highlighted with
-comments in the line above.
+*Intel® Neural Compressor* 所需的代码更改在上面的注释中突出显示。
 
-Model
+模型
 ^^^^^
 
-In this tutorial, the LeNet model is used to demonstrate how to deal with *Intel® Neural Compressor*.
+在本教程中，我们使用LeNet模型来演示如何使用 *Intel® Neural Compressor* 。
 
 .. code-block:: python3
 
@@ -94,7 +75,7 @@ In this tutorial, the LeNet model is used to demonstrate how to deal with *Intel
     import torch.nn as nn
     import torch.nn.functional as F
 
-    # LeNet Model definition
+    # LeNet模型定义
     class Net(nn.Module):
         def __init__(self):
             super(Net, self).__init__()
@@ -117,17 +98,15 @@ In this tutorial, the LeNet model is used to demonstrate how to deal with *Intel
     model = Net()
     model.load_state_dict(torch.load('./lenet_mnist_model.pth'))
 
-The pretrained model weight `lenet_mnist_model.pth` comes from
-`here <https://drive.google.com/drive/folders/1fn83DF14tWmit0RTKWRhPq5uVXt73e0h?usp=sharing>`_.
+预训练模型权重 `lenet_mnist_model.pth` 来自
+`这里 <https://drive.google.com/drive/folders/1fn83DF14tWmit0RTKWRhPq5uVXt73e0h?usp=sharing>`_ 。
 
-Accuracy driven quantization
+精度驱动量化
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Intel® Neural Compressor supports accuracy-driven automatic tuning to generate the optimal
-int8 model which meets a predefined accuracy goal.
+Intel® Neural Compressor 支持精度驱动的自动调优，以生成满足预定精度目标的最佳 int8 模型。
 
-Below is an example of how to quantize a simple network on PyTorch
-`FX graph mode <https://pytorch.org/docs/stable/fx.html>`_ by auto-tuning.
+以下是通过自动调优在PyTorch `FX图模式 <https://pytorch.org/docs/stable/fx.html>`_ 上量化简单网络的示例。
 
 .. code-block:: yaml
 
@@ -158,7 +137,7 @@ Below is an example of how to quantize a simple network on PyTorch
                        ])),
         batch_size=1)
 
-    # launch code for Intel® Neural Compressor
+    # Intel® Neural Compressor启动代码
     from neural_compressor.experimental import Quantization
     quantizer = Quantization("./conf.yaml")
     quantizer.model = model
@@ -167,13 +146,11 @@ Below is an example of how to quantize a simple network on PyTorch
     q_model = quantizer()
     q_model.save('./output')
 
-In the `conf.yaml` file, the built-in metric `top1` of Intel® Neural Compressor is specified as
-the evaluation method, and `1%` relative accuracy loss is set as the accuracy target for auto-tuning.
-Intel® Neural Compressor will traverse all possible quantization config combinations on per-op level
-to find out the optimal int8 model that reaches the predefined accuracy target.
+在 `conf.yaml` 文件中，指定了 Intel® Neural Compressor 的内置指标 `top1` 作为评估方法，
+并将 `1%` 的相对精度损失设置为自动调优的精度目标。Intel® Neural Compressor 将遍历每个操作级别上所有可能的量化配置组合，
+以找出达到预定精度目标的最佳 int8 模型。
 
-Besides those built-in metrics, Intel® Neural Compressor also supports customized metric through
-python code:
+除了这些内置指标外，Intel® Neural Compressor 还支持通过 Python 代码自定义指标：
 
 .. code-block:: yaml
 
@@ -199,7 +176,7 @@ python code:
                        ])),
         batch_size=1)
 
-    # define a customized metric
+    # 定义自定义指标
     class Top1Metric(object):
         def __init__(self):
             self.correct = 0
@@ -211,7 +188,7 @@ python code:
         def result(self):
             return 100. * self.correct / len(test_loader.dataset)
 
-    # launch code for Intel® Neural Compressor
+    # Intel® Neural Compressor启动代码
     from neural_compressor.experimental import Quantization
     quantizer = Quantization("./conf.yaml")
     quantizer.model = model
@@ -221,17 +198,14 @@ python code:
     q_model = quantizer()
     q_model.save('./output')
 
-In the above example, a `class` which contains `update()` and `result()` function is implemented
-to record per mini-batch result and calculate final accuracy at the end.
+在上面的示例中，实现了一个包含 `update()` 和 `result()` 函数的 `class` ，用于记录每个小批量的结果并在最后计算最终精度。
 
-Quantization aware training
+量化感知训练
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Besides post-training static quantization and post-training dynamic quantization, Intel® Neural
-Compressor supports quantization-aware training with an accuracy-driven automatic tuning mechanism.
+除了训练后静态量化和训练后动态量化外，Intel® Neural Compressor 还支持具有精度驱动自动调优机制的量化感知训练。
 
-Below is an example of how to do quantization aware training on a simple network on PyTorch
-`FX graph mode <https://pytorch.org/docs/stable/fx.html>`_.
+以下是在PyTorch `FX图模式 <https://pytorch.org/docs/stable/fx.html>`_ 上对简单网络进行量化感知训练的示例。
 
 .. code-block:: yaml
 
@@ -285,11 +259,11 @@ Below is an example of how to do quantization aware training on a simple network
                 loss = F.nll_loss(output, target)
                 loss.backward()
                 optimizer.step()
-                print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
+                print('训练轮次: {} [{}/{} ({:.0f}%)]\t损失: {:.6f}'.format(
                       epoch, batch_idx * len(data), len(train_loader.dataset),
                       100. * batch_idx / len(train_loader), loss.item()))
 
-    # launch code for Intel® Neural Compressor
+    # Intel® Neural Compressor 启动代码
     from neural_compressor.experimental import Quantization
     quantizer = Quantization("./conf.yaml")
     quantizer.model = model
@@ -298,14 +272,12 @@ Below is an example of how to do quantization aware training on a simple network
     q_model = quantizer()
     q_model.save('./output')
 
-Performance only quantization
+仅性能量化
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Intel® Neural Compressor supports directly yielding int8 model with dummy dataset for the
-performance benchmarking purpose.
+Intel® Neural Compressor 支持使用虚拟数据集直接生成 int8 模型，用于性能基准测试目的。
 
-Below is an example of how to quantize a simple network on PyTorch
-`FX graph mode <https://pytorch.org/docs/stable/fx.html>`_ with a dummy dataset.
+以下是使用虚拟数据集在PyTorch `FX图模式 <https://pytorch.org/docs/stable/fx.html>`_ 上量化简单网络的示例。
 
 .. code-block:: yaml
 
@@ -319,7 +291,7 @@ Below is an example of how to quantize a simple network on PyTorch
     # main.py
     model.eval()
 
-    # launch code for Intel® Neural Compressor
+    # Intel® Neural Compressor启动代码
     from neural_compressor.experimental import Quantization, common
     from neural_compressor.experimental.data.datasets.dummy_dataset import DummyDataset
     quantizer = Quantization("./conf.yaml")
@@ -328,11 +300,10 @@ Below is an example of how to quantize a simple network on PyTorch
     q_model = quantizer()
     q_model.save('./output')
 
-Quantization outputs
+量化输出
 ~~~~~~~~~~~~~~~~~~~~
 
-Users could know how many ops get quantized from log printed by Intel® Neural Compressor
-like below:
+用户可以从 Intel® Neural Compressor 打印的日志中了解有多少操作被量化，如下所示：
 
 ::
 
@@ -349,25 +320,25 @@ like below:
     2021-12-08 14:58:35 [INFO] |         Linear         |   1    |   1   |
     2021-12-08 14:58:35 [INFO] +------------------------+--------+-------+
 
-The quantized model will be generated under `./output` directory, in which there are two files:
+量化模型将在 `./output` 目录下生成，其中包含两个文件：
+
 1. best_configure.yaml
 2. best_model_weights.pt
 
-The first file contains the quantization configurations of each op, the second file contains
-int8 weights and zero point and scale info of activations.
+第一个文件包含每个操作的量化配置，第二个文件包含 int8 权重以及激活的零点和比例信息。
 
-Deployment
-~~~~~~~~~~
+部署
+~~~~
 
-Users could use the below code to load quantized model and then do inference or performance benchmark.
+用户可以使用以下代码加载量化模型，然后进行推理或性能基准测试。
 
 .. code-block:: python3
 
     from neural_compressor.utils.pytorch import load
     int8_model = load('./output', model)
 
-Tutorials
----------
+教程
+----
 
-Please visit `Intel® Neural Compressor Github repo <https://github.com/intel/neural-compressor>`_
-for more tutorials.
+请访问 `Intel® Neural Compressor Github 仓库 <https://github.com/intel/neural-compressor>`_
+获取更多教程。

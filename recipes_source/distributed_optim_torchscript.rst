@@ -1,75 +1,61 @@
-Distributed Optimizer with TorchScript support
+支持 TorchScript 的分布式优化器
 ==============================================================
 
-.. note:: Distributed Optimizer with TorchScript support is introduced in PyTorch 1.8
-    as a beta feature. This API is subject to change.
+.. note:: 支持 TorchScript 的分布式优化器在 PyTorch 1.8 中作为 beta 功能引入。
+    此 API 可能会发生变化。
 
-In this recipe, you will learn:
+在本教程中，您将学习：
 
-- The high-level idea of distributed optimizer with TorchScript support and what this feature brings
-- How to write customized distributed optimizer that enables TorchScript support
+- 支持 TorchScript 的分布式优化器的高级概念及其带来的功能
+- 如何编写支持 TorchScript 的自定义分布式优化器
 
 
-Requirements
+要求
 ------------
 
 - PyTorch 1.8+
-- `Getting Started With Distributed RPC Framework <https://pytorch.org/tutorials/intermediate/rpc_tutorial.html>`_
+- `分布式 RPC 框架入门 <https://pytorch.org/tutorials/intermediate/rpc_tutorial.html>`_
 
 
-What is Distributed Optimizer?
+什么是分布式优化器？
 ------------------------------------
 
-`DistributedOptimizer <https://pytorch.org/docs/master/rpc.html#module-torch.distributed.optim>`_ takes a list of remote
-parameters (RRef) and runs the optimizer locally on the workers where the parameters live, which is commonly used together
-with Distributed RPC/Autograd to do model parallel training. It could use any of the local optimizer algorithms (either
-pre-defined algorithms provided in ``torch.optim`` or custom defined ones) to apply the gradients on each worker.
+`DistributedOptimizer <https://pytorch.org/docs/master/rpc.html#module-torch.distributed.optim>`_
+接受一个远程参数列表（RRef），并在参数所在的工作节点上本地运行优化器。它通常与分布式 RPC/Autograd 一起使用，
+用于模型并行训练。它可以使用任何本地优化器算法（无论是 ``torch.optim`` 中预定义的算法还是自定义的算法）在每个工作节点上应用梯度。
 
 
-What is Distributed Optimizer with TorchScript support?
+什么是支持 TorchScript 的分布式优化器？
 -------------------------------------------------------
 
-Distributed Optimizer are widely used in distributed model parallel training, and in some
-common use cases, training need to be done in multithreaded manner instead of multiprocess
-due to performance concern and resource utilizations (or at least partially multithreaded,
-i.e. Parameter Server hosting part of the model and parameters, with new thread updating the
-parameters per request). PyTorch itself does not support multithreaded training natively as
-it suffers from the Python's Global Interpreter Lock (GIL), but it could leverage 
-`TorchScript <https://pytorch.org/docs/stable/jit.html>`_ to get rid of GIL and run the
-model in a multithreaded way. 
+分布式优化器在分布式模型并行训练中被广泛使用。在一些常见用例中，由于性能考虑和资源利用，训练需要以多线程方式进行，
+而不是多进程方式（或至少部分多线程，例如参数服务器托管部分模型和参数，新线程根据请求更新参数）。
+PyTorch 本身由于 Python 的全局解释器锁（GIL）而不支持原生多线程训练，但它可以利用
+`TorchScript <https://pytorch.org/docs/stable/jit.html>`_ 来摆脱 GIL 并以多线程方式运行模型。
 
-For critical model training workloads, improving the training performance is an
-important topic. Researchers often would like to implement different optimization strategies
-with the graph representation (i.e. via operator fusion) or implement custom operator kernels
-in order to speed up training.
+对于关键的模型训练工作负载，提高训练性能是一个重要话题。研究人员经常希望通过图表示实现不同的优化策略（例如通过算子融合）
+或实现自定义算子内核以加速训练。
 
-Distributed Optimizer with TorchScript support could help getting rid of GIL, thus improve
-PyTorch's training performance in the multithreaded environment, it also unlocks the potential
-to further enhance the performance by using advanced compiler technologies that TorchScript
-offers (i.e. CPU/GPU fusion).
+支持 TorchScript 的分布式优化器可以帮助摆脱 GIL，从而提高 PyTorch 在多线程环境中的训练性能，
+它还解锁了使用 TorchScript 提供的高级编译器技术（例如 CPU/GPU 融合）来进一步提升性能的潜力。
 
 
-How to write a customized distributed optimizer with TorchScript support?
+如何编写支持 TorchScript 的自定义分布式优化器？
 -------------------------------------------------------------------------
 
-The code below shows how to write a customized distributed optimizer given an existing local
-optimizer implementation, which unlocks the TorchScript benefits including GIL removal and
-performance improvement opportunities.
+以下代码展示了如何基于现有的本地优化器实现编写自定义分布式优化器，从而解锁 TorchScript 的优势，包括 GIL 移除和性能改进机会。
 
-Suppose that you already have a local optimizer that is currently used during training,
-In this case we will use `quasi-hyperbolic momentum (QHM) <https://github.com/facebookresearch/qhoptim/blob/e81dea3f2765780cf4fbb90b87b22ba7604b8625/qhoptim/pyt/qhm.py#L12>`_
-as an example to show how to enable the TorchScript support, note that it also applies
-to any custom optimizers that inherits from ``torch.optim.Optimizer``.
+假设您已经有一个在训练中使用的本地优化器，在这个例子中，我们将使用
+`准超曲面动量（QHM）<https://github.com/facebookresearch/qhoptim/blob/e81dea3f2765780cf4fbb90b87b22ba7604b8625/qhoptim/pyt/qhm.py#L12>`_
+来展示如何启用 TorchScript 支持。请注意，这也适用于任何继承自 ``torch.optim.Optimizer`` 的自定义优化器。
 
-First, we need to separate the computation and state management from the optimizer implementation,
-this is so that we could extract the computation part and make it a free function, which is
-TorchScript friendly. It has two benefits: 1. The computation logic becomes easier to inspect,
-it allows us to quickly turn the parameter update/computation part into TorchScript, and utilize
-TorchScript IR to do further optimizations (operator fusion, etc.) 2. Distributed Optimizer
-underlying is using a different mechanisms to get gradients and update parameters (we store
-gradients separately instead of directly populating the ``param.grad`` field during backward).
-Separating the computation allows distributed optimizer to enable the possibility of optimizer
-update in multithreaded mode, as it eliminates the possible race condition to ``param.grad``.
+首先，我们需要将计算和状态管理从优化器实现中分离出来，这样我们就可以提取计算部分并将其变成一个独立函数，这对 TorchScript 友好。
+这有两个好处：
+
+1. 计算逻辑变得更容易检查，我们可以快速将参数更新/计算部分转换为 TorchScript，
+并利用 TorchScript IR 进行进一步优化（算子融合等）
+2. 分布式优化器底层使用不同的机制来获取梯度和更新参数（我们单独存储梯度，而不是在反向传播期间直接填充 ``param.grad`` 字段）。
+分离计算允许分布式优化器在多线程模式下进行优化器更新，因为它消除了对 ``param.grad`` 的可能竞争条件。
 
 
 ::
@@ -104,11 +90,11 @@ update in multithreaded mode, as it eliminates the possible race condition to ``
 
 
 
-Next we will define a distributed functional optimizer with TorchScript compatability to manage
-the optimizer states and calls into the TorchScript compatible update function we defined above. 
-Note that a few conventions are different from normal custom optimizers: 1. We don't inherit
-``torch.optim.Optimizer`` as TorchScript does not support polymorphism 2. ``step`` takes gradients
-list instead of the loss closure.
+接下来，我们将定义一个支持 TorchScript 的分布式函数式优化器来管理优化器状态，并调用我们上面定义的兼容 TorchScript 的更新函数。
+请注意，与普通自定义优化器相比，有几个约定不同：
+
+1. 我们不继承 ``torch.optim.Optimizer``，因为 TorchScript 不支持多态
+2. ``step`` 接受梯度列表而不是损失闭包。
 
 ::
 
@@ -116,7 +102,7 @@ list instead of the loss closure.
     from torch import Tensor
     from typing import List, Optional, Dict
 
-    # define this as a TorchScript class
+    # 将其定义为 TorchScript 类
     @torch.jit.script
     class FunctionalQHM(object):
         def __init__(self,
@@ -143,8 +129,7 @@ list instead of the loss closure.
             }
             self.weight_decay_type = weight_decay_type
 
-            # NOTE: we only have one param_group here and don't allow user to add additional
-            # param group as it's not a common use case.
+            # 注意：我们这里只有一个参数组，不允许用户添加额外的参数组，因为这不是常见用例。
             self.param_group = {"params": params}
 
             self.state = torch.jit.annotate(Dict[torch.Tensor, Dict[str, torch.Tensor]], {})
@@ -157,9 +142,9 @@ list instead of the loss closure.
 
             if len(params) != len(gradients):
                 raise ValueError(
-                    "the gradients passed in does not equal to the size of the parameters!"
-                    + f"Params length: {len(params)}. "
-                    + f"Gradients length: {len(gradients)}"
+                    "传入的梯度数量与参数数量不相等！"
+                    + f"参数长度：{len(params)}。"
+                    + f"梯度长度：{len(gradients)}"
                 )
 
             for param, gradient in zip(self.param_group['params'], gradients):
@@ -170,7 +155,7 @@ list instead of the loss closure.
                     state['momentum_buffer'] = torch.zeros_like(param, memory_format=torch.preserve_format)
                     momentum_buffer_list.append(state['momentum_buffer'])
 
-            # calls into the update function we just defined
+            # 调用我们刚刚定义的更新函数
             with torch.no_grad():
                 qhm_update(params_with_grad,
                         grads,
@@ -183,9 +168,8 @@ list instead of the loss closure.
 
 
 
-Finally, we register our newly defined distributed functional optimizer into the ``functional_optim_map``
-This is so that the ``DistributedOptimizer`` will try to pick up our custom implementation instead of the
-pre-defined default ones.
+最后，我们将新定义的分布式函数式优化器注册到 ``functional_optim_map`` 中。
+这样 ``DistributedOptimizer`` 就会尝试使用我们的自定义实现，而不是预定义的默认实现。
 
 ::
 
@@ -193,7 +177,7 @@ pre-defined default ones.
 
     DistributedOptimizer.functional_optim_map[QHM] = FunctionalQHM
 
-Now you can use the ``QHM`` optimizer as normal in distributed training by passing it to
+现在，您可以在分布式训练中正常使用 ``QHM`` 优化器，只需将其传递给
 `DistributedOptimizer <https://pytorch.org/docs/master/rpc.html#module-torch.distributed.optim>`_
 
 
@@ -205,10 +189,9 @@ Now you can use the ``QHM`` optimizer as normal in distributed training by passi
         QHM, remote_params_list, *args, **kwargs
     )
 
-DistributedOptimizer will automatically transform the QHM optimizer into the ``FunctionalQHM`` under the hood,
-and enable the TorchScript support. This will unlock the performance that boosted by multithreaded training
-and also give more potentials for further improvements (i.e. TorchScript fusion, etc.)
+DistributedOptimizer 将自动在底层将 QHM 优化器转换为 ``FunctionalQHM``，
+并启用 TorchScript 支持。这将解锁多线程训练带来的性能提升，
+并为进一步改进提供更多潜力（例如 TorchScript 融合等）。
 
-Note that majority of PyTorch built-in optimizers are already using this methodology to speed up distributed
-training. If you see warning about some optimizers haven't been converted yet, you can write your own conversion
-by following this recipe.
+请注意，大多数 PyTorch 内置优化器已经使用这种方法来加速分布式训练。
+如果您看到有关某些优化器尚未转换的警告，您可以按照本教程编写自己的转换。

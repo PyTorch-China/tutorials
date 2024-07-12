@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Distributed Optimizer with TorchScript support &mdash; PyTorch Tutorials 2.3.0 documentation</title>
+  <title>支持 TorchScript 的分布式优化器 &mdash; PyTorch Tutorials 2.3.0 documentation</title>
   
 
   
@@ -43,7 +43,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="(beta) Efficient mobile interpreter in Android and iOS" href="mobile_interpreter.html" />
-    <link rel="prev" title="Direct Device-to-Device Communication with TensorPipe CUDA RPC" href="cuda_rpc.html" />
+    <link rel="prev" title="使用TensorPipe CUDA RPC进行设备到设备通信" href="cuda_rpc.html" />
   <!-- Google Tag Manager -->
     <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
     new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
@@ -535,7 +535,7 @@
         
           <li><a href="recipes_index.html">PyTorch 示例</a> &gt;</li>
         
-      <li>Distributed Optimizer with TorchScript support</li>
+      <li>支持 TorchScript 的分布式优化器</li>
     
     
       <li class="pytorch-breadcrumbs-aside">
@@ -594,69 +594,54 @@
             <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
-  <div class="section" id="distributed-optimizer-with-torchscript-support">
-<h1>Distributed Optimizer with TorchScript support<a class="headerlink" href="#distributed-optimizer-with-torchscript-support" title="Permalink to this heading">¶</a></h1>
+  <div class="section" id="torchscript">
+<h1>支持 TorchScript 的分布式优化器<a class="headerlink" href="#torchscript" title="Permalink to this heading">¶</a></h1>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Distributed Optimizer with TorchScript support is introduced in PyTorch 1.8
-as a beta feature. This API is subject to change.</p>
+<p>支持 TorchScript 的分布式优化器在 PyTorch 1.8 中作为 beta 功能引入。
+此 API 可能会发生变化。</p>
 </div>
-<p>In this recipe, you will learn:</p>
+<p>在本教程中，您将学习：</p>
 <ul class="simple">
-<li><p>The high-level idea of distributed optimizer with TorchScript support and what this feature brings</p></li>
-<li><p>How to write customized distributed optimizer that enables TorchScript support</p></li>
+<li><p>支持 TorchScript 的分布式优化器的高级概念及其带来的功能</p></li>
+<li><p>如何编写支持 TorchScript 的自定义分布式优化器</p></li>
 </ul>
-<div class="section" id="requirements">
-<h2>Requirements<a class="headerlink" href="#requirements" title="Permalink to this heading">¶</a></h2>
+<div class="section" id="id1">
+<h2>要求<a class="headerlink" href="#id1" title="Permalink to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>PyTorch 1.8+</p></li>
-<li><p><a class="reference external" href="https://pytorch.org/tutorials/intermediate/rpc_tutorial.html">Getting Started With Distributed RPC Framework</a></p></li>
+<li><p><a class="reference external" href="https://pytorch.org/tutorials/intermediate/rpc_tutorial.html">分布式 RPC 框架入门</a></p></li>
 </ul>
 </div>
-<div class="section" id="what-is-distributed-optimizer">
-<h2>What is Distributed Optimizer?<a class="headerlink" href="#what-is-distributed-optimizer" title="Permalink to this heading">¶</a></h2>
-<p><a class="reference external" href="https://pytorch.org/docs/master/rpc.html#module-torch.distributed.optim">DistributedOptimizer</a> takes a list of remote
-parameters (RRef) and runs the optimizer locally on the workers where the parameters live, which is commonly used together
-with Distributed RPC/Autograd to do model parallel training. It could use any of the local optimizer algorithms (either
-pre-defined algorithms provided in <code class="docutils literal notranslate"><span class="pre">torch.optim</span></code> or custom defined ones) to apply the gradients on each worker.</p>
+<div class="section" id="id2">
+<h2>什么是分布式优化器？<a class="headerlink" href="#id2" title="Permalink to this heading">¶</a></h2>
+<p><a class="reference external" href="https://pytorch.org/docs/master/rpc.html#module-torch.distributed.optim">DistributedOptimizer</a>
+接受一个远程参数列表（RRef），并在参数所在的工作节点上本地运行优化器。它通常与分布式 RPC/Autograd 一起使用，
+用于模型并行训练。它可以使用任何本地优化器算法（无论是 <code class="docutils literal notranslate"><span class="pre">torch.optim</span></code> 中预定义的算法还是自定义的算法）在每个工作节点上应用梯度。</p>
 </div>
-<div class="section" id="what-is-distributed-optimizer-with-torchscript-support">
-<h2>What is Distributed Optimizer with TorchScript support?<a class="headerlink" href="#what-is-distributed-optimizer-with-torchscript-support" title="Permalink to this heading">¶</a></h2>
-<p>Distributed Optimizer are widely used in distributed model parallel training, and in some
-common use cases, training need to be done in multithreaded manner instead of multiprocess
-due to performance concern and resource utilizations (or at least partially multithreaded,
-i.e. Parameter Server hosting part of the model and parameters, with new thread updating the
-parameters per request). PyTorch itself does not support multithreaded training natively as
-it suffers from the Python’s Global Interpreter Lock (GIL), but it could leverage
-<a class="reference external" href="https://pytorch.org/docs/stable/jit.html">TorchScript</a> to get rid of GIL and run the
-model in a multithreaded way.</p>
-<p>For critical model training workloads, improving the training performance is an
-important topic. Researchers often would like to implement different optimization strategies
-with the graph representation (i.e. via operator fusion) or implement custom operator kernels
-in order to speed up training.</p>
-<p>Distributed Optimizer with TorchScript support could help getting rid of GIL, thus improve
-PyTorch’s training performance in the multithreaded environment, it also unlocks the potential
-to further enhance the performance by using advanced compiler technologies that TorchScript
-offers (i.e. CPU/GPU fusion).</p>
+<div class="section" id="id3">
+<h2>什么是支持 TorchScript 的分布式优化器？<a class="headerlink" href="#id3" title="Permalink to this heading">¶</a></h2>
+<p>分布式优化器在分布式模型并行训练中被广泛使用。在一些常见用例中，由于性能考虑和资源利用，训练需要以多线程方式进行，
+而不是多进程方式（或至少部分多线程，例如参数服务器托管部分模型和参数，新线程根据请求更新参数）。
+PyTorch 本身由于 Python 的全局解释器锁（GIL）而不支持原生多线程训练，但它可以利用
+<a class="reference external" href="https://pytorch.org/docs/stable/jit.html">TorchScript</a> 来摆脱 GIL 并以多线程方式运行模型。</p>
+<p>对于关键的模型训练工作负载，提高训练性能是一个重要话题。研究人员经常希望通过图表示实现不同的优化策略（例如通过算子融合）
+或实现自定义算子内核以加速训练。</p>
+<p>支持 TorchScript 的分布式优化器可以帮助摆脱 GIL，从而提高 PyTorch 在多线程环境中的训练性能，
+它还解锁了使用 TorchScript 提供的高级编译器技术（例如 CPU/GPU 融合）来进一步提升性能的潜力。</p>
 </div>
-<div class="section" id="how-to-write-a-customized-distributed-optimizer-with-torchscript-support">
-<h2>How to write a customized distributed optimizer with TorchScript support?<a class="headerlink" href="#how-to-write-a-customized-distributed-optimizer-with-torchscript-support" title="Permalink to this heading">¶</a></h2>
-<p>The code below shows how to write a customized distributed optimizer given an existing local
-optimizer implementation, which unlocks the TorchScript benefits including GIL removal and
-performance improvement opportunities.</p>
-<p>Suppose that you already have a local optimizer that is currently used during training,
-In this case we will use <a class="reference external" href="https://github.com/facebookresearch/qhoptim/blob/e81dea3f2765780cf4fbb90b87b22ba7604b8625/qhoptim/pyt/qhm.py#L12">quasi-hyperbolic momentum (QHM)</a>
-as an example to show how to enable the TorchScript support, note that it also applies
-to any custom optimizers that inherits from <code class="docutils literal notranslate"><span class="pre">torch.optim.Optimizer</span></code>.</p>
-<p>First, we need to separate the computation and state management from the optimizer implementation,
-this is so that we could extract the computation part and make it a free function, which is
-TorchScript friendly. It has two benefits: 1. The computation logic becomes easier to inspect,
-it allows us to quickly turn the parameter update/computation part into TorchScript, and utilize
-TorchScript IR to do further optimizations (operator fusion, etc.) 2. Distributed Optimizer
-underlying is using a different mechanisms to get gradients and update parameters (we store
-gradients separately instead of directly populating the <code class="docutils literal notranslate"><span class="pre">param.grad</span></code> field during backward).
-Separating the computation allows distributed optimizer to enable the possibility of optimizer
-update in multithreaded mode, as it eliminates the possible race condition to <code class="docutils literal notranslate"><span class="pre">param.grad</span></code>.</p>
+<div class="section" id="id5">
+<h2>如何编写支持 TorchScript 的自定义分布式优化器？<a class="headerlink" href="#id5" title="Permalink to this heading">¶</a></h2>
+<p>以下代码展示了如何基于现有的本地优化器实现编写自定义分布式优化器，从而解锁 TorchScript 的优势，包括 GIL 移除和性能改进机会。</p>
+<p>假设您已经有一个在训练中使用的本地优化器，在这个例子中，我们将使用
+<a href="#id7"><span class="problematic" id="id8">`准超曲面动量（QHM）&lt;https://github.com/facebookresearch/qhoptim/blob/e81dea3f2765780cf4fbb90b87b22ba7604b8625/qhoptim/pyt/qhm.py#L12&gt;`_</span></a>
+来展示如何启用 TorchScript 支持。请注意，这也适用于任何继承自 <code class="docutils literal notranslate"><span class="pre">torch.optim.Optimizer</span></code> 的自定义优化器。</p>
+<p>首先，我们需要将计算和状态管理从优化器实现中分离出来，这样我们就可以提取计算部分并将其变成一个独立函数，这对 TorchScript 友好。
+这有两个好处：</p>
+<p>1. 计算逻辑变得更容易检查，我们可以快速将参数更新/计算部分转换为 TorchScript，
+并利用 TorchScript IR 进行进一步优化（算子融合等）
+2. 分布式优化器底层使用不同的机制来获取梯度和更新参数（我们单独存储梯度，而不是在反向传播期间直接填充 <code class="docutils literal notranslate"><span class="pre">param.grad</span></code> 字段）。
+分离计算允许分布式优化器在多线程模式下进行优化器更新，因为它消除了对 <code class="docutils literal notranslate"><span class="pre">param.grad</span></code> 的可能竞争条件。</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">Tensor</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span>
@@ -686,16 +671,17 @@ update in multithreaded mode, as it eliminates the possible race condition to <c
         <span class="n">p</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">add_</span><span class="p">(</span><span class="o">-</span><span class="n">lr</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">nu</span><span class="p">),</span> <span class="n">d_p</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Next we will define a distributed functional optimizer with TorchScript compatability to manage
-the optimizer states and calls into the TorchScript compatible update function we defined above.
-Note that a few conventions are different from normal custom optimizers: 1. We don’t inherit
-<code class="docutils literal notranslate"><span class="pre">torch.optim.Optimizer</span></code> as TorchScript does not support polymorphism 2. <code class="docutils literal notranslate"><span class="pre">step</span></code> takes gradients
-list instead of the loss closure.</p>
+<p>接下来，我们将定义一个支持 TorchScript 的分布式函数式优化器来管理优化器状态，并调用我们上面定义的兼容 TorchScript 的更新函数。
+请注意，与普通自定义优化器相比，有几个约定不同：</p>
+<ol class="arabic simple">
+<li><p>我们不继承 <code class="docutils literal notranslate"><span class="pre">torch.optim.Optimizer</span></code>，因为 TorchScript 不支持多态</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">step</span></code> 接受梯度列表而不是损失闭包。</p></li>
+</ol>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">Tensor</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Dict</span>
 
-<span class="c1"># define this as a TorchScript class</span>
+<span class="c1"># 将其定义为 TorchScript 类</span>
 <span class="nd">@torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">script</span>
 <span class="k">class</span> <span class="nc">FunctionalQHM</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
@@ -722,8 +708,7 @@ list instead of the loss closure.</p>
         <span class="p">}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">weight_decay_type</span> <span class="o">=</span> <span class="n">weight_decay_type</span>
 
-        <span class="c1"># NOTE: we only have one param_group here and don&#39;t allow user to add additional</span>
-        <span class="c1"># param group as it&#39;s not a common use case.</span>
+        <span class="c1"># 注意：我们这里只有一个参数组，不允许用户添加额外的参数组，因为这不是常见用例。</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">param_group</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;params&quot;</span><span class="p">:</span> <span class="n">params</span><span class="p">}</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="n">Dict</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]],</span> <span class="p">{})</span>
@@ -736,9 +721,9 @@ list instead of the loss closure.</p>
 
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">params</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">gradients</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;the gradients passed in does not equal to the size of the parameters!&quot;</span>
-                <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;Params length: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">params</span><span class="p">)</span><span class="si">}</span><span class="s2">. &quot;</span>
-                <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;Gradients length: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">gradients</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="s2">&quot;传入的梯度数量与参数数量不相等！&quot;</span>
+                <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;参数长度：</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">params</span><span class="p">)</span><span class="si">}</span><span class="s2">。&quot;</span>
+                <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;梯度长度：</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">gradients</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="p">)</span>
 
         <span class="k">for</span> <span class="n">param</span><span class="p">,</span> <span class="n">gradient</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">param_group</span><span class="p">[</span><span class="s1">&#39;params&#39;</span><span class="p">],</span> <span class="n">gradients</span><span class="p">):</span>
@@ -749,7 +734,7 @@ list instead of the loss closure.</p>
                 <span class="n">state</span><span class="p">[</span><span class="s1">&#39;momentum_buffer&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">param</span><span class="p">,</span> <span class="n">memory_format</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">preserve_format</span><span class="p">)</span>
                 <span class="n">momentum_buffer_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">state</span><span class="p">[</span><span class="s1">&#39;momentum_buffer&#39;</span><span class="p">])</span>
 
-        <span class="c1"># calls into the update function we just defined</span>
+        <span class="c1"># 调用我们刚刚定义的更新函数</span>
         <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
             <span class="n">qhm_update</span><span class="p">(</span><span class="n">params_with_grad</span><span class="p">,</span>
                     <span class="n">grads</span><span class="p">,</span>
@@ -761,15 +746,14 @@ list instead of the loss closure.</p>
                     <span class="bp">self</span><span class="o">.</span><span class="n">defaults</span><span class="p">[</span><span class="s1">&#39;momentum&#39;</span><span class="p">])</span>
 </pre></div>
 </div>
-<p>Finally, we register our newly defined distributed functional optimizer into the <code class="docutils literal notranslate"><span class="pre">functional_optim_map</span></code>
-This is so that the <code class="docutils literal notranslate"><span class="pre">DistributedOptimizer</span></code> will try to pick up our custom implementation instead of the
-pre-defined default ones.</p>
+<p>最后，我们将新定义的分布式函数式优化器注册到 <code class="docutils literal notranslate"><span class="pre">functional_optim_map</span></code> 中。
+这样 <code class="docutils literal notranslate"><span class="pre">DistributedOptimizer</span></code> 就会尝试使用我们的自定义实现，而不是预定义的默认实现。</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torch.distributed.optim</span> <span class="kn">import</span> <span class="n">DistributedOptimizer</span>
 
 <span class="n">DistributedOptimizer</span><span class="o">.</span><span class="n">functional_optim_map</span><span class="p">[</span><span class="n">QHM</span><span class="p">]</span> <span class="o">=</span> <span class="n">FunctionalQHM</span>
 </pre></div>
 </div>
-<p>Now you can use the <code class="docutils literal notranslate"><span class="pre">QHM</span></code> optimizer as normal in distributed training by passing it to
+<p>现在，您可以在分布式训练中正常使用 <code class="docutils literal notranslate"><span class="pre">QHM</span></code> 优化器，只需将其传递给
 <a class="reference external" href="https://pytorch.org/docs/master/rpc.html#module-torch.distributed.optim">DistributedOptimizer</a></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">...</span>
 <span class="n">remote_params_list</span> <span class="o">=</span> <span class="p">[</span><span class="o">...</span><span class="p">]</span>
@@ -778,12 +762,11 @@ pre-defined default ones.</p>
 <span class="p">)</span>
 </pre></div>
 </div>
-<p>DistributedOptimizer will automatically transform the QHM optimizer into the <code class="docutils literal notranslate"><span class="pre">FunctionalQHM</span></code> under the hood,
-and enable the TorchScript support. This will unlock the performance that boosted by multithreaded training
-and also give more potentials for further improvements (i.e. TorchScript fusion, etc.)</p>
-<p>Note that majority of PyTorch built-in optimizers are already using this methodology to speed up distributed
-training. If you see warning about some optimizers haven’t been converted yet, you can write your own conversion
-by following this recipe.</p>
+<p>DistributedOptimizer 将自动在底层将 QHM 优化器转换为 <code class="docutils literal notranslate"><span class="pre">FunctionalQHM</span></code>，
+并启用 TorchScript 支持。这将解锁多线程训练带来的性能提升，
+并为进一步改进提供更多潜力（例如 TorchScript 融合等）。</p>
+<p>请注意，大多数 PyTorch 内置优化器已经使用这种方法来加速分布式训练。
+如果您看到有关某些优化器尚未转换的警告，您可以按照本教程编写自己的转换。</p>
 </div>
 </div>
 
@@ -798,7 +781,7 @@ by following this recipe.</p>
         <a href="mobile_interpreter.html" class="btn btn-neutral float-right" title="(beta) Efficient mobile interpreter in Android and iOS" accesskey="n" rel="next">Next <img src="../_static/images/chevron-right-orange.svg" class="next-page"></a>
       
       
-        <a href="cuda_rpc.html" class="btn btn-neutral" title="Direct Device-to-Device Communication with TensorPipe CUDA RPC" accesskey="p" rel="prev"><img src="../_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
+        <a href="cuda_rpc.html" class="btn btn-neutral" title="使用TensorPipe CUDA RPC进行设备到设备通信" accesskey="p" rel="prev"><img src="../_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
       
     </div>
   
@@ -848,11 +831,11 @@ if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.i
           <div class="pytorch-right-menu" id="pytorch-right-menu">
             <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
               <ul>
-<li><a class="reference internal" href="#">Distributed Optimizer with TorchScript support</a><ul>
-<li><a class="reference internal" href="#requirements">Requirements</a></li>
-<li><a class="reference internal" href="#what-is-distributed-optimizer">What is Distributed Optimizer?</a></li>
-<li><a class="reference internal" href="#what-is-distributed-optimizer-with-torchscript-support">What is Distributed Optimizer with TorchScript support?</a></li>
-<li><a class="reference internal" href="#how-to-write-a-customized-distributed-optimizer-with-torchscript-support">How to write a customized distributed optimizer with TorchScript support?</a></li>
+<li><a class="reference internal" href="#">支持 TorchScript 的分布式优化器</a><ul>
+<li><a class="reference internal" href="#id1">要求</a></li>
+<li><a class="reference internal" href="#id2">什么是分布式优化器？</a></li>
+<li><a class="reference internal" href="#id3">什么是支持 TorchScript 的分布式优化器？</a></li>
+<li><a class="reference internal" href="#id5">如何编写支持 TorchScript 的自定义分布式优化器？</a></li>
 </ul>
 </li>
 </ul>

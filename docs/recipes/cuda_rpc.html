@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Direct Device-to-Device Communication with TensorPipe CUDA RPC &mdash; PyTorch Tutorials 2.3.0 documentation</title>
+  <title>使用TensorPipe CUDA RPC进行设备到设备通信 &mdash; PyTorch Tutorials 2.3.0 documentation</title>
   
 
   
@@ -42,8 +42,8 @@
   <link rel="stylesheet" href="../_static/css/custom2.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Distributed Optimizer with TorchScript support" href="distributed_optim_torchscript.html" />
-    <link rel="prev" title="Shard Optimizer States with ZeroRedundancyOptimizer" href="zero_redundancy_optimizer.html" />
+    <link rel="next" title="支持 TorchScript 的分布式优化器" href="distributed_optim_torchscript.html" />
+    <link rel="prev" title="使用ZeroRedundancyOptimizer分片优化器状态" href="zero_redundancy_optimizer.html" />
   <!-- Google Tag Manager -->
     <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
     new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
@@ -535,7 +535,7 @@
         
           <li><a href="recipes_index.html">PyTorch 示例</a> &gt;</li>
         
-      <li>Direct Device-to-Device Communication with TensorPipe CUDA RPC</li>
+      <li>使用TensorPipe CUDA RPC进行设备到设备通信</li>
     
     
       <li class="pytorch-breadcrumbs-aside">
@@ -594,62 +594,47 @@
             <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
-  <div class="section" id="direct-device-to-device-communication-with-tensorpipe-cuda-rpc">
-<h1>Direct Device-to-Device Communication with TensorPipe CUDA RPC<a class="headerlink" href="#direct-device-to-device-communication-with-tensorpipe-cuda-rpc" title="Permalink to this heading">¶</a></h1>
+  <div class="section" id="tensorpipe-cuda-rpc">
+<h1>使用TensorPipe CUDA RPC进行设备到设备通信<a class="headerlink" href="#tensorpipe-cuda-rpc" title="Permalink to this heading">¶</a></h1>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Direct device-to-device RPC (CUDA RPC) is introduced in PyTorch 1.8
-as a prototype feature. This API is subject to change.</p>
+<p>直接设备到设备RPC（CUDA RPC）在PyTorch 1.8中作为原型功能引入。此API可能会发生变化。</p>
 </div>
-<p>In this recipe, you will learn:</p>
+<p>在本教程中，您将学习：</p>
 <ul class="simple">
-<li><p>The high-level idea of CUDA RPC.</p></li>
-<li><p>How to use CUDA RPC.</p></li>
+<li><p>CUDA RPC的高级概念。</p></li>
+<li><p>如何使用CUDA RPC。</p></li>
 </ul>
-<div class="section" id="requirements">
-<h2>Requirements<a class="headerlink" href="#requirements" title="Permalink to this heading">¶</a></h2>
+<div class="section" id="id1">
+<h2>要求<a class="headerlink" href="#id1" title="Permalink to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>PyTorch 1.8+</p></li>
-<li><p><a class="reference external" href="https://pytorch.org/tutorials/intermediate/rpc_tutorial.html">Getting Started With Distributed RPC Framework</a></p></li>
+<li><p><a class="reference external" href="https://pytorch.org/tutorials/intermediate/rpc_tutorial.html">分布式RPC框架入门</a></p></li>
 </ul>
 </div>
-<div class="section" id="what-is-cuda-rpc">
-<h2>What is CUDA RPC?<a class="headerlink" href="#what-is-cuda-rpc" title="Permalink to this heading">¶</a></h2>
-<p>CUDA RPC supports directly sending Tensors from local CUDA memory to remote
-CUDA memory. Prior to v1.8 release, PyTorch RPC only accepts CPU Tensors. As a
-result, when an application needs to send a CUDA Tensor through RPC, it has
-to first move the Tensor to CPU on the caller, send it via RPC, and then move
-it to the destination device on the callee, which incurs both unnecessary
-synchronizations and D2H and H2D copies. Since v1.8, RPC allows users to
-configure a per-process global device map using the
+<div class="section" id="cuda-rpc">
+<h2>什么是CUDA RPC？<a class="headerlink" href="#cuda-rpc" title="Permalink to this heading">¶</a></h2>
+<p>CUDA RPC支持直接从本地CUDA内存向远程CUDA内存发送张量。在1.8版本发布之前，PyTorch RPC只接受CPU张量。
+因此，当应用程序需要通过RPC发送CUDA张量时，它必须首先将张量移动到调用方的CPU，通过RPC发送，
+然后在被调用方将其移动到目标设备，这会导致不必要的同步和D2H和H2D复制。从1.8版本开始，RPC允许用户使用
 <a class="reference external" href="https://pytorch.org/docs/master/rpc.html#torch.distributed.rpc.TensorPipeRpcBackendOptions.set_device_map">set_device_map</a>
-API, specifying how to map local devices to remote devices. More specifically,
-if <code class="docutils literal notranslate"><span class="pre">worker0</span></code>’s device map has an entry <code class="docutils literal notranslate"><span class="pre">&quot;worker1&quot;</span> <span class="pre">:</span> <span class="pre">{&quot;cuda:0&quot;</span> <span class="pre">:</span> <span class="pre">&quot;cuda:1&quot;}</span></code>,
-all RPC arguments on <code class="docutils literal notranslate"><span class="pre">&quot;cuda:0&quot;</span></code> from <code class="docutils literal notranslate"><span class="pre">worker0</span></code> will be directly sent to
-<code class="docutils literal notranslate"><span class="pre">&quot;cuda:1&quot;</span></code> on <code class="docutils literal notranslate"><span class="pre">worker1</span></code>. The response of an RPC will use the inverse of
-the caller device map, i.e., if <code class="docutils literal notranslate"><span class="pre">worker1</span></code> returns a Tensor on <code class="docutils literal notranslate"><span class="pre">&quot;cuda:1&quot;</span></code>,
-it will be directly sent to <code class="docutils literal notranslate"><span class="pre">&quot;cuda:0&quot;</span></code> on <code class="docutils literal notranslate"><span class="pre">worker0</span></code>. All intended
-device-to-device direct communication must be specified in the per-process
-device map. Otherwise, only CPU tensors are allowed.</p>
-<p>Under the hood, PyTorch RPC relies on <a class="reference external" href="https://github.com/pytorch/tensorpipe">TensorPipe</a>
-as the communication backend. PyTorch RPC extracts all Tensors from each
-request or response into a list and packs everything else into a binary
-payload. Then, TensorPipe will automatically choose a communication channel
-for each Tensor based on Tensor device type and channel availability on both
-the caller and the callee. Existing TensorPipe channels cover NVLink, InfiniBand,
-SHM, CMA, TCP, etc.</p>
+API配置每个进程的全局设备映射，指定如何将本地设备映射到远程设备。具体来说，如果``worker0``的设备映射有一个条目
+<code class="docutils literal notranslate"><span class="pre">&quot;worker1&quot;</span> <span class="pre">:</span> <span class="pre">{&quot;cuda:0&quot;</span> <span class="pre">:</span> <span class="pre">&quot;cuda:1&quot;}</span></code>，所有来自 <code class="docutils literal notranslate"><span class="pre">worker0</span></code> 的 <code class="docutils literal notranslate"><span class="pre">&quot;cuda:0&quot;</span></code> 上的RPC参数
+将直接发送到 <code class="docutils literal notranslate"><span class="pre">worker1``的</span></code>”cuda:1”`` 。RPC的响应将使用调用方设备映射的逆映射，即如果 <code class="docutils literal notranslate"><span class="pre">worker1</span></code>
+返回 <code class="docutils literal notranslate"><span class="pre">&quot;cuda:1&quot;</span></code> 上的张量，它将直接发送到 <code class="docutils literal notranslate"><span class="pre">worker0</span></code> 的 <code class="docutils literal notranslate"><span class="pre">&quot;cuda:0&quot;</span></code> 。
+所有预期的设备到设备直接通信必须在每个进程的设备映射中指定。否则，只允许CPU张量。</p>
+<p>在底层，PyTorch RPC依赖于 <a class="reference external" href="https://github.com/pytorch/tensorpipe">TensorPipe</a> 作为通信后端。
+PyTorch RPC从每个请求或响应中提取所有张量到一个列表中，并将其他所有内容打包成二进制负载。
+然后，TensorPipe将根据张量设备类型和调用方和被调用方的通道可用性，自动为每个张量选择通信通道。
+现有的 TensorPipe 通道涵盖 NVLink、InfiniBand、SHM、CMA、TCP 等。</p>
 </div>
-<div class="section" id="how-to-use-cuda-rpc">
-<h2>How to use CUDA RPC?<a class="headerlink" href="#how-to-use-cuda-rpc" title="Permalink to this heading">¶</a></h2>
-<p>The code below shows how to use CUDA RPC. The model contains two linear layers
-and is split into two shards. The two shards are placed on <code class="docutils literal notranslate"><span class="pre">worker0</span></code> and
-<code class="docutils literal notranslate"><span class="pre">worker1</span></code> respectively, and <code class="docutils literal notranslate"><span class="pre">worker0</span></code> serves as the master that drives the
-forward and backward passes. Note that we intentionally skipped
+<div class="section" id="id2">
+<h2>如何使用CUDA RPC？<a class="headerlink" href="#id2" title="Permalink to this heading">¶</a></h2>
+<p>以下代码展示了如何使用CUDA RPC。该模型包含两个线性层，被分成两个分片。这两个分片分别放置在 <code class="docutils literal notranslate"><span class="pre">worker0</span></code> 和 <code class="docutils literal notranslate"><span class="pre">worker1</span></code> 上，
+<code class="docutils literal notranslate"><span class="pre">worker0</span></code> 作为主节点驱动前向和后向传播。请注意，我们有意跳过了
 <a class="reference external" href="https://pytorch.org/docs/master/rpc.html#module-torch.distributed.optim">DistributedOptimizer</a>
-to highlight the performance improvements when using CUDA RPC. The experiment
-repeats the forward and backward passes 10 times and measures the total
-execution time. It compares using CUDA RPC against manually staging to CPU
-memory and using CPU RPC.</p>
+以突出使用 CUDA RPC 时的性能改进。实验重复前向和后向传播 10 次，并测量总执行时间。它比较了使用 CUDA RPC 与手动暂存到 CPU 内存
+并使用 CPU RPC 的情况。</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">import</span> <span class="nn">torch.distributed.autograd</span> <span class="k">as</span> <span class="nn">autograd</span>
 <span class="kn">import</span> <span class="nn">torch.distributed.rpc</span> <span class="k">as</span> <span class="nn">rpc</span>
@@ -668,7 +653,7 @@ memory and using CPU RPC.</p>
         <span class="bp">self</span><span class="o">.</span><span class="n">comm_mode</span> <span class="o">=</span> <span class="n">comm_mode</span>
 
     <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-        <span class="c1"># x.to() is a no-op if x is already on self.device</span>
+        <span class="c1"># 如果x已经在self.device上，x.to()是一个空操作</span>
         <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">linear</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">y</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm_mode</span> <span class="o">==</span> <span class="s2">&quot;cpu&quot;</span> <span class="k">else</span> <span class="n">y</span>
 
@@ -677,11 +662,11 @@ memory and using CPU RPC.</p>
 
 
 <span class="k">def</span> <span class="nf">measure</span><span class="p">(</span><span class="n">comm_mode</span><span class="p">):</span>
-    <span class="c1"># local module on &quot;worker0/cuda:0&quot;</span>
+    <span class="c1"># &quot;worker0/cuda:0&quot;上的本地模块</span>
     <span class="n">lm</span> <span class="o">=</span> <span class="n">MyModule</span><span class="p">(</span><span class="s2">&quot;cuda:0&quot;</span><span class="p">,</span> <span class="n">comm_mode</span><span class="p">)</span>
-    <span class="c1"># remote module on &quot;worker1/cuda:1&quot;</span>
+    <span class="c1"># &quot;worker1/cuda:1&quot;上的远程模块</span>
     <span class="n">rm</span> <span class="o">=</span> <span class="n">rpc</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span><span class="s2">&quot;worker1&quot;</span><span class="p">,</span> <span class="n">MyModule</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;cuda:1&quot;</span><span class="p">,</span> <span class="n">comm_mode</span><span class="p">))</span>
-    <span class="c1"># prepare random inputs</span>
+    <span class="c1"># 准备随机输入</span>
     <span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span> <span class="mi">1000</span><span class="p">)</span><span class="o">.</span><span class="n">cuda</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 
     <span class="n">tik</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
@@ -689,11 +674,10 @@ memory and using CPU RPC.</p>
         <span class="k">with</span> <span class="n">autograd</span><span class="o">.</span><span class="n">context</span><span class="p">()</span> <span class="k">as</span> <span class="n">ctx</span><span class="p">:</span>
             <span class="n">y</span> <span class="o">=</span> <span class="n">rm</span><span class="o">.</span><span class="n">rpc_sync</span><span class="p">()</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">lm</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
             <span class="n">autograd</span><span class="o">.</span><span class="n">backward</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="p">[</span><span class="n">y</span><span class="o">.</span><span class="n">sum</span><span class="p">()])</span>
-    <span class="c1"># synchronize on &quot;cuda:0&quot; to make sure that all pending CUDA ops are</span>
-    <span class="c1"># included in the measurements</span>
+    <span class="c1"># 在&quot;cuda:0&quot;上同步，以确保所有待处理的CUDA操作都包含在测量中</span>
     <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">current_stream</span><span class="p">(</span><span class="s2">&quot;cuda:0&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">synchronize</span><span class="p">()</span>
     <span class="n">tok</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">comm_mode</span><span class="si">}</span><span class="s2"> RPC total execution time: </span><span class="si">{</span><span class="n">tok</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">tik</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">comm_mode</span><span class="si">}</span><span class="s2"> RPC总执行时间：</span><span class="si">{</span><span class="n">tok</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">tik</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">run_worker</span><span class="p">(</span><span class="n">rank</span><span class="p">):</span>
@@ -719,7 +703,7 @@ memory and using CPU RPC.</p>
             <span class="n">rpc_backend_options</span><span class="o">=</span><span class="n">options</span>
         <span class="p">)</span>
 
-    <span class="c1"># block until all rpcs finish</span>
+    <span class="c1"># 阻塞直到所有rpc完成</span>
     <span class="n">rpc</span><span class="o">.</span><span class="n">shutdown</span><span class="p">()</span>
 
 
@@ -728,10 +712,9 @@ memory and using CPU RPC.</p>
     <span class="n">mp</span><span class="o">.</span><span class="n">spawn</span><span class="p">(</span><span class="n">run_worker</span><span class="p">,</span> <span class="n">nprocs</span><span class="o">=</span><span class="n">world_size</span><span class="p">,</span> <span class="n">join</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Outputs are displayed below, which shows that CUDA RPC can help to achieve
-34X speed up compared to CPU RPC in this experiment.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cpu</span> <span class="n">RPC</span> <span class="n">total</span> <span class="n">execution</span> <span class="n">time</span><span class="p">:</span> <span class="mf">2.3145179748535156</span> <span class="n">Seconds</span>
-<span class="n">cuda</span> <span class="n">RPC</span> <span class="n">total</span> <span class="n">execution</span> <span class="n">time</span><span class="p">:</span> <span class="mf">0.06867480278015137</span> <span class="n">Seconds</span>
+<p>输出显示如下，表明在这个实验中，CUDA RPC 可以帮助实现 34 倍的速度提升，相比于 CPU RPC。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>cpu RPC总执行时间：2.3145179748535156秒
+cuda RPC总执行时间：0.06867480278015137秒
 </pre></div>
 </div>
 </div>
@@ -745,10 +728,10 @@ memory and using CPU RPC.</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="distributed_optim_torchscript.html" class="btn btn-neutral float-right" title="Distributed Optimizer with TorchScript support" accesskey="n" rel="next">Next <img src="../_static/images/chevron-right-orange.svg" class="next-page"></a>
+        <a href="distributed_optim_torchscript.html" class="btn btn-neutral float-right" title="支持 TorchScript 的分布式优化器" accesskey="n" rel="next">Next <img src="../_static/images/chevron-right-orange.svg" class="next-page"></a>
       
       
-        <a href="zero_redundancy_optimizer.html" class="btn btn-neutral" title="Shard Optimizer States with ZeroRedundancyOptimizer" accesskey="p" rel="prev"><img src="../_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
+        <a href="zero_redundancy_optimizer.html" class="btn btn-neutral" title="使用ZeroRedundancyOptimizer分片优化器状态" accesskey="p" rel="prev"><img src="../_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
       
     </div>
   
@@ -798,10 +781,10 @@ if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.i
           <div class="pytorch-right-menu" id="pytorch-right-menu">
             <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
               <ul>
-<li><a class="reference internal" href="#">Direct Device-to-Device Communication with TensorPipe CUDA RPC</a><ul>
-<li><a class="reference internal" href="#requirements">Requirements</a></li>
-<li><a class="reference internal" href="#what-is-cuda-rpc">What is CUDA RPC?</a></li>
-<li><a class="reference internal" href="#how-to-use-cuda-rpc">How to use CUDA RPC?</a></li>
+<li><a class="reference internal" href="#">使用TensorPipe CUDA RPC进行设备到设备通信</a><ul>
+<li><a class="reference internal" href="#id1">要求</a></li>
+<li><a class="reference internal" href="#cuda-rpc">什么是CUDA RPC？</a></li>
+<li><a class="reference internal" href="#id2">如何使用CUDA RPC？</a></li>
 </ul>
 </li>
 </ul>
