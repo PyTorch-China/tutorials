@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>分布式检查点 (DCP) 入门 &mdash; PyTorch Tutorials 2.3.0 documentation</title>
+  <title>分布式检查点 (DCP) 入门 &mdash; PyTorch Tutorials 2.3.0+cu121 documentation</title>
   
 
   
@@ -276,7 +276,7 @@
               
               
                 <div class="version">
-                  2.3.0
+                  2.3.0+cu121
                 </div>
               
             
@@ -612,7 +612,7 @@ Pytorch 分布式检查点 (DCP) 可以帮助简化这个过程。</p>
 <p>此外，通过使用 <code class="xref py py-func docutils literal notranslate"><span class="pre">torch.distributed.checkpoint.state_dict()</span></code> 中的模块，
 DCP 提供了在分布式设置中优雅处理 <code class="docutils literal notranslate"><span class="pre">state_dict</span></code> 生成和加载的支持。
 这包括管理模型和优化器之间的全限定名称 (FQN) 映射，以及为 PyTorch 提供的并行性设置默认参数。</p>
-<p>DCP 与 <a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.save.html#torch.save" title="(in PyTorch v2.3)"><code class="xref py py-func docutils literal notranslate"><span class="pre">torch.save()</span></code></a> 和 <a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.load.html#torch.load" title="(in PyTorch v2.3)"><code class="xref py py-func docutils literal notranslate"><span class="pre">torch.load()</span></code></a> 在几个重要方面有所不同：</p>
+<p>DCP 与 <a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.save.html#torch.save" title="(in PyTorch v2.5)"><code class="xref py py-func docutils literal notranslate"><span class="pre">torch.save()</span></code></a> 和 <a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.load.html#torch.load" title="(in PyTorch v2.5)"><code class="xref py py-func docutils literal notranslate"><span class="pre">torch.load()</span></code></a> 在几个重要方面有所不同：</p>
 <ul class="simple">
 <li><p>它为每个检查点生成多个文件，每个 rank 至少一个。</p></li>
 <li><p>它就地操作，这意味着模型应该首先分配其数据，DCP 使用该存储而不是创建新的存储。</p></li>
@@ -714,7 +714,7 @@ DCP 提供了在分布式设置中优雅处理 <code class="docutils literal not
 <h3>加载<a class="headerlink" href="#id4" title="Permalink to this heading">¶</a></h3>
 <p>保存之后，让我们创建相同的 FSDP 包装模型，并从存储中加载保存的状态字典到模型中。您可以在相同的世界大小或不同的世界大小中加载。</p>
 <p>请注意，您需要在加载之前调用 <code class="xref py py-func docutils literal notranslate"><span class="pre">model.state_dict()</span></code>，并将其传递给 DCP 的 <code class="xref py py-func docutils literal notranslate"><span class="pre">load_state_dict()</span></code> API。
-这与 <a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.load.html#torch.load" title="(in PyTorch v2.3)"><code class="xref py py-func docutils literal notranslate"><span class="pre">torch.load()</span></code></a> 有根本的不同，因为 <a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.load.html#torch.load" title="(in PyTorch v2.3)"><code class="xref py py-func docutils literal notranslate"><span class="pre">torch.load()</span></code></a> 只需要加载前的检查点路径。
+这与 <a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.load.html#torch.load" title="(in PyTorch v2.5)"><code class="xref py py-func docutils literal notranslate"><span class="pre">torch.load()</span></code></a> 有根本的不同，因为 <a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.load.html#torch.load" title="(in PyTorch v2.5)"><code class="xref py py-func docutils literal notranslate"><span class="pre">torch.load()</span></code></a> 只需要加载前的检查点路径。
 我们需要在加载之前提供 <code class="docutils literal notranslate"><span class="pre">state_dict</span></code> 的原因是：</p>
 <ul class="simple">
 <li><p>DCP 使用模型状态字典中预分配的存储来从检查点目录加载。在加载过程中，传入的状态字典将被就地更新。</p></li>
@@ -849,7 +849,7 @@ DCP 会推断意图是以”非分布式”方式保存或加载，这意味着�
 </div>
 <div class="section" id="id5">
 <h2>结论<a class="headerlink" href="#id5" title="Permalink to this heading">¶</a></h2>
-<p>总之，我们学习了如何使用 DCP 的 <code class="xref py py-func docutils literal notranslate"><span class="pre">save()</span></code> 和 <code class="xref py py-func docutils literal notranslate"><span class="pre">load()</span></code> API，以及它们与 <a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.save.html#torch.save" title="(in PyTorch v2.3)"><code class="xref py py-func docutils literal notranslate"><span class="pre">torch.save()</span></code></a> 和 <a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.load.html#torch.load" title="(in PyTorch v2.3)"><code class="xref py py-func docutils literal notranslate"><span class="pre">torch.load()</span></code></a> 的不同之处。
+<p>总之，我们学习了如何使用 DCP 的 <code class="xref py py-func docutils literal notranslate"><span class="pre">save()</span></code> 和 <code class="xref py py-func docutils literal notranslate"><span class="pre">load()</span></code> API，以及它们与 <a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.save.html#torch.save" title="(in PyTorch v2.5)"><code class="xref py py-func docutils literal notranslate"><span class="pre">torch.save()</span></code></a> 和 <a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.load.html#torch.load" title="(in PyTorch v2.5)"><code class="xref py py-func docutils literal notranslate"><span class="pre">torch.load()</span></code></a> 的不同之处。
 此外，我们还学习了如何使用 <code class="xref py py-func docutils literal notranslate"><span class="pre">get_state_dict()</span></code> 和 <code class="xref py py-func docutils literal notranslate"><span class="pre">set_state_dict()</span></code> 在状态字典生成和加载期间自动管理并行性特定的 FQN 和默认值。</p>
 <p>更多信息，请参阅以下内容：</p>
 <ul class="simple">
