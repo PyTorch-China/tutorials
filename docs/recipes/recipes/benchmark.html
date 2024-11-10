@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>PyTorch Benchmark &mdash; PyTorch Tutorials 2.3.0 documentation</title>
+  <title>PyTorch Benchmark &mdash; PyTorch Tutorials 2.3.0+cu121 documentation</title>
   
 
   
@@ -276,7 +276,7 @@
               
               
                 <div class="version">
-                  2.3.0
+                  2.3.0+cu121
                 </div>
               
             
@@ -926,7 +926,7 @@ PyTorch 的 <cite>benchmark</cite> 模块为我们做了同步。</p>
             <span class="p">)</span><span class="o">.</span><span class="n">blocked_autorange</span><span class="p">(</span><span class="n">min_run_time</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
         <span class="p">)</span>
 
-<span class="n">compare</span> <span class="o">=</span> <span class="n">benchmark</span><span class="o">.</span><span class="n">Compare</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
+<span class="n">compare</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/benchmark_utils.html#torch.utils.benchmark.Compare" title="torch.utils.benchmark.Compare" class="sphx-glr-backref-module-torch-utils-benchmark sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">benchmark</span><span class="o">.</span><span class="n">Compare</span></a><span class="p">(</span><span class="n">results</span><span class="p">)</span>
 <span class="n">compare</span><span class="o">.</span><span class="n">print</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -1045,7 +1045,7 @@ PyTorch 的 <cite>benchmark</cite> 模块为我们做了同步。</p>
         <span class="n">ab_test_results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pickle</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">m</span><span class="p">))</span>
 
 <span class="n">ab_results</span> <span class="o">=</span> <span class="p">[</span><span class="n">pickle</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">ab_test_results</span><span class="p">]</span>
-<span class="n">compare</span> <span class="o">=</span> <span class="n">benchmark</span><span class="o">.</span><span class="n">Compare</span><span class="p">(</span><span class="n">ab_results</span><span class="p">)</span>
+<span class="n">compare</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/benchmark_utils.html#torch.utils.benchmark.Compare" title="torch.utils.benchmark.Compare" class="sphx-glr-backref-module-torch-utils-benchmark sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">benchmark</span><span class="o">.</span><span class="n">Compare</span></a><span class="p">(</span><span class="n">ab_results</span><span class="p">)</span>
 <span class="n">compare</span><span class="o">.</span><span class="n">trim_significant_figures</span><span class="p">()</span>
 <span class="n">compare</span><span class="o">.</span><span class="n">colorize</span><span class="p">()</span>
 <span class="n">compare</span><span class="o">.</span><span class="n">print</span><span class="p">()</span>
@@ -1065,7 +1065,7 @@ PyTorch 的 <cite>benchmark</cite> 模块为我们做了同步。</p>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># 仅为展示可以将之前所有的结果通过 pickle 进行回传:</span>
 <span class="n">round_tripped_results</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">pickle</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">results</span><span class="p">))</span>
-<span class="k">assert</span> <span class="nb">str</span><span class="p">(</span><span class="n">benchmark</span><span class="o">.</span><span class="n">Compare</span><span class="p">(</span><span class="n">results</span><span class="p">))</span> <span class="o">==</span> <span class="nb">str</span><span class="p">(</span><span class="n">benchmark</span><span class="o">.</span><span class="n">Compare</span><span class="p">(</span><span class="n">round_tripped_results</span><span class="p">))</span>
+<span class="k">assert</span> <span class="nb">str</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/benchmark_utils.html#torch.utils.benchmark.Compare" title="torch.utils.benchmark.Compare" class="sphx-glr-backref-module-torch-utils-benchmark sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">benchmark</span><span class="o">.</span><span class="n">Compare</span></a><span class="p">(</span><span class="n">results</span><span class="p">))</span> <span class="o">==</span> <span class="nb">str</span><span class="p">(</span><a href="https://pytorch.org/docs/stable/benchmark_utils.html#torch.utils.benchmark.Compare" title="torch.utils.benchmark.Compare" class="sphx-glr-backref-module-torch-utils-benchmark sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">benchmark</span><span class="o">.</span><span class="n">Compare</span></a><span class="p">(</span><span class="n">round_tripped_results</span><span class="p">))</span>
 </pre></div>
 </div>
 </div>
@@ -1121,7 +1121,7 @@ PyTorch 的 <cite>benchmark</cite> 模块为我们做了同步。</p>
         <span class="p">)</span><span class="o">.</span><span class="n">blocked_autorange</span><span class="p">(</span><span class="n">min_run_time</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
     <span class="p">)</span>
 
-<span class="n">compare</span> <span class="o">=</span> <span class="n">benchmark</span><span class="o">.</span><span class="n">Compare</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
+<span class="n">compare</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/benchmark_utils.html#torch.utils.benchmark.Compare" title="torch.utils.benchmark.Compare" class="sphx-glr-backref-module-torch-utils-benchmark sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">benchmark</span><span class="o">.</span><span class="n">Compare</span></a><span class="p">(</span><span class="n">results</span><span class="p">)</span>
 <span class="n">compare</span><span class="o">.</span><span class="n">trim_significant_figures</span><span class="p">()</span>
 <span class="n">compare</span><span class="o">.</span><span class="n">print</span><span class="p">()</span>
 </pre></div>
@@ -1175,7 +1175,7 @@ PyTorch 的 <cite>benchmark</cite> 模块为我们做了同步。</p>
         <span class="p">)</span><span class="o">.</span><span class="n">blocked_autorange</span><span class="p">(</span><span class="n">min_run_time</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
     <span class="p">)</span>
 
-<span class="n">compare</span> <span class="o">=</span> <span class="n">benchmark</span><span class="o">.</span><span class="n">Compare</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
+<span class="n">compare</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/benchmark_utils.html#torch.utils.benchmark.Compare" title="torch.utils.benchmark.Compare" class="sphx-glr-backref-module-torch-utils-benchmark sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">benchmark</span><span class="o">.</span><span class="n">Compare</span></a><span class="p">(</span><span class="n">results</span><span class="p">)</span>
 <span class="n">compare</span><span class="o">.</span><span class="n">trim_significant_figures</span><span class="p">()</span>
 <span class="n">compare</span><span class="o">.</span><span class="n">colorize</span><span class="p">(</span><span class="n">rowwise</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="n">compare</span><span class="o">.</span><span class="n">print</span><span class="p">()</span>

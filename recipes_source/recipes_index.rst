@@ -331,6 +331,15 @@ Recipes are bite-sized, actionable examples of how to use specific PyTorch featu
    :link: ../recipes/torch_compile_user_defined_triton_kernel_tutorial.html
    :tags: Model-Optimization
 
+.. Reducing Cold Start Compilation Time with Regional Compilation
+
+.. customcarditem::
+   :header: 通过区域编译减少 torch.compile 冷启动编译时间
+   :card_description: 了解如何使用区域编译来控制冷启动编译时间
+   :image: ../_static/img/thumbnails/cropped/generic-pytorch-logo.png
+   :link: ../recipes/regional_compilation.html
+   :tags: Model-Optimization
+
 .. Intel(R) Extension for PyTorch*
 
 .. customcarditem::

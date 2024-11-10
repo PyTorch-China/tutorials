@@ -27,17 +27,17 @@
 
 我们建议将本教程作为笔记本（notebook）运行。请点击页面顶部的链接，下载笔记本（``.ipynb``）文件。
 
-PyTorch 提供了优雅设计的模块和类
+PyTorch 提供了优雅设计的模块和类 
 `torch.nn <https://pytorch.org/docs/stable/nn.html>`_ ，
 `torch.optim <https://pytorch.org/docs/stable/optim.html>`_ ，
 `Dataset <https://pytorch.org/docs/stable/data.html?highlight=dataset#torch.utils.data.Dataset>`_ ，
 以及 `DataLoader <https://pytorch.org/docs/stable/data.html?highlight=dataloader#torch.utils.data.DataLoader>`_ ，
 以帮助你创建和训练神经网络。
 为了充分利用它们的功能，并通过自定义对应模块或类，来解决特定问题，需要理解它们的具体功能。为此，我们将首先在 MNIST 数据集上训练一个基本的神经网络，而不使用这些模型的任何特性；
-我们最初只使用最基本的 PyTorch 张量功能。然后，我们将逐步添加 ``torch.nn``、``torch.optim``、``Dataset``
-或 ``DataLoader`` 中的一个特性，展示每个部分的作用，以及如何使用它们让代码更简洁或更灵活。
+我们最初只使用最基本的 PyTorch 张量功能。然后，我们将逐步添加``torch.nn``、``torch.optim``、``Dataset`` 
+或 ``DataLoader``中的一个特性，展示每个部分的作用，以及如何使用它们让代码更简洁或更灵活。
 
-** 本教程假定你已经安装了 PyTorch，并且熟悉张量操作的基础知识。 **（如果你熟悉 Numpy 数组操作，你会发现这里使用的 PyTorch 张量操作几乎相同）。
+**本教程假定你已经安装了 PyTorch，并且熟悉张量操作的基础知识。**（如果你熟悉 Numpy 数组操作，你会发现这里使用的 PyTorch 张量操作几乎相同）。
 
 MNIST 数据集设置
 ----------------
@@ -262,7 +262,7 @@ PyTorch 会为你的函数自动创建 GPU 或矢量化 CPU 代码。
 - ``loss.backward()`` 更新模型的梯度，即更新 ``weights`` 和 ``bias``。
 
 我们现在使用这些梯度来更新权重(weights)和偏置(bias)。我们在 ``torch.no_grad()`` 上下文管理器中执行此操作，
-因为我们不希望这些操作记录为下一次梯度计算的一部分。你可以在 `这里 <https://pytorch.org/docs/stable/notes/autograd.html>`_
+因为我们不希望这些操作记录为下一次梯度计算的一部分。你可以在 `这里 <https://pytorch.org/docs/stable/notes/autograd.html>`_ 
 阅读有关 PyTorch 的 Autograd 如何记录操作的更多信息。
 
 然后，我们将梯度设置为零，以便我们准备进行下一次循环。否则，我们的梯度将记录所有已发生的操作（即 ``loss.backward()`` *添加* 梯度到已有的梯度中，而不是替换它们）。
@@ -323,7 +323,7 @@ PyTorch 会为你的函数自动创建 GPU 或矢量化 CPU 代码。
  除了各种损失和激活函数，你还会看到一些创建神经网络的便捷函数，比如池化函数。
 （还有用于卷积、线性层等的函数，但正如我们将看到的，这些通常更适合使用库的其他模块来处理。）
 
- 如果你使用negative log likelihood loss 和 log softmax activation，那么 PyTorch 提供了一个结合了两者的单一函数
+ 如果你使用negative log likelihood loss 和 log softmax activation，那么 PyTorch 提供了一个结合了两者的单一函数 
  ``F.cross_entropy``。所以我们可以从模型中移除激活函数。
 
 .. GENERATED FROM PYTHON SOURCE LINES 219-227
@@ -357,8 +357,8 @@ PyTorch 会为你的函数自动创建 GPU 或矢量化 CPU 代码。
 -----------------------------
 
 接下来，我们将使用 ``nn.Module`` 和 ``nn.Parameter``，以实现更清晰和简洁的训练循环。
-我们将继承 ``nn.Module`` （它本身是一个类，能够跟踪状态）。在这种情况下，我们想创建一个类来保存我们的权重、偏置和forward方法。
-我们将会使用 ``nn.Module`` 的属性和方法（例如 ``.parameters()`` 和 ``.zero_grad()`` ）。
+我们将继承 ``nn.Module``（它本身是一个类，能够跟踪状态）。在这种情况下，我们想创建一个类来保存我们的权重、偏置和forward方法。
+我们将会使用 ``nn.Module`` 的属性和方法（例如 ``.parameters()`` 和 ``.zero_grad()``）。
 
 .. GENERATED FROM PYTHON SOURCE LINES 239-254
 
@@ -589,10 +589,10 @@ PyTorch ``torch.optim``包含多种优化算法 。我们可以使用优化器�
 
 PyTorch 有一个抽象的 Dataset 类。Dataset 可以是任何具有 ``__len__`` 函数（由 Python 的标准 ``len`` 函数调用）
 和 ``__getitem__`` 函数（作为索引方式）的对象。
-`教程 <https://pytorch.org/tutorials/beginner/data_loading_tutorial.html>`_ 详细介绍了创建一个自定义
+`教程 <https://pytorch.org/tutorials/beginner/data_loading_tutorial.html>`_ 详细介绍了创建一个自定义 
 ``FacialLandmarkDataset`` 类作为 ``Dataset`` 子类的例子。
 
-PyTorch 的 `TensorDataset <https://pytorch.org/docs/stable/_modules/torch/utils/data/dataset.html#TensorDataset>`_
+PyTorch 的 `TensorDataset <https://pytorch.org/docs/stable/_modules/torch/utils/data/dataset.html#TensorDataset>`_ 
 是一个包装张量的 Dataset，为我们提供了一种迭代、索引和沿张量的第一个维度切片的方式，使我们在训练时更容易同时访问自变量和因变量。
 
 .. GENERATED FROM PYTHON SOURCE LINES 404-407
@@ -681,7 +681,7 @@ PyTorch 的 `TensorDataset <https://pytorch.org/docs/stable/_modules/torch/utils
        xb,yb = train_ds[i*bs : i*bs+bs]
        pred = model(xb)
 
-现在，我们的循环变得更加简洁，``(xb, yb)`` 自动从DataLoader中加载:
+现在，我们的循环变得更加简洁，``(xb, yb)`` 自动从DataLoader中加载: 
 
 .. code-block:: python
 
@@ -1119,7 +1119,6 @@ stochastic gradient descent 的一种变体，通过统计更新记录来提升�
 ``torch.nn``，``torch.optim``，``Dataset``， and ``DataLoader``。现在让我们总结一下:
 
  - ``torch.nn``:
-
    + ``Module``: 创建一个类似于函数的可调用对象，其中包含了状态数据(如神经网络层权重)。它可以自动对包含的参数，进行梯度归零和更新权重等操作。
    + ``Parameter``: 对张量进行包装，使 ``Module`` 对象在进行反向传播时，可更新权重参数(仅设置 `requires_grad=True` 参数时生效)。
    + ``functional``: 包含多种激活函数、损失函数，以及无状态的卷积层和线性层等的实现。

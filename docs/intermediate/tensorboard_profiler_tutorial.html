@@ -1,213 +1,247 @@
 
-<!DOCTYPE html>
 
+
+<!DOCTYPE html>
 <!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en"> <!--<![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>PyTorch Profiler With TensorBoard — PyTorch Tutorials 2.3.0 documentation</title>
-<link href="../_static/css/theme.css" rel="stylesheet" type="text/css"/>
-<!-- <link rel="stylesheet" href="../_static/pygments.css" type="text/css" /> -->
-<link href="../_static/pygments.css" rel="stylesheet" type="text/css"/>
-<link href="../_static/css/theme.css" rel="stylesheet" type="text/css"/>
-<link href="../_static/copybutton.css" rel="stylesheet" type="text/css"/>
-<link href="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.css" rel="stylesheet" type="text/css"/>
-<link href="../_static/katex-math.css" rel="stylesheet" type="text/css"/>
-<link href="../_static/sg_gallery.css" rel="stylesheet" type="text/css"/>
-<link href="../_static/sg_gallery-binder.css" rel="stylesheet" type="text/css"/>
-<link href="../_static/sg_gallery-dataframe.css" rel="stylesheet" type="text/css"/>
-<link href="../_static/sg_gallery-rendered-html.css" rel="stylesheet" type="text/css"/>
-<link href="../_static/sphinx-design.5ea377869091fd0449014c60fc090103.min.css" rel="stylesheet" type="text/css"/>
-<link href="https://cdn.jsdelivr.net/npm/katex@0.10.0-beta/dist/katex.min.css" rel="stylesheet" type="text/css"/>
-<link href="../_static/css/custom.css" rel="stylesheet" type="text/css"/>
-<link href="../_static/css/custom2.css" rel="stylesheet" type="text/css"/>
-<link href="../genindex.html" rel="index" title="Index"/>
-<link href="../search.html" rel="search" title="Search"/>
-<link href="../beginner/hyperparameter_tuning_tutorial.html" rel="next" title="Ray Tune 超参数调优"/>
-<link href="../advanced/privateuseone.html" rel="prev" title="Facilitating New Backend Integration by PrivateUse1"/>
-<!-- Google Tag Manager -->
-<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>PyTorch Profiler With TensorBoard &mdash; PyTorch Tutorials 2.3.0+cu121 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!-- <link rel="stylesheet" href="../_static/pygments.css" type="text/css" /> -->
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/katex-math.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/sg_gallery.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/sg_gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/sg_gallery-dataframe.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/sg_gallery-rendered-html.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/sphinx-design.5ea377869091fd0449014c60fc090103.min.css" type="text/css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0-beta/dist/katex.min.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/custom2.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Ray Tune 超参数调优" href="../beginner/hyperparameter_tuning_tutorial.html" />
+    <link rel="prev" title="Facilitating New Backend Integration by PrivateUse1" href="../advanced/privateuseone.html" />
+  <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
     new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
     j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
     })(window,document,'script','dataLayer','GTM-T8XT4PS');</script>
-<!-- End Google Tag Manager -->
-<script src="../_static/js/modernizr.min.js"></script>
-<!-- Preload the theme fonts -->
-<link as="font" crossorigin="anonymous" href="../_static/fonts/FreightSans/freight-sans-book.woff2" rel="preload" type="font/woff2"/>
-<link as="font" crossorigin="anonymous" href="../_static/fonts/FreightSans/freight-sans-medium.woff2" rel="preload" type="font/woff2"/>
-<link as="font" crossorigin="anonymous" href="../_static/fonts/IBMPlexMono/IBMPlexMono-Medium.woff2" rel="preload" type="font/woff2"/>
-<link as="font" crossorigin="anonymous" href="../_static/fonts/FreightSans/freight-sans-bold.woff2" rel="preload" type="font/woff2"/>
-<link as="font" crossorigin="anonymous" href="../_static/fonts/FreightSans/freight-sans-medium-italic.woff2" rel="preload" type="font/woff2"/>
-<link as="font" crossorigin="anonymous" href="../_static/fonts/IBMPlexMono/IBMPlexMono-SemiBold.woff2" rel="preload" type="font/woff2"/>
+    <!-- End Google Tag Manager -->
+  
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+  <!-- Preload the theme fonts -->
+
+<link rel="preload" href="../_static/fonts/FreightSans/freight-sans-book.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../_static/fonts/FreightSans/freight-sans-medium.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../_static/fonts/IBMPlexMono/IBMPlexMono-Medium.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../_static/fonts/FreightSans/freight-sans-bold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../_static/fonts/FreightSans/freight-sans-medium-italic.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../_static/fonts/IBMPlexMono/IBMPlexMono-SemiBold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+
 <!-- Preload the katex fonts -->
-<link as="font" crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Math-Italic.woff2" rel="preload" type="font/woff2"/>
-<link as="font" crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Main-Regular.woff2" rel="preload" type="font/woff2"/>
-<link as="font" crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Main-Bold.woff2" rel="preload" type="font/woff2"/>
-<link as="font" crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size1-Regular.woff2" rel="preload" type="font/woff2"/>
-<link as="font" crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size4-Regular.woff2" rel="preload" type="font/woff2"/>
-<link as="font" crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size2-Regular.woff2" rel="preload" type="font/woff2"/>
-<link as="font" crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size3-Regular.woff2" rel="preload" type="font/woff2"/>
-<link as="font" crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Caligraphic-Regular.woff2" rel="preload" type="font/woff2"/>
-<link crossorigin="anonymous" href="https://use.fontawesome.com/releases/v5.15.2/css/all.css" integrity="sha384-vSIIfh2YWi9wW0r9iZe7RJPrKwp6bG+s9QZMoITbCckVJqGCCRhc+ccxNcdpHuYu" rel="stylesheet"/>
+
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Math-Italic.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Main-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Main-Bold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size1-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size4-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size2-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size3-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Caligraphic-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.2/css/all.css" integrity="sha384-vSIIfh2YWi9wW0r9iZe7RJPrKwp6bG+s9QZMoITbCckVJqGCCRhc+ccxNcdpHuYu" crossorigin="anonymous">
 </head>
+
 <div class="container-fluid header-holder tutorials-header" id="header-holder">
-<div class="container">
-<div class="header-container">
-<a aria-label="PyTorch" class="header-logo" href="https://pytorch.org/"></a>
-<div class="main-menu">
-<ul>
-<li class="main-menu-item">
-<div class="resources-dropdown" data-toggle="resources-dropdown" id="resourcesDropdownButton">
-<a class="with-down-arrow">
+  <div class="container">
+    <div class="header-container">
+      <a class="header-logo" href="https://pytorch.org/" aria-label="PyTorch"></a>
+
+      <div class="main-menu">
+        <ul>
+
+          <li class="main-menu-item">
+          <div id="resourcesDropdownButton" data-toggle="resources-dropdown" class="resources-dropdown">
+              <a class="with-down-arrow">
                 Learn
               </a>
-<div class="resources-dropdown-menu">
-<a class="nav-dropdown-item" href="https://pytorch.org/get-started">
-<span class="dropdown-title">Get Started</span>
-<p>Run PyTorch locally or get started quickly with one of the supported cloud platforms</p>
-</a>
-<a class="nav-dropdown-item" href="https://pytorch.org/tutorials">
-<span class="dropdown-title">Tutorials</span>
-<p>Whats new in PyTorch tutorials</p>
-</a>
-<a class="nav-dropdown-item" href="https://pytorch.org/tutorials/beginner/basics/intro.html">
-<span class="dropdown-title">Learn the Basics</span>
-<p>Familiarize yourself with PyTorch concepts and modules</p>
-</a>
-<a class="nav-dropdown-item" href="https://pytorch.org/tutorials/recipes/recipes_index.html">
-<span class="dropdown-title">PyTorch Recipes</span>
-<p>Bite-size, ready-to-deploy PyTorch code examples</p>
-</a>
-<a class="nav-dropdown-item" href="https://pytorch.org/tutorials/beginner/introyt.html">
-<span class="dropdown-title">Intro to PyTorch - YouTube Series</span>
-<p>Master PyTorch basics with our engaging YouTube tutorial series</p>
-</a>
-</div>
-</div>
-</li>
-<li>
-<div class="resources-dropdown" data-toggle="resources-dropdown" id="resourcesDropdownButton">
-<a class="with-down-arrow">
+              <div class="resources-dropdown-menu">
+                <a class="nav-dropdown-item" href="https://pytorch.org/get-started">
+                  <span class=dropdown-title>Get Started</span>
+                  <p>Run PyTorch locally or get started quickly with one of the supported cloud platforms</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/tutorials">
+                  <span class="dropdown-title">Tutorials</span>
+                  <p>Whats new in PyTorch tutorials</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/tutorials/beginner/basics/intro.html">
+                  <span class="dropdown-title">Learn the Basics</span>
+                  <p>Familiarize yourself with PyTorch concepts and modules</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/tutorials/recipes/recipes_index.html">
+                  <span class="dropdown-title">PyTorch Recipes</span>
+                  <p>Bite-size, ready-to-deploy PyTorch code examples</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/tutorials/beginner/introyt.html">
+                  <span class="dropdown-title">Intro to PyTorch - YouTube Series</span>
+                  <p>Master PyTorch basics with our engaging YouTube tutorial series</p>
+                </a>
+              </div>
+            </div>
+          </li>
+
+          <li>
+          <div id="resourcesDropdownButton" data-toggle="resources-dropdown" class="resources-dropdown">
+              <a class="with-down-arrow">
                 Ecosystem
               </a>
-<div class="resources-dropdown-menu">
-<a class="nav-dropdown-item" href="https://pytorch.org/ecosystem">
-<span class="dropdown-title">Tools</span>
-<p>Learn about the tools and frameworks in the PyTorch Ecosystem</p>
-</a>
-<a class="nav-dropdown-item" href="https://pytorch.org/#community-module">
-<span class="dropdown-title">Community</span>
-<p>Join the PyTorch developer community to contribute, learn, and get your questions answered</p>
-</a>
-<a class="nav-dropdown-item" href="https://discuss.pytorch.org/" target="_blank">
-<span class="dropdown-title">Forums</span>
-<p>A place to discuss PyTorch code, issues, install, research</p>
-</a>
-<a class="nav-dropdown-item" href="https://pytorch.org/resources">
-<span class="dropdown-title">Developer Resources</span>
-<p>Find resources and get questions answered</p>
-</a>
-<a class="nav-dropdown-item" href="https://pytorch.org/ecosystem/contributor-awards-2023">
-<span class="dropdown-title">Contributor Awards - 2023</span>
-<p>Award winners announced at this year's PyTorch Conference</p>
-</a>
-</div>
-</div>
-</li>
-<li>
-<div class="resources-dropdown" data-toggle="resources-dropdown" id="resourcesDropdownButton">
-<a class="with-down-arrow">
+              <div class="resources-dropdown-menu">
+                <a class="nav-dropdown-item" href="https://pytorch.org/ecosystem">
+                  <span class="dropdown-title">Tools</span>
+                  <p>Learn about the tools and frameworks in the PyTorch Ecosystem</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/#community-module">
+                  <span class=dropdown-title>Community</span>
+                  <p>Join the PyTorch developer community to contribute, learn, and get your questions answered</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://discuss.pytorch.org/" target="_blank">
+                  <span class=dropdown-title>Forums</span>
+                  <p>A place to discuss PyTorch code, issues, install, research</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/resources">
+                  <span class=dropdown-title>Developer Resources</span>
+                  <p>Find resources and get questions answered</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/ecosystem/contributor-awards-2023">
+                  <span class="dropdown-title">Contributor Awards - 2023</span>
+                  <p>Award winners announced at this year's PyTorch Conference</p>
+                </a>
+              </div>
+            </div>
+          </li>
+
+          <li>
+          <div id="resourcesDropdownButton" data-toggle="resources-dropdown" class="resources-dropdown">
+              <a class="with-down-arrow">
                 Edge
               </a>
-<div class="resources-dropdown-menu">
-<a class="nav-dropdown-item" href="https://pytorch.org/edge">
-<span class="dropdown-title">About PyTorch Edge</span>
-<p>Build innovative and privacy-aware AI experiences for edge devices</p>
-</a>
-<a class="nav-dropdown-item" href="https://pytorch.org/executorch-overview">
-<span class="dropdown-title">ExecuTorch</span>
-<p>End-to-end solution for enabling on-device inference capabilities across mobile and edge devices</p>
-</a>
-</div>
-</div>
-</li>
-<li class="main-menu-item">
-<div class="resources-dropdown" data-toggle="resources-dropdown" id="resourcesDropdownButton">
-<a class="with-down-arrow">
+              <div class="resources-dropdown-menu">
+                <a class="nav-dropdown-item" href="https://pytorch.org/edge">
+                  <span class="dropdown-title">About PyTorch Edge</span>
+                  <p>Build innovative and privacy-aware AI experiences for edge devices</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/executorch-overview">
+                  <span class="dropdown-title">ExecuTorch</span>
+                  <p>End-to-end solution for enabling on-device inference capabilities across mobile and edge devices</p>
+                </a>
+              </div>
+            </div>  
+          </li>
+
+          <li class="main-menu-item">
+            <div id="resourcesDropdownButton" data-toggle="resources-dropdown" class="resources-dropdown">
+              <a class="with-down-arrow">
                 Docs
               </a>
-<div class="resources-dropdown-menu">
-<a class="nav-dropdown-item" href="https://pytorch.org/docs/stable/index.html">
-<span class="dropdown-title">PyTorch</span>
-<p>Explore the documentation for comprehensive guidance on how to use PyTorch</p>
-</a>
-<a class="nav-dropdown-item" href="https://pytorch.org/pytorch-domains">
-<span class="dropdown-title">PyTorch Domains</span>
-<p>Read the PyTorch Domains documentation to learn more about domain-specific libraries</p>
-</a>
-</div>
-</div>
-</li>
-<li>
-<div class="resources-dropdown" data-toggle="resources-dropdown" id="resourcesDropdownButton">
-<a class="with-down-arrow">
-                Blogs &amp; News 
+              <div class="resources-dropdown-menu">
+                <a class="nav-dropdown-item" href="https://pytorch.org/docs/stable/index.html">
+                  <span class="dropdown-title">PyTorch</span>
+                  <p>Explore the documentation for comprehensive guidance on how to use PyTorch</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/pytorch-domains">
+                  <span class="dropdown-title">PyTorch Domains</span>
+                  <p>Read the PyTorch Domains documentation to learn more about domain-specific libraries</p>
+                </a>
+              </div>
+            </div>
+          </li>
+
+          <li>
+            <div id="resourcesDropdownButton" data-toggle="resources-dropdown" class="resources-dropdown">
+              <a class="with-down-arrow">
+                Blogs & News 
               </a>
-<div class="resources-dropdown-menu">
-<a class="nav-dropdown-item" href="https://pytorch.org/blog/">
-<span class="dropdown-title">PyTorch Blog</span>
-<p>Catch up on the latest technical news and happenings</p>
-</a>
-<a class="nav-dropdown-item" href="https://pytorch.org/community-blog">
-<span class="dropdown-title">Community Blog</span>
-<p>Stories from the PyTorch ecosystem</p>
-</a>
-<a class="nav-dropdown-item" href="https://pytorch.org/videos">
-<span class="dropdown-title">Videos</span>
-<p>Learn about the latest PyTorch tutorials, new, and more </p>
-<a class="nav-dropdown-item" href="https://pytorch.org/community-stories">
-<span class="dropdown-title">Community Stories</span>
-<p>Learn how our community solves real, everyday machine learning problems with PyTorch</p>
-</a>
-<a class="nav-dropdown-item" href="https://pytorch.org/events">
-<span class="dropdown-title">Events</span>
-<p>Find events, webinars, and podcasts</p>
-</a>
-</a></div>
-</div></li>
-<li>
-<div class="resources-dropdown" data-toggle="resources-dropdown" id="resourcesDropdownButton">
-<a class="with-down-arrow">
+              <div class="resources-dropdown-menu">
+                <a class="nav-dropdown-item" href="https://pytorch.org/blog/">
+                  <span class="dropdown-title">PyTorch Blog</span>
+                  <p>Catch up on the latest technical news and happenings</p>
+                </a>
+                 <a class="nav-dropdown-item" href="https://pytorch.org/community-blog">
+                  <span class="dropdown-title">Community Blog</span>
+                  <p>Stories from the PyTorch ecosystem</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/videos">
+                  <span class="dropdown-title">Videos</span>
+                  <p>Learn about the latest PyTorch tutorials, new, and more </p>
+                <a class="nav-dropdown-item" href="https://pytorch.org/community-stories">
+                  <span class="dropdown-title">Community Stories</span>
+                  <p>Learn how our community solves real, everyday machine learning problems with PyTorch</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/events">
+                  <span class="dropdown-title">Events</span>
+                  <p>Find events, webinars, and podcasts</p>
+                </a>
+            </div>
+          </li>
+
+          <li>
+            <div id="resourcesDropdownButton" data-toggle="resources-dropdown" class="resources-dropdown">
+              <a class="with-down-arrow">
                 About
               </a>
-<div class="resources-dropdown-menu">
-<a class="nav-dropdown-item" href="https://pytorch.org/foundation">
-<span class="dropdown-title">PyTorch Foundation</span>
-<p>Learn more about the PyTorch Foundation</p>
-</a>
-<a class="nav-dropdown-item" href="https://pytorch.org/governing-board">
-<span class="dropdown-title">Governing Board</span>
-<p></p>
-</a>
-</div>
-</div>
-</li>
-<li class="main-menu-item">
-<div class="no-dropdown">
-<a data-cta="join" href="https://pytorch.org/join">
+              <div class="resources-dropdown-menu">
+                <a class="nav-dropdown-item" href="https://pytorch.org/foundation">
+                  <span class="dropdown-title">PyTorch Foundation</span>
+                  <p>Learn more about the PyTorch Foundation</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/governing-board">
+                  <span class="dropdown-title">Governing Board</span>
+                  <p></p>
+                </a>
+              </div>
+            </div>
+          </li>
+
+          <li class="main-menu-item">
+            <div class="no-dropdown">
+              <a href="https://pytorch.org/join" data-cta="join">
                 Become a Member
               </a>
-</div>
-</li>
-<li>
-<div class="main-menu-item">
-<a class="github-icon" href="https://github.com/pytorch/pytorch">
-</a>
-</div>
-</li>
-<!--- TODO: This block adds the search icon to the nav bar. We will enable it later. 
+            </div>
+          </li>
+          <li>
+           <div class="main-menu-item">
+             <a href="https://github.com/pytorch/pytorch" class="github-icon">
+             </a>
+           </div>
+          </li>
+          <!--- TODO: This block adds the search icon to the nav bar. We will enable it later. 
           <li>
             <div class="main-menu-item">
              <a href="https://github.com/pytorch/pytorch" class="search-icon">
@@ -215,33 +249,64 @@
             </div>
           </li>
           --->
-</ul>
+        </ul>
+      </div>
+
+      <a class="main-menu-open-button" href="#" data-behavior="open-mobile-menu"></a>
+    </div>
+  </div>
 </div>
-<a class="main-menu-open-button" data-behavior="open-mobile-menu" href="#"></a>
-</div>
-</div>
-</div>
+
 <body class="pytorch-body">
-<div class="table-of-contents-link-wrapper">
-<span>Table of Contents</span>
-<a class="toggle-table-of-contents" data-behavior="toggle-table-of-contents" href="#"></a>
-</div>
-<nav class="pytorch-left-menu" data-toggle="wy-nav-shift" id="pytorch-left-menu">
-<div class="pytorch-side-scroll">
-<div aria-label="main navigation" class="pytorch-menu pytorch-menu-vertical" data-spy="affix" role="navigation">
-<div class="pytorch-left-menu-search">
-<div class="version">
-                  2.3.0
+
+   
+
+    
+
+    <div class="table-of-contents-link-wrapper">
+      <span>Table of Contents</span>
+      <a href="#" class="toggle-table-of-contents" data-behavior="toggle-table-of-contents"></a>
+    </div>
+
+    <nav data-toggle="wy-nav-shift" class="pytorch-left-menu" id="pytorch-left-menu">
+      <div class="pytorch-side-scroll">
+        <div class="pytorch-menu pytorch-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          <div class="pytorch-left-menu-search">
+            
+
+            
+              
+              
+                <div class="version">
+                  2.3.0+cu121
                 </div>
+              
+            
+
+            
+
+
+  
+
+
 <div role="search">
-<form action="../search.html" class="wy-form" id="rtd-search-form" method="get">
-<input name="q" placeholder="Search Tutorials" type="text"/>
-<input name="check_keywords" type="hidden" value="yes"/>
-<input name="area" type="hidden" value="default"/>
-</form>
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search Tutorials" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
 </div>
-</div>
-<p class="caption" role="heading"><span class="caption-text">PyTorch 示例</span></p>
+
+            
+          </div>
+
+          
+            
+            
+              
+            
+            
+              <p class="caption" role="heading"><span class="caption-text">PyTorch 示例</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../recipes/recipes_index.html">所有示例</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../prototype/prototype_index.html">原型示例</a></li>
@@ -429,59 +494,105 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/flava_finetuning_tutorial.html">TorchMultimodal 教程：微调 FLAVA</a></li>
 </ul>
-</div>
-</div>
-</nav>
-<div class="pytorch-container">
-<div class="pytorch-page-level-bar" id="pytorch-page-level-bar">
-<div class="pytorch-breadcrumbs-wrapper">
-<div aria-label="breadcrumbs navigation" role="navigation">
-<ul class="pytorch-breadcrumbs">
-<li>
-<a href="../index.html">
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <div class="pytorch-container">
+      <div class="pytorch-page-level-bar" id="pytorch-page-level-bar">
+        <div class="pytorch-breadcrumbs-wrapper">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="pytorch-breadcrumbs">
+    
+      <li>
+        <a href="../index.html">
           
             Tutorials
           
         </a> &gt;
       </li>
-<li>PyTorch Profiler With TensorBoard</li>
-<li class="pytorch-breadcrumbs-aside">
-<a href="../_sources/intermediate/tensorboard_profiler_tutorial.rst.txt" rel="nofollow"><img src="../_static/images/view-page-source-icon.svg"/></a>
-</li>
-</ul>
+
+        
+      <li>PyTorch Profiler With TensorBoard</li>
+    
+    
+      <li class="pytorch-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/intermediate/tensorboard_profiler_tutorial.rst.txt" rel="nofollow"><img src="../_static/images/view-page-source-icon.svg"></a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
 </div>
-</div>
-<div class="pytorch-shortcuts-wrapper" id="pytorch-shortcuts-wrapper">
+        </div>
+
+        <div class="pytorch-shortcuts-wrapper" id="pytorch-shortcuts-wrapper">
           Shortcuts
         </div>
-</div>
-<section class="pytorch-content-wrap" data-toggle="wy-nav-shift" id="pytorch-content-wrap">
-<div class="pytorch-content-left">
-<div class="pytorch-call-to-action-links">
-<div id="tutorial-type">intermediate/tensorboard_profiler_tutorial</div>
-<div id="google-colab-link">
-<img class="call-to-action-img" src="../_static/images/pytorch-colab.svg">
-<div class="call-to-action-desktop-view">Run in Google Colab</div>
-<div class="call-to-action-mobile-view">Colab</div>
-</img></div>
-<div id="download-notebook-link">
-<img class="call-to-action-notebook-img" src="../_static/images/pytorch-download.svg"/>
-<div class="call-to-action-desktop-view">Download Notebook</div>
-<div class="call-to-action-mobile-view">Notebook</div>
-</div>
-<div id="github-view-link">
-<img class="call-to-action-img" src="../_static/images/pytorch-github.svg"/>
-<div class="call-to-action-desktop-view">View on GitHub</div>
-<div class="call-to-action-mobile-view">GitHub</div>
-</div>
-</div>
-<!-- Google Tag Manager (noscript) -->
-<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-T8XT4PS" style="display:none;visibility:hidden" width="0"></iframe></noscript>
-<!-- End Google Tag Manager (noscript) -->
-<div class="rst-content">
-<div class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article" role="main">
-<article class="pytorch-article" id="pytorch-article" itemprop="articleBody">
-<div class="sphx-glr-download-link-note admonition note">
+      </div>
+
+      <section data-toggle="wy-nav-shift" id="pytorch-content-wrap" class="pytorch-content-wrap">
+        <div class="pytorch-content-left">
+
+        
+
+          <div class="pytorch-call-to-action-links">
+            <div id="tutorial-type">intermediate/tensorboard_profiler_tutorial</div>
+
+            <div id="google-colab-link">
+              <img class="call-to-action-img" src="../_static/images/pytorch-colab.svg"/>
+              <div class="call-to-action-desktop-view">Run in Google Colab</div>
+              <div class="call-to-action-mobile-view">Colab</div>
+            </div>
+            <div id="download-notebook-link">
+              <img class="call-to-action-notebook-img" src="../_static/images/pytorch-download.svg"/>
+              <div class="call-to-action-desktop-view">Download Notebook</div>
+              <div class="call-to-action-mobile-view">Notebook</div>
+            </div>
+            <div id="github-view-link">
+              <img class="call-to-action-img" src="../_static/images/pytorch-github.svg"/>
+              <div class="call-to-action-desktop-view">View on GitHub</div>
+              <div class="call-to-action-mobile-view">GitHub</div>
+            </div>
+          </div>
+
+        
+
+          <!-- Google Tag Manager (noscript) -->
+          <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-T8XT4PS"
+          height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+          <!-- End Google Tag Manager (noscript) -->
+          
+          <div class="rst-content">
+          
+            <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
+             <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
+              
+  <div class="sphx-glr-download-link-note admonition note">
 <p class="admonition-title">Note</p>
 <p>Click <a class="reference internal" href="#sphx-glr-download-intermediate-tensorboard-profiler-tutorial-py"><span class="std std-ref">here</span></a>
 to download the full example code</p>
@@ -532,20 +643,20 @@ use TensorBoard plugin to analyze model performance.</p>
 </div>
 <p>Then prepare the input data. For this tutorial, we use the CIFAR10 dataset.
 Transform it to the desired format and use <code class="docutils literal notranslate"><span class="pre">DataLoader</span></code> to load each batch.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">transform</span> <span class="o">=</span> <a class="sphx-glr-backref-module-torchvision-transforms sphx-glr-backref-type-py-class sphx-glr-backref-instance" href="https://pytorch.org/vision/stable/generated/torchvision.transforms.Compose.html#torchvision.transforms.Compose" title="torchvision.transforms.Compose"><span class="n">T</span><span class="o">.</span><span class="n">Compose</span></a><span class="p">(</span>
-    <span class="p">[</span><a class="sphx-glr-backref-module-torchvision-transforms sphx-glr-backref-type-py-class sphx-glr-backref-instance" href="https://pytorch.org/vision/stable/generated/torchvision.transforms.Resize.html#torchvision.transforms.Resize" title="torchvision.transforms.Resize"><span class="n">T</span><span class="o">.</span><span class="n">Resize</span></a><span class="p">(</span><span class="mi">224</span><span class="p">),</span>
-     <a class="sphx-glr-backref-module-torchvision-transforms sphx-glr-backref-type-py-class sphx-glr-backref-instance" href="https://pytorch.org/vision/stable/generated/torchvision.transforms.ToTensor.html#torchvision.transforms.ToTensor" title="torchvision.transforms.ToTensor"><span class="n">T</span><span class="o">.</span><span class="n">ToTensor</span></a><span class="p">(),</span>
-     <a class="sphx-glr-backref-module-torchvision-transforms sphx-glr-backref-type-py-class sphx-glr-backref-instance" href="https://pytorch.org/vision/stable/generated/torchvision.transforms.Normalize.html#torchvision.transforms.Normalize" title="torchvision.transforms.Normalize"><span class="n">T</span><span class="o">.</span><span class="n">Normalize</span></a><span class="p">((</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">),</span> <span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">))])</span>
-<span class="n">train_set</span> <span class="o">=</span> <a class="sphx-glr-backref-module-torchvision-datasets sphx-glr-backref-type-py-class sphx-glr-backref-instance" href="https://pytorch.org/vision/stable/generated/torchvision.datasets.CIFAR10.html#torchvision.datasets.CIFAR10" title="torchvision.datasets.CIFAR10"><span class="n">torchvision</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">CIFAR10</span></a><span class="p">(</span><span class="n">root</span><span class="o">=</span><span class="s1">'./data'</span><span class="p">,</span> <span class="n">train</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">download</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="n">transform</span><span class="p">)</span>
-<span class="n">train_loader</span> <span class="o">=</span> <a class="sphx-glr-backref-module-torch-utils-data sphx-glr-backref-type-py-class sphx-glr-backref-instance" href="https://pytorch.org/docs/stable/data.html#torch.utils.data.DataLoader" title="torch.utils.data.DataLoader"><span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span></a><span class="p">(</span><span class="n">train_set</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">transform</span> <span class="o">=</span> <a href="https://pytorch.org/vision/stable/generated/torchvision.transforms.Compose.html#torchvision.transforms.Compose" title="torchvision.transforms.Compose" class="sphx-glr-backref-module-torchvision-transforms sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">T</span><span class="o">.</span><span class="n">Compose</span></a><span class="p">(</span>
+    <span class="p">[</span><a href="https://pytorch.org/vision/stable/generated/torchvision.transforms.Resize.html#torchvision.transforms.Resize" title="torchvision.transforms.Resize" class="sphx-glr-backref-module-torchvision-transforms sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">T</span><span class="o">.</span><span class="n">Resize</span></a><span class="p">(</span><span class="mi">224</span><span class="p">),</span>
+     <a href="https://pytorch.org/vision/stable/generated/torchvision.transforms.ToTensor.html#torchvision.transforms.ToTensor" title="torchvision.transforms.ToTensor" class="sphx-glr-backref-module-torchvision-transforms sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">T</span><span class="o">.</span><span class="n">ToTensor</span></a><span class="p">(),</span>
+     <a href="https://pytorch.org/vision/stable/generated/torchvision.transforms.Normalize.html#torchvision.transforms.Normalize" title="torchvision.transforms.Normalize" class="sphx-glr-backref-module-torchvision-transforms sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">T</span><span class="o">.</span><span class="n">Normalize</span></a><span class="p">((</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">),</span> <span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">))])</span>
+<span class="n">train_set</span> <span class="o">=</span> <a href="https://pytorch.org/vision/stable/generated/torchvision.datasets.CIFAR10.html#torchvision.datasets.CIFAR10" title="torchvision.datasets.CIFAR10" class="sphx-glr-backref-module-torchvision-datasets sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">torchvision</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">CIFAR10</span></a><span class="p">(</span><span class="n">root</span><span class="o">=</span><span class="s1">&#39;./data&#39;</span><span class="p">,</span> <span class="n">train</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">download</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="n">transform</span><span class="p">)</span>
+<span class="n">train_loader</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/data.html#torch.utils.data.DataLoader" title="torch.utils.data.DataLoader" class="sphx-glr-backref-module-torch-utils-data sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span></a><span class="p">(</span><span class="n">train_set</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Next, create Resnet model, loss function, and optimizer objects.
 To run on GPU, move model and loss to GPU device.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">device</span> <span class="o">=</span> <a class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance" href="https://pytorch.org/docs/stable/tensor_attributes.html#torch.device" title="torch.device"><span class="n">torch</span><span class="o">.</span><span class="n">device</span></a><span class="p">(</span><span class="s2">"cuda:0"</span><span class="p">)</span>
-<span class="n">model</span> <span class="o">=</span> <a class="sphx-glr-backref-module-torchvision-models sphx-glr-backref-type-py-function" href="https://pytorch.org/vision/stable/models/generated/torchvision.models.resnet18.html#torchvision.models.resnet18" title="torchvision.models.resnet18"><span class="n">torchvision</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">resnet18</span></a><span class="p">(</span><span class="n">weights</span><span class="o">=</span><span class="s1">'IMAGENET1K_V1'</span><span class="p">)</span><span class="o">.</span><span class="n">cuda</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
-<span class="n">criterion</span> <span class="o">=</span> <a class="sphx-glr-backref-module-torch-nn sphx-glr-backref-type-py-class sphx-glr-backref-instance" href="https://pytorch.org/docs/stable/generated/torch.nn.CrossEntropyLoss.html#torch.nn.CrossEntropyLoss" title="torch.nn.CrossEntropyLoss"><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">CrossEntropyLoss</span></a><span class="p">()</span><span class="o">.</span><span class="n">cuda</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
-<span class="n">optimizer</span> <span class="o">=</span> <a class="sphx-glr-backref-module-torch-optim sphx-glr-backref-type-py-class sphx-glr-backref-instance" href="https://pytorch.org/docs/stable/generated/torch.optim.SGD.html#torch.optim.SGD" title="torch.optim.SGD"><span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">SGD</span></a><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span> <span class="n">momentum</span><span class="o">=</span><span class="mf">0.9</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">device</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/tensor_attributes.html#torch.device" title="torch.device" class="sphx-glr-backref-module-torch sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">torch</span><span class="o">.</span><span class="n">device</span></a><span class="p">(</span><span class="s2">&quot;cuda:0&quot;</span><span class="p">)</span>
+<span class="n">model</span> <span class="o">=</span> <a href="https://pytorch.org/vision/stable/models/generated/torchvision.models.resnet18.html#torchvision.models.resnet18" title="torchvision.models.resnet18" class="sphx-glr-backref-module-torchvision-models sphx-glr-backref-type-py-function"><span class="n">torchvision</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">resnet18</span></a><span class="p">(</span><span class="n">weights</span><span class="o">=</span><span class="s1">&#39;IMAGENET1K_V1&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">cuda</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+<span class="n">criterion</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.nn.CrossEntropyLoss.html#torch.nn.CrossEntropyLoss" title="torch.nn.CrossEntropyLoss" class="sphx-glr-backref-module-torch-nn sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">CrossEntropyLoss</span></a><span class="p">()</span><span class="o">.</span><span class="n">cuda</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+<span class="n">optimizer</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/generated/torch.optim.SGD.html#torch.optim.SGD" title="torch.optim.SGD" class="sphx-glr-backref-module-torch-optim sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">SGD</span></a><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span> <span class="n">momentum</span><span class="o">=</span><span class="mf">0.9</span><span class="p">)</span>
 <span class="n">model</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -590,24 +701,24 @@ before 1.10, if you suffer long profiling time, please disable it or upgrade to 
 If the TensorBoard is launched in VS Code (<a class="reference external" href="https://code.visualstudio.com/docs/datascience/pytorch-support#_tensorboard-integration">reference</a>),
 clicking a stack frame will navigate to the specific code line.</p></li>
 </ul>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <a class="sphx-glr-backref-module-torch-profiler sphx-glr-backref-type-py-class sphx-glr-backref-instance" href="https://pytorch.org/docs/stable/profiler.html#torch.profiler.profile" title="torch.profiler.profile"><span class="n">torch</span><span class="o">.</span><span class="n">profiler</span><span class="o">.</span><span class="n">profile</span></a><span class="p">(</span>
-        <span class="n">schedule</span><span class="o">=</span><a class="sphx-glr-backref-module-torch-profiler sphx-glr-backref-type-py-function" href="https://pytorch.org/docs/stable/profiler.html#torch.profiler.schedule" title="torch.profiler.schedule"><span class="n">torch</span><span class="o">.</span><span class="n">profiler</span><span class="o">.</span><span class="n">schedule</span></a><span class="p">(</span><span class="n">wait</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">warmup</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">active</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">repeat</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
-        <span class="n">on_trace_ready</span><span class="o">=</span><a class="sphx-glr-backref-module-torch-profiler sphx-glr-backref-type-py-function" href="https://pytorch.org/docs/stable/profiler.html#torch.profiler.tensorboard_trace_handler" title="torch.profiler.tensorboard_trace_handler"><span class="n">torch</span><span class="o">.</span><span class="n">profiler</span><span class="o">.</span><span class="n">tensorboard_trace_handler</span></a><span class="p">(</span><span class="s1">'./log/resnet18'</span><span class="p">),</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <a href="https://pytorch.org/docs/stable/profiler.html#torch.profiler.profile" title="torch.profiler.profile" class="sphx-glr-backref-module-torch-profiler sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">torch</span><span class="o">.</span><span class="n">profiler</span><span class="o">.</span><span class="n">profile</span></a><span class="p">(</span>
+        <span class="n">schedule</span><span class="o">=</span><a href="https://pytorch.org/docs/stable/profiler.html#torch.profiler.schedule" title="torch.profiler.schedule" class="sphx-glr-backref-module-torch-profiler sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">profiler</span><span class="o">.</span><span class="n">schedule</span></a><span class="p">(</span><span class="n">wait</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">warmup</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">active</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">repeat</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+        <span class="n">on_trace_ready</span><span class="o">=</span><a href="https://pytorch.org/docs/stable/profiler.html#torch.profiler.tensorboard_trace_handler" title="torch.profiler.tensorboard_trace_handler" class="sphx-glr-backref-module-torch-profiler sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">profiler</span><span class="o">.</span><span class="n">tensorboard_trace_handler</span></a><span class="p">(</span><span class="s1">&#39;./log/resnet18&#39;</span><span class="p">),</span>
         <span class="n">record_shapes</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="n">profile_memory</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="n">with_stack</span><span class="o">=</span><span class="kc">True</span>
 <span class="p">)</span> <span class="k">as</span> <span class="n">prof</span><span class="p">:</span>
     <span class="k">for</span> <span class="n">step</span><span class="p">,</span> <span class="n">batch_data</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">train_loader</span><span class="p">):</span>
-        <span class="n">prof</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>  <span class="c1"># Need to call this at each step to notify profiler of steps' boundary.</span>
+        <span class="n">prof</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>  <span class="c1"># Need to call this at each step to notify profiler of steps&#39; boundary.</span>
         <span class="k">if</span> <span class="n">step</span> <span class="o">&gt;=</span> <span class="mi">1</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">+</span> <span class="mi">3</span><span class="p">:</span>
             <span class="k">break</span>
         <span class="n">train</span><span class="p">(</span><span class="n">batch_data</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Alternatively, the following non-context manager start/stop is supported as well.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">prof</span> <span class="o">=</span> <a class="sphx-glr-backref-module-torch-profiler sphx-glr-backref-type-py-class sphx-glr-backref-instance" href="https://pytorch.org/docs/stable/profiler.html#torch.profiler.profile" title="torch.profiler.profile"><span class="n">torch</span><span class="o">.</span><span class="n">profiler</span><span class="o">.</span><span class="n">profile</span></a><span class="p">(</span>
-        <span class="n">schedule</span><span class="o">=</span><a class="sphx-glr-backref-module-torch-profiler sphx-glr-backref-type-py-function" href="https://pytorch.org/docs/stable/profiler.html#torch.profiler.schedule" title="torch.profiler.schedule"><span class="n">torch</span><span class="o">.</span><span class="n">profiler</span><span class="o">.</span><span class="n">schedule</span></a><span class="p">(</span><span class="n">wait</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">warmup</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">active</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">repeat</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
-        <span class="n">on_trace_ready</span><span class="o">=</span><a class="sphx-glr-backref-module-torch-profiler sphx-glr-backref-type-py-function" href="https://pytorch.org/docs/stable/profiler.html#torch.profiler.tensorboard_trace_handler" title="torch.profiler.tensorboard_trace_handler"><span class="n">torch</span><span class="o">.</span><span class="n">profiler</span><span class="o">.</span><span class="n">tensorboard_trace_handler</span></a><span class="p">(</span><span class="s1">'./log/resnet18'</span><span class="p">),</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">prof</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/profiler.html#torch.profiler.profile" title="torch.profiler.profile" class="sphx-glr-backref-module-torch-profiler sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">torch</span><span class="o">.</span><span class="n">profiler</span><span class="o">.</span><span class="n">profile</span></a><span class="p">(</span>
+        <span class="n">schedule</span><span class="o">=</span><a href="https://pytorch.org/docs/stable/profiler.html#torch.profiler.schedule" title="torch.profiler.schedule" class="sphx-glr-backref-module-torch-profiler sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">profiler</span><span class="o">.</span><span class="n">schedule</span></a><span class="p">(</span><span class="n">wait</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">warmup</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">active</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">repeat</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+        <span class="n">on_trace_ready</span><span class="o">=</span><a href="https://pytorch.org/docs/stable/profiler.html#torch.profiler.tensorboard_trace_handler" title="torch.profiler.tensorboard_trace_handler" class="sphx-glr-backref-module-torch-profiler sphx-glr-backref-type-py-function"><span class="n">torch</span><span class="o">.</span><span class="n">profiler</span><span class="o">.</span><span class="n">tensorboard_trace_handler</span></a><span class="p">(</span><span class="s1">&#39;./log/resnet18&#39;</span><span class="p">),</span>
         <span class="n">record_shapes</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="n">with_stack</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="n">prof</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
@@ -647,7 +758,7 @@ work as previously. Please take a look at the replacement, <a class="reference e
 <ul class="simple">
 <li><p>Overview</p></li>
 </ul>
-<a class="reference internal image-reference" href="../_static/img/profiler_overview1.png"><img alt="../_static/img/profiler_overview1.png" src="../_static/img/profiler_overview1.png"/></a>
+<a class="reference internal image-reference" href="../_static/img/profiler_overview1.png"><img alt="../_static/img/profiler_overview1.png" src="../_static/img/profiler_overview1.png" /></a>
 <p>The overview shows a high-level summary of model performance.</p>
 <p>The “GPU Summary” panel shows the GPU configuration, GPU usage and Tensor Cores usage.
 In this example, the GPU Utilization is low.
@@ -658,13 +769,13 @@ In this example, you can see the <code class="docutils literal notranslate"><spa
 to automatically highlight likely bottlenecks,
 and gives you actionable optimization suggestions.</p>
 <p>You can change the view page in left “Views” dropdown list.</p>
-<img alt="" src="../_static/img/profiler_views_list.png"/>
+<img alt="" src="../_static/img/profiler_views_list.png" />
 <ul class="simple">
 <li><p>Operator view</p></li>
 </ul>
 <p>The operator view displays the performance of every PyTorch operator
 that is executed either on the host or device.</p>
-<a class="reference internal image-reference" href="../_static/img/profiler_operator_view.png"><img alt="../_static/img/profiler_operator_view.png" src="../_static/img/profiler_operator_view.png"/></a>
+<a class="reference internal image-reference" href="../_static/img/profiler_operator_view.png"><img alt="../_static/img/profiler_operator_view.png" src="../_static/img/profiler_operator_view.png" /></a>
 <p>The “Self” duration does not include its child operators’ time.
 The “Total” duration includes its child operators’ time.</p>
 <ul class="simple">
@@ -672,16 +783,16 @@ The “Total” duration includes its child operators’ time.</p>
 </ul>
 <p>Click the <code class="docutils literal notranslate"><span class="pre">View</span> <span class="pre">Callstack</span></code> of an operator, the operators with same name but different call stacks will be shown.
 Then click a <code class="docutils literal notranslate"><span class="pre">View</span> <span class="pre">Callstack</span></code> in this sub-table, the call stack frames will be shown.</p>
-<a class="reference internal image-reference" href="../_static/img/profiler_callstack.png"><img alt="../_static/img/profiler_callstack.png" src="../_static/img/profiler_callstack.png"/></a>
+<a class="reference internal image-reference" href="../_static/img/profiler_callstack.png"><img alt="../_static/img/profiler_callstack.png" src="../_static/img/profiler_callstack.png" /></a>
 <p>If the TensorBoard is launched inside VS Code
 (<a class="reference external" href="https://devblogs.microsoft.com/python/python-in-visual-studio-code-february-2021-release/#tensorboard-integration">Launch Guide</a>),
 clicking a call stack frame will navigate to the specific code line.</p>
-<a class="reference internal image-reference" href="../_static/img/profiler_vscode.png"><img alt="../_static/img/profiler_vscode.png" src="../_static/img/profiler_vscode.png"/></a>
+<a class="reference internal image-reference" href="../_static/img/profiler_vscode.png"><img alt="../_static/img/profiler_vscode.png" src="../_static/img/profiler_vscode.png" /></a>
 <ul class="simple">
 <li><p>Kernel view</p></li>
 </ul>
 <p>The GPU kernel view shows all kernels’ time spent on GPU.</p>
-<a class="reference internal image-reference" href="../_static/img/profiler_kernel_view.png"><img alt="../_static/img/profiler_kernel_view.png" src="../_static/img/profiler_kernel_view.png"/></a>
+<a class="reference internal image-reference" href="../_static/img/profiler_kernel_view.png"><img alt="../_static/img/profiler_kernel_view.png" src="../_static/img/profiler_kernel_view.png" /></a>
 <p>Tensor Cores Used:
 Whether this kernel uses Tensor Cores.</p>
 <p>Mean Blocks per SM:
@@ -698,7 +809,7 @@ using each run’s duration as weight.</p>
 </ul>
 <p>The trace view shows timeline of profiled operators and GPU kernels.
 You can select it to see details as below.</p>
-<a class="reference internal image-reference" href="../_static/img/profiler_trace_view1.png"><img alt="../_static/img/profiler_trace_view1.png" src="../_static/img/profiler_trace_view1.png"/></a>
+<a class="reference internal image-reference" href="../_static/img/profiler_trace_view1.png"><img alt="../_static/img/profiler_trace_view1.png" src="../_static/img/profiler_trace_view1.png" /></a>
 <p>You can move the graph and zoom in/out with the help of right side toolbar.
 And keyboard can also be used to zoom and move around inside the timeline.
 The ‘w’ and ‘s’ keys zoom in centered around the mouse,
@@ -706,7 +817,7 @@ and the ‘a’ and ‘d’ keys move the timeline left and right.
 You can hit these keys multiple times until you see a readable representation.</p>
 <p>If a backward operator’s “Incoming Flow” field is with value “forward correspond to backward”,
 you can click the text to get its launching forward operator.</p>
-<a class="reference internal image-reference" href="../_static/img/profiler_trace_view_fwd_bwd.png"><img alt="../_static/img/profiler_trace_view_fwd_bwd.png" src="../_static/img/profiler_trace_view_fwd_bwd.png"/></a>
+<a class="reference internal image-reference" href="../_static/img/profiler_trace_view_fwd_bwd.png"><img alt="../_static/img/profiler_trace_view_fwd_bwd.png" src="../_static/img/profiler_trace_view_fwd_bwd.png" /></a>
 <p>In this example, we can see the event prefixed with <code class="docutils literal notranslate"><span class="pre">enumerate(DataLoader)</span></code> costs a lot of time.
 And during most of this period, the GPU is idle.
 Because this function is loading data and transforming data on host side,
@@ -720,14 +831,14 @@ User could enable multi-process data loading by setting the parameter <code clas
 <a class="reference external" href="https://pytorch.org/docs/stable/data.html#single-and-multi-process-data-loading">Here</a> is more details.</p>
 <p>In this example, we follow the “Performance Recommendation” and set <code class="docutils literal notranslate"><span class="pre">num_workers</span></code> as below,
 pass a different name such as <code class="docutils literal notranslate"><span class="pre">./log/resnet18_4workers</span></code> to <code class="docutils literal notranslate"><span class="pre">tensorboard_trace_handler</span></code>, and run it again.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">train_loader</span> <span class="o">=</span> <a class="sphx-glr-backref-module-torch-utils-data sphx-glr-backref-type-py-class sphx-glr-backref-instance" href="https://pytorch.org/docs/stable/data.html#torch.utils.data.DataLoader" title="torch.utils.data.DataLoader"><span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span></a><span class="p">(</span><span class="n">train_set</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">num_workers</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">train_loader</span> <span class="o">=</span> <a href="https://pytorch.org/docs/stable/data.html#torch.utils.data.DataLoader" title="torch.utils.data.DataLoader" class="sphx-glr-backref-module-torch-utils-data sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span></a><span class="p">(</span><span class="n">train_set</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">num_workers</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Then let’s choose the recently profiled run in left “Runs” dropdown list.</p>
-<a class="reference internal image-reference" href="../_static/img/profiler_overview2.png"><img alt="../_static/img/profiler_overview2.png" src="../_static/img/profiler_overview2.png"/></a>
+<a class="reference internal image-reference" href="../_static/img/profiler_overview2.png"><img alt="../_static/img/profiler_overview2.png" src="../_static/img/profiler_overview2.png" /></a>
 <p>From the above view, we can find the step time is reduced to about 76ms comparing with previous run’s 132ms,
 and the time reduction of <code class="docutils literal notranslate"><span class="pre">DataLoader</span></code> mainly contributes.</p>
-<a class="reference internal image-reference" href="../_static/img/profiler_trace_view2.png"><img alt="../_static/img/profiler_trace_view2.png" src="../_static/img/profiler_trace_view2.png"/></a>
+<a class="reference internal image-reference" href="../_static/img/profiler_trace_view2.png"><img alt="../_static/img/profiler_trace_view2.png" src="../_static/img/profiler_trace_view2.png" /></a>
 <p>From the above view, we can see that the runtime of <code class="docutils literal notranslate"><span class="pre">enumerate(DataLoader)</span></code> is reduced,
 and the GPU utilization is increased.</p>
 </div>
@@ -744,7 +855,7 @@ and the GPU utilization is increased.</p>
 </div>
 <p>The profiler records all memory allocation/release events and allocator’s internal state during profiling.
 The memory view consists of three components as shown in the following.</p>
-<a class="reference internal image-reference" href="../_static/img/profiler_memory_view.png"><img alt="../_static/img/profiler_memory_view.png" src="../_static/img/profiler_memory_view.png"/></a>
+<a class="reference internal image-reference" href="../_static/img/profiler_memory_view.png"><img alt="../_static/img/profiler_memory_view.png" src="../_static/img/profiler_memory_view.png" /></a>
 <p>The components are memory curve graph, memory events table and memory statistics table, from top to bottom, respectively.</p>
 <p>The memory type could be selected in “Device” selection box.
 For example, “GPU0” means the following table only shows each operator’s memory usage on GPU 0, not including CPU or other GPUs.</p>
@@ -752,11 +863,11 @@ For example, “GPU0” means the following table only shows each operator’s m
 in use, e.g., tensors. In PyTorch, caching mechanism is employed in CUDA allocator and some other allocators. The
 “Reserved” curve shows the total memory that is reserved by the allocator. You can left click and drag on the graph
 to select events in the desired range:</p>
-<a class="reference internal image-reference" href="../_static/img/profiler_memory_curve_selecting.png"><img alt="../_static/img/profiler_memory_curve_selecting.png" src="../_static/img/profiler_memory_curve_selecting.png"/></a>
+<a class="reference internal image-reference" href="../_static/img/profiler_memory_curve_selecting.png"><img alt="../_static/img/profiler_memory_curve_selecting.png" src="../_static/img/profiler_memory_curve_selecting.png" /></a>
 <p>After selection, the three components will be updated for the restricted time range, so that you can gain more
 information about it. By repeating this process, you can zoom into a very fine-grained detail. Right click on the graph
 will reset the graph to the initial state.</p>
-<a class="reference internal image-reference" href="../_static/img/profiler_memory_curve_single.png"><img alt="../_static/img/profiler_memory_curve_single.png" src="../_static/img/profiler_memory_curve_single.png"/></a>
+<a class="reference internal image-reference" href="../_static/img/profiler_memory_curve_single.png"><img alt="../_static/img/profiler_memory_curve_single.png" src="../_static/img/profiler_memory_curve_single.png" /></a>
 <p>In the memory events table, the allocation and release events are paired into one entry. The “operator” column shows
 the immediate ATen operator that is causing the allocation. Notice that in PyTorch, ATen operators commonly use
 <code class="docutils literal notranslate"><span class="pre">aten::empty</span></code> to allocate memory. For example, <code class="docutils literal notranslate"><span class="pre">aten::ones</span></code> is implemented as <code class="docutils literal notranslate"><span class="pre">aten::empty</span></code> followed by an
@@ -778,7 +889,7 @@ Finally, the “Allocation Size” column sums up all allocation without conside
 <span class="n">tensorboard</span> <span class="o">--</span><span class="n">logdir</span><span class="o">=</span><span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">torchtbprofiler</span><span class="o">.</span><span class="n">blob</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">windows</span><span class="o">.</span><span class="n">net</span><span class="o">/</span><span class="n">torchtbprofiler</span><span class="o">/</span><span class="n">demo</span><span class="o">/</span><span class="n">distributed_bert</span>
 </pre></div>
 </div>
-<a class="reference internal image-reference" href="../_static/img/profiler_distributed_view.png"><img alt="../_static/img/profiler_distributed_view.png" src="../_static/img/profiler_distributed_view.png"/></a>
+<a class="reference internal image-reference" href="../_static/img/profiler_distributed_view.png"><img alt="../_static/img/profiler_distributed_view.png" src="../_static/img/profiler_distributed_view.png" /></a>
 <p>The “Computation/Communication Overview” shows computation/communication ratio and their overlapping degree.
 From this view, User can figure out load balance issue among workers.
 For example, if the computation + overlapping time of one worker is much larger than others,
@@ -840,7 +951,7 @@ before installing PyTorch.</p>
 </pre></div>
 </div>
 <p>Choose different views as described in <strong>Step 4</strong>. For example, below is the <strong>Operator</strong> View:</p>
-<a class="reference internal image-reference" href="../_static/img/profiler_rocm_tensorboard_operartor_view.png"><img alt="../_static/img/profiler_rocm_tensorboard_operartor_view.png" src="../_static/img/profiler_rocm_tensorboard_operartor_view.png"/></a>
+<a class="reference internal image-reference" href="../_static/img/profiler_rocm_tensorboard_operartor_view.png"><img alt="../_static/img/profiler_rocm_tensorboard_operartor_view.png" src="../_static/img/profiler_rocm_tensorboard_operartor_view.png" /></a>
 <p>At the time this section is written, <strong>Trace</strong> view does not work and it displays nothing. You can work around by typing <code class="docutils literal notranslate"><span class="pre">chrome://tracing</span></code> in your Chrome Browser.</p>
 <ul class="simple">
 <li><p>Copy the <code class="docutils literal notranslate"><span class="pre">trace.json</span></code> file under <code class="docutils literal notranslate"><span class="pre">~/profiler_tutorial/log/resnet18</span></code> directory to the Windows.</p></li>
@@ -849,7 +960,7 @@ before installing PyTorch.</p>
 <ul class="simple">
 <li><p>Click <strong>Load</strong> button to load the trace JSON file from the <code class="docutils literal notranslate"><span class="pre">chrome://tracing</span></code> page in the browser.</p></li>
 </ul>
-<a class="reference internal image-reference" href="../_static/img/profiler_rocm_chrome_trace_view.png"><img alt="../_static/img/profiler_rocm_chrome_trace_view.png" src="../_static/img/profiler_rocm_chrome_trace_view.png"/></a>
+<a class="reference internal image-reference" href="../_static/img/profiler_rocm_chrome_trace_view.png"><img alt="../_static/img/profiler_rocm_chrome_trace_view.png" src="../_static/img/profiler_rocm_chrome_trace_view.png" /></a>
 <p>As mentioned previously, you can move the graph and zoom in and out.
 You can also use keyboard to zoom and move around inside the timeline.
 The <code class="docutils literal notranslate"><span class="pre">w</span></code> and <code class="docutils literal notranslate"><span class="pre">s</span></code> keys zoom in centered around the mouse,
@@ -878,36 +989,55 @@ and feel free to open an issue <a class="reference external" href="https://githu
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
 </div>
 </div>
-</article>
-</div>
-<footer>
-<div aria-label="footer navigation" class="rst-footer-buttons" role="navigation">
-<a accesskey="n" class="btn btn-neutral float-right" href="../beginner/hyperparameter_tuning_tutorial.html" rel="next" title="Ray Tune 超参数调优">Next <img class="next-page" src="../_static/images/chevron-right-orange.svg"/></a>
-<a accesskey="p" class="btn btn-neutral" href="../advanced/privateuseone.html" rel="prev" title="Facilitating New Backend Integration by PrivateUse1"><img class="previous-page" src="../_static/images/chevron-right-orange.svg"/> Previous</a>
-</div>
-<hr class="rating-hr hr-top"/>
-<div class="rating-container">
-<div class="rating-prompt">Rate this Tutorial</div>
-<div class="stars-outer">
-<i class="far fa-star" data-behavior="tutorial-rating" data-count="1" title="1 Star"></i>
-<i class="far fa-star" data-behavior="tutorial-rating" data-count="2" title="2 Stars"></i>
-<i class="far fa-star" data-behavior="tutorial-rating" data-count="3" title="3 Stars"></i>
-<i class="far fa-star" data-behavior="tutorial-rating" data-count="4" title="4 Stars"></i>
-<i class="far fa-star" data-behavior="tutorial-rating" data-count="5" title="5 Stars"></i>
-</div>
-</div>
-<hr class="rating-hr hr-bottom">
-<div role="contentinfo">
-<p>
-        © Copyright 2024, PyTorch.
+
+
+             </article>
+             
+            </div>
+            <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../beginner/hyperparameter_tuning_tutorial.html" class="btn btn-neutral float-right" title="Ray Tune 超参数调优" accesskey="n" rel="next">Next <img src="../_static/images/chevron-right-orange.svg" class="next-page"></a>
+      
+      
+        <a href="../advanced/privateuseone.html" class="btn btn-neutral" title="Facilitating New Backend Integration by PrivateUse1" accesskey="p" rel="prev"><img src="../_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
+      
+    </div>
+  
+
+  
+
+    <hr class="rating-hr hr-top">
+      <div class="rating-container">
+        <div class="rating-prompt">Rate this Tutorial</div>
+        <div class="stars-outer">
+          <i class="far fa-star" title="1 Star" data-behavior="tutorial-rating" data-count="1"></i>
+          <i class="far fa-star" title="2 Stars" data-behavior="tutorial-rating" data-count="2"></i>
+          <i class="far fa-star" title="3 Stars" data-behavior="tutorial-rating" data-count="3"></i>
+          <i class="far fa-star" title="4 Stars" data-behavior="tutorial-rating" data-count="4"></i>
+          <i class="far fa-star" title="5 Stars" data-behavior="tutorial-rating" data-count="5"></i>
+        </div>
+      </div>
+    <hr class="rating-hr hr-bottom"/>
+
+  
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2024, PyTorch.
 
     </p>
-</div>
-<div>
+  </div>
+    
+      <div>
         Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
       </div>
-</hr></footer>
-</div>
+     
+
+</footer>
+
+          </div>
 <script>
 if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.indexOf("/prototype/prototype_index")< 1))
   {
@@ -915,11 +1045,12 @@ if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.i
     document.getElementById("pytorch-article").insertAdjacentHTML('afterBegin', div)
   } 
 </script>
-</div>
-<div class="pytorch-content-right" id="pytorch-content-right">
-<div class="pytorch-right-menu" id="pytorch-right-menu">
-<div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
-<ul>
+        </div>
+
+        <div class="pytorch-content-right" id="pytorch-content-right">
+          <div class="pytorch-right-menu" id="pytorch-right-menu">
+            <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
+              <ul>
 <li><a class="reference internal" href="#">PyTorch Profiler With TensorBoard</a><ul>
 <li><a class="reference internal" href="#introduction">Introduction</a></li>
 <li><a class="reference internal" href="#setup">Setup</a></li>
@@ -937,32 +1068,46 @@ if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.i
 </ul>
 </li>
 </ul>
-</div>
-</div>
-</div>
-</section>
-</div>
-<script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js" type="text/javascript"></script>
-<script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-<script src="../_static/jquery.js"></script>
-<script src="../_static/underscore.js"></script>
-<script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
-<script src="../_static/doctools.js"></script>
-<script src="../_static/clipboard.min.js"></script>
-<script src="../_static/copybutton.js"></script>
-<script src="../_static/katex.min.js"></script>
-<script src="../_static/auto-render.min.js"></script>
-<script src="../_static/katex_autorenderer.js"></script>
-<script src="../_static/design-tabs.js"></script>
-<script src="../_static/js/vendor/popper.min.js" type="text/javascript"></script>
-<script src="../_static/js/vendor/bootstrap.min.js" type="text/javascript"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min.js"></script>
-<script src="../_static/js/theme.js" type="text/javascript"></script>
-<script type="text/javascript">
+
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+  
+
+
+  
+
+     
+       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+         <script src="../_static/jquery.js"></script>
+         <script src="../_static/underscore.js"></script>
+         <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+         <script src="../_static/doctools.js"></script>
+         <script src="../_static/clipboard.min.js"></script>
+         <script src="../_static/copybutton.js"></script>
+         <script src="../_static/katex.min.js"></script>
+         <script src="../_static/auto-render.min.js"></script>
+         <script src="../_static/katex_autorenderer.js"></script>
+         <script src="../_static/design-tabs.js"></script>
+     
+
+  
+
+  <script type="text/javascript" src="../_static/js/vendor/popper.min.js"></script>
+  <script type="text/javascript" src="../_static/js/vendor/bootstrap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min.js"></script>
+  <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
   </script>
+ 
 <script>
 
 // Helper function to make it easier to call dataLayer.push() 
@@ -1049,217 +1194,253 @@ if(window.location.href.indexOf("/beginner/basics/")!= -1)
 
 
 </script>
+
 <noscript>
-<img height="1" src="https://www.facebook.com/tr?id=243028289693773&amp;ev=PageView
-  &amp;noscript=1" width="1">
-</img></noscript>
+  <img height="1" width="1"
+  src="https://www.facebook.com/tr?id=243028289693773&ev=PageView
+  &noscript=1"/>
+</noscript>
+
 <script type="text/javascript">
   var collapsedSections = ['PyTorch Recipes', 'Learning PyTorch', 'Image and Video', 'Audio', 'Text', 'Backends', 'Reinforcement Learning', 'Deploying PyTorch Models in Production', 'Profiling PyTorch', 'Code Transforms with FX', 'Frontend APIs', 'Extending PyTorch', 'Model Optimization', 'Parallel and Distributed Training', 'Edge with ExecuTorch', 'Recommendation Systems', 'Multimodality'];
 </script>
-<img alt="" height="1" src="https://www.googleadservices.com/pagead/conversion/795629140/?label=txkmCPmdtosBENSssfsC&amp;guid=ON&amp;script=0" style="border-style:none;" width="1">
-<!-- Begin Footer -->
-<div class="container-fluid docs-tutorials-resources" id="docs-tutorials-resources">
-<div class="container">
-<div class="row">
-<div class="col-md-4 text-center">
-<h2>Docs</h2>
-<p>Access comprehensive developer documentation for PyTorch</p>
-<a class="with-right-arrow" href="https://pytorch.org/docs/stable/index.html">View Docs</a>
-</div>
-<div class="col-md-4 text-center">
-<h2>Tutorials</h2>
-<p>Get in-depth tutorials for beginners and advanced developers</p>
-<a class="with-right-arrow" href="https://pytorch.org/tutorials">View Tutorials</a>
-</div>
-<div class="col-md-4 text-center">
-<h2>Resources</h2>
-<p>Find development resources and get your questions answered</p>
-<a class="with-right-arrow" href="https://pytorch.org/resources">View Resources</a>
-</div>
-</div>
-</div>
-</div>
-<footer class="site-footer">
-<div class="container footer-container">
-<div class="footer-logo-wrapper">
-<a class="footer-logo" href="https://pytorch.org/"></a>
-</div>
-<div class="footer-links-wrapper">
-<div class="footer-links-col">
-<ul>
-<li class="list-title"><a href="https://pytorch.org/">PyTorch</a></li>
-<li><a href="https://pytorch.org/get-started">Get Started</a></li>
-<li><a href="https://pytorch.org/features">Features</a></li>
-<li><a href="https://pytorch.org/ecosystem">Ecosystem</a></li>
-<li><a href="https://pytorch.org/blog/">Blog</a></li>
-<li><a href="https://github.com/pytorch/pytorch/blob/master/CONTRIBUTING.md">Contributing</a></li>
-</ul>
-</div>
-<div class="footer-links-col">
-<ul>
-<li class="list-title"><a href="https://pytorch.org/resources">Resources</a></li>
-<li><a href="https://pytorch.org/tutorials">Tutorials</a></li>
-<li><a href="https://pytorch.org/docs/stable/index.html">Docs</a></li>
-<li><a href="https://discuss.pytorch.org" target="_blank">Discuss</a></li>
-<li><a href="https://github.com/pytorch/pytorch/issues" target="_blank">Github Issues</a></li>
-<li><a href="https://pytorch.org/assets/brand-guidelines/PyTorch-Brand-Guidelines.pdf" target="_blank">Brand Guidelines</a></li>
-</ul>
-</div>
-<div class="footer-links-col">
-<ul>
-<li class="list-title">Stay up to date</li>
-<li><a href="https://www.facebook.com/pytorch" target="_blank">Facebook</a></li>
-<li><a href="https://twitter.com/pytorch" target="_blank">Twitter</a></li>
-<li><a href="https://www.youtube.com/pytorch" target="_blank">YouTube</a></li>
-<li><a href="https://www.linkedin.com/company/pytorch" target="_blank">LinkedIn</a></li>
-</ul>
-</div>
-<div class="footer-links-col">
-<ul>
-<li class="list-title">PyTorch Podcasts</li>
-<li><a href="https://open.spotify.com/show/6UzHKeiy368jKfQMKKvJY5" target="_blank">Spotify</a></li>
-<li><a href="https://podcasts.apple.com/us/podcast/pytorch-developer-podcast/id1566080008" target="_blank">Apple</a></li>
-<li><a href="https://www.google.com/podcasts?feed=aHR0cHM6Ly9mZWVkcy5zaW1wbGVjYXN0LmNvbS9PQjVGa0lsOA%3D%3D" target="_blank">Google</a></li>
-<li><a href="https://music.amazon.com/podcasts/7a4e6f0e-26c2-49e9-a478-41bd244197d0/PyTorch-Developer-Podcast?" target="_blank">Amazon</a></li>
-</ul>
-</div>
-</div>
-<div class="privacy-policy">
-<ul>
-<li class="privacy-policy-links"><a href="https://www.linuxfoundation.org/terms/" target="_blank">Terms</a></li>
-<li class="privacy-policy-links">|</li>
-<li class="privacy-policy-links"><a href="https://www.linuxfoundation.org/privacy-policy/" target="_blank">Privacy</a></li>
-</ul>
-</div>
-<div class="copyright">
-<p>© Copyright The Linux Foundation. The PyTorch Foundation is a project of The Linux Foundation.
+
+<img height="1" width="1" style="border-style:none;" alt="" src="https://www.googleadservices.com/pagead/conversion/795629140/?label=txkmCPmdtosBENSssfsC&amp;guid=ON&amp;script=0"/>
+
+
+  <!-- Begin Footer -->
+
+  <div class="container-fluid docs-tutorials-resources" id="docs-tutorials-resources">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-4 text-center">
+          <h2>Docs</h2>
+          <p>Access comprehensive developer documentation for PyTorch</p>
+          <a class="with-right-arrow" href="https://pytorch.org/docs/stable/index.html">View Docs</a>
+        </div>
+
+        <div class="col-md-4 text-center">
+          <h2>Tutorials</h2>
+          <p>Get in-depth tutorials for beginners and advanced developers</p>
+          <a class="with-right-arrow" href="https://pytorch.org/tutorials">View Tutorials</a>
+        </div>
+
+        <div class="col-md-4 text-center">
+          <h2>Resources</h2>
+          <p>Find development resources and get your questions answered</p>
+          <a class="with-right-arrow" href="https://pytorch.org/resources">View Resources</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="container footer-container">
+      <div class="footer-logo-wrapper">
+        <a href="https://pytorch.org/" class="footer-logo"></a>
+      </div>
+
+      <div class="footer-links-wrapper">
+        <div class="footer-links-col">
+          <ul>
+            <li class="list-title"><a href="https://pytorch.org/">PyTorch</a></li>
+            <li><a href="https://pytorch.org/get-started">Get Started</a></li>
+            <li><a href="https://pytorch.org/features">Features</a></li>
+            <li><a href="https://pytorch.org/ecosystem">Ecosystem</a></li>
+            <li><a href="https://pytorch.org/blog/">Blog</a></li>
+            <li><a href="https://github.com/pytorch/pytorch/blob/master/CONTRIBUTING.md">Contributing</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-links-col">
+          <ul>
+            <li class="list-title"><a href="https://pytorch.org/resources">Resources</a></li>
+            <li><a href="https://pytorch.org/tutorials">Tutorials</a></li>
+            <li><a href="https://pytorch.org/docs/stable/index.html">Docs</a></li>
+            <li><a href="https://discuss.pytorch.org" target="_blank">Discuss</a></li>
+            <li><a href="https://github.com/pytorch/pytorch/issues" target="_blank">Github Issues</a></li>
+            <li><a href="https://pytorch.org/assets/brand-guidelines/PyTorch-Brand-Guidelines.pdf" target="_blank">Brand Guidelines</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-links-col">
+          <ul>
+            <li class="list-title">Stay up to date</li>
+            <li><a href="https://www.facebook.com/pytorch" target="_blank">Facebook</a></li>
+            <li><a href="https://twitter.com/pytorch" target="_blank">Twitter</a></li>
+            <li><a href="https://www.youtube.com/pytorch" target="_blank">YouTube</a></li>
+            <li><a href="https://www.linkedin.com/company/pytorch" target="_blank">LinkedIn</a></li>
+          </ul>  
+          </div>
+
+        <div class="footer-links-col">
+          <ul>
+            <li class="list-title">PyTorch Podcasts</li>
+            <li><a href="https://open.spotify.com/show/6UzHKeiy368jKfQMKKvJY5" target="_blank">Spotify</a></li>
+            <li><a href="https://podcasts.apple.com/us/podcast/pytorch-developer-podcast/id1566080008" target="_blank">Apple</a></li>
+            <li><a href="https://www.google.com/podcasts?feed=aHR0cHM6Ly9mZWVkcy5zaW1wbGVjYXN0LmNvbS9PQjVGa0lsOA%3D%3D" target="_blank">Google</a></li>
+            <li><a href="https://music.amazon.com/podcasts/7a4e6f0e-26c2-49e9-a478-41bd244197d0/PyTorch-Developer-Podcast?" target="_blank">Amazon</a></li>
+          </ul>
+         </div>
+        </div>
+        
+        <div class="privacy-policy">
+          <ul>
+            <li class="privacy-policy-links"><a href="https://www.linuxfoundation.org/terms/" target="_blank">Terms</a></li>
+            <li class="privacy-policy-links">|</li>
+            <li class="privacy-policy-links"><a href="https://www.linuxfoundation.org/privacy-policy/" target="_blank">Privacy</a></li>
+          </ul>
+        </div>
+        <div class="copyright">
+        <p>© Copyright The Linux Foundation. The PyTorch Foundation is a project of The Linux Foundation.
           For web site terms of use, trademark policy and other policies applicable to The PyTorch Foundation please see
           <a href="https://www.linuxfoundation.org/policies/">www.linuxfoundation.org/policies/</a>. The PyTorch Foundation supports the PyTorch open source
           project, which has been established as PyTorch Project a Series of LF Projects, LLC. For policies applicable to the PyTorch Project a Series of LF Projects, LLC,
           please see <a href="https://www.lfprojects.org/policies/">www.lfprojects.org/policies/</a>.</p>
+      </div>
+     </div>
+
+  </footer>
+
+  <div class="cookie-banner-wrapper">
+  <div class="container">
+    <p class="gdpr-notice">To analyze traffic and optimize your experience, we serve cookies on this site. By clicking or navigating, you agree to allow our usage of cookies. As the current maintainers of this site, Facebook’s Cookies Policy applies. Learn more, including about available controls: <a href="https://www.facebook.com/policies/cookies/">Cookies Policy</a>.</p>
+    <img class="close-button" src="../_static/images/pytorch-x.svg">
+  </div>
 </div>
-</div>
-</footer>
-<div class="cookie-banner-wrapper">
-<div class="container">
-<p class="gdpr-notice">To analyze traffic and optimize your experience, we serve cookies on this site. By clicking or navigating, you agree to allow our usage of cookies. As the current maintainers of this site, Facebook’s Cookies Policy applies. Learn more, including about available controls: <a href="https://www.facebook.com/policies/cookies/">Cookies Policy</a>.</p>
-<img class="close-button" src="../_static/images/pytorch-x.svg"/>
-</div>
-</div>
-<!-- End Footer -->
-<!-- Begin Mobile Menu -->
-<div class="mobile-main-menu">
-<div class="container-fluid">
-<div class="container">
-<div class="mobile-main-menu-header-container">
-<a aria-label="PyTorch" class="header-logo" href="https://pytorch.org/"></a>
-<a class="main-menu-close-button" data-behavior="close-mobile-menu" href="#"></a>
-</div>
-</div>
-</div>
-<div class="mobile-main-menu-links-container">
-<div class="main-menu">
-<ul>
-<li class="resources-mobile-menu-title">
-<a>Learn</a>
-</li>
-<ul class="resources-mobile-menu-items">
-<li>
-<a href="https://pytorch.org/get-started">Get Started</a>
-</li>
-<li>
-<a href="https://pytorch.org/tutorials">Tutorials</a>
-</li>
-<li>
-<a href="https://pytorch.org/tutorials/beginner/basics/intro.html">Learn the Basics</a>
-</li>
-<li>
-<a href="https://pytorch.org/tutorials/recipes/recipes_index.html">PyTorch Recipes</a>
-</li>
-<li>
-<a href="https://pytorch.org/tutorials/beginner/introyt.html">Introduction to PyTorch - YouTube Series</a>
-</li>
-</ul>
-<li class="resources-mobile-menu-title">
-<a>Ecosystem</a>
-</li>
-<ul class="resources-mobile-menu-items">
-<li>
-<a href="https://pytorch.org/ecosystem">Tools</a>
-</li>
-<li>
-<a href="https://pytorch.org/#community-module">Community</a>
-</li>
-<li>
-<a href="https://discuss.pytorch.org/">Forums</a>
-</li>
-<li>
-<a href="https://pytorch.org/resources">Developer Resources</a>
-</li>
-<li>
-<a href="https://pytorch.org/ecosystem/contributor-awards-2023">Contributor Awards - 2023</a>
-</li>
-</ul>
-<li class="resources-mobile-menu-title">
-<a>Edge</a>
-</li>
-<ul class="resources-mobile-menu-items">
-<li>
-<a href="https://pytorch.org/edge">About PyTorch Edge</a>
-</li>
-<li>
-<a href="https://pytorch.org/executorch-overview">ExecuTorch</a>
-</li>
-</ul>
-<li class="resources-mobile-menu-title">
-<a>Docs</a>
-</li>
-<ul class="resources-mobile-menu-items">
-<li>
-<a href="https://pytorch.org/docs/stable/index.html">PyTorch</a>
-</li>
-<li>
-<a href="https://pytorch.org/pytorch-domains">PyTorch Domains</a>
-</li>
-</ul>
-<li class="resources-mobile-menu-title">
-<a>Blog &amp; News</a>
-</li>
-<ul class="resources-mobile-menu-items">
-<li>
-<a href="https://pytorch.org/blog/">PyTorch Blog</a>
-</li>
-<li>
-<a href="https://pytorch.org/community-blog">Community Blog</a>
-</li>
-<li>
-<a href="https://pytorch.org/videos">Videos</a>
-</li>
-<li>
-<a href="https://pytorch.org/community-stories">Community Stories</a>
-</li>
-<li>
-<a href="https://pytorch.org/events">Events</a>
-</li>
-</ul>
-<li class="resources-mobile-menu-title">
-<a>About</a>
-</li>
-<ul class="resources-mobile-menu-items">
-<li>
-<a href="https://pytorch.org/foundation">PyTorch Foundation</a>
-</li>
-<li>
-<a href="https://pytorch.org/governing-board">Governing Board</a>
-</li>
-</ul>
-</ul>
-</div>
-</div>
-</div>
-<!-- End Mobile Menu -->
-<script src="../_static/js/vendor/anchor.min.js" type="text/javascript"></script>
-<script type="text/javascript">
+
+  <!-- End Footer -->
+
+  <!-- Begin Mobile Menu -->
+
+  <div class="mobile-main-menu">
+    <div class="container-fluid">
+      <div class="container">
+        <div class="mobile-main-menu-header-container">
+          <a class="header-logo" href="https://pytorch.org/" aria-label="PyTorch"></a>
+          <a class="main-menu-close-button" href="#" data-behavior="close-mobile-menu"></a>
+        </div>
+      </div>
+    </div>
+
+    <div class="mobile-main-menu-links-container">
+      <div class="main-menu">
+        <ul>
+           <li class="resources-mobile-menu-title">
+             <a>Learn</a>
+           </li>
+           <ul class="resources-mobile-menu-items">
+             <li>
+               <a href="https://pytorch.org/get-started">Get Started</a>
+             </li>
+             <li>
+               <a href="https://pytorch.org/tutorials">Tutorials</a>
+             </li>
+             <li>
+               <a href="https://pytorch.org/tutorials/beginner/basics/intro.html">Learn the Basics</a>
+             </li>
+             <li>
+               <a href="https://pytorch.org/tutorials/recipes/recipes_index.html">PyTorch Recipes</a>
+             </li>
+             <li>
+               <a href="https://pytorch.org/tutorials/beginner/introyt.html">Introduction to PyTorch - YouTube Series</a>
+             </li>
+           </ul>
+           <li class="resources-mobile-menu-title">
+             <a>Ecosystem</a>
+           </li>
+           <ul class="resources-mobile-menu-items">
+             <li>
+               <a href="https://pytorch.org/ecosystem">Tools</a>
+             </li>
+             <li>
+               <a href="https://pytorch.org/#community-module">Community</a>
+             </li>
+             <li>
+               <a href="https://discuss.pytorch.org/">Forums</a>
+             </li>
+             <li>
+               <a href="https://pytorch.org/resources">Developer Resources</a>
+             </li>
+             <li>
+               <a href="https://pytorch.org/ecosystem/contributor-awards-2023">Contributor Awards - 2023</a>
+             </li>
+           </ul>
+
+           <li class="resources-mobile-menu-title">
+             <a>Edge</a>
+           </li>
+
+           <ul class="resources-mobile-menu-items">
+             <li>
+               <a href="https://pytorch.org/edge">About PyTorch Edge</a>
+             </li>
+             
+             <li>
+               <a href="https://pytorch.org/executorch-overview">ExecuTorch</a>
+             </li>
+           </ul>
+
+           <li class="resources-mobile-menu-title">
+             <a>Docs</a>
+           </li>
+
+           <ul class="resources-mobile-menu-items">
+            <li>
+              <a href="https://pytorch.org/docs/stable/index.html">PyTorch</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/pytorch-domains">PyTorch Domains</a>
+            </li>
+          </ul>
+
+          <li class="resources-mobile-menu-title">
+            <a>Blog & News</a>
+          </li>
+            
+           <ul class="resources-mobile-menu-items">
+            <li>
+              <a href="https://pytorch.org/blog/">PyTorch Blog</a>
+            </li>
+            <li>
+              <a href="https://pytorch.org/community-blog">Community Blog</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/videos">Videos</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/community-stories">Community Stories</a>
+            </li>
+            <li>
+              <a href="https://pytorch.org/events">Events</a>
+            </li>
+          </ul>
+          
+          <li class="resources-mobile-menu-title">
+            <a>About</a>
+          </li>
+
+          <ul class="resources-mobile-menu-items">
+            <li>
+              <a href="https://pytorch.org/foundation">PyTorch Foundation</a>
+            </li>
+            <li>
+              <a href="https://pytorch.org/governing-board">Governing Board</a>
+            </li>
+          </ul>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- End Mobile Menu -->
+
+  <script type="text/javascript" src="../_static/js/vendor/anchor.min.js"></script>
+
+  <script type="text/javascript">
     $(document).ready(function() {
       mobileMenu.bind();
       mobileTOC.bind();
@@ -1276,5 +1457,5 @@ if(window.location.href.indexOf("/beginner/basics/")!= -1)
       });
     })
   </script>
-</img></body>
+</body>
 </html>

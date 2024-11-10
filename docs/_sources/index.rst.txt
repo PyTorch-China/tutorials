@@ -4,6 +4,7 @@
 **PyTorch 新增教程**
 
 * `使用自定义的 Triton 内核与 torch.compile <https://pytorch.org/tutorials/recipes/torch_compile_user_defined_triton_kernel_tutorial.html>`__
+* `通过区域编译减少 torch.compile 冷启动编译时间 <https://pytorch-cn.org/tutorials/recipes/regional_compilation.html>`__
 * `使用 Tensor Parallel (TP) 进行大规模 Transformer 模型训练 <https://pytorch.org/tutorials/intermediate/TP_tutorial.html>`__
 * `利用半结构化(2:4)稀疏性加速 BERT <https://pytorch.org/tutorials/advanced/semi_structured_sparse.html>`__
 * `torch.export 教程 <https://pytorch.org/tutorials/intermediate/torch_export_tutorial.html>`__
