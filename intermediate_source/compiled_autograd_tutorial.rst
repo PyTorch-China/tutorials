@@ -4,21 +4,18 @@ Compiled Autograd: 为 ``torch.compile`` 捕获更大的后向图
 
 .. grid:: 2
 
-    .. grid-item-card:: :octicon:`mortar-board;1em;` What you will learn
+    .. grid-item-card:: :octicon:`mortar-board;1em;` 你将学到什么
        :class-card: card-prerequisites
 
-       * How compiled autograd interacts with ``torch.compile``
-       * How to use the compiled autograd API
-       * How to inspect logs using ``TORCH_LOGS``
        * 编译自动微分如何与 ``torch.compile`` 交互
        * 如何使用编译自动微分API
        * 如何使用 ``TORCH_LOGS`` 检查日志
 
-    .. grid-item-card:: :octicon:`list-unordered;1em;` Prerequisites
+    .. grid-item-card:: :octicon:`list-unordered;1em;` 预备知识
        :class-card: card-prerequisites
 
        * PyTorch 2.4
-       * 完成 `torch.compile介绍` <https://pytorch.org/tutorials/intermediate/torch_compile_tutorial.html>`_
+       * 完成 `torch.compile介绍 <https://pytorch.org/tutorials/intermediate/torch_compile_tutorial.html>`_
        * 阅读 `开始使用PyTorch 2.x <https://pytorch.org/get-started/pytorch-2.0/>`_ 中的TorchDynamo和AOTAutograd部分
 
 概览
