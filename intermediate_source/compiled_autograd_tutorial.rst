@@ -1,44 +1,48 @@
-编译的 Autograd：捕获更大的反向图用于 ``torch.compile``
+Compiled Autograd: 为 ``torch.compile`` 捕获更大的后向图
 ==========================================================================
 **作者:** `Simon Fan <https://github.com/xmfan>`_
 
 .. grid:: 2
 
-    .. grid-item-card:: :octicon:`mortar-board;1em;` 你将学到什么
+    .. grid-item-card:: :octicon:`mortar-board;1em;` What you will learn
        :class-card: card-prerequisites
 
-       * 编译的 autograd 如何与 ``torch.compile`` 交互
-       * 如何使用编译的 autograd API
+       * How compiled autograd interacts with ``torch.compile``
+       * How to use the compiled autograd API
+       * How to inspect logs using ``TORCH_LOGS``
+       * 编译自动微分如何与 ``torch.compile`` 交互
+       * 如何使用编译自动微分API
        * 如何使用 ``TORCH_LOGS`` 检查日志
 
-    .. grid-item-card:: :octicon:`list-unordered;1em;` 前提条件
+    .. grid-item-card:: :octicon:`list-unordered;1em;` Prerequisites
        :class-card: card-prerequisites
 
        * PyTorch 2.4
-       * 完成 `Introduction to torch.compile <https://pytorch.org/tutorials/intermediate/torch_compile_tutorial.html>`_
-       * 阅读 `Get Started with PyTorch 2.x <https://pytorch.org/get-started/pytorch-2.0/>`_ 中的 TorchDynamo 和 AOTAutograd 部分
+       * 完成 `torch.compile介绍` <https://pytorch.org/tutorials/intermediate/torch_compile_tutorial.html>`_
+       * 阅读 `开始使用PyTorch 2.x <https://pytorch.org/get-started/pytorch-2.0/>`_ 中的TorchDynamo和AOTAutograd部分
 
-概述
+概览
 --------
-编译的 Autograd 是 PyTorch 2.4 中引入的 ``torch.compile`` 扩展，允许捕获更大的反向图。
+编译自动微分是 PyTorch 2.4 中引入的 ``torch.compile`` 扩展，它允许捕获更大的后向图。
 
-虽然 ``torch.compile`` 确实捕获了反向图，但它是 **部分** 捕获的。AOTAutograd 组件提前捕获反向图，但有一定的限制：
+虽然 ``torch.compile`` 确实会捕获后向图，但它是 **部分** 捕获的。AOTAutograd 组件提前捕获后向图，但存在一些限制：
 
-* 前向图中的图中断会导致反向图中的图中断
-* `反向钩子 <https://pytorch.org/docs/stable/notes/autograd.html#backward-hooks-execution>`_ 未被捕获
+* 前向中的图断裂导致后向中的图断裂
+* `后向钩子 <https://pytorch.org/docs/stable/notes/autograd.html#backward-hooks-execution>`_ 没有被捕获
 
-编译的 Autograd 通过直接与 autograd 引擎集成，解决了这些限制，允许它在运行时捕获完整的反向图。具有这些特征的模型应尝试编译的 Autograd，并可能观察到更好的性能。
+编译自动微分通过直接与自动微分引擎集成，允许在运行时捕获完整的后向图。具有以下两个特征的模型应该尝试使用编译自动微分，并可能观察到更好的性能。
 
-然而，编译的 Autograd 也引入了自身的限制：
+然而，编译自动微分也有对应的限制：
 
-* 在反向开始时增加了缓存查找的运行时开销
-* 由于更大的捕获，更容易在 dynamo 中重新编译和图中断
+* 在后向开始时增加了运行时开销，用于缓存查找
+* 在动态中更容易重新编译和图断裂，因为捕获的范围更大
 
-.. note:: 编译的 Autograd 正在积极开发中，尚不兼容所有现有的 PyTorch 功能。有关特定功能的最新状态，请参阅 `Compiled Autograd Landing Page <https://docs.google.com/document/d/11VucFBEewzqgkABIjebZIzMvrXr3BtcY1aGKpX61pJY>`_。
+.. 注意:: 编译自动微分正在积极开发中，尚未与所有现有的PyTorch功能兼容。有关特定功能的最新消息，请参阅 `编译自动微分登录页面 <https://docs.google.com/document/d/11VucFBEewzqgkABIjebZIzMvrXr3BtcY1aGKpX61pJY>`_。
 
 设置
 -----
-在本教程中，我们将基于这个简单的神经网络模型进行示例。它接受一个 10 维的输入向量，通过一个线性层处理，并输出另一个 10 维的向量。
+在本教程中，我们将基于这个简单的神经网络模型进行示例。
+它接受一个10维输入向量，通过单个线性层处理它，并输出另一个10维向量。
 
 .. code:: python
 
@@ -54,7 +58,7 @@
 
 基本用法
 ------------
-在调用 ``torch.compile`` API 之前，请确保将 ``torch._dynamo.config.compiled_autograd`` 设置为 ``True``：
+在调用 ``torch.compile`` API之前，请确保将 ``torch._dynamo.config.compiled_autograd`` 设置为 ``True``：
 
 .. code:: python
 
@@ -67,41 +71,42 @@
       loss = model(x).sum()
       loss.backward()
 
-   train(model, x)
+   train(model, x) 
 
-在上面的代码中，我们创建了一个 ``Model`` 类的实例，并使用 ``torch.randn(10)`` 生成一个随机的 10 维张量 ``x``。
-我们定义了训练循环函数 ``train`` 并用 @torch.compile 装饰它以优化其执行。
+在上述代码中，我们创建了 ``Model`` 类的实例，并使用 ``torch.randn(10)`` 生成了一个随机的10维张量 ``x``。
+我们定义了训练循环函数 ``train``，并用 @torch.compile 装饰它以优化其执行。
 当调用 ``train(model, x)`` 时：
 
-* 由于此调用被 ``@torch.compile`` 装饰，Python 解释器调用 Dynamo。
-* Dynamo 拦截 Python 字节码，模拟其执行并将操作记录到图中。
-* ``AOTDispatcher`` 禁用钩子并调用 autograd 引擎来计算 ``model.linear.weight`` 和 ``model.linear.bias`` 的梯度，并将操作记录到图中。使用 ``torch.autograd.Function``，AOTDispatcher 重写了 ``train`` 的前向和反向实现。
-* Inductor 生成一个函数，对应于 AOTDispatcher 前向和反向的优化实现。
-* Dynamo 设置优化函数，以便由 Python 解释器接下来评估。
-* Python 解释器执行优化函数，该函数执行 ``loss = model(x).sum()``。
-* Python 解释器执行 ``loss.backward()``，调用 autograd 引擎，由于我们设置了 ``torch._dynamo.config.compiled_autograd = True``，它会路由到编译的 Autograd 引擎。
-* 编译的 Autograd 计算 ``model.linear.weight`` 和 ``model.linear.bias`` 的梯度，并将操作记录到图中，包括它遇到的任何钩子。在此过程中，它将记录 AOTDispatcher 先前重写的反向。然后，编译的 Autograd 生成一个新函数，该函数对应于 ``loss.backward()`` 的完全跟踪实现，并在推理模式下使用 ``torch.compile`` 执行它。
-* 相同的步骤递归应用于编译的 Autograd 图，但这次 AOTDispatcher 不需要对图进行分区。
+* Python解释器调用Dynamo，因为此调用被装饰有 ``@torch.compile``。
+* Dynamo拦截Python字节码，模拟它们的执行并将操作记录到图中。
+* ``AOTDispatcher`` 禁用钩子并调用自动微分引擎为 ``model.linear.weight`` 和 ``model.linear.bias`` 计算梯度，并将操作记录到图中。使用 ``torch.autograd.Function``，AOTDispatcher重写 ``train`` 的前向和后向实现。
+* Inductor生成一个对应于AOTDispatcher前向和后向的优化实现的函数。
+* Dynamo将优化后的函数设置为Python解释器下一次执行。
+* Python解释器执行优化后的函数，执行 ``loss = model(x).sum()``.
+* Python解释器执行 ``loss.backward()`` ,调用自动微分引擎，因为我们设置了 ``torch._dynamo.config.compiled_autograd = True``，所以路由到编译自动微分引擎。
+* 编译自动微分计算 ``model.linear.weight`` 和 ``model.linear.bias`` 的梯度，并将操作记录到图中，包括它遇到的任何钩子。在此过程中，它将记录AOTDispatcher之前重写的后向。然后编译自动微分生成一个新的函数，对应于 ``loss.backward()`` 的完全跟踪实现，并在 ``torch.compile`` 的推理模式下执行它。
+* 相同的步骤递归地适用于编译自动微分图，但这一次AOTDispatcher将不需要划分图。
 
-检查编译的 autograd 日志
+检查编译自动微分日志
 -------------------------------------
 使用 ``TORCH_LOGS`` 环境变量运行脚本：
 
-* 仅打印编译的 autograd 图，使用 ``TORCH_LOGS="compiled_autograd" python example.py``
-* 打印包含更多张量元数据和重新编译原因的图，以性能为代价，使用 ``TORCH_LOGS="compiled_autograd_verbose" python example.py``
+* 仅打印编译自动微分图，使用 ``TORCH_LOGS="compiled_autograd" python example.py``
+* 以性能为代价打印带有更多张量元数据和重新编译原因的图，使用 ``TORCH_LOGS="compiled_autograd_verbose" python example.py``
 
-重新运行上面的代码片段，编译的 autograd 图现在应该记录到 ``stderr``。某些图节点的名称将以 ``aot0_`` 为前缀，
-这些对应于先前在 AOTAutograd 反向图 0 中提前编译的节点，例如，``aot0_view_2`` 对应于 id=0 的 AOT 反向图中的 ``view_2``。
+重新运行上述代码片段，编译自动微分图现在应该被记录到 ``stderr``。某些图节点的名称将有 ``aot0_`` 的前缀，
+这些对应于AOTAutograd后向图0中预先编译的节点，例如， ``aot0_view_2`` 对应于ID为0的AOT后向图中的view_2。
 
-在下图中，红色框封装了由 ``torch.compile`` 捕获的 AOT 反向图，而没有编译的 Autograd。
+下图中，红色框包含了 ``torch.compile`` 在没有编译自动微分的情况下捕获的AOT后向图。
+
 
 .. image:: ../_static/img/compiled_autograd/entire_verbose_log.png
 
-.. note:: This is the graph on which we will call ``torch.compile``, **NOT** the optimized graph. Compiled Autograd essentially generates some unoptimized Python code to represent the entire C++ autograd execution.
+.. 注意:: 这是我们将调用 ``torch.compile`` 的图，不是优化后的图。编译自动微分本质上生成一些未优化的Python代码来表示整个C++自动微分执行。
 
-编译前向和后向传递使用不同的标志
+使用不同的标志编译前向和后向传递
 -------------------------------------------------------------
-您可以为两次编译使用不同的编译器配置，例如，即使前向传递中有图断裂，后向传递也可以是完整图。
+你可以为两次编译使用不同的编译器配置，例如，即使前向存在图断裂，后向可能是全图。
 
 .. code:: python
 
@@ -111,7 +116,7 @@
        torch._dynamo.config.compiled_autograd = True
        torch.compile(lambda: loss.backward(), fullgraph=True)()
 
-或者您可以使用上下文管理器，它将应用于其范围内的所有自动梯度调用。
+或者你可以使用上下文管理器，它将适用于其作用域内的所有自动微分调用。
 
 .. code:: python
 
@@ -122,7 +127,7 @@
          loss.backward()
 
 
-编译的自动梯度解决了AOTAutograd的某些限制
+编译自动微分解决了AOTAutograd的某些限制
 --------------------------------------------------------------
 1. 前向传递中的图断裂不再必然导致后向传递中的图断裂：
 
@@ -155,11 +160,14 @@
    # single graph for the backward
    assert(torch._dynamo.utils.counters["stats"]["unique_graphs"] == 1)
 
-在第一个 torch.compile 情况下，由于编译函数 fn 中的2次图断裂，生成了3个后向图。 而在第二个使用编译的自动梯度的 torch.compile 情况下，尽管有图断裂，仍然跟踪了完整的后向图。
 
-.. note:: 在跟踪由编译的自动梯度捕获的后向钩子时，Dynamo仍然可能会图断裂。
+在第一个 ``torch.compile`` 案例中，我们可以看到由于编译函数 ``fn`` 中的两个图断裂，产生了3个后向图。
+而在第二个带有编译自动微分的 ``torch.compile`` 案例中，尽管存在图断裂，我们看到了整个后向图被跟踪。
 
-2. 现在可以捕获后向hooks
+.. 注意:: Dynamo在跟踪编译自动微分捕获的后向钩子时，仍然可能发生图断裂。
+
+
+2. 现在可以捕获后向钩子
 
 .. code:: python
 
@@ -174,14 +182,13 @@
    with torch._dynamo.compiled_autograd.enable(torch.compile(backend="aot_eager")):
       loss.backward()
 
-图中应该有一个 ``call_hook`` 节点，dynamo 稍后会将其内联到以下内容中：
-
+图中应该有一个 ``call_hook`` 节点，dynamo稍后将其内联到以下内容：
 
 .. image:: ../_static/img/compiled_autograd/call_hook_node.png
 
-编译自动梯度的常见重新编译原因
+编译自动微分的常见重新编译原因
 --------------------------------------------------
-1. 由于损失值的自动梯度结构发生变化：
+1. 由于损失值的自动微分结构发生变化：
 
 .. code:: python
 
@@ -191,11 +198,11 @@
       loss = op(x, x).sum()
       torch.compile(lambda: loss.backward(), backend="eager")()
 
-在上面的例子中，我们在每次迭代中调用不同的操作符，导致 ``loss`` 每次跟踪不同的自动梯度历史。您应该会看到一些重新编译消息： **由于新的自动梯度节点导致缓存未命中**。
+在上面的例子中，我们在每次迭代中调用不同的操作符，导致 ``loss`` 每次都跟踪不同的自动微分历史。你应该看到一些重新编译消息： **由于新的自动微分节点导致的缓存未命中**。
 
 .. image:: ../_static/img/compiled_autograd/recompile_due_to_node.png
 
-2. 由于张量形状发生变化：
+2. 由于张量形状变化:
 
 .. code:: python
 
@@ -205,11 +212,10 @@
       loss = x.sum()
       torch.compile(lambda: loss.backward(), backend="eager")()
 
-在上面的例子中， ``x`` 的形状发生变化，编译的自动梯度将在第一次变化后将 ``x`` 标记为动态形状张量。您应该会看到重新编译消息： **由于形状变化导致缓存未命中**。
-
+在上面的例子中， ``x`` 改变了形状，编译自动微分在第一次变化后将x标记为动态形状张量。你应该看到重新编译消息： **由于形状变化导致的缓存未命中**。
 
 .. image:: ../_static/img/compiled_autograd/recompile_due_to_dynamic.png
 
 结论
 ----------
-在本教程中，我们介绍了 ``torch.compile`` 与编译的自动梯度的高级生态系统，编译的自动梯度的基础知识以及一些常见的重新编译原因。请关注 `dev-discuss <https://dev-discuss.pytorch.org/>_` 进行深入讨论。
+在本教程中，我们介绍了 ``torch.compile`` 与编译自动微分的高级生态系统，编译自动微分的基础知识以及一些常见的重新编译原因。请继续关注 `dev-discuss <https://dev-discuss.pytorch.org/>`_ 上的深入探讨。
