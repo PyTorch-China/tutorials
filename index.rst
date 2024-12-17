@@ -3,7 +3,7 @@
 
 **PyTorch 新增教程**
 
-* `使用自定义的 Triton 内核与 torch.compile <https://pytorch-cn.com/tutorials/recipes/torch_compile_user_defined_triton_kernel_tutorial.html>`__
+* `Compiled Autograd: 为 torch.compile 捕获更大的后向图 <https://pytorch-cn.com/tutorials/intermediate/compiled_autograd_tutorial.html>`__
 * `通过区域编译减少 torch.compile 冷启动编译时间 <https://pytorch-cn.com/tutorials/recipes/regional_compilation.html>`__
 * `使用 Tensor Parallel (TP) 进行大规模 Transformer 模型训练 <https://pytorch-cn.com/tutorials/intermediate/TP_tutorial.html>`__
 * `利用半结构化(2:4)稀疏性加速 BERT <https://pytorch-cn.com/tutorials/advanced/semi_structured_sparse.html>`__
