@@ -5,10 +5,7 @@
 
 * `Compiled Autograd: 为 torch.compile 捕获更大的后向图 <https://pytorch-cn.com/tutorials/intermediate/compiled_autograd_tutorial.html>`__
 * `通过区域编译减少 torch.compile 冷启动编译时间 <https://pytorch-cn.com/tutorials/recipes/regional_compilation.html>`__
-* `使用 Tensor Parallel (TP) 进行大规模 Transformer 模型训练 <https://pytorch-cn.com/tutorials/intermediate/TP_tutorial.html>`__
-* `利用半结构化(2:4)稀疏性加速 BERT <https://pytorch-cn.com/tutorials/advanced/semi_structured_sparse.html>`__
-* `torch.export 教程 <https://pytorch-cn.com/tutorials/intermediate/torch_export_tutorial.html>`__
-* `nn.Module 中 load_state_dict 和张量子类的扩展点 <https://pytorch-cn.com/tutorials/recipes/recipes/swap_tensors.html>`__
+* `如何在 Windows CPU 上使用 TorchInductor <https://pytorch-cn.org/tutorials/prototype/inductor_windows_cpu.html>`__
 
 .. raw:: html
 
