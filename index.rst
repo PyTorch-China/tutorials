@@ -5,7 +5,7 @@
 
 * `Compiled Autograd: 为 torch.compile 捕获更大的后向图 <https://pytorch-cn.com/tutorials/intermediate/compiled_autograd_tutorial.html>`__
 * `通过区域编译减少 torch.compile 冷启动编译时间 <https://pytorch-cn.com/tutorials/recipes/regional_compilation.html>`__
-* `如何在 Windows CPU 上使用 TorchInductor <https://pytorch-cn.org/tutorials/prototype/inductor_windows_cpu.html>`__
+* `如何在 Windows CPU 上使用 TorchInductor <https://pytorch-cn.com/tutorials/prototype/inductor_windows_cpu.html>`__
 
 .. raw:: html
 
